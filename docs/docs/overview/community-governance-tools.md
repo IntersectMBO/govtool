@@ -8,7 +8,7 @@ The DRep Campaign Platform is a community built platform for facilitating connec
 
 * Mainnet instance: [https://www.1694.io/en/dreps](https://www.1694.io/en/dreps)
 * Preview instance: [https://preview.1694.io/en/dreps](https://preview.1694.io/en/dreps)
-* SanchoNet instance: [https://sancho.1694.io/en/dreps](https://preview.1694.io/en/dreps)
+* SanchoNet instance: [https://sancho.1694.io/en/dreps](https://sancho.1694.io/en/dreps)
 * Github: [https://github.com/IntersectMBO/drep-campaign-platform](https://github.com/IntersectMBO/drep-campaign-platform)
 
 ***

@@ -17,7 +17,9 @@ In the Budget Proposal section, you can:
 * Review and comment on existing proposals
 * Submit, edit, or delete your own proposals
 * If you are a DRep you can provide your sentiment about that proposal via a simple poll
-* If you are a member of the Intersect Committees you can provide recognisable feedback
+* Indicate, as a proposer, which Intersect Committee your proposal aligns with
+
+Once a proposal has been included in the Intersect Budget Info Action, it can no longer be edited, and the DRep poll is closed.
 
 ### Quick video guide
 

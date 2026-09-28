@@ -4,6 +4,10 @@ description: This is a short and concise version of a longer more detailed versi
 
 # Updated Govtool Budget Proposal - short version
 
+:::info Historical (2025)
+This page documents GovTool's 2025 funding and maintenance discussion and is kept for reference. Timelines and statements on this page reflect that period, not the current state of GovTool.
+:::
+
 :::danger
 **FULL DETAILED PROPOSAL**
 
@@ -110,4 +114,4 @@ Any unused funds will be returned to the Cardano Treasury, and the project will 
 * A new tiered budget was introduced bringing a more balanced approach, where in particular the foundational tier brings savings by embracing fully the common open source project support
 
 \
-\
+

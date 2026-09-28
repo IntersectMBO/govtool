@@ -1,11 +1,15 @@
 # Treasury Withdrawal
 
-### Treasury withdrawals are sub-categorised into small, medium, or large and are determined by the amount of Lovelace to be withdrawn.
+### A withdrawal of a positive amount of Lovelace from the treasury to one or more reward addresses.
 
 This action will have:
 
-* A withdrawal address
-* A positive number of Lovelace
+* One or more receiving (reward) addresses
+* A positive number of Lovelace for each address
+
+:::note
+The thresholds on this page are the example values from CIP-1694. The thresholds that actually apply are protocol parameters that can be changed by governance; GovTool reads them from the current epoch parameters and shows the applicable threshold on each Governance Action's detail page.
+:::
 
 To pass, this Action requires:
 

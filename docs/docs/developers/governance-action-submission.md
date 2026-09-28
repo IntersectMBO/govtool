@@ -4,45 +4,98 @@
 
 - Follow the steps of setting up the [GovTool Frontend](https://github.com/IntersectMBO/govtool/blob/develop/govtool/frontend/README.md).
 - Provide any backend that provides the Epoch params (for the wallet connection), can be the current [GovTool Backend](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-backend/README.md).
-- Have a wallet with the 50k of ADA to pay for the transaction and fee.
+- Have a wallet with enough ADA to cover the Governance Action deposit (protocol parameter `govActionDeposit`, currently 100,000 ADA on mainnet) plus transaction fees.
 
 ## Development guide
 
 ### Prerequisites
 
-For creating the Governance Action, you need to consume 2 utility methods provided by `GovernanceActionProvided` (documented later within this document), and 3 exported from `CardanoProvider` wallet actions (2 for the 2 types of supported by GovTool Governance Actions and 1 for Signing and Submitting the transaction)
+For creating the Governance Action, you need to consume 2 utility methods provided by `GovernanceActionProvider` through the `useGovernanceActions()` hook (documented later within this document), and the wallet actions exposed by `useCardano()` from `CardanoProvider`: one builder per Governance Action type (Info, Treasury, Protocol Parameter Change, Hard Fork, New Constitution, Update Committee, No Confidence) plus `buildSignSubmitConwayCertTx` for signing and submitting the transaction.
 
 ### Types
+
+The types below are taken from [`govtool/frontend/src/context/wallet.tsx`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/frontend/src/context/wallet.tsx) and [`govtool/frontend/src/context/governanceAction.tsx`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/frontend/src/context/governanceAction.tsx). Check those files for the latest definitions.
 
 ```typescript
 import {
   VotingProposalBuilder,
   Costmdls,
-  DrepVotingThresholds,
+  DRepVotingThresholds,
   ExUnitPrices,
   UnitInterval,
   ExUnits,
   PoolVotingThresholds,
-} from "@emurgo/cardano-serialization-lib-nodejs";
+} from "@emurgo/cardano-serialization-lib-asmjs";
+import { NodeObject } from "jsonld";
 
-interface GovernanceAction {
+// GovernanceActionProvider (useGovernanceActions)
+type GovActionMetadata = {
   title: string;
   abstract: string;
   motivation: string;
   rationale: string;
-  references: [{ label: string; uri: string }];
-}
+  references: { uri: string; label: string }[];
+};
 
+type GovernanceActionContextType = {
+  createGovernanceActionJsonLD: (
+    govActionMetadata: GovActionMetadata,
+  ) => Promise<NodeObject | undefined>;
+  createHash: (jsonLD: NodeObject) => Promise<string | undefined>;
+};
+
+// CardanoProvider (useCardano)
 type VotingAnchor = {
   url: string;
   hash: string;
-}
+};
 
 type InfoProps = VotingAnchor;
 
-type TreasuryProps {
+type NoConfidenceProps = VotingAnchor;
+
+type TreasuryProps = {
   withdrawals: { receivingAddress: string; amount: string }[];
 } & VotingAnchor;
+
+type ProtocolParameterChangeProps = {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: string;
+  protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
+} & VotingAnchor;
+
+type HardForkInitiationProps = {
+  prevGovernanceActionHash: string;
+  prevGovernanceActionIndex: string;
+  major: string;
+  minor: string;
+} & VotingAnchor;
+
+type NewConstitutionProps = {
+  prevGovernanceActionHash?: string;
+  prevGovernanceActionIndex?: string;
+  constitutionUrl: string;
+  constitutionHash: string;
+  scriptHash?: string;
+} & VotingAnchor;
+
+type UpdateCommitteeProps = {
+  prevGovernanceActionHash?: string;
+  prevGovernanceActionIndex?: string;
+  quorumThreshold: QuorumThreshold;
+  newCommittee?: CommitteeToAdd[];
+  removeCommittee?: string[];
+} & VotingAnchor;
+
+type CommitteeToAdd = {
+  expiryEpoch: string;
+  committee: string;
+};
+
+type QuorumThreshold = {
+  numerator: string;
+  denominator: string;
+};
 
 type ProtocolParamsUpdate = {
   adaPerUtxo: string;
@@ -51,7 +104,7 @@ type ProtocolParamsUpdate = {
   costModels: Costmdls;
   drepDeposit: string;
   drepInactivityPeriod: number;
-  drepVotingThresholds: DrepVotingThresholds;
+  drepVotingThresholds: DRepVotingThresholds;
   executionCosts: ExUnitPrices;
   expansionRate: UnitInterval;
   governanceActionDeposit: string;
@@ -77,79 +130,39 @@ type ProtocolParamsUpdate = {
   treasuryGrowthRate: UnitInterval;
 };
 
-type ProtocolParameterChangeProps {
-  prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
-  protocolParamsUpdate: Partial<ProtocolParamsUpdate>;
-} & VotingAnchor;
-
-type HardForkInitiationProps = {
-  prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
-  major: number;
-  minor: number;
-} & VotingAnchor;
-
-type NewConstitutionProps = {
-  prevGovernanceActionHash: string;
-  prevGovernanceActionIndex: number;
-  constitutionUrl: string;
-  constitutionHash: string;
-  scriptHash: string;
-} & VotingAnchor;
-
-type UpdateCommitteeProps = {
-  prevGovernanceActionHash?: string;
-  prevGovernanceActionIndex?: number;
-  quorumThreshold: QuorumThreshold;
-  newCommittee?: CommitteeToAdd[];
-  removeCommittee?: string[];
-} & VotingAnchor;
-
-type CommitteeToAdd = {
-  expiryEpoch: number;
-  committee: string;
-};
-
-type QuorumThreshold = {
-  numerator: number;
-  denominator: number;
-};
-
-const createGovernanceActionJsonLD: (
-  governanceAction: GovernanceAction
-) => NodeObject;
-
-const createHash: (jsonLd: NodeObject) => string;
-
-const buildNewInfoGovernanceAction: (
-  infoProps: InfoProps
+// Governance Action builders exposed by useCardano()
+type BuildNewInfoGovernanceAction = (
+  infoProps: InfoProps,
+) => Promise<VotingProposalBuilder | undefined>;
+type BuildTreasuryGovernanceAction = (
+  treasuryProps: TreasuryProps,
+) => Promise<VotingProposalBuilder | undefined>;
+type BuildProtocolParameterChangeGovernanceAction = (
+  protocolParamsProps: ProtocolParameterChangeProps,
+) => Promise<VotingProposalBuilder | undefined>;
+type BuildHardForkGovernanceAction = (
+  hardForkInitiationProps: HardForkInitiationProps,
+) => Promise<VotingProposalBuilder | undefined>;
+type BuildNewConstitutionGovernanceAction = (
+  newConstitutionProps: NewConstitutionProps,
+) => Promise<VotingProposalBuilder | undefined>;
+type BuildUpdateCommitteeGovernanceAction = (
+  updateCommitteeProps: UpdateCommitteeProps,
+) => Promise<VotingProposalBuilder | undefined>;
+type BuildNoConfidenceGovernanceAction = (
+  noConfidenceProps: NoConfidenceProps,
 ) => Promise<VotingProposalBuilder | undefined>;
 
-const buildTreasuryGovernanceAction: (
-  treasuryProps: TreasuryProps
-) => Promise<VotingProposalBuilder | undefined>;
-
-const buildProtocolParameterChangeGovernanceAction: (
-  protocolParameterChangeProps: ProtocolParameterChangeProps
-) => Promise<VotingProposalBuilder | undefined>;
-
-const buildHardForkGovernanceAction: (
-  hardForkInitiationProps: HardForkInitiationProps
-) => Promise<VotingProposalBuilder | undefined>;
-
-const buildNewConstitutionGovernanceAction: (
-  newConstitutionProps: NewConstitutionProps
-) => Promise<VotingProposalBuilder | undefined>;
-
-const buildUpdateCommitteeGovernanceAction: (
-  updateCommitteeProps: UpdateCommitteeProps
-) => Promise<VotingProposalBuilder | undefined>;
-
-const buildSignSubmitConwayCertTx: (params: {
-  govActionBuilder: VotingProposalBuilder;
-  type: "createGovAction";
-}) => Promise<void>;
+// Signs and submits the transaction; resolves to the transaction hash
+type BuildSignSubmitConwayCertTx = (args: {
+  certBuilder?: CertificatesBuilder | Certificate;
+  govActionBuilder?: VotingProposalBuilder;
+  votingBuilder?: VotingBuilder;
+  voter?: VoterInfo;
+  transactionMetadata?: MetadatumMap;
+  type: "createGovAction"; // or another pending transaction type
+  resourceId?: string;
+}) => Promise<string>;
 ```
 
 ### Step 1: Create the Governance Action metadata object
@@ -166,30 +179,30 @@ Create the Governance Action object with the fields specified by [CIP-108](https
 
 ### Step 2: Create the Governance Action JSON-LD
 
-Using the `GovernanceActionProvider` provider, use the `createGovernanceActionJsonLd` method to create the JSON-LD object for the Governance Action.
+Using the `GovernanceActionProvider` provider, use the `createGovernanceActionJsonLD` method to create the JSON-LD object for the Governance Action.
 
 Example:
 
 ```typescript
 // When used within a GovernanceActionProvider
-const { createGovernanceActionJsonLD } = useCreateGovernanceAction();
+const { createGovernanceActionJsonLD } = useGovernanceActions();
 
-const jsonLd = createGovernanceActionJsonLD(governanceAction);
+const jsonLd = await createGovernanceActionJsonLD(governanceAction);
 ```
 
 Type of the `jsonLd` object is `NodeObject` provided from the `jsonld` package by digitalbazaar ([ref](https://github.com/digitalbazaar/jsonld.js)).
 
 ### Step 3: Create the Governance Action Hash of the JSON-LD
 
-Using the `GovernanceActionProvider` provider, use the `createGovernanceActionHash` method to create the hash of the JSON-LD object.
+Using the `GovernanceActionProvider` provider, use the `createHash` method to create the hash of the JSON-LD object.
 
 Example:
 
 ```typescript
 // When used within a GovernanceActionProvider
-const { createHash } = useCreateGovernanceAction();
+const { createHash } = useGovernanceActions();
 
-const hash = createHash(jsonLd);
+const hash = await createHash(jsonLd);
 ```
 
 Type of the `hash` object is `string` (blake2b-256).
@@ -200,7 +213,7 @@ Validate the Governance Action hash and metadata using any backend that provides
 
 ### Step 5: Sign and Submit the Governance Action
 
-Using the `CardanoProvider` provider, use the `buildSignSubmitConwayCertTx` method to sign and submit the Governance Action, and either the `buildNewInfoGovernanceAction` or `buildTreasuryGovernanceAction` method to build the transaction based on the Governance action type.
+Using the `CardanoProvider` provider, use the `buildSignSubmitConwayCertTx` method to sign and submit the Governance Action, and the builder matching the Governance Action type (for example `buildNewInfoGovernanceAction` or `buildTreasuryGovernanceAction`) to build the transaction.
 
 Example:
 
@@ -254,6 +267,8 @@ govActionBuilder = await buildHardForkGovernanceAction({
 govActionBuilder = await buildNewConstitutionGovernanceAction({
   prevGovernanceActionHash,
   prevGovernanceActionIndex,
+  url,
+  hash,
   constitutionUrl,
   constitutionHash,
   scriptHash,
@@ -263,13 +278,15 @@ govActionBuilder = await buildNewConstitutionGovernanceAction({
 govActionBuilder = await buildUpdateCommitteeGovernanceAction({
   prevGovernanceActionHash,
   prevGovernanceActionIndex,
+  url,
+  hash,
   quorumThreshold,
   newCommittee,
   removeCommittee,
 });
 
-// sign and submit the transaction
-await buildSignSubmitConwayCertTx({
+// sign and submit the transaction; resolves to the transaction hash
+const txHash = await buildSignSubmitConwayCertTx({
   govActionBuilder,
   type: "createGovAction",
 });
@@ -300,7 +317,7 @@ type Props = {
   }: {
     url: string;
     hash: string;
-    standard: "CIP108";
+    standard?: "CIP108" | "CIP119" | "CIP100";
   }) => Promise<{
     metadata?: any;
     status?: MetadataValidationStatus;

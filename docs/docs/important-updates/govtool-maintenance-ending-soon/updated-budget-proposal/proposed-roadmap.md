@@ -1,5 +1,9 @@
 # Proposed roadmap
 
+:::info Historical (2025)
+This page documents GovTool's 2025 funding and maintenance discussion and is kept for reference. Timelines and statements on this page reflect that period, not the current state of GovTool.
+:::
+
 Cardano Govtool direction and roadmap is community driven, both directly, via feedback and direct contribution, and more simply follows community’s priorities over time as governance evolves.&#x20;
 
 You can see key planned (as well as delivered) initiatives here[ https://tinyurl.com/4275j7w4](https://t.co/msEkcwvj5i).&#x20;
@@ -10,7 +14,7 @@ Because Govtool’s roadmap is directly defined by the Cardano community, so sub
 
 ## Initiatives that have clear community support
 
-Below is a list of initiatives that have shown to have community support from feedback collected in calls, on X and directly on github, so are currently being refine and prepared for implementation.\
+Below is a list of initiatives that have shown to have community support from feedback collected in calls, on X and directly on github, so are currently being refine and prepared for implementation.
 
 
 * Add DRep history on the DRep page. This will show what that DRep voted on, how and (if available) with what rationale. Furthermore it will show the delegations moving in and out. All this will provide better context to the delegator, also opening new options to sort and filter DReps. [https://github.com/IntersectMBO/govtool/discussions/3895](https://github.com/IntersectMBO/govtool/discussions/3895)&#x20;
@@ -26,10 +30,10 @@ Below is a list of initiatives that have shown to have community support from fe
 * Generally expand options for individual contribution to the open source code. Specifically integrate the GitHub backlog with the Andamio platform to allow anyone to get onboarded to the repos and be rewarded for meaningful contribution to key identified issues
 * Optimise the hosting and deployment infrastructure to reduce cost and make general maintainance more efficient
 
-\
 
 
-\
 
 
-\
+
+
+

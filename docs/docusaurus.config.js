@@ -49,6 +49,25 @@ const config = {
     ],
   ],
 
+  plugins: [
+    [
+      "@docusaurus/plugin-client-redirects",
+      {
+        // Old URLs that are still linked from GovTool, the CC portal or GitBook.
+        redirects: [
+          {
+            from: "/cardano-govtool/faqs/how-was-the-author-of-withdraw-ara45-217-for-mlabs-core...-ga-verified",
+            to: "/cardano-govtool/faqs/how-was-the-author-of-withdraw-ara45-217-for-mlabs-core-ga-verified",
+          },
+          {
+            from: "/about/what-is-the-constitutional-committee-portal",
+            to: "/overview/what-is-the-constitutional-committee-portal",
+          },
+        ],
+      },
+    ],
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -86,8 +105,8 @@ const config = {
           {
             title: "Legal",
             items: [
-              { label: "Privacy Policy", href: "https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy" },
-              { label: "Terms of Use", href: "https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use" },
+              { label: "Privacy Policy", to: "/legal/privacy-policy" },
+              { label: "Terms of Use", to: "/legal/terms-of-use" },
             ],
           },
         ],

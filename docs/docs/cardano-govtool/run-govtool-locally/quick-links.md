@@ -2,9 +2,14 @@
 
 ### Build Workflows
 
-* [Core Govtool](https://github.com/IntersectMBO/govtool/blob/bdea53d06e3b65a4f2531551c8201db2db3681ce/.github/workflows/build-from-main.yml)
-* [Proposal Pillar](https://github.com/IntersectMBO/govtool-proposal-pillar/blob/0bc51ed9051965291340b21e4f2df368eb54e20b/.github/workflows/merge.yaml)
-* [Outcomes Pillar](https://github.com/IntersectMBO/govtool-outcomes-pillar/blob/5a9542b8c521e93524c0d198984d7c2135509a59/.github/workflows/build-backend-image.yaml)
+* [Core Govtool](https://github.com/IntersectMBO/govtool/blob/develop/.github/workflows/build-docker-images.yml)
+* [Proposal Pillar](https://github.com/IntersectMBO/govtool-proposal-pillar/blob/main/.github/workflows/merge.yaml)
+* [Outcomes Pillar](https://github.com/IntersectMBO/govtool-outcomes-pillar/blob/main/.github/workflows/build-backend-image.yaml)
+
+### Local development
+
+* [Docker Compose setup for Core GovTool](https://github.com/IntersectMBO/govtool/blob/develop/docker/README.md)
+* [Helm / Argo CD deployment configuration](https://github.com/IntersectMBO/govtool-argo)
 
 ### Docker Desktop Installation
 

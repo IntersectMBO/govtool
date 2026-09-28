@@ -8,14 +8,14 @@ To be able to vote, you will need to connect your wallet to GovTool, and registe
 
 
 
-1.  **Dashboard** Click on the "View and vote" button to see on-chain Governance Actions. _(You can also use the 'Governance actions' tab in sidebar)_\
+1.  **Dashboard** Click on the "Review and vote" button to see on-chain Governance Actions. _(You can also use "Governance Actions" → "Live Voting" in the sidebar)_
 
 
     <figure><img src="/img/gitbook/hjkhkjhk.webp" alt=""><figcaption></figcaption></figure>
 2.  **Governance Actions Page**
 
     1. Search box, type any text Governance Action ID
-    2. Links to sort actions that you have not voted on as of yet ("To Vote"), and ones that you have voted on ("Voted")
+    2. Tabs to show actions that you have not voted on yet ("To vote"), and ones that you have voted on ("Voted on by me")
     3. Main Categories of Governance Actions
     4. Filters and Sort
     5. GA Summary
@@ -32,16 +32,16 @@ To be able to vote, you will need to connect your wallet to GovTool, and registe
     6. Share button
     7. Voting buttons
     8. "Show Votes" will show you the latest votes on this Action
-    9. "Provide context about your vote" lets you provide off-chain rationalisation about your vote. You will have to take responsibilty for storing this data yourself.
+    9. After you click "Vote", you can optionally "Provide context about your vote": an off-chain rationale for your vote (up to 10,000 characters, stored as CIP-100 JSON-LD). You can let GovTool pin this data to IPFS for you ("GovTool pins data to IPFS"), or download it and store it yourself ("Download and store yourself") and paste its public URL.
 
     **Governance Action Detail Page** This is where you can see all the details of any Governance Action.
 
-    \
+
 
 
     <figure><img src="/img/gitbook/Artboard%20p.webp" alt=""><figcaption></figcaption></figure>
 4.  **Voting**\
-    Choose "Yes", "No", or "Abstain"&#x20;
+    Choose "Yes", "No", or "Abstain" and click "Vote". Optionally add context about your vote (see above), or submit your vote without it.&#x20;
 
     <figure><img src="/img/gitbook/Artboard%20Copy%203.webp" alt=""><figcaption></figcaption></figure>
 5.  **Wallet Confirmation** \
@@ -49,7 +49,7 @@ To be able to vote, you will need to connect your wallet to GovTool, and registe
 
     <figure><img src="/img/gitbook/Artboard%20Copy%204.webp" alt=""><figcaption></figcaption></figure>
 6.  **In-progress state**\
-    Your Vote transaction will be submitted to on-chain. The transaction could take a few seconds or minutes to be fully completed. An in-progress state will be shown to keep track of progresses.\
+    Your Vote transaction will be submitted to on-chain. The transaction could take a few seconds or minutes to be fully completed. An in-progress state will be shown to keep track of progresses.
 
 
     <figure><img src="/img/gitbook/FArtboard%20Copy%209.webp" alt=""><figcaption></figcaption></figure>

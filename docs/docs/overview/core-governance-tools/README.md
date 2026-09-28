@@ -22,3 +22,5 @@ With the freedom to test and refine Cardano’s next era of governance principle
 
 ### Where?
 
+* See [Access the Core Governance Tools](./access-the-core-governance-tools.md)
+

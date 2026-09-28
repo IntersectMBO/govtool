@@ -1,10 +1,10 @@
 # What is a DRep?
 
-Delegated Representatives (DReps) are ADA holders who registered on-chain to allow other members of the community to delegate their voting power to them, so that they can vote on their behalf. They are are like 'parlimentary representatives' in the Governance system.
+Delegated Representatives (DReps) are ADA holders who registered on-chain to allow other members of the community to delegate their voting power to them, so that they can vote on their behalf. They are are like 'parliamentary representatives' in the Governance system.
 
-DReps are defined by [CIP-1694](https://www.1694.io/). They can:
+DReps are defined by [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md). They can:
 
-* Submit Governance Actions
+* Submit Governance Actions (as can any ada holder, with a deposit)
 * Review and submit votes on active Governance Actions
 * Accept delegated Voting Power from any ADA holder
 

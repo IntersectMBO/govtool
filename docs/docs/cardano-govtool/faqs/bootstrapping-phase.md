@@ -1,5 +1,9 @@
 # Bootstrapping phase
 
+:::note Historical
+The bootstrapping phase ended when Cardano moved to protocol version 10 (the Plomin hard fork). All Governance Action types can now be proposed and voted on. GovTool only shows the bootstrapping banner and restrictions described below on a network that is still running protocol version 9.
+:::
+
 ### What is the bootstrapping phase?
 
 The technical bootstrapping phase is a temporary state of governance as described in [CIP-1694 Bootstrapping Phase](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md#bootstrapping-phase). Within this state only a limited set of governance features are enabled by the network.

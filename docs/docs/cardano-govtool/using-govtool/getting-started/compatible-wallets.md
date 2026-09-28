@@ -4,6 +4,13 @@
 GovTool requires Cardano wallets to have upgraded to CIP-95 to be able to connect and share governance data, thus some existing Cardano wallets might not work.
 :::
 
+GovTool does not keep a fixed list of allowed wallets: any wallet that supports and enables [CIP-95](https://github.com/cardano-foundation/CIPs/tree/master/CIP-0095) can connect. If your wallet is not compatible, GovTool shows one of these errors when you try to connect:
+
+* "Your wallet does not support the required CIP-30 extension, CIP-95."
+* "Your wallet did not enable the needed CIP-95 functions during connection."
+
+The status of individual wallets below is maintained manually and may change as wallets release updates.
+
 ### Mainnet Compatible Wallets (`gov.tools`)
 
 Wallets which are working with GovTool on Mainnet.

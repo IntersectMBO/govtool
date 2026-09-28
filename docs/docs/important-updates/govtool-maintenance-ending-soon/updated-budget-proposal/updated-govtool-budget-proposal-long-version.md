@@ -6,6 +6,10 @@ description: >-
 
 # Updated Govtool Budget Proposal - long version
 
+:::info Historical (2025)
+This page documents GovTool's 2025 funding and maintenance discussion and is kept for reference. Timelines and statements on this page reflect that period, not the current state of GovTool.
+:::
+
 :::info
 you can read the short version [here](./updated-govtool-budget-proposal-short-version.md) or you can listen to the key details of this proposal in [this podcast](https://drive.google.com/file/d/1HVtw7qYNDUNp577Rz2rTM8JxacvXZMD3/view?usp=sharing)
 :::
@@ -149,7 +153,7 @@ Since full governance came live with Plomin upgrade in September 2024, the <mark
 
 
 
-Furthermore, Cardano GovTool’s fast support has enabled the Cardano community to have this Budget Proposal submission process available in record time (less than 10 working days), keeping it still open for integration via OpenAPIs.\
+Furthermore, Cardano GovTool’s fast support has enabled the Cardano community to have this Budget Proposal submission process available in record time (less than 10 working days), keeping it still open for integration via OpenAPIs.
 
 
 The distributed model, which connects multiple applications in one cohesive experience, allows multiple builders and many individual participants to develop and evolve Govtool’s applications in parallel, as well as allowing anyone to take any part of GovTool as a reference implementation. This has encouraged wide positive support and participation so far.
@@ -385,7 +389,7 @@ The **funds requested cover 12 months of maintenance and improvement** for **5 a
 
 **This will be the first time these sets of tools, made as public good, will request funds to continue running**. So in this first instance the existing builders, which have invested effort and have the deepest expertise and knowledge to run them, will be requesting funds directly for the next 12 months. During this first 12 months more builders and individual contributors will be onboarded via incentivised bounties, giving more options for future maintainers.
 
-The commitment is to be efficient with funding, so **any budget remaining at the end of the 12 months will be returned to the Cardano Treasury**.\
+The commitment is to be efficient with funding, so **any budget remaining at the end of the 12 months will be returned to the Cardano Treasury**.
 
 
 The budget cost breakdown is as follows:
@@ -437,27 +441,27 @@ Level 3 cost breakdown:
    2. Only one or a combination of different pillars:\
       (Any pillar combination is possible)
       1. Level 1 and 2 ($530k) + Overall end-to-end testing ($120k) + Proposals pillar ($90k) → **$740,000** for 12 months\
-         \
+
          <sup>_Proposals Pillar  - rendered as part of Govtool experience (0.75FTE - $90,000)_</sup>\ <sup>_This covers the costs of software engineers, QA engineers, and DevOps support for the environments related to this application. They are responsible for maintaining the application, making sure it's always operational, they need to support and make easier external contribution as well as add new features defined in the community roadmap_</sup>\
-         \
+
 
       2. Level 1 and 2 ($530k) + Overall end-to-end testing ($120k) + Delegation Pillar ($120k) → **$770,000** for 12 months\
-         \
+
          <sup>_Delegation Pillar  - rendered as part of Govtool experience (1 FTE - $120,000)_</sup>\ <sup>_This covers the costs of software engineers, QA engineers, and DevOps support for the environments related to this application. This application connects directly to the chain, requiring engineers with more niche skills. They are responsible for maintaining the application, making sure it's always operational, they need to support and make easier external contribution as well as add new features defined in the community roadmap_</sup>\
-         \
+
 
       3. Level 1 and 2 ($530k) + Overall end-to-end testing ($120k) + Voting Pillar ($150k) → **$800,000** for 12 months\
-         \
+
          <sup>_Voting Pillar - rendered as part of Govtool experience (1.25FTE - $150,000)_</sup>\ <sup>_This covers the costs of software engineers, QA engineers, and DevOps support for the environments related to this application. This application connects directly to the chain, requiring engineers with more niche skills. They are responsible for maintaining the application, making sure it's always operational, they need to support and make easier external contribution as well as add new features defined in the community roadmap_</sup>\
-         \
+
 
       4. Level 1 and 2 ($530k)+ Overall end-to-end testing ($120k) + Outcomes Pillar ($90k) → **$740,000** for 12 months\
-         \
+
          <sup>_Outcomes Pillar - rendered as part of Govtool experience (0.75 FTE - $90,000)_</sup>\ <sup>_This covers the costs of software engineers, QA engineers, and DevOps support for the environments related to this application. This application connects directly to the chain, requiring engineers with more niche skills. They are responsible for maintaining the application, making sure it's always operational, they need to support and make easier external contribution as well as add new features defined in the community roadmap_</sup>\
-         \
+
 
       5. Level 1 and 2 ($530k)+ Overall end-to-end testing ($120k) + Budget discussion Pillar ($60k) → **$710,000** for 12 months\
-         \
+
          <sup>_Budget discussion Pillar - rendered as part of Govtool experience (0.5 FTE - $60,000)_</sup>\ <sup>_This covers the costs of software engineers, QA engineers, and DevOps support for the environments related to this application. They are responsible for maintaining the application, making sure it's always operational, they need to support and make easier external contribution as well as add new features defined in the community roadmap_</sup>
 
 </details>
@@ -487,4 +491,4 @@ Level 3 cost breakdown:
 * [GovTool - a breakdown of the costs so far](https://docs.gov.tools/important-updates/govtool-maintenance-ending-soon/govtool-a-breakdown-of-the-costs-so-far)
 
 \
-\
+

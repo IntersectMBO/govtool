@@ -3,6 +3,10 @@
 
 <img src="/img/gitbook/Torus_array%202.webp" alt="" class="gitbook-cover" />
 
+:::info Historical (2025)
+This page documents GovTool's 2025 funding and maintenance discussion and is kept for reference. Timelines and statements on this page reflect that period, not the current state of GovTool.
+:::
+
 Cardano has entered a new chapter, a new dawn. With the implementation of [CIP-1694](https://www.1694.io/en) and the dawn of the [Voltaire era](https://roadmap.cardano.org/en/voltaire/), the community now has the power to shape the network’s future through on-chain governance. But power without access is meaningless. Participation in governance depends not just on protocol, but on accessibility.
 
 [GovTool](https://gov.tools/) was created to make Cardano’s governance system truly accessible and for the benefit of the public. It offers a simple, open source, non-commercial experience that empowers anyone in the ecosystem to participate directly. In the most recent budget round, however, the proposal to continue funding its active development did not receive enough support from the DReps. In this post, we’ll explore what GovTool is, why that decision matters, and what comes next.
@@ -87,4 +91,4 @@ Whether you're a voter, a developer, a builder, or simply someone who cares abou
 
 With your support, we can maintain an open governance approach, ensuring the continuity of decentralized governance on Cardano.
 
-\
+

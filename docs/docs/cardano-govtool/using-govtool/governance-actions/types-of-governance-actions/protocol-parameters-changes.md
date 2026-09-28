@@ -2,7 +2,9 @@
 
 ### Any change to **one or more** updatable protocol parameters, excluding changes to major protocol versions ('hard forks')
 
-There are four types of protocol parameter changes, however, changes are not restricted to any groupp. In case where a Governance Action carries updates for multiple parameters from different groups, the maximum threshold of all the groups involved will apply to any given such governance action.
+There are four types of protocol parameter changes, however, changes are not restricted to any group. In case where a Governance Action carries updates for multiple parameters from different groups, the maximum threshold of all the groups involved will apply to any given such governance action.
+
+The four types of parameter changes are listed below. In addition, some parameters also belong to the **security group** (for example `maxBlockBodySize`, `maxTxSize`, `maxBlockHeaderSize`, `maxValueSize`, `maxBlockExecutionUnits`, `txFeePerByte`, `txFeeFixed`, `utxoCostPerByte`, `govActionDeposit` and `minFeeRefScriptCostPerByte`). SPOs only vote on Protocol Parameter Changes that modify at least one security-group parameter.
 
 The four types of parameter changes:
 
@@ -16,11 +18,15 @@ The **network group** consists of:
 * maximum script execution units in a single block (`maxBlockExecutionUnits`)
 * maximum number of collateral inputs (`maxCollateralInputs`)
 
+:::note
+The thresholds on this page are the example values from CIP-1694. The thresholds that actually apply are protocol parameters that can be changed by governance; GovTool reads them from the current epoch parameters and shows the applicable threshold on each Governance Action's detail page.
+:::
+
 Ratification threshold for the **network group:**
 
 <table><thead><tr><th width="258">Constitutional Committee</th><th width="210">DReps</th><th>SPOs</th></tr></thead><tbody><tr><td>Pass</td><td>60%</td><td>51%</td></tr></tbody></table>
 
-The **ecomomic group** consists of:
+The **economic group** consists of:
 
 * minimum fee coefficient (`txFeePerByte`)
 * minimum fee constant (`txFeeFixed`)
@@ -32,7 +38,7 @@ The **ecomomic group** consists of:
 * minimum Lovelace deposit per byte of serialized UTxO (`utxoCostPerByte`)
 * prices of Plutus execution units (`executionUnitPrices`)
 
-Ratification threshold for the **ecomomic group:**
+Ratification threshold for the **economic group:**
 
 <table><thead><tr><th width="258">Constitutional Committee</th><th width="210">DReps</th><th>SPOs</th></tr></thead><tbody><tr><td>Pass</td><td>67%</td><td>Doesn't vote</td></tr></tbody></table>
 

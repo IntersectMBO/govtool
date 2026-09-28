@@ -7,7 +7,7 @@ The Cardano Govtool is a community tool that supports the key steps of Cardano's
 
 Intersect has facilitated the bootstrapping of GovTool and supported the process to fully open source it, allowing community ownership for improvement and maintenance.
 
-The Cardano Govtool, together with the other core tools such as the Constitutional Committee Portal, is currently managed by the Intersect [Governance tools WG](https://intersect.gitbook.io/intersect-committees-groups/groups-overview/working-groups/governance-tools-working-group), the four existing pillars that make Govtool (Proposal Discussion, Delegation, Outcomes and Voting) are developed and maintained by the WeDeliver Team, the Byron team, the Lido Nation team and tested by the DQuadrand team.
+The Cardano Govtool, together with the other core tools such as the Constitutional Committee Portal, is currently managed by the Intersect [Governance tools WG](https://intersect.gitbook.io/intersect-committees-groups/groups-overview/working-groups/governance-tools-working-group), the pillars that make up Govtool (Voting & Delegation, Proposal Discussion, Budget Discussion and Outcomes) are developed and maintained by community builder teams. The availability of some pillars (Proposal Discussion, Budget Discussion and Outcomes) depends on the deployment configuration of each GovTool instance.
 
 GovTool is an application that enables users to participate in many ways in the governance of the Cardano blockchain.
 
@@ -18,5 +18,6 @@ GovTool is an application that enables users to participate in many ways in the 
 * [Delegate Voting Power](../cardano-govtool/using-govtool/delegating/delegate-to-a-drep.md) to a DRep
 * Register to become a Delegated Representative ([**DRep**](../cardano-govtool/using-govtool/dreps/register-as-a-drep.md)), allowing others to delegate their voting power to the DRep.
 * [Vote on Governance Actions](../cardano-govtool/using-govtool/governance-actions/vote-on-governance-actions/README.md) - available to users that are registered to vote as DReps or Direct Voters.
-* See outcomes of [Governanace Action](../cardano-govtool/using-govtool/governance-actions/README.md) votes.
-* [Propose](../cardano-govtool/using-govtool/governance-actions/propose-a-governance-action.md) a Governance Action.
+* See outcomes of [Governance Action](../cardano-govtool/using-govtool/governance-actions/README.md) votes.
+* [Propose](../cardano-govtool/using-govtool/governance-actions/propose-a-governance-action.md) a Governance Action, and discuss proposals before they go on-chain.
+* Submit and discuss [Budget Proposals](../cardano-govtool/using-govtool/cardano-budget-proposals.md).

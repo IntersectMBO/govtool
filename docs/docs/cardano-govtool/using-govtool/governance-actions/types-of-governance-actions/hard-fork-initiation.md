@@ -4,7 +4,12 @@
 
 This action will have:
 
-* The new (greater) major protocol version
+* The new protocol version (major and minor)
+* Optionally, the ID of the previous Hard Fork Initiation Governance Action
+
+:::note
+The thresholds on this page are the example values from CIP-1694. The thresholds that actually apply are protocol parameters that can be changed by governance; GovTool reads them from the current epoch parameters and shows the applicable threshold on each Governance Action's detail page.
+:::
 
 To pass, this Action requires:
 

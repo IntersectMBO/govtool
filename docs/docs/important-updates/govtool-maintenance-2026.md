@@ -3,7 +3,6 @@ description: >-
   GovTool is actively maintained. Since September 2026 the Sireto team has
   day-to-day operational ownership of GovTool. Read what this means and what the
   team is working on next.
-slug: /
 ---
 
 # GovTool Maintenance in 2026

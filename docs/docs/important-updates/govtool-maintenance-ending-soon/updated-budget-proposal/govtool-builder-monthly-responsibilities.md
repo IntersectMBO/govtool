@@ -1,5 +1,9 @@
 # Govtool Builder monthly responsibilities
 
+:::info Historical (2025)
+This page documents GovTool's 2025 funding and maintenance discussion and is kept for reference. Timelines and statements on this page reflect that period, not the current state of GovTool.
+:::
+
 ## For Builders handling one of the pillars
 
 As one of the Govtool maintainers, the Builder shall carry out all the duties that are commonly connected to this role in an open source project, for projects supported by Intersect this will evolve and be refined by the Intersect Open Source Committee, they include but are not limited to:

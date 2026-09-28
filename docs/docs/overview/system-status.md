@@ -20,7 +20,7 @@ Check Constitutional Committee portal system status
 
 For an up-to-date list of all known issues and bugs please refer to [Github GovTool/Issues](https://github.com/IntersectMBO/govtool/issues).
 
-* _Proposing all types of governance action for discussion via proposal forum_
+* _Protocol Parameter Change proposals can't yet be created for discussion via the Proposals forum_
 
 ### Constitutional Committee Portal
 

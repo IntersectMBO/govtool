@@ -12,6 +12,10 @@ Core Govtool is comprised of the frontend, backend and metadata services which w
 
 with or without a wallet connected
 
+:::note
+"Backend" on these pages refers to the Haskell service in `govtool/backend` (image `ghcr.io/intersectmbo/govtool-backend`), which is the one built and deployed today. A NestJS (TypeScript) replacement exists in `govtool/backend-ts`, but it is not yet used by the published images.
+:::
+
 ## Prerequisites
 
 To run Core GovTool you will need access to a **DB-Sync Instance**, this can be run locally or via a third party e.g. Demeter.\
@@ -36,4 +40,4 @@ previous versions
 1. Review the frontend -> fe-env-vars.yaml and the backend -> config.json files and add your custom env vars
 2. Review [frontend.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml), [backend.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/backend/backend.yaml) and [metadata.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/metadata/metadata.yaml) ensuring to update the Deployment Containers Image Spec ([example](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml#L34)) with the associated image for the service (these can be custom or the images referenced in the current deployments) and metadata -> namespace ([example](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml#L5)) if not using the default govtool namespace
 3. Create the Kubernetes Secrets which will house the env vars using `kubectl apply` and `kubectl create secret` (this will be used with the [config.json](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/backend/config.json)) in your chosen namespace
-4. Use `kubectl apply` to launch the frontend backend and metadata services in the same namespace as your secrets -- ([kubectl links](https://app.gitbook.com/o/Prbm1mtkwSsGWSvG1Bfd/s/qBJxNzoywC55SZXT5Tv2/~/changes/107/cardano-govtool/run-govtool-locally/quick-links))
+4. Use `kubectl apply` to launch the frontend backend and metadata services in the same namespace as your secrets -- ([kubectl links](./quick-links.md))

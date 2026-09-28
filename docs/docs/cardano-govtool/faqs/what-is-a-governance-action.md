@@ -13,7 +13,7 @@ We define seven different types of **governance actions**. A governance action i
 | 1. Motion of no-confidence                                    | A motion to create a _state of no-confidence_ in the current constitutional committee                                    |
 | 2. New constitutional committee and/or threshold and/or terms | Changes to the members of the constitutional committee and/or to its signature threshold and/or terms                    |
 | 3. Update to the Constitution or proposal policy              | A modification to the Constitution or proposal policy, recorded as on-chain hashes                                       |
-| 4. Hard-Fork2 Initiation                                      | Triggers a non-backwards compatible upgrade of the network; requires a prior software upgrade                            |
+| 4. Hard-Fork Initiation                                      | Triggers a non-backwards compatible upgrade of the network; requires a prior software upgrade                            |
 | 5. Protocol Parameter Changes                                 | Any change to **one or more** updatable protocol parameters, excluding changes to major protocol versions ("hard forks") |
 | 6. Treasury Withdrawals                                       | Withdrawals from the treasury                                                                                            |
 | 7. Info                                                       | An action that has no effect on-chain, other than an on-chain record                                                     |

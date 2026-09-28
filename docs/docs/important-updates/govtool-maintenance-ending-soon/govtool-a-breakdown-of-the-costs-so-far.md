@@ -6,6 +6,10 @@ description: >-
 
 # GovTool - a breakdown of the costs so far
 
+:::info Historical (2025)
+This page documents GovTool's 2025 funding and maintenance discussion and is kept for reference. Timelines and statements on this page reflect that period, not the current state of GovTool.
+:::
+
 :::info
 The budget broken down below was distributed to community builders: **ByronNetwork, DQuadrant, WeDeliver, Bloxico, Lidonation**
 :::
@@ -185,4 +189,4 @@ Total: \~$255.5K for these last 6 months
 
 Initial costs were high due to the innovative nature of GovTool — a platform designed from scratch to serve a governance model that had never been implemented before. However, recent figures are a more accurate reflection of ongoing costs to maintain and evolve a live, multi-network governance system.
 
-\
+

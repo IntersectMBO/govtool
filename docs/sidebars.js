@@ -1,12 +1,24 @@
 // @ts-check
 const gitbookSidebar = require("./sidebars.gitbook.js");
 
-// Legal links stay at the bottom, after the developer documentation.
+// The GitBook "Legal" section linked to Intersect's policies; it is replaced
+// below by GovTool's own Privacy Policy and Terms of Use pages.
 const legalIndex = gitbookSidebar.findIndex(
   (item) => item.type === "html" && item.value === "Legal",
 );
-const userDocs = legalIndex === -1 ? gitbookSidebar : gitbookSidebar.slice(0, legalIndex);
-const legal = legalIndex === -1 ? [] : gitbookSidebar.slice(legalIndex);
+const userDocs = (legalIndex === -1 ? gitbookSidebar : gitbookSidebar.slice(0, legalIndex)).slice();
+
+// Add the Support page right after the GovTool FAQs.
+const faqsIndex = userDocs.findIndex(
+  (item) => item.type === "category" && item.link && item.link.id === "cardano-govtool/faqs/README",
+);
+userDocs.splice(faqsIndex + 1, 0, { type: "doc", id: "cardano-govtool/support", label: "Support" });
+
+const legal = [
+  { type: "html", value: "Legal", className: "sidebar-section", defaultStyle: true },
+  { type: "doc", id: "legal/privacy-policy", label: "Privacy Policy" },
+  { type: "doc", id: "legal/terms-of-use", label: "Terms of Use" },
+];
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {

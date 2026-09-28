@@ -23,4 +23,4 @@ _Related X Post about Cardano Signer_ [https://x.com/ATADA\_Stakepool/status/194
 
 [https://drive.google.com/file/d/1D4THSXXNWxZdfBlcRucrV013ICxIwiwT/view?usp=sharing](https://drive.google.com/file/d/1D4THSXXNWxZdfBlcRucrV013ICxIwiwT/view?usp=sharing)
 
-\
+

@@ -5,22 +5,27 @@ description: How to register as a DRep
 # Register as a DRep
 
 1.  **Dashboard**\
-    From the dashboard, click "Register" in the "Become a DRep" panel:\
+    From the dashboard, click "Register" in the "Become a DRep" panel:
 
 
     <div align="left"><figure><img src="/img/gitbook/Artboard%20Copy%201000.png" alt=""><figcaption></figcaption></figure></div>
-2.  **Roles and Responsibilites**\
-    Explains what a DRep does, and tells you about the refundable deposit. \
+2.  **Roles and Responsibilities**\
+    The "Roles & Responsibilities" screen explains what a DRep does, and tells you about the refundable deposit (the amount comes from the `drepDeposit` protocol parameter). If you previously retired as a DRep, this step is skipped.
 
 
     <div align="left"><figure><img src="/img/gitbook/drep%20reg%202.png" alt=""><figcaption></figcaption></figure></div>
 3.  **DRep Info**\
-    The DRep name is required, and there are three other fields that are optional: Email, Bio, and Link(s). You can add up to 8 links. This information will be displayed you your DRep page, and publicly available to all users of GovTool\
+    The form follows the [CIP-119](https://github.com/cardano-foundation/CIPs/tree/master/CIP-0119) DRep metadata standard. **DRep Name** is required (max 80 characters). All other fields are optional:
 
+    * **Objectives**, **Motivations** and **Qualifications** (max 1,000 characters each)
+    * **Image**: a URL to an image, or a base64-encoded image
+    * **References**: **Links** (social media or other web pages) and **Identity** links (ideally a page that clearly shows your DRep ID). Up to 7 of each; each description is limited to 80 characters.
+    * **Payment Address**: an address for receiving payments
+    * **Do Not List**: tick this if you don't want to appear in the GovTool DRep Directory
 
-    <div align="left"><figure><img src="/img/gitbook/drep%20reg%203.png" alt=""><figcaption></figcaption></figure></div>
+    This information will be displayed on your DRep page, and is publicly available to all users of GovTool.
 4.  **Data storage confirmation**\
-    DRep data is not stored on-chain. Every DRep must responsibly store their information off-chain and pass that link back to GovTool (on the following screen). You must check the box and agree to this to proceed with registration.\
+    DRep data is not stored on-chain. Every DRep must responsibly store their information off-chain and pass that link back to GovTool (on the following screen). You must check the box "I agree to store correctly this information and to maintain them over the years" and click "Register" to proceed.
 
 
     <div align="left"><figure><img src="/img/gitbook/drep%20reg%204.png" alt=""><figcaption></figcaption></figure></div>
@@ -28,7 +33,9 @@ description: How to register as a DRep
    There are three steps to storing your information:
    1. Download the file to your computer. This file contains the DRep registration info that you entered in the registration form.
    2. Save the file in a location that will provide you with a publicly-accessible URL.
-   3. Copy the URL from the location above and paste it into the URL field.
+   3. Copy the URL from the location above and paste it into the URL field. The URL must start with `https://` or `ipfs://` and be no longer than 128 characters.
+
+   When you click "Submit", GovTool downloads the file from your URL and checks that it is identical to the one you downloaded ("GovTool Is Checking Your Data"). If the URL can't be found ("The URL You Entered Cannot Be Found") or the content differs ("Your External Data Does Not Match the Original File."), you'll be asked to fix it before continuing.
 6.  **Example using GitHub** [**See example using IPFS**](./register-as-a-drep.md#ipfs)\
     \
     This example uses a new public repo for simplicity.&#x20;
@@ -37,7 +44,7 @@ description: How to register as a DRep
     2. Commit the changes to the repository with the green button at the bottom right
 
     <figure><img src="/img/gitbook/github%201%20%281%29.png" alt=""><figcaption></figcaption></figure>
-7.  **In GitHub, find the file you uploaded, click on it's name.**\
+7.  **In GitHub, find the file you uploaded, click on it's name.**
 
 
     <figure><img src="/img/gitbook/github%202.png" alt=""><figcaption></figcaption></figure>
@@ -49,7 +56,7 @@ description: How to register as a DRep
 
     <figure><img src="/img/gitbook/github%204%20%281%29.png" alt=""><figcaption></figcaption></figure>
 10. **Return to GovTool and paste in the URL** \
-    Then click "Submit"\
+    Then click "Submit"
 
 
     <figure><img src="/img/gitbook/drep%20reg%206.png" alt=""><figcaption></figcaption></figure>
@@ -57,11 +64,12 @@ description: How to register as a DRep
     &#x20;
 
     <figure><img src="/img/gitbook/drep%20reg%207.png" alt=""><figcaption></figcaption></figure>
-12. **Your transaction will be submitted to the blockchain** \
+12. **Your transaction will be submitted to the blockchain**
 
 
     <figure><img src="/img/gitbook/drep%20reg%208.png" alt=""><figcaption></figcaption></figure>
 13. **Now you are registered as a DRep**\
+    The registration transaction also delegates your own Voting Power to your new DRep ID, and registers your stake key if it wasn't registered yet (which requires an additional refundable stake key deposit).
 
 
     <figure><img src="/img/gitbook/drep%20reg%209.png" alt=""><figcaption></figcaption></figure>

@@ -7,6 +7,10 @@ slug: /
 
 # ⚠️ GovTool Maintenance Ending Soon
 
+:::info Historical (2025)
+This page documents GovTool's 2025 funding and maintenance discussion and is kept for reference. Timelines and statements on this page reflect that period, not the current state of GovTool.
+:::
+
 ## Key Links
 
 * 👉🏻 [The future of GovTool: Why it matters and what comes next](./important-updates/govtool-maintenance-ending-soon/the-future-of-govtool-why-it-matters-and-what-comes-next.md)

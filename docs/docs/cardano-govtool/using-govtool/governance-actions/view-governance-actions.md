@@ -6,7 +6,7 @@ description: You can view all Governance Actions with or without connecting a wa
 
 ## Starting from the Landing Page
 
-Click "Governance Actions" from the top menu.
+Open "Governance Actions" in the top menu and choose "Live Voting". The same menu also contains "Proposals" (proposals under discussion) and "Outcomes" (results of past Governance Actions), where those features are enabled.
 
 <div align="left"><figure><img src="/img/gitbook/gov%20actions%20menu%20item.png" alt=""><figcaption></figcaption></figure></div>
 
@@ -16,7 +16,7 @@ Clicking on the outlined menu item above will bring you to the Governance Action
 
 1. Search box, enter any Governance Action ID, title, keyword, etc.
 2. Filters for Governance Actions. You will be able to choose which categories of Actions you want to see.&#x20;
-3. Sort order. Clicking this will allow you to sort Governance Actions by date, and by most votes
+3. Sort order. You can sort Governance Actions by "Soon to expire", "Newest first", or "Highest amount of 'Yes' votes"
 4. Categories of Governance Actions. These are the major, pre-set categories of Actions.
 5. "View Details" Click on this to see detailed info.
 6. Horizontal navigation. Click the left or right arrows to see more proposals.
@@ -31,8 +31,8 @@ If you Click on "View Details", you will be taken to a detail screen for that pa
 2. Governance Action type
 3. Submitted and Expiry dates and epochs
 4. Share button
-5. Governance Action ID
+5. Governance Action ID (CIP-129 format), and the Legacy Governance Action ID (CIP-105)
 6. Governance Action details
-7. Vote tally
+7. Vote tally, including the ratification threshold for each voter group. See [How Governance Action Vote Totals are Calculated in GovTool](../../faqs/how-governance-action-vote-totals-are-calculated-in-govtool.md).
 
 <figure><img src="/img/gitbook/Donate.png" alt=""><figcaption><p>Governance Action detail page</p></figcaption></figure>

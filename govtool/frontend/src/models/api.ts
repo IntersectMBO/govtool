@@ -285,3 +285,16 @@ export type Account = {
   isRegistered: boolean;
   isScriptBased: boolean;
 };
+
+/**
+ * `GET /proposal/enacted-details`: the last enacted action of a type's
+ * lineage, which a new action of that lineage must name as its previous
+ * action. Null when nothing of the lineage has been enacted.
+ */
+export type EnactedProposalDetails = {
+  id: number | null;
+  txId: number | null;
+  index: number;
+  description: unknown;
+  hash: string;
+};

@@ -26,3 +26,4 @@ export * from "./postIpfs";
 export * from "./getDRepVotingPowerList";
 export * from "./getAccount";
 export * from "./metadataReports";
+export * from "./getEnactedProposalDetails";

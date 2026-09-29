@@ -1,9 +1,11 @@
 import type {
   Account,
   DRepVotingPowerListResponse,
+  EnactedProposalDetails,
   EpochParams,
   MetadataValidationStatus,
 } from "@/models";
+import type { GovernanceActionType } from "@/types/governanceAction";
 
 export type ProposalDiscussionProps = {
   pdfApiUrl: string;
@@ -45,6 +47,10 @@ export type ProposalDiscussionProps = {
     stakeKey?: string;
   }) => Promise<number>;
   getAccount: ({ stakeKey }: { stakeKey?: string }) => Promise<Account>;
+  /** The previous action a new action of `type`'s lineage must name. */
+  getEnactedProposalDetails: (
+    type: GovernanceActionType,
+  ) => Promise<EnactedProposalDetails | null>;
 };
 
 export default function ProposalDiscussion(

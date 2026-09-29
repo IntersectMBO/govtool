@@ -172,6 +172,22 @@ export const getLovelaceFromCborBalance = (cborHex) => {
     }
 };
 
+/**
+ * The lovelace string of an ADA amount (number or decimal string), computed
+ * on the digits so no float rounding reaches the ledger: 1.005 * 1e6 is
+ * 1004999.9999999999. Throws on a negative, non-numeric or sub-lovelace
+ * amount rather than guessing.
+ */
+export const adaToLovelace = (ada) => {
+    const text = String(ada).trim().replace(',', '.');
+    const match = /^(\d+)(?:\.(\d*))?$/.exec(text);
+    if (!match || (match[2] ?? '').length > 6) {
+        throw new Error(`Invalid ADA amount: ${ada}`);
+    }
+    const lovelace = `${match[1]}${(match[2] ?? '').padEnd(6, '0')}`;
+    return lovelace.replace(/^0+(?=\d)/, '');
+};
+
 export function getItemFromLocalStorage(key) {
     const item = window.localStorage.getItem(key);
     return item ? JSON.parse(item) : null;

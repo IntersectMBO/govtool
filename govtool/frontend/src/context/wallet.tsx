@@ -126,7 +126,10 @@ type VotingAnchor = {
 
 type InfoProps = VotingAnchor;
 
-type NoConfidenceProps = VotingAnchor;
+type NoConfidenceProps = {
+  prevGovernanceActionHash?: string;
+  prevGovernanceActionIndex?: string;
+} & VotingAnchor;
 
 type TreasuryProps = {
   withdrawals: { receivingAddress: string; amount: string }[];
@@ -1336,11 +1339,25 @@ const CardanoProvider = (props: Props) => {
 
   // no confidence action
   const buildNoConfidenceGovernanceAction = useCallback(
-    async ({ hash, url }: NoConfidenceProps) => {
+    async ({
+      hash,
+      url,
+      prevGovernanceActionHash,
+      prevGovernanceActionIndex,
+    }: NoConfidenceProps) => {
       const govActionBuilder = VotingProposalBuilder.new();
       try {
-        // Create new no confidence action
-        const noConfidenceAction = NoConfidenceAction.new();
+        // Create new no confidence action; it must follow the last enacted
+        // action of the committee lineage, if there is one.
+        const noConfidenceAction =
+          prevGovernanceActionHash && prevGovernanceActionIndex
+            ? NoConfidenceAction.new_with_action_id(
+                GovernanceActionId.new(
+                  TransactionHash.from_hex(prevGovernanceActionHash),
+                  Number(prevGovernanceActionIndex),
+                ),
+              )
+            : NoConfidenceAction.new();
         const noConfidenceGovAct =
           GovernanceAction.new_no_confidence_action(noConfidenceAction);
         // Create an anchor

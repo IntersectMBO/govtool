@@ -13,7 +13,11 @@ import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Background } from "@/components/atoms";
 import { Footer, TopNav } from "@/components/organisms";
 import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
-import { getAdaHolderVotingPower, getAccount } from "@/services";
+import {
+  getAdaHolderVotingPower,
+  getAccount,
+  getEnactedProposalDetails,
+} from "@/services";
 import { env } from "@/config/env";
 import { getPdfWalletStatus } from "@/utils/getPdfWalletStatus";
 
@@ -94,6 +98,7 @@ export const ProposalDiscussionPillar = () => {
             allowUrlPorts={isTestMode}
             getAdaHolderVotingPower={getAdaHolderVotingPower}
             getAccount={getAccount}
+            getEnactedProposalDetails={getEnactedProposalDetails}
             {...snackbarContext}
           />
         </Suspense>

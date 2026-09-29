@@ -37,6 +37,8 @@ export function AppContextProvider({ children, govtoolProps = {} }) {
     const validateMetadata = govtoolProps.validateMetadata ?? null;
     const fetchDRepVotingPowerList =
         govtoolProps.fetchDRepVotingPowerList ?? null;
+    const getEnactedProposalDetails =
+        govtoolProps.getEnactedProposalDetails ?? null;
     const addSuccessAlert = govtoolProps.addSuccessAlert ?? noop;
     const addErrorAlert = govtoolProps.addErrorAlert ?? noop;
     const addWarningAlert = govtoolProps.addWarningAlert ?? noop;
@@ -165,6 +167,7 @@ export function AppContextProvider({ children, govtoolProps = {} }) {
                 validateMetadata,
                 clearStates,
                 fetchDRepVotingPowerList,
+                getEnactedProposalDetails,
                 addSuccessAlert,
                 addErrorAlert,
                 addWarningAlert,

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+    adaToLovelace,
     getGovActionDepositAda,
     getLovelaceFromCborBalance,
     isValidURLFormat,
@@ -64,5 +65,22 @@ describe('isValidURLFormat', () => {
         expect(isValidURLFormat('https://example.com:65536')).toBe(false);
         expect(isValidURLFormat('https://example.com:0/doc')).toBe(false);
         expect(isValidURLFormat('ipfs://abc')).toBe(true);
+    });
+});
+
+describe('adaToLovelace', () => {
+    it('converts whole and decimal amounts without float rounding', () => {
+        expect(adaToLovelace(929)).toBe('929000000');
+        expect(adaToLovelace('1.005')).toBe('1005000');
+        expect(adaToLovelace('0.000001')).toBe('1');
+        expect(adaToLovelace('12,5')).toBe('12500000');
+        expect(adaToLovelace('0')).toBe('0');
+    });
+
+    it('refuses amounts the ledger cannot carry', () => {
+        expect(() => adaToLovelace('-1')).toThrow();
+        expect(() => adaToLovelace('1.0000001')).toThrow();
+        expect(() => adaToLovelace('abc')).toThrow();
+        expect(() => adaToLovelace('')).toThrow();
     });
 });

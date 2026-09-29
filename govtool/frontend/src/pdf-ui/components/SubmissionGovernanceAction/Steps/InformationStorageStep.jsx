@@ -18,6 +18,7 @@ import {
 } from '../../../components/SubmissionGovernanceAction';
 import { getViaProxy, updateProposalContent } from '../../../lib/api';
 import {
+    adaToLovelace,
     isValidURLFormat,
     isValidURLLength,
     openInNewTab,
@@ -32,7 +33,8 @@ import {
 
 const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
     const navigate = useNavigate();
-    const { walletAPI, validateMetadata } = useAppContext();
+    const { walletAPI, validateMetadata, getEnactedProposalDetails } =
+        useAppContext();
     const [jsonLdData, setJsonLdData] = useState({});
     const [hashData, setHashData] = useState('');
     const [fileURL, setFileURL] = useState('');
@@ -112,6 +114,19 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
     };
     const proposalGATypeId =
         proposal?.attributes?.content?.attributes.gov_action_type_id;
+    // The previous action a new action of `type`'s lineage must name: the
+    // last enacted one, or none when nothing of the lineage was enacted.
+    const getPrevGovernanceAction = async (type) => {
+        const enacted = getEnactedProposalDetails
+            ? await getEnactedProposalDetails(type)
+            : null;
+        return enacted
+            ? {
+                  prevGovernanceActionHash: enacted.hash,
+                  prevGovernanceActionIndex: String(enacted.index),
+              }
+            : {};
+    };
     const handleGASubmission = async () => {
         try {
             let url = fileURL;
@@ -160,9 +175,9 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                             url: fileURL,
                             constitutionUrl: constitUrl,
                             constitutionHash: constiUrlHash,
-                            //prevGovernanceActionHash: string;
-                            //prevGovernanceActionIndex: number;
-                            //scriptHash: string;
+                            ...(await getPrevGovernanceAction(
+                                'NewConstitution'
+                            )),
                         });
                 } else if (parseInt(proposalGATypeId) === 4) {
                     ///Motion of No Confidence
@@ -170,6 +185,7 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                         await walletAPI.buildNoConfidenceGovernanceAction({
                             hash: hashData,
                             url: fileURL,
+                            ...(await getPrevGovernanceAction('NoConfidence')),
                         });
                 } else if (parseInt(proposalGATypeId) === 6) {
                     ///Hard Fork Initiation
@@ -222,7 +238,7 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
             }
         } catch (error) {
             console.error(error);
-            if (error?.includes('Insufficient')) {
+            if (String(error?.message ?? error).includes('Insufficient')) {
                 setShowInsufficientBallanceModal(true);
             }
         } finally {
@@ -237,7 +253,7 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                 (withdrawal) => {
                     withdrawalsArray.push({
                         receivingAddress: withdrawal.prop_receiving_address,
-                        amount: (withdrawal.prop_amount * 1000000).toString(),
+                        amount: adaToLovelace(withdrawal.prop_amount),
                     });
                 }
             );

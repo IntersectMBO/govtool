@@ -93,7 +93,7 @@ fi
   echo "CARDANOAPI_METADATA_URL=${METADATA_BUCKET_URL}"
   echo "TEST_WALLET_MNEMONIC=\"${mnemonic}\""
   echo "TX_TIMEOUT=${DEVNET_TX_TIMEOUT:-120000}"
-  echo "IS_HARDFORK_PROPOSAL_ENABLED=false"
+  echo "IS_HARDFORK_PROPOSAL_ENABLED=true"
   echo "CI=true"
   echo "TEST_WORKERS=${DEVNET_TEST_WORKERS:-4}"
   [ -f "$DEVNET_STATE_DIR/faucet.env" ] && grep '^FAUCET_' "$DEVNET_STATE_DIR/faucet.env"

@@ -1,7 +1,7 @@
 import environments from "@constants/environments";
 import { guardrailsScript, guardrailsScriptHash } from "@constants/index";
 import { faker } from "@faker-js/faker";
-import { isBootStrapingPhase } from "@helpers/cardano";
+import { getProtocolVersion, isBootStrapingPhase } from "@helpers/cardano";
 import { expectWithInfo } from "@helpers/exceptionHandler";
 import { getProposalType } from "@helpers/index";
 import {
@@ -564,12 +564,14 @@ export default class ProposalSubmissionPage {
       }
     }
     if (proposalType == ProposalType.hardFork) {
-      proposal.prop_min_version = faker.number
-        .float({ min: 0, max: 100 })
-        .toString();
-      proposal.prop_major_version = faker.number
-        .float({ min: 0, max: 100 })
-        .toString();
+      // The ledger accepts only a direct successor of the current version:
+      // (major + 1, 0) or (major, minor + 1).
+      const { major, minor } = await getProtocolVersion();
+      const next = faker.datatype.boolean()
+        ? { major: major + 1, minor: 0 }
+        : { major, minor: minor + 1 };
+      proposal.prop_major_version = next.major.toString();
+      proposal.prop_min_version = next.minor.toString();
     }
 
     return proposal;

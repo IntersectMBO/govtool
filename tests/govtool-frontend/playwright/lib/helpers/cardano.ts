@@ -1,7 +1,7 @@
 import environments from "@constants/environments";
 import test from "@playwright/test";
 import kuberService from "@services/kuberService";
-import { ProposalType } from "@types";
+import { ProposalType, ProtocolVersionType } from "@types";
 import { allure } from "allure-playwright";
 import { bech32 } from "bech32";
 import { functionWaitedAssert } from "./waitedLoop";
@@ -18,7 +18,8 @@ export function generateWalletAddress() {
   return bech32.encode("addr_test", randomBytes);
 }
 
-export async function getProtocolParamsMajorVersion() {
+/** The chain's current protocol version, from Kuber (cached per run). */
+export async function getProtocolVersion(): Promise<ProtocolVersionType> {
   let protocolParameter = await getFile("protocolParameter.json");
   if (protocolParameter === undefined) {
     await functionWaitedAssert(
@@ -29,7 +30,11 @@ export async function getProtocolParamsMajorVersion() {
       { name: "queryProtocolParams" }
     );
   }
-  return protocolParameter.protocolVersion.major;
+  return protocolParameter.protocolVersion;
+}
+
+export async function getProtocolParamsMajorVersion() {
+  return (await getProtocolVersion()).major;
 }
 
 export async function isBootStrapingPhase() {

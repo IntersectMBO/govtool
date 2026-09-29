@@ -122,13 +122,15 @@ jobs:
         uses: crazy-max/ghaction-github-runtime@v3
 
       # Bake resolves the compose file's build contexts from the working
-      # directory, not from the file's own directory.
+      # directory, not from the file's own directory, and reads contexts
+      # outside it (../../govtool/...) only with an fs.read entitlement.
       - name: Build app images
         working-directory: tests/devnet
         run: |
           source lib.sh
           load_env
-          docker buildx bake --file docker-compose.yml --load \
+          docker buildx bake --allow=fs.read="$GITHUB_WORKSPACE" \
+            --file docker-compose.yml --load \
             --set '*.cache-from=type=gha' --set '*.cache-to=type=gha,mode=max'
 
       - name: Start devnet and app stack

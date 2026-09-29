@@ -66,12 +66,12 @@ const LEGACY_TYPE: Record<GovAction['type'], GovernanceActionType> = {
  * because `UpdateCommittee` and `NoConfidence` share one and a per-type answer
  * returns a `prevGovActionId` the ledger rejects.
  */
-const LINEAGE_OF: Record<
-  'ParameterChange' | 'HardForkInitiation',
-  GovActionLineage
-> = {
+const LINEAGE_OF: Partial<Record<GovernanceActionType, GovActionLineage>> = {
   ParameterChange: 'pparamUpdate',
   HardForkInitiation: 'hardFork',
+  NoConfidence: 'committee',
+  NewCommittee: 'committee',
+  NewConstitution: 'constitution',
 };
 
 /**
@@ -195,23 +195,24 @@ export class ProposalService {
   }
 
   /**
-   * The legacy endpoint substituted `HardForkInitiation` for any type other
-   * than itself and `ParameterChange`, because the statement can only return
-   * those two. The provider refuses an unanswerable type instead, so the
-   * substitution is reproduced here to keep the response identical.
+   * Every type with a lineage answers with its own (D147); the legacy
+   * endpoint answered only `ParameterChange` and `HardForkInitiation` and
+   * substituted the hard-fork lineage for any other type. Types without a
+   * lineage (`TreasuryWithdrawals`, `InfoAction`) and a missing type keep
+   * that substitution, so their responses are unchanged.
    */
   async getEnactedDetails(
     type?: GovernanceActionType,
   ): Promise<EnactedProposalDetailsResponse | null> {
-    const proposalType =
-      type === 'ParameterChange' || type === 'HardForkInitiation'
-        ? type
-        : 'HardForkInitiation';
+    // `type` is an unvalidated query parameter: only own keys count.
+    const lineage =
+      (type !== undefined && Object.hasOwn(LINEAGE_OF, type)
+        ? LINEAGE_OF[type]
+        : undefined) ?? 'hardFork';
 
     return asHttp(async () => {
-      const { data } = await this.chain.governance.proposals.getEnacted(
-        LINEAGE_OF[proposalType],
-      );
+      const { data } =
+        await this.chain.governance.proposals.getEnacted(lineage);
 
       if (data === null) {
         return null;

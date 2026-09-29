@@ -41,6 +41,7 @@ import { DRepService } from '../src/drep/drep.service';
 import { EpochService } from '../src/epoch/epoch.service';
 import { NetworkService } from '../src/network/network.service';
 import { ProposalService } from '../src/proposal/proposal.service';
+import type { GovernanceActionType } from '../src/proposal/proposal.type';
 import { TransactionService } from '../src/transaction/transaction.service';
 import { drepIdToCip105, legacyStakeAddress } from '../src/common/legacy-ids';
 import { LegacyNetwork } from '../src/common/legacy-network';
@@ -1844,9 +1845,26 @@ describe('GET /proposal/enacted-details', () => {
     });
 
     await service.getEnactedDetails('ParameterChange');
+    await service.getEnactedDetails('HardForkInitiation');
+    await service.getEnactedDetails('NoConfidence');
+    await service.getEnactedDetails('NewCommittee');
+    await service.getEnactedDetails('NewConstitution');
     await service.getEnactedDetails('InfoAction');
+    await service.getEnactedDetails('TreasuryWithdrawals');
     await service.getEnactedDetails(undefined);
-    expect(requested).toEqual(['pparamUpdate', 'hardFork', 'hardFork']);
+    // An unvalidated query value naming an inherited key.
+    await service.getEnactedDetails('constructor' as GovernanceActionType);
+    expect(requested).toEqual([
+      'pparamUpdate',
+      'hardFork',
+      'committee',
+      'committee',
+      'constitution',
+      'hardFork',
+      'hardFork',
+      'hardFork',
+      'hardFork',
+    ]);
   });
 
   it('returns null when nothing of the lineage has ever been enacted', async () => {

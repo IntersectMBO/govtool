@@ -5256,3 +5256,24 @@ investigation and then implementation"
   epochs it tests are never 0 on a Conway network, and `index` goes through `toString(16)` first.
 - Search and list rows read titles and abstracts from a per-(hash, url) cache in the backend (resolved
   24 h, unresolved 5 min, 4096 entries), warmed after each snapshot refresh; results are unchanged.
+
+## D147 — `enacted-details` answers every lineage; pdf-ui names the previous action
+
+**Date:** 2026-09-29
+
+- `GET /proposal/enacted-details?type=` resolves `NewConstitution` to the constitution lineage and
+  `NoConfidence` and `NewCommittee` to the committee lineage, as it already did `ParameterChange` and
+  `HardForkInitiation`. The Haskell backend answered the hard-fork lineage for any other type, which is
+  the wrong previous action for every one of them; its only caller asked for `HardForkInitiation`.
+  `TreasuryWithdrawals`, `InfoAction`, a missing type and any unknown value keep the hard-fork answer,
+  so those responses are unchanged. Only the table's own keys count: `type` is an unvalidated query value.
+- GovTool passes pdf-ui a `getEnactedProposalDetails(type)` prop on its own API client (D144's host-owned
+  pattern), rather than pdf-ui calling through the pdf backend's `/api/proxy`. pdf-ui calls it when it
+  submits an Updates to the Constitution or a Motion of No Confidence and names the result as the
+  previous action; null means none is named. The index travels as a string, because the wallet builders
+  skip a falsy index.
+- The wallet's no-confidence builder takes the previous action (`NoConfidenceAction.new_with_action_id`);
+  it built without one, which the ledger rejects once any committee action is enacted.
+- pdf-ui converts withdrawal amounts to lovelace on the digits (`adaToLovelace`): `prop_amount * 1e6`
+  gave fractional strings for about 2% of two-decimal amounts (1.005 → 1004999.9999999999), which the
+  serialisation library refuses. Its submit `catch` no longer throws on an `Error` (#3949).

@@ -1,6 +1,6 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 import { useLocation } from "react-router";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 
 import { useCardano } from "@context";
 import {
@@ -28,9 +28,15 @@ export const EditDRepForm = ({
   const { dRepID } = useCardano();
   const { control, errors, isError, register, watch, reset } =
     useEditDRepInfoForm();
-  const { dRep: yourselfDRep } = useGetDRepDetailsQuery(dRepID, {
-    enabled: !state,
-  });
+  const { dRep: yourselfDRep, isLoading: isDRepLoading } =
+    useGetDRepDetailsQuery(dRepID, {
+      enabled: !state,
+    });
+  // The stored metadata is applied to the form exactly once, before the form
+  // is shown: a prefill landing after the user has started typing would
+  // overwrite their input and clear its errors.
+  const prefilled = useRef(false);
+  const isWaitingForPrefill = loadUserData && !state && isDRepLoading;
 
   const onClickContinue = () => {
     setStep(2);
@@ -40,7 +46,8 @@ export const EditDRepForm = ({
   const isContinueButtonDisabled = !watch("givenName") || isError;
 
   useEffect(() => {
-    if (loadUserData) {
+    if (loadUserData && !isWaitingForPrefill && !prefilled.current) {
+      prefilled.current = true;
       const data: DRepData = state ?? yourselfDRep;
 
       reset({
@@ -62,7 +69,15 @@ export const EditDRepForm = ({
             : defaultEditDRepInfoValues.identityReferences,
       });
     }
-  }, [yourselfDRep, loadUserData]);
+  }, [yourselfDRep, loadUserData, isWaitingForPrefill]);
+
+  if (isWaitingForPrefill) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 8 }}>

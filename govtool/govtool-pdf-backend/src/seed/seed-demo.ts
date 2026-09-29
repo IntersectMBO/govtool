@@ -188,10 +188,12 @@ export async function seedDemo(prisma: PrismaClient): Promise<boolean> {
         await proposal(tx, ids[0], typeId, typeName, ids, false);
       }
       await proposal(tx, ids[1], 1, 'Info Action', ids, true);
+      // The submitted BD comes first, so it is the oldest: specs open the
+      // newest BD and need its editing and poll voting enabled.
+      await bd(tx, ids[1], 1, 'Core', ids, new Date());
       for (const [typeId, typeName] of BD_TYPES) {
         await bd(tx, ids[0], typeId, typeName, ids, null);
       }
-      await bd(tx, ids[1], 1, 'Core', ids, new Date());
     },
     { timeout: 60000 },
   );

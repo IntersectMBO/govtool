@@ -3,7 +3,8 @@
 Runs GovTool and its integration suites against a local Cardano devnet. Once
 images are pulled or built, nothing reaches a public network, hosted Kuber,
 Blockfrost, a faucet, Pinata or an IPFS gateway, and no secrets are needed.
-CI: `.github/workflows/test_integration_devnet.yml` (push to `dev`, manual).
+CI: `.github/workflows/test_integration_devnet.yml` (push to `dev` and
+`draft/govtool-provider-layer`, manual).
 
 - Chain: adaup (`cardano devnet up --docker`) runs cardano-node 11.0.1
   (magic 42, protocol 10), Kuber, db-sync 13.7 with its Postgres and an
@@ -78,12 +79,10 @@ the host (macOS and systemd-resolved map `*.localhost`; otherwise add it to
 
 ## Excluded
 
-- Proposal discussion forum specs (7, 8, 11, 12 and 6I–6L): left out of
-  every run by request; the `.pd`/`.pb`/`.ga` projects are not in the list
-  and `run-tests.sh` filters their plain specs. The local pdf backend makes
-  them runnable (set the three variables above).
+Playwright runs every project, the proposal discussion forum and `mobile`
+included; the pdf backend in the stack serves the forum.
+
 - `10-feedback/chatwoot.spec.ts`: Chatwoot is disabled.
-- `mobile` project: not in the default list.
 - pytest survey tests: opt-in upstream (`RUN_SURVEY_TESTS=1`).
 
 ## Workarounds in the suites

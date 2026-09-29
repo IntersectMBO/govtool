@@ -4956,3 +4956,303 @@ diffed against preview.gov.tools/api and now matches it:
   same change keeps polling until the expected state appears or the 3-minute
   expiry fires; before, polling stopped at confirmation and "in progress" could
   stay up for good.
+
+## D138 — Rebuild the proposal discussion forum (PDF) backend in NestJS
+
+**Date:** 2026-09-26
+**Said:** "I need you to autonomously build it from scratch using a typescript
+nest.js backend. Use libcardano for the crypto. Use prisma for
+database access/modification, use postgres for storage." Then: update the
+frontend to use it, remove the `@intersect.mbo/pdf-ui` package and make it
+local in the frontend.
+
+- New package `govtool/govtool-pdf-backend` (NestJS 11, Prisma 6, Postgres 16),
+  replacing the Strapi backend of IntersectMBO/govtool-proposal-pillar. Its
+  `docker-compose.yml` runs Postgres and the backend with
+  `docker compose up -d`; migrations apply on start.
+- The wire surface is the Strapi **v4** REST envelope and query syntax, limited
+  to what pdf-ui sends. Strapi's package.json says 5.47, but the controllers
+  and pdf-ui are v4-shaped and pdf-ui never sends `Strapi-Response-Format: v4`,
+  so v4 is what the frontend actually needs. No Strapi admin panel, GraphQL, or
+  generic content-type API.
+- Where the Strapi code is unsafe, the rebuild deliberately differs, and the
+  spec lists each difference: the proxy is not an open relay, login checks
+  that the signed payload is the issued challenge and consumes it, ownership
+  is enforced on every write, counters and owner fields are server-set, and
+  user private fields are never returned.
+- Crypto (CIP-8/CIP-30 `signData` verification, key-hash and address checks)
+  goes through `libcardano`.
+- The spec is `govtool/govtool-pdf-backend/SPEC.md`; the investigation it rests
+  on is summarised there, not copied.
+
+## D139 — pdf-ui source lives in the frontend
+
+**Date:** 2026-09-26
+**Said:** "remove the old-pdf-ui package and make it locally in the frontend."
+
+- `govtool/frontend/src/pdf-ui/` holds the 1.0.18-beta source as plain JS/JSX
+  (not converted to TS); `ProposalDiscussion.tsx` lazy-loads `@/pdf-ui/App`,
+  typed by `src/pdf-ui/App.d.ts`. The `@intersect.mbo/pdf-ui` dependency, its
+  type shim and the `pdfUiFonts` Vite plugin are gone.
+- The vendored code runs on the frontend's own versions (date-fns 2,
+  react-markdown 9, cardano-serialization-lib 14); nothing it used changed
+  between those majors.
+- `src/pdf-ui` is outside lint (`--ext ts,tsx`) and type checking (`checkJs`
+  off). Converting it is separate work.
+
+## D140 — PDF backend spec choices not forced by the Strapi source
+
+**Date:** 2026-09-26
+**Context:** writing `govtool/govtool-pdf-backend/SPEC.md` (D138). These were
+judgement calls; the spec's §13 deviation index (Δ1–Δ45) lists every place the
+rebuild differs from Strapi.
+
+- Login binds the key hash and the signed payload (it must equal the issued
+  challenge, which is consumed on the first attempt). It does not bind the
+  COSE `address` header: the Playwright wallet (`SimpleCip30Wallet`) puts the
+  base address there when asked to sign with a reward address.
+- Stake or DRep login is chosen by identifier form (58-hex e0/e1 reward
+  address vs 56-hex DRep hash). Access JWT 1h, refresh 7d in an httpOnly
+  cookie holding a JWT with its own secret, SameSite=Lax by default.
+- A bad token on a public route reads as anonymous; missing auth 403, bad
+  token 401, foreign row 403.
+- Users are exposed to others only as `{id, govtool_username}`; report hashes,
+  e-mail and contact information never leave the server. Unknown query keys,
+  paths and populates are a 400, except no-op paths pdf-ui sends.
+- Seeds come from the Playwright enums in enum order; hard fork is id 6,
+  id 5 unseeded. One like/dislike per user, one budget-poll vote per DRep;
+  polls close but never reopen.
+- Budget discussion delete removes the whole version chain; submitted ones
+  are locked. `POST /api/proxy` needs login, GET only, 10 s, 5 MiB, public
+  addresses unless `PDF_ALLOW_PRIVATE_URLS=true`.
+- Dropped: e-mail, the report endpoint, `old_ver`, the protocol-version filter
+  on action types.
+- e2e runs on a `pdf_test` database and refuses any database not ending in
+  `_test`; `npm run seed:demo` provides the existing rows Playwright expects.
+
+## F52 — Playwright pdf run against govtool-pdf-backend: no backend defects, ten elsewhere
+
+**Date:** 2026-09-26
+**Context:** first run of the pdf specs (7, 8, 11, 12, 6I–6L) against the
+rebuilt backend (D138) and the vendored pdf-ui (D139), preview network,
+HD wallets pinned with `HD_RUN_ID`. Failed tests were re-run once serially;
+passing tests were not re-run. Every backend response in the failing traces
+was correct. Defects, by owner:
+
+- **D1, test suite.** Fresh HD wallets have no pdf username, so pdf-ui's
+  username modal blocks the fixtures and most logged-in specs; the setup
+  projects that set usernames went in 438a62e3. For the run, users with
+  `govtool_username` were pre-inserted for the pinned wallets (environment,
+  not code or tests).
+- **D2, pdf-ui / wallet context.** Sign-in reads `wallet.stakeKey` after
+  checking only `address` (`pdf-ui/lib/helpers.js:93`,
+  `UserValidation.jsx:68`); GovTool sets the address first
+  (`context/wallet.tsx:424` vs `:472`), so pdf-ui sends
+  `challenge?identifier=undefined` (400) and never signs in. Worse under
+  parallel workers; the HD wallet's Blockfrost-backed stake-key calls widen
+  the gap. 9 tests.
+- **D3, test vs pdf-ui.** 7E_1–4 expect `add-link-button` hidden after 7
+  links; pdf-ui always renders it (unchanged upstream).
+- **D4, test vs pdf-ui.** 7M_2 expects `amount-0-content` "929"; the UI
+  shows "₳ 929".
+- **D5, environment.** pdf-ui's `URL_REGEX` (`lib/utils.js:7`) rejects URLs
+  with a port, so the local bucket `http://127.0.0.1:3001/...` is an invalid
+  constitution URL. 4 tests.
+- **D6, pdf-ui.** On reload, the stale-session check compares
+  `jwt.stakeKey` with a not-yet-set `wallet.stakeKey` and clears the session
+  (`helpers.js:28-34`). 12H, 12J.
+- **D7, test suite.** The page wallet proxy (`lib/wallet/pageWallet.ts`) has
+  no CIP-30 `getBalance`; pdf-ui then reads the balance as 0. 7O passes only
+  because of this.
+- **D8, pdf-ui.** GA submission is gated on a hard-coded 100000.18 ADA
+  (`SingleGovernanceAction/index.jsx:650`, `:1179`) instead of
+  `epochParams.gov_action_deposit` (1000 ADA on preview); the .ga tests fund
+  deposit + 22 ADA, so all of 7H/7J/7K/7P stay blocked after D7.
+- **D9, pdf-ui.** Wallet info is copied once at sign-in; a slow
+  `/drep/info` arrives after it, so `verify-drep-link` never appears (11K).
+- **D10, test suite.** 7J_1's afterEach throws `undefined.goto` when its
+  beforeEach failed.
+
+Results: anonymous desktop smoke 21/21; pdf projects 53 of 79 passed (40 in
+parallel, 13 more serially), 26 failing on D2–D10; 6I–6L 4/4; mobile pdf specs
+24/25 (6M footer links, unrelated to pdf).
+
+## D141 — IPFS for isolated test environments goes to the test metadata service
+
+**Date:** 2026-09-27
+
+- `govtool-pinning-test` (`@govtool/pinning-test`) implements `PinningServiceV1`
+  over `tests/test-metadata-api`, selected by `GOVTOOL_PINNING_PROVIDER=test`
+  with `GOVTOOL_TEST_PINNING_URL`. Default stays `pinata`; an unknown name or a
+  non-http(s) url is refused at startup.
+- CIDs are CIDv1, raw codec, sha2-256, base32 (`bafkrei…`): what Pinata's v3
+  upload returns for single-block content and what `govtool-pinning-pinata`
+  already computes in `getDataCid`. Computed with node:crypto, no dependency;
+  the client checks the service's answer against its own. Above one 256 KiB
+  block a real node would assign a dag-pb root; the test service keeps the raw
+  CID up to its 512 KiB cap, which nothing in GovTool can observe.
+- `tests/test-metadata-api` serves `POST|PUT /ipfs`, `GET|DELETE /ipfs/<cid>`
+  and `GET /ipfs` (health). `GET` accepts only `bafkrei` CIDs so a request can
+  never name a path outside the store. It is the gateway for every reader:
+  frontend `VITE_IPFS_GATEWAY=<url>/ipfs`, metadata service
+  `IPFS_PRIMARY_GATEWAY=<url>` plus the new `IPFS_GATEWAYS=<url>` (replaces the
+  public list) and `METADATA_ALLOW_PRIVATE_ADDRESSES=true`, metadata-validation
+  `IPFS_GATEWAY=<url>/ipfs`, db-sync `"ipfs_gateway": ["<url>/ipfs"]` in its
+  config file (13.7.2.1; default `https://ipfs.io/ipfs`).
+- The frontend's three hard-coded `https://ipfs.io/ipfs` uses now read
+  `VITE_IPFS_GATEWAY` with that as the fallback. A CIP-179 `ipfs://` anchor may
+  now be fetched over http when the configured gateway is http; any other
+  anchor must still be https.
+
+## D142 — A custom devnet is a db-sync network, dated from its genesis file
+
+**Date:** 2026-09-27
+
+- `GOVTOOL_DBSYNC_NETWORK` (and `GOVTOOL_BLOCKFROST_NETWORK`) accept `devnet`:
+  any local testnet, network id 0, `stake_test` prefixes. The contract's
+  `NetworkId` already allowed a custom name, and both providers treat every
+  name but `mainnet` as a testnet, so nothing else switches on the name.
+- db-sync's `meta.network_name` comes from db-sync's own `NetworkName`, which
+  a devnet harness chooses. For a non-public network the db-sync provider
+  accepts any name except `mainnet`, `preprod` and `preview` (so a devnet
+  backend pointed at a public database still refuses);
+  `GOVTOOL_DBSYNC_NETWORK_NAME` (provider option `dbNetworkName`) pins it.
+- The epoch schedule is not hard-coded and not configured as numbers: a devnet
+  regenerates its genesis every run and slots can be 0.2 s. The db-sync
+  provider gains `network.getGenesisParams()`, present only when given
+  `shelleyGenesisPath` (`GOVTOOL_DBSYNC_SHELLEY_GENESIS_PATH`), the Shelley
+  genesis db-sync itself was started with. It is read on each call and
+  refused (`INTERNAL`) when its `systemStart` is not `meta.start_time`, which
+  is how a file left over from an earlier run shows. Deriving the schedule from
+  db-sync alone was rejected: `meta.start_time` gives the start, but the slot
+  and epoch lengths would have to be inferred from block times.
+- The backend keeps the three public schedules as constants (mainnet began in
+  Byron, so its Shelley genesis alone would misdate it) and asks
+  `getGenesisParams` for any other network, in milliseconds, rounded
+  (300 × 0.2 s is 60.00000000000001 s in a double). A failed read leaves
+  epoch-only stamps undated (`expiryDate: null`) rather than failing the
+  route. Any provider with genesis parameters (Koios, Blockfrost) gets the
+  same behaviour on a custom network.
+
+## D143 — The outcomes UI is served by govtool-backend, through the contract
+
+**Date:** 2026-09-27
+
+- `@intersect.mbo/govtool-outcomes-pillar-ui` calls seven routes on
+  `VITE_OUTCOMES_API_URL`: `GET /governance-actions` (`search`, `filters`,
+  `sort`, `page`, `limit`), `GET /governance-actions/:txHash?index=`,
+  `GET /governance-actions/metadata?url=&hash=`,
+  `GET /governance-actions/proposal/:txHash`, `GET /misc/network/metrics?epoch=`,
+  `GET /misc/epoch/params?epoch=` and `POST /misc/verify-signature`.
+  Neither `backend` nor `backend-ts` on develop serves them; an unmerged
+  branch (`cardanoapi/outcomes-merge`, 2026-09-25) adds them to `backend-ts`
+  over new SQL under `/outcomes`. govtool-backend serves them under the same
+  `/outcomes` prefix, so `VITE_OUTCOMES_API_URL=<backend>/outcomes`, built from
+  the contract instead of SQL.
+- Contract additions, all optional: `getStakeDistribution({ epoch })` and
+  `getCommittee({ epoch })`, declared `stakeDistribution.epoch` and
+  `committee.epoch`, and `StakeDistribution.spoAlwaysAbstainVotingPower` /
+  `spoAlwaysNoConfidenceVotingPower` (pool voting power whose reward account
+  delegates to a predefined DRep: the protocol-10 default SPO vote). The
+  db-sync provider implements all four; fixture, Koios and Blockfrost do not
+  yet, so on them `/outcomes/misc/network/metrics` is a 501 (they lack the SPO
+  fields, and the fixture the DRep breakdown too) and a past epoch is a 501
+  rather than current figures.
+- Rows come from the proposal snapshot the `/proposal` routes already keep.
+  Deliberate differences from the branch: `id` is the CIP-129 action id (no
+  provider has db-sync row ids); list `yes_votes`/`no_votes`/`abstain_votes`
+  are the DRep tally (stake, or count where the provider only counts) rather
+  than a count of vote rows of every role, which nothing renders and only the
+  `highestYesVotes` sort read; `description` uses one shape in list and detail
+  (the branch's list had a null committee threshold and bare hash strings);
+  a ParameterChange `description.data` carries contract parameter names (the
+  UI renders `proposal_params`); dates are `toISOString()` UTC, and
+  `status_times` are epoch starts from the schedule (D142), not db-sync's
+  first-block times; the active-DRep total excludes inactive DReps, as the
+  ledger's denominator does; `/misc/epoch/params` answers the flat
+  `epoch_param` row the UI reads (the branch wrapped it in `{ epoch_param }`,
+  which the UI cannot read).
+- Title, abstract, motivation, rationale and `json_metadata` are resolved
+  through the metadata service when `GOVTOOL_METADATA_SERVICE_URL` is set, and
+  null otherwise; the UI then calls `…/metadata`, which is the backend's
+  existing CIP-108 validation.
+- `…/proposal/:txHash` asks `GOVTOOL_PDF_API_URL` (the pdf API, e.g.
+  `http://pdf-backend:1337/api`) for
+  `filters[prop_submission_tx_hash][$eq]`, and answers `{ data: item | null }`;
+  503 unset. The branch fetched `/proposals/<txHash>`, an id route. The hash
+  is validated as 64-hex before the request; no redirects, 10 s, 1 MB.
+- `verify-signature` fetches through the backend's guarded metadata fetch (the
+  branch used a bare `fetch` of a caller-supplied URL), canonicalises with
+  `jsonld` URDNA2015 under a document loader that refuses every remote
+  context, and verifies `ed25519` and `CIP-0008` witnesses with node:crypto
+  and a minimal CBOR codec, so the backend takes one new dependency (`jsonld`)
+  rather than the branch's four.
+
+## D144 — pdf-ui reads GovTool state and uses GovTool's design system
+
+**Date:** 2026-09-28
+**Said:** "fix that on the frontend, and to make the design style same with govtool. with a proper plan and
+investigation and then implementation"
+
+- The plan is `docs/pdf-ui/plan.md`; the investigations behind it are beside it.
+- State: the host passes `walletStatus` (`disconnected | connecting | ready`); pdf-ui derives wallet, user, DRep and
+  epoch state live from props instead of copying them, with one session-sync effect and one refresh loop. Fixes D2,
+  D6, D9.
+- Design: pdf-ui drops its own theme for GovTool's (via a temporary compatibility layer), GovTool tokens,
+  breakpoints, icons and atoms/molecules; screens are laid out on their closest GovTool counterparts.
+- Kept: every testid, every asserted string, the API calls, the session format and the routes. TypeScript
+  conversion and i18n are follow-ups.
+
+## F53 — pdf-ui alignment: 76/79 pdf tests, D2/D6/D9 fixed, three known failures left
+
+**Date:** 2026-09-28
+**Context:** D144 implemented as `docs/pdf-ui/plan.md` P1–P6; one full pdf run on a build of the final tree.
+
+- pdf projects 76/79 (from 53), 6I–6L + 6P 5/5, mobile pdf 21/21. The acceptance list for the state fix
+  (7D_3, 7I_1, 7I_4, 7M_1, 8G, 12D_3, 12F_5, 12H, 12J, 11K) is green.
+- Left: 7H_3 (D13, local constitution URL unreachable from the pdf backend container), 7H_4 (D11, #3917),
+  7P (D14). The last two also fail in CI #491.
+- pdf-ui keeps a thin theme over GovTool's (`ThemeProviderWrapper/theme.js`): only MuiCard and a scoped
+  MuiTextField pill for the MUI Cards and the selects/getByLabel fields that stay MUI. The plan's "delete the
+  wrapper" step became this, because those components remain.
+- GovTool shared code touched: TextArea/Input atoms and Field.TextArea/Input forward `onBlur`, Field.TextArea
+  gains `errorDataTestId`; vitest forks capped at 2 locally, 4 in CI (`vite.config.ts`).
+- Report: `tests/govtool-frontend/playwright/reports/pdf-ui-alignment-2026-09-28.md`.
+
+## D145 — Outcomes signature checks match the outcomes service; remote `@context` resolved through the guarded fetch
+
+**Date:** 2026-09-28
+**Said:** "We need to support the @context with url … for now we let support @context like outcomes";
+"signature verification -> lets make it as strict as it does in the outcomes"; "keep our hash check".
+**Amends:** D143 (verify-signature refused every remote context).
+
+- Compared against `IntersectMBO/govtool-outcomes-pillar` main `6a267ba`. cardanoapi's `outcomes-merge`
+  branch is the same SQL, copied into backend-ts.
+- `POST /outcomes/misc/verify-signature` resolves a remote JSON-LD `@context` as the outcomes service did.
+  It is fetched through the backend's guarded metadata fetch (SSRF guard, size and time limits, ipfs:// via the
+  gateway), at most 8 per document, and cached by url. The long-term policy is #4255 (sub-issue of #4225):
+  where it lives, allowlist or guarded fetch, limits, cache TTL, and pinning a context against later change.
+- CIP-0008 checks are the outcomes service's: the COSE_Key must be an OKP / EdDSA / Ed25519 map
+  (a raw 32-byte vkey is still accepted), and the protected header must carry alg -8 and `address`.
+  The unprotected header must be a map.
+- `GET /outcomes/governance-actions/metadata` returns the document's `authors` in `data`, as the outcomes
+  service did; the UI falls back to it when `json_metadata` is null, which it is with no metadata service
+  configured. The legacy `/metadata/validate` route is unchanged.
+- Kept as is: raw-byte hash checking (the outcomes service also accepted re-serialised and canonical-form
+  hashes), and CIP-108 as the only standard on this route (outcomes are governance actions; the outcomes
+  service's CIP-119 detection came from shared DRep validation code).
+- Undecided: the DRep stake denominator (ours counts active DReps only; the outcomes service counted every
+  DRep's latest stake) and the committee member count.
+
+## D146 — Outcomes `prev_gov_action_index` is a decimal string
+
+**Date:** 2026-09-28
+**Amends:** D143.
+
+- `GET /outcomes/governance-actions/:txHash` answers `prev_gov_action_index` as a string (`"0"`), or null,
+  as the outcomes service did. The UI links the previous action only when the field is truthy, so the
+  number 0 hid the link for every action whose previous action was at index 0.
+- No other outcomes number is truthiness-tested where 0 can occur: the status epochs and committee term
+  epochs it tests are never 0 on a Conway network, and `index` goes through `toString(16)` first.
+- Search and list rows read titles and abstracts from a per-(hash, url) cache in the backend (resolved
+  24 h, unresolved 5 min, 4096 entries), warmed after each snapshot refresh; results are unchanged.

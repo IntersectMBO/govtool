@@ -31,6 +31,11 @@ import { SurveyController } from './survey/survey.controller';
 import { SurveyService } from './survey/survey.service';
 import { ProvidersModule } from './providers/providers.module';
 import { LegacyNetwork } from './common/legacy-network';
+import {
+  OutcomesGovernanceActionsController,
+  OutcomesMiscController,
+} from './outcomes/outcomes.controller';
+import { OutcomesService } from './outcomes/outcomes.service';
 
 /**
  * There is no `DbService` or `SqlService` here any more: every read goes
@@ -53,6 +58,8 @@ import { LegacyNetwork } from './common/legacy-network';
     IpfsController,
     SystemController,
     SurveyController,
+    OutcomesGovernanceActionsController,
+    OutcomesMiscController,
   ],
   providers: [
     // Writes bigint response fields as unquoted JSON numbers, so a lovelace
@@ -72,6 +79,7 @@ import { LegacyNetwork } from './common/legacy-network';
     CacheWarmerService,
     SurveyService,
     SystemService,
+    OutcomesService,
   ],
 })
 export class AppModule {}

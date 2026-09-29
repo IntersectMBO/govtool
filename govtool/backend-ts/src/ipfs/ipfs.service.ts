@@ -43,7 +43,7 @@ export class IpfsService {
     let response: Response;
 
     try {
-      response = await fetch('https://upload.pinata.cloud/v3/files', {
+      response = await fetch('https://uploads.pinata.cloud/v3/files', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${jwt}`,

@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const lock_api = require('./locks_api')
+const ipfs_api = require('./ipfs_api')
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -14,7 +15,7 @@ const dynamicCors = (req, res, next) => {
 
     // Allow requests from any origin but with credentials
     res.header('Access-Control-Allow-Origin', origin || '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     res.header('Access-Control-Allow-Credentials', 'true');
 
@@ -31,6 +32,13 @@ const dataDir = process.env.DATA_DIR || path.join(__dirname, 'json_files');
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
 }
+// cors enable
+app.use(dynamicCors);
+
+// IPFS pinning and gateway routes; they parse their own raw bodies, so they
+// are set up before the text parser below.
+ipfs_api.setup(app, { ipfsDir: process.env.IPFS_DIR || path.join(dataDir, 'ipfs') });
+
 // Middleware to parse text request bodies
 app.use(express.text());
 
@@ -44,18 +52,25 @@ const swaggerOptions = {
             description: 'API for saving and deleting files',
         },
     },
-    apis: ['index.js','locks_api.js'], // Update the path to reflect the compiled JavaScript file
+    apis: ['index.js','locks_api.js','ipfs_api.js'], // Update the path to reflect the compiled JavaScript file
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
-// cors enable
-app.use(dynamicCors);
 
 // Serve Swagger UI
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // PUT endpoint to save a file
+// Filenames are single path segments; anything that could leave dataDir
+// (separators, "..", NUL) or reach the ipfs store is refused.
+function resolveDataPath(filename) {
+    if (!filename || filename === '.' || filename === '..' || filename === 'ipfs'
+        || /[\\/\0]/.test(filename)) {
+        return null;
+    }
+    return path.join(dataDir, filename);
+}
+
 /**
  * @swagger
  * /data/{filename}:
@@ -80,8 +95,10 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *         description: File saved successfully
  */
 app.put('/data/:filename', (req, res) => {
-    const filename = req.params.filename;
-    const filePath = path.join(dataDir, filename);
+    const filePath = resolveDataPath(req.params.filename);
+    if (!filePath) {
+        return res.status(400).send({'message': 'Invalid filename'});
+    }
 
     fs.writeFile(filePath, req.body, (err) => {
         if (err) {
@@ -116,8 +133,10 @@ app.put('/data/:filename', (req, res) => {
  *               type: string
  */
 app.get('/data/:filename', (req, res) => {
-    const filename = req.params.filename;
-    const filePath = path.join(dataDir, filename);
+    const filePath = resolveDataPath(req.params.filename);
+    if (!filePath) {
+        return res.status(400).send({'message': 'Invalid filename'});
+    }
 
     fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
@@ -149,8 +168,10 @@ app.get('/data/:filename', (req, res) => {
  *         description: File deleted successfully
  */
 app.delete('/data/:filename', (req, res) => {
-    const filename = req.params.filename;
-    const filePath = path.join(dataDir, filename);
+    const filePath = resolveDataPath(req.params.filename);
+    if (!filePath) {
+        return res.status(400).send({'message': 'Invalid filename'});
+    }
 
     fs.unlink(filePath, (err) => {
         if (err) {

@@ -7,6 +7,7 @@ import {
   isBootStrapingPhase,
   skipIfMainnet,
 } from "@helpers/cardano";
+import { adaAmountText } from "@helpers/adaFormat";
 import { getProposalType } from "@helpers/index";
 import { createNewPageWithWallet } from "@helpers/page";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
@@ -34,7 +35,6 @@ test.describe("Proposal created logged state", () => {
         page,
       }) => {
         await skipIfNotInfoAndBootstrapping(type);
-
 
         test.slow(); // Brute-force testing with 50 random data
 
@@ -79,7 +79,19 @@ test.describe("Proposal created logged state", () => {
           await proposalSubmissionPage.addLinkBtn.click();
         }
 
-        await expect(proposalSubmissionPage.addLinkBtn).toBeHidden();
+        // Reference links have no limit (#4087): one past the old cap of 7
+        // still adds an input.
+        const linkUrlInputs = page.locator(
+          '[data-testid^="link-"][data-testid$="-url-input"]'
+        );
+        const linkCount = await linkUrlInputs.count();
+        await expect(proposalSubmissionPage.addLinkBtn).toBeVisible();
+        await proposalSubmissionPage.addLinkBtn.click();
+        await expect(linkUrlInputs).toHaveCount(linkCount + 1);
+        await expect(
+          page.getByTestId(`link-${linkCount}-url-input`)
+        ).toBeVisible();
+        await expect(proposalSubmissionPage.addLinkBtn).toBeVisible();
       });
     });
   });
@@ -232,7 +244,7 @@ test.describe("Proposal created logged state", () => {
             proposalSubmissionPage.receivingAddressContent
           ).toHaveText(proposal.prop_receiving_address);
           await expect(proposalSubmissionPage.amountContent).toHaveText(
-            proposal.prop_amount
+            adaAmountText(proposal.prop_amount)
           );
         }
 
@@ -499,7 +511,7 @@ test.describe("Proposal Draft", () => {
           newTreasuryAddress
         );
         await expect(proposalSubmissionPage.amountContent).toHaveText(
-          proposalFormValue.prop_amount
+          adaAmountText(proposalFormValue.prop_amount)
         );
       }
 

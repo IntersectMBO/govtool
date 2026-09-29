@@ -1,5 +1,8 @@
-import { Inject, Injectable, Optional } from '@nestjs/common';
-import type { ChainDataApiV1 } from '@govtool/data-providers/chain-data';
+import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
+import type {
+  ChainDataApiV1,
+  GenesisParams,
+} from '@govtool/data-providers/chain-data';
 
 import { ConfigService } from 'src/config/config.service';
 import { CHAIN_DATA } from 'src/providers/providers.module';
@@ -15,33 +18,62 @@ import { isBareStakeKeyHash, legacyStakeAddress } from './legacy-ids';
  * start time is itself `systemStart + no × epochLength` and the two formulas
  * give the same instant. These are genesis constants (`systemStart` in the
  * Byron/Shelley genesis, `epochLength` in the Shelley genesis), not estimates.
+ *
+ * Any other network (a local devnet) regenerates its genesis on every run, so
+ * its schedule is read from the provider's `getGenesisParams` rather than
+ * kept here. Milliseconds, because a devnet's slots can be shorter than a
+ * second (300 slots of 0.2 s).
  */
 export interface EpochSchedule {
   /** Milliseconds since the Unix epoch. */
   systemStartMs: number;
-  epochLengthSeconds: number;
+  epochLengthMs: number;
 }
 
 const EPOCH_SCHEDULES: Readonly<Record<string, EpochSchedule>> = {
   mainnet: {
     systemStartMs: Date.parse('2017-09-23T21:44:51Z'),
-    epochLengthSeconds: 432_000,
+    epochLengthMs: 432_000_000,
   },
   preprod: {
     systemStartMs: Date.parse('2022-06-01T00:00:00Z'),
-    epochLengthSeconds: 432_000,
+    epochLengthMs: 432_000_000,
   },
   preview: {
     systemStartMs: Date.parse('2022-10-25T00:00:00Z'),
-    epochLengthSeconds: 86_400,
+    epochLengthMs: 86_400_000,
   },
 };
 
-/** A network's epoch schedule, or `null` for one with no known genesis. */
+/** A public network's epoch schedule, or `null` for one with no known genesis. */
 export function epochScheduleOf(network: string): EpochSchedule | null {
   return Object.prototype.hasOwnProperty.call(EPOCH_SCHEDULES, network)
     ? EPOCH_SCHEDULES[network]
     : null;
+}
+
+/**
+ * The schedule a Shelley genesis implies: `epochLength` slots of `slotLength`
+ * seconds from `systemStart`. Right for a network that began in Shelley or
+ * later, which is every devnet; a network that began in Byron is in
+ * `EPOCH_SCHEDULES` instead. `null` for constants that do not make one.
+ */
+export function epochScheduleFromGenesis(
+  genesis: Pick<GenesisParams, 'systemStart' | 'epochLength' | 'slotLength'>,
+): EpochSchedule | null {
+  const systemStartMs = Date.parse(genesis.systemStart);
+  // Rounded to whole ms: 300 × 0.2 s is 60.00000000000001 s in a double.
+  const epochLengthMs = Math.round(
+    genesis.epochLength * genesis.slotLength * 1000,
+  );
+  if (
+    Number.isNaN(systemStartMs) ||
+    !Number.isSafeInteger(epochLengthMs) ||
+    epochLengthMs <= 0
+  ) {
+    return null;
+  }
+  return { systemStartMs, epochLengthMs };
 }
 
 /**
@@ -57,8 +89,7 @@ export function epochStartTime(
   if (!Number.isSafeInteger(epoch) || epoch < 0) {
     return null;
   }
-  const ms =
-    schedule.systemStartMs + epoch * schedule.epochLengthSeconds * 1000;
+  const ms = schedule.systemStartMs + epoch * schedule.epochLengthMs;
   const date = new Date(ms);
   if (Number.isNaN(date.getTime())) {
     return null;
@@ -78,6 +109,7 @@ export function epochStartTime(
  */
 @Injectable()
 export class LegacyNetwork {
+  private readonly logger = new Logger(LegacyNetwork.name);
   private pending: Promise<string> | undefined;
 
   constructor(
@@ -115,7 +147,29 @@ export class LegacyNetwork {
       : legacyStakeAddress(input);
   }
 
+  /**
+   * A public network's schedule is a constant. Any other is asked of the
+   * provider's genesis constants on every call, since a devnet's change
+   * between runs; a provider without them, or a failed read, dates nothing
+   * (`null`) rather than failing the route that wanted a date.
+   */
   async epochSchedule(): Promise<EpochSchedule | null> {
-    return epochScheduleOf(await this.name());
+    const known = epochScheduleOf(await this.name());
+    if (known !== null) {
+      return known;
+    }
+    const network = this.chain.network;
+    if (network.getGenesisParams === undefined) {
+      return null;
+    }
+    try {
+      const { data } = await network.getGenesisParams();
+      return epochScheduleFromGenesis(data);
+    } catch (error) {
+      this.logger.warn(
+        `no epoch schedule: genesis parameters unavailable (${error instanceof Error ? error.message : String(error)})`,
+      );
+      return null;
+    }
   }
 }

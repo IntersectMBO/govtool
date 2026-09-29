@@ -32,7 +32,7 @@ export const RegisterAsDirectVoter = () => {
     buildDRepUpdateCert,
     buildVoteDelegationCert,
     dRepID,
-    registeredStakeKeysListState,
+    isStakeKeyRegistered,
   } = useCardano();
   const { openModal, closeModal } = useModal();
 
@@ -47,7 +47,7 @@ export const RegisterAsDirectVoter = () => {
         : await buildDRepRegCert();
       certBuilder.add(registerCert);
 
-      if (!registeredStakeKeysListState.length) {
+      if (!isStakeKeyRegistered()) {
         const stakeKeyRegCert = await buildStakeKeyRegCert();
         certBuilder.add(stakeKeyRegCert);
       }
@@ -90,7 +90,9 @@ export const RegisterAsDirectVoter = () => {
   }, [
     buildSignSubmitConwayCertTx,
     buildDRepRegCert,
+    buildStakeKeyRegCert,
     dRepID,
+    isStakeKeyRegistered,
     openModal,
     voter?.isRegisteredAsDRep,
   ]);

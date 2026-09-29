@@ -1470,6 +1470,103 @@ describe('GET /proposal/list', () => {
     expect(proposal.expiryDate).toBeNull();
   });
 
+  const DEVNET_GENESIS = {
+    networkMagic: 42,
+    networkId: 'Testnet' as const,
+    systemStart: '2026-09-27T10:00:00.000Z',
+    epochLength: 300,
+    slotLength: 0.2,
+    activeSlotsCoefficient: { numerator: 1, denominator: 1 },
+    securityParam: 10,
+    slotsPerKesPeriod: 129600,
+    maxKesEvolutions: 60,
+    updateQuorum: 1,
+    maxLovelaceSupply: '45000000000000000',
+  };
+
+  it('dates a devnet from its genesis: 300 slots of 0.2 s are one-minute epochs', async () => {
+    const service = proposalService({
+      network: {
+        getNetworkInfo: networkInfo('devnet'),
+        getGenesisParams: () => Promise.resolve(env(DEVNET_GENESIS)),
+      },
+      governance: {
+        proposals: {
+          list: () => Promise.resolve(page([undatedAction(3, 9)])),
+        },
+      },
+    });
+
+    const [proposal] = (await service.list({ type: [], page: 0, pageSize: 10 }))
+      .elements;
+    expect(proposal).toMatchObject({
+      createdDate: '2026-09-27T10:03:00Z',
+      expiryDate: '2026-09-27T10:09:00Z',
+      expiryEpochNo: 9,
+    });
+  });
+
+  it('truncates a fractional epoch start to whole seconds, as the legacy format did', async () => {
+    const service = proposalService({
+      network: {
+        getNetworkInfo: networkInfo('devnet'),
+        // 301 slots of 0.2 s: 60.2 s epochs
+        getGenesisParams: () =>
+          Promise.resolve(env({ ...DEVNET_GENESIS, epochLength: 301 })),
+      },
+      governance: {
+        proposals: {
+          list: () => Promise.resolve(page([undatedAction(1, 5)])),
+        },
+      },
+    });
+
+    const [proposal] = (await service.list({ type: [], page: 0, pageSize: 10 }))
+      .elements;
+    // 5 × 60.2 s = 301 s
+    expect(proposal.expiryDate).toBe('2026-09-27T10:05:01Z');
+    expect(proposal.createdDate).toBe('2026-09-27T10:01:00Z');
+  });
+
+  it('leaves a devnet undated when its genesis cannot be read, without failing the list', async () => {
+    const service = proposalService({
+      network: {
+        getNetworkInfo: networkInfo('devnet'),
+        getGenesisParams: () =>
+          Promise.reject(new ChainDataError('INTERNAL', 'stale genesis file')),
+      },
+      governance: {
+        proposals: {
+          list: () => Promise.resolve(page([undatedAction(3, 9)])),
+        },
+      },
+    });
+
+    const [proposal] = (await service.list({ type: [], page: 0, pageSize: 10 }))
+      .elements;
+    expect(proposal.expiryDate).toBeNull();
+    expect(proposal.expiryEpochNo).toBe(9);
+  });
+
+  it('uses the built-in schedule on a public network even when genesis is served', async () => {
+    const getGenesisParams = jest.fn(() =>
+      Promise.resolve(env(DEVNET_GENESIS)),
+    );
+    const service = proposalService({
+      network: { getNetworkInfo: networkInfo('preview'), getGenesisParams },
+      governance: {
+        proposals: {
+          list: () => Promise.resolve(page([undatedAction(1417, 1448)])),
+        },
+      },
+    });
+
+    const [proposal] = (await service.list({ type: [], page: 0, pageSize: 10 }))
+      .elements;
+    expect(proposal.expiryDate).toBe('2026-10-12T00:00:00Z');
+    expect(getGenesisParams).not.toHaveBeenCalled();
+  });
+
   it('reports UpdateCommittee under db-sync’s name, which is what clients expect', async () => {
     const service = proposalService({
       governance: {

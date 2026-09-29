@@ -11,13 +11,16 @@ import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { Page, expect } from "@playwright/test";
 import { sharedDRep } from "lib/wallet/sharedDReps";
+import { isStakeAddressRegistered } from "lib/wallet/services";
 import {
   adaBalance,
-  ensureFunded,
-  testWallet,
+  singleUseWalletName,
   TestWallet,
 } from "lib/wallet/testWallets";
-import { registeredDRepWallet } from "lib/wallet/transactions";
+import {
+  registeredDRepWallet,
+  stakeRegisteredWallet,
+} from "lib/wallet/transactions";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
@@ -28,8 +31,12 @@ async function dRepIdOf(name: "dRep01" | "dRep02") {
   return (await sharedDRep(name)).wallet.dRepId;
 }
 
+// The ADA holders below start undelegated with a registered stake key, as the
+// old static wallets did at the start of a run. Each test process gets new
+// accounts (singleUseWallet), since the tests change the delegation.
+
 test.describe("Delegate to others", () => {
-  test.use({ walletName: "adaHolder01" });
+  test.use({ walletName: "adaHolder01", singleUseWallet: true });
 
   test.describe.configure({ mode: "serial" });
 
@@ -76,7 +83,7 @@ test.describe("Delegate to others", () => {
 });
 
 test.describe("Change delegation", () => {
-  test.use({ walletName: "adaHolder02" });
+  test.use({ walletName: "adaHolder02", singleUseWallet: true });
 
   test("2F. Should change delegated DRep", async ({ page }, testInfo) => {
     test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
@@ -119,8 +126,10 @@ test.describe("Register DRep state", () => {
   test.beforeEach(async ({ browser }, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
-    wallet = await testWallet(`${testInfo.title.split(".")[0]}:directVoter`);
-    await ensureFunded(wallet, 600);
+    wallet = await stakeRegisteredWallet(
+      singleUseWalletName(`${testInfo.title.split(".")[0]}:directVoter`),
+      600
+    );
 
     dRepPage = await createNewPageWithWallet(browser, { wallet });
 
@@ -180,7 +189,8 @@ test.describe("Register DRep state", () => {
 test("2G. Should delegate to myself", async ({ browser }, testInfo) => {
   test.setTimeout(testInfo.timeout + 3 * environments.txTimeOut);
 
-  const wallet = await registeredDRepWallet("2G:dRep");
+  // Single use: the test leaves the DRep delegated to itself.
+  const wallet = await registeredDRepWallet(singleUseWalletName("2G:dRep"));
   const dRepId = wallet.dRepId;
 
   const dRepPage = await createNewPageWithWallet(browser, { wallet });
@@ -201,7 +211,7 @@ test("2G. Should delegate to myself", async ({ browser }, testInfo) => {
 });
 
 test.describe("Multiple delegations", () => {
-  test.use({ walletName: "adaHolder05" });
+  test.use({ walletName: "adaHolder05", singleUseWallet: true });
 
   test("2R. Should display a modal indicating waiting for previous transaction when delegating if the previous transaction is not completed", async ({
     page,
@@ -229,7 +239,7 @@ test.describe("Multiple delegations", () => {
 });
 
 test.describe("No confidence delegation", () => {
-  test.use({ walletName: "adaHolder04" });
+  test.use({ walletName: "adaHolder04", singleUseWallet: true });
 
   test("2V. Should show delegated voting power to No confidence", async ({
     page,
@@ -260,14 +270,21 @@ test.describe("No confidence delegation", () => {
 test.describe("Delegated ADA visibility", () => {
   test.use({
     walletName: "adaHolder06",
-    // A second registered stake key, so the app asks which one to use.
-    pageWallet: async ({}, use) => {
-      const other = await testWallet("adaHolder05");
-      await use({
-        extraRegisteredPubStakeKeys: [other.stake.public],
-        extraRewardAddresses: [other.rewardAddress],
-      });
-    },
+    singleUseWallet: true,
+    // A second stake key reported as registered, so the app has two to choose
+    // from. The page preselects the wallet's own key, which the delegation
+    // uses. The extra key is registered on chain too, so the wallet reports
+    // only what is true; it is never changed, so one per run is enough.
+    pageWallet: [
+      async ({}, use) => {
+        const other = await stakeRegisteredWallet("2W:extraStake", 5);
+        await use({
+          extraRegisteredPubStakeKeys: [other.stake.public],
+          extraRewardAddresses: [other.rewardAddress],
+        });
+      },
+      { scope: "test", timeout: 3 * environments.txTimeOut },
+    ],
   });
 
   test("2W. Should show my delegated ADA to the DRep", async ({
@@ -294,5 +311,43 @@ test.describe("Delegated ADA visibility", () => {
         `Your Voting Power of ₳${correctDelegatedVoteAdaFormat(adaHolderVotingPower)} is Delegated to`
       )
     ).toBeVisible({ timeout: 60_000 });
+  });
+});
+
+test.describe("Unregistered stake key", () => {
+  // A new user: the wallet holds ADA but its stake key was never registered.
+  test.use({
+    walletName: "2Y:newHolder",
+    singleUseWallet: true,
+    stakeRegistered: false,
+  });
+
+  test("2Y. Should register the stake key with the first delegation", async ({
+    page,
+    wallet,
+  }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+
+    expect(
+      await isStakeAddressRegistered(wallet!.stakeAddress),
+      "the stake key must start unregistered"
+    ).toBe(false);
+    const dRepId = await dRepIdOf("dRep01");
+
+    const dRepDirectoryPage = new DRepDirectoryPage(page);
+    await dRepDirectoryPage.goto();
+    // delegateToDRep waits for the transaction to confirm.
+    await dRepDirectoryPage.delegateToDRep(dRepId);
+
+    await expect(page.getByTestId(`${dRepId}-delegated-card`)).toBeVisible({
+      timeout: 60_000,
+    });
+    // The ledger accepts a vote delegation only from a registered stake key,
+    // so the app put the registration in the same transaction.
+    await expect
+      .poll(() => isStakeAddressRegistered(wallet!.stakeAddress), {
+        timeout: 60_000,
+      })
+      .toBe(true);
   });
 });

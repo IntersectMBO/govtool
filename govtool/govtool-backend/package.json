@@ -24,6 +24,7 @@
     "@govtool/data-providers": "file:../govtool-data-providers",
     "@govtool/metadata-http": "file:../govtool-metadata-http",
     "@govtool/pinning-pinata": "file:../govtool-pinning-pinata",
+    "@govtool/pinning-test": "file:../govtool-pinning-test",
     "@govtool/provider-blockfrost": "file:../govtool-provider-blockfrost",
     "@govtool/provider-dbsync": "file:../govtool-provider-dbsync",
     "@govtool/provider-fixture": "file:../govtool-provider-fixture",
@@ -38,6 +39,7 @@
     "class-validator": "^0.15.1",
     "dotenv": "^17.4.2",
     "ipaddr.js": "^2.5.0",
+    "jsonld": "^9.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1"
@@ -50,6 +52,7 @@
     "@nestjs/testing": "^11.0.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
+    "@types/jsonld": "^1.5.15",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",

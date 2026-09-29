@@ -34,7 +34,7 @@ pinned to one gateway's availability outlives that gateway.
 ## What it does
 
 `pin()` behaves as GovTool's `POST /ipfs/upload` route does: the same endpoint
-(`https://upload.pinata.cloud/v3/files`), the same multipart shape
+(`https://uploads.pinata.cloud/v3/files`), the same multipart shape
 (`network` + `file`), the same 512 KiB cap, the same default file name
 (`data.txt`), and failures in the same four classes. It additionally computes
 `dataHash`, blake2b-256 over the exact bytes, so the author never has to.

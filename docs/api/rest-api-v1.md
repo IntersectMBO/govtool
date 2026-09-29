@@ -98,7 +98,7 @@ Filters on `/governance-actions`: `type`, `status`, `voterId`, `voted`.
 |---|---|---|
 | GET | `/api/v1/network` | `GET /network/info` |
 | GET | `/api/v1/network/protocol-parameters` | `GET /epoch/params` |
-| GET | `/api/v1/network/stake-distribution` | `GET /network/total-stake` |
+| GET | `/api/v1/network/stake-distribution[?epoch=]` | `GET /network/total-stake` |
 | GET | `/api/v1/network/treasury` | — new |
 
 > **`/epoch/params` moves under `/network`.** Protocol parameters are network
@@ -112,10 +112,14 @@ Filters on `/governance-actions`: `type`, `status`, `voterId`, `voted`.
 
 | Method | Path | Replaces |
 |---|---|---|
-| GET | `/api/v1/committee` | — new |
+| GET | `/api/v1/committee[?epoch=]` | — new |
 | GET | `/api/v1/committee/members/{coldCredentialId}` | — new |
 | GET | `/api/v1/constitution` | — new |
 
+> `?epoch=` on both is the contract's optional argument
+> (`stakeDistribution.epoch`, `committee.epoch`, D143): a provider that does
+> not declare it answers 501 for any epoch but the current one.
+>
 > Members are addressed by **cold** credential. The hot credential rotates, so
 > an id built on it breaks every stored reference.
 

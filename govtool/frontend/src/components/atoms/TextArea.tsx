@@ -40,12 +40,20 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       [],
     );
 
+    // onBlur is also forwarded to the <textarea> below. When the textarea has
+    // focus, blurring it fires that DOM handler, so it is not called twice;
+    // otherwise the imperative blur() still calls onBlur, as it always did.
     const handleBlur = useCallback(
       (e: React.FocusEvent<HTMLTextAreaElement>) => {
+        const element = textAraeRef.current;
+        if (element && element === document.activeElement) {
+          element.blur();
+          return;
+        }
         onBlur?.(e);
-        textAraeRef.current?.blur();
+        element?.blur();
       },
-      [],
+      [onBlur],
     );
 
     useImperativeHandle(
@@ -78,6 +86,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           resize: "none",
         }}
         maxLength={maxLength}
+        onBlur={onBlur}
         ref={textAraeRef}
         sx={{
           fontSize: isModifiedLayout ? "12px" : "auto",

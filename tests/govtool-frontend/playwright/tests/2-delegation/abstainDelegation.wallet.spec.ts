@@ -14,7 +14,12 @@ test.beforeEach(async () => {
 });
 
 test.describe("Abstain delegation", () => {
-  test.use({ walletName: "adaHolder03", walletFundsAda: 50 });
+  // New accounts per test process: the test leaves the wallet delegated.
+  test.use({
+    walletName: "adaHolder03",
+    singleUseWallet: true,
+    walletFundsAda: 50,
+  });
 
   test("2U. Should show delegated voting power to Abstain", async ({
     page,

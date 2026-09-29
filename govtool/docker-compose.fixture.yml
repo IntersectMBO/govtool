@@ -4,12 +4,17 @@
 #   docker compose -f docker-compose.fixture.yml up -d --build
 #   frontend  http://localhost:8080
 #   backend   http://localhost:9999
+#   pdf       http://localhost:1337 (proposal discussion forum backend)
 #
-# Four services:
+# Six services:
 #   backend       govtool-backend with the fixture chain-data provider
 #   metadata      govtool-metadata-service, which resolves anchors; private,
 #                 reached only by the backend, as in a deployment
 #   metadata-db   its Postgres, the permanent content and report store
+#   pdf           govtool-pdf-backend, the proposal discussion forum backend;
+#                 it seeds its lookup tables on start (npm run seed:demo in
+#                 govtool-pdf-backend adds sample discussions)
+#   pdf-db        its Postgres
 #   frontend      the Vite dev server over ./frontend, so it shows local source
 #
 # Metadata is live, not frozen: the fixture's anchors are real mainnet urls,
@@ -99,6 +104,41 @@ services:
       start_period: 20s
     restart: unless-stopped
 
+  pdf-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pdf
+      POSTGRES_PASSWORD: pdf
+      POSTGRES_DB: pdf
+    volumes:
+      - pdf-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pdf -d pdf"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  pdf:
+    build:
+      context: ./govtool-pdf-backend
+    environment:
+      DATABASE_URL: postgresql://pdf:pdf@pdf-db:5432/pdf?schema=public
+      PORT: 1337
+      # Development secrets only; set real ones anywhere else.
+      JWT_SECRET: ${PDF_JWT_SECRET:-fixture-only-access-secret-0123456789abcdef}
+      REFRESH_SECRET: ${PDF_REFRESH_SECRET:-fixture-only-refresh-secret-0123456789abcd}
+      CORS_ORIGINS: ${PUBLIC_FRONTEND_URL:-http://localhost:8080}
+      # The fixture is mainnet data.
+      CARDANO_NETWORK_ID: "1"
+      GOVTOOL_API_BASE_URL: http://backend:9999
+    ports:
+      - "${PDF_PORT:-1337}:1337"
+    depends_on:
+      pdf-db:
+        condition: service_healthy
+    restart: unless-stopped
+
   frontend:
     # The dev server, not the production image: building the frontend image
     # is killed by the OOM killer at about 8 GB of Docker memory, and the dev
@@ -118,16 +158,23 @@ services:
       VITE_IS_DEV: "true"
       # The fixture is mainnet data.
       VITE_NETWORK_FLAG: "1"
-      VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false"
+      VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "true"
+      VITE_PDF_API_URL: ${PUBLIC_PDF_URL:-http://localhost:1337}/
+      # Off because the fixture provider cannot serve
+      # /outcomes/misc/network/metrics (501, D143); the URL is ready for it.
       VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "false"
+      VITE_OUTCOMES_API_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}/outcomes
       NODE_OPTIONS: --max-old-space-size=4096
     ports:
       - "${FRONTEND_PORT:-8080}:8080"
     depends_on:
       backend:
         condition: service_healthy
+      pdf:
+        condition: service_started
     restart: unless-stopped
 
 volumes:
   metadata-db:
+  pdf-db:
   frontend-node-modules:

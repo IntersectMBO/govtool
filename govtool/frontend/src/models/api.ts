@@ -7,6 +7,8 @@ export type EpochParams = {
   committee_max_term_length: number | null;
   committee_min_size: number | null;
   cost_model_id: number | null;
+  /** The joined cost-model row; `costs` feeds the script data hash. */
+  cost_model: { costs: Record<string, number[]> } | null;
   decentralisation: number | null;
   drep_activity: number | null;
   drep_deposit: number | null;

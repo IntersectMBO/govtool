@@ -40,7 +40,6 @@ if (env.VITE_SENTRY_DSN) {
 });
 }
 
-Sentry.setTag("pdf_ui_version", pkg.dependencies["@intersect.mbo/pdf-ui"]);
 Sentry.setTag(
   "govtool_outcomes_pillar_ui_version",
   pkg.dependencies["@intersect.mbo/govtool-outcomes-pillar-ui"],

@@ -22,6 +22,7 @@ import type {
 
 import type { Ctx } from './context';
 import { internal, notFound } from './errors';
+import { readShelleyGenesis } from './network/genesis';
 import { TIP_EPOCH_CTE, TIP_SQL, parseEpoch, staleData, toStamp, type BlockCols } from './network/chain';
 import { toRatio } from './governance/proposals/ratio';
 import { toInt, toLovelace } from './numbers';
@@ -290,25 +291,50 @@ export function mapProtocolParams(row: ProtocolParamsRow): ProtocolParams | unde
  * - SPO breakdown: `pool_stat.voting_power` for the tip epoch. No index on
  *   `epoch_no`; a sequential scan of a table of pools x epochs.
  */
+/**
+ * `$1` is the requested epoch, null for the tip's. The SPO default-vote sums
+ * follow each pool's reward account (from its latest registration or update
+ * before the epoch) to that account's latest vote delegation before the
+ * epoch, which is the state the epoch-boundary snapshot was taken from.
+ */
 export const STAKE_DISTRIBUTION_SQL = `WITH ${TIP_EPOCH_CTE},
+target AS (SELECT COALESCE($1::int, (SELECT epoch_no FROM tip)) AS epoch_no),
 dd AS (
   SELECT count(*) AS n,
          sum(d.amount) FILTER (WHERE h.raw IS NOT NULL AND d.active_until >= d.epoch_no) AS active_dreps,
          sum(d.amount) FILTER (WHERE h.raw IS NULL AND h.view = 'drep_always_abstain') AS always_abstain,
          sum(d.amount) FILTER (WHERE h.raw IS NULL AND h.view = 'drep_always_no_confidence') AS always_no_confidence
     FROM drep_distr d JOIN drep_hash h ON h.id = d.hash_id
-   WHERE d.epoch_no = (SELECT epoch_no FROM tip)
+   WHERE d.epoch_no = (SELECT epoch_no FROM target)
 ),
 ps AS (
   SELECT count(*) AS n, count(voting_power) AS n_vp, sum(voting_power) AS voting_power
-    FROM pool_stat WHERE epoch_no = (SELECT epoch_no FROM tip)
+    FROM pool_stat WHERE epoch_no = (SELECT epoch_no FROM target)
+),
+spo AS (
+  SELECT sum(p.voting_power) FILTER (WHERE dv.view = 'drep_always_abstain') AS spo_always_abstain,
+         sum(p.voting_power) FILTER (WHERE dv.view = 'drep_always_no_confidence') AS spo_always_no_confidence
+    FROM pool_stat p
+    CROSS JOIN LATERAL (
+      SELECT pu.reward_addr_id FROM pool_update pu
+        JOIN tx t ON t.id = pu.registered_tx_id JOIN block b ON b.id = t.block_id
+       WHERE pu.hash_id = p.pool_hash_id AND b.epoch_no < p.epoch_no
+       ORDER BY pu.registered_tx_id DESC LIMIT 1) ra
+    CROSS JOIN LATERAL (
+      SELECT h.view FROM delegation_vote v
+        JOIN drep_hash h ON h.id = v.drep_hash_id
+        JOIN tx t ON t.id = v.tx_id JOIN block b ON b.id = t.block_id
+       WHERE v.addr_id = ra.reward_addr_id AND b.epoch_no < p.epoch_no
+       ORDER BY v.tx_id DESC LIMIT 1) dv
+   WHERE p.epoch_no = (SELECT epoch_no FROM target)
 )
-SELECT tip.epoch_no,
-       (SELECT completed FROM epoch_stake_progress WHERE epoch_no = tip.epoch_no) AS stake_complete,
-       (SELECT sum(amount) FROM epoch_stake WHERE epoch_no = tip.epoch_no) AS active_stake,
+SELECT target.epoch_no, (SELECT epoch_no FROM tip) AS tip_epoch,
+       (SELECT completed FROM epoch_stake_progress WHERE epoch_no = target.epoch_no) AS stake_complete,
+       (SELECT sum(amount) FROM epoch_stake WHERE epoch_no = target.epoch_no) AS active_stake,
        dd.n AS drep_rows, dd.active_dreps, dd.always_abstain, dd.always_no_confidence,
-       ps.n AS pool_rows, ps.n_vp AS pool_rows_with_vp, ps.voting_power AS pool_voting_power
-  FROM tip, dd, ps`;
+       ps.n AS pool_rows, ps.n_vp AS pool_rows_with_vp, ps.voting_power AS pool_voting_power,
+       spo.spo_always_abstain, spo.spo_always_no_confidence
+  FROM target, dd, ps, spo`;
 
 export interface StakeDistributionRow {
   epoch_no: number | null;
@@ -321,6 +347,9 @@ export interface StakeDistributionRow {
   pool_rows: DbNumber;
   pool_rows_with_vp: DbNumber;
   pool_voting_power: DbNumber | null;
+  tip_epoch?: DbNumber | null;
+  spo_always_abstain?: DbNumber | null;
+  spo_always_no_confidence?: DbNumber | null;
 }
 
 /**
@@ -344,6 +373,9 @@ export function mapStakeDistribution(row: StakeDistributionRow): StakeDistributi
   const pools = toInt(row.pool_rows);
   if (pools > 0 && toInt(row.pool_rows_with_vp) === pools && row.pool_voting_power !== null) {
     out.totalStakeControlledBySPOs = toLovelace(row.pool_voting_power);
+    // Known zeros once every pool is counted, like the DRep targets above.
+    out.spoAlwaysAbstainVotingPower = toLovelace(row.spo_always_abstain ?? 0);
+    out.spoAlwaysNoConfidenceVotingPower = toLovelace(row.spo_always_no_confidence ?? 0);
   }
   return out;
 }
@@ -378,7 +410,29 @@ interface TipRow extends BlockCols {
   network_name: string | null;
 }
 
-export function createNetworkApi(ctx: Ctx): NetworkApi {
+const PUBLIC_NETWORKS: readonly string[] = ['mainnet', 'preprod', 'preview'];
+
+/**
+ * Whether db-sync's `meta.network_name` is the configured network's. A public
+ * network must match by name. A custom one (a devnet) takes its name from
+ * db-sync's own config, which the provider does not control, so it accepts
+ * any name except a public network's, unless `expected` pins it.
+ */
+export function networkNameMatches(dbName: string, network: string, expected?: string): boolean {
+  if (expected !== undefined) return dbName === expected;
+  if (PUBLIC_NETWORKS.includes(network)) return dbName === network;
+  return !PUBLIC_NETWORKS.includes(dbName);
+}
+
+export interface NetworkApiOptions {
+  /** Enables `getGenesisParams`: db-sync keeps no genesis constants (./network/genesis). */
+  shelleyGenesisPath?: string;
+  /** The `meta.network_name` to insist on; see `networkNameMatches`. */
+  dbNetworkName?: string;
+}
+
+export function createNetworkApi(ctx: Ctx, options: NetworkApiOptions = {}): NetworkApi {
+  const { shelleyGenesisPath, dbNetworkName } = options;
   /** A requested epoch with no row: after the tip it is not yet known; before it, not recorded. */
   const missingEpoch = (what: string, epoch: number, tipEpoch: number | null) =>
     notFound(
@@ -394,7 +448,7 @@ export function createNetworkApi(ctx: Ctx): NetworkApi {
         `SELECT t.*, (SELECT network_name FROM meta ORDER BY id LIMIT 1) AS network_name FROM (${TIP_SQL}) t`,
       );
       if (!row) throw staleData('db-sync has no blocks');
-      if (row.network_name && row.network_name !== ctx.network) {
+      if (row.network_name && !networkNameMatches(row.network_name, ctx.network, dbNetworkName)) {
         // Stake addresses would be encoded for the wrong network: a configuration error, not data.
         throw internal(`provider is configured for ${ctx.network} but the database follows ${row.network_name}`);
       }
@@ -426,9 +480,19 @@ export function createNetworkApi(ctx: Ctx): NetworkApi {
       return ctx.envelope(params);
     },
 
-    async getStakeDistribution() {
-      const [row] = await ctx.db.query<StakeDistributionRow>(STAKE_DISTRIBUTION_SQL);
-      if (!row) throw staleData('db-sync has no blocks');
+    async getStakeDistribution(q) {
+      const epoch = parseEpoch(q?.epoch);
+      const [row] = await ctx.db.query<StakeDistributionRow>(STAKE_DISTRIBUTION_SQL, [epoch ?? null]);
+      if (!row || row.epoch_no === null) throw staleData('db-sync has no blocks');
+      if (epoch !== undefined) {
+        const tip = row.tip_epoch === null || row.tip_epoch === undefined ? null : toInt(row.tip_epoch);
+        // A past epoch whose snapshot db-sync never finished is not stale data
+        // that retrying will fix: it is missing.
+        const incomplete = row.stake_complete !== true || row.active_stake === null;
+        if ((tip !== null && epoch > tip) || (epoch !== tip && incomplete)) {
+          throw missingEpoch('stake distribution', epoch, tip);
+        }
+      }
       return ctx.envelope(mapStakeDistribution(row));
     },
 
@@ -447,8 +511,20 @@ export function createNetworkApi(ctx: Ctx): NetworkApi {
       };
       return ctx.envelope(treasury);
     },
+
+    ...(shelleyGenesisPath === undefined
+      ? {}
+      : {
+          async getGenesisParams() {
+            return ctx.envelope(await readShelleyGenesis(shelleyGenesisPath, ctx.db));
+          },
+        }),
   };
 }
 
 /** `getProtocolParams({ epoch })` is served: `epoch_param` keeps one row per epoch. */
-export const NETWORK_OPTIONAL_ARGUMENTS: OptionalArgument[] = ['protocolParams.epoch'];
+export const NETWORK_OPTIONAL_ARGUMENTS: OptionalArgument[] = [
+  'protocolParams.epoch',
+  'stakeDistribution.epoch',
+  'committee.epoch',
+];

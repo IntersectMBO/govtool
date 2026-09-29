@@ -13,7 +13,9 @@ const { chainData, close } = createDbSyncProvider({
 });
 ```
 
-Options: `network` (required; decides stake address prefixes) and either
+Options: `network` (required; decides stake address prefixes: only `mainnet`
+is network id 1, so a custom name such as `devnet` is a testnet), optional
+`shelleyGenesisPath` and `dbNetworkName` (below), and either
 `connection`, in which case the provider opens and owns a `pg` pool and
 `close()` ends it, or `db`, a caller-owned object with one `query(sql, params)`
 method, which is how tests drive it with a fake. Statements run under a
@@ -21,6 +23,15 @@ statement timeout, and a cancelled statement is reported as
 `PROVIDER_TIMEOUT`. Every driver failure becomes a `ChainDataError` with a
 generic message, so a connection string or table name never reaches a
 response.
+
+A custom network (a local devnet) is served like a public one, with two
+differences. db-sync's `meta.network_name` comes from db-sync's own config, so
+for a non-public `network` any name except `mainnet`, `preprod` or `preview`
+is accepted; `dbNetworkName` pins the expected name instead. And its genesis
+changes on every run, so `shelleyGenesisPath` names the Shelley genesis file
+db-sync was started with: `getGenesisParams` reads it on each call and refuses
+it (`INTERNAL`) when its `systemStart` is not `meta.start_time`, which is how a
+file left over from an earlier run shows.
 
 The provider owns its SQL. A statement may be changed or added when the
 contract needs a value; a changed statement needs a test pinning whatever
@@ -32,12 +43,12 @@ names and a name-based reader silently gets `undefined`.
 
 | Area         | Served                                                                                                   | Omitted, and why                                                                                                                                                      |
 | ------------ | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| network      | `getNetworkInfo`, `getProtocolParams` (+ past epochs), `getStakeDistribution`, `getTreasury`             | `getGenesisParams`: db-sync does not keep the genesis file                                                                                                            |
+| network      | `getNetworkInfo`, `getProtocolParams` (+ past epochs), `getStakeDistribution` (+ past epochs, SPO default-vote sums), `getTreasury` | `getGenesisParams` unless `shelleyGenesisPath` is given: db-sync does not keep the genesis file                                                                                                            |
 | accounts     | `get`, `getDelegation`, `getPoolDelegation`, `getVotingPower`, `listDelegationHistory`                   | `balance`: db-sync records withdrawals without saying whether they drew on staking or non-staking rewards, so `rewards` / `rewardsRest` cannot be split                |
 | dreps        | `list`, `get`, `listVotes`, `listUpdateHistory`, `getCounts`                                             | `listDelegators`: db-sync holds only the per-DRep total in `drep_distr`; the per-account figure in `epoch_stake` is the pool snapshot, taken at a different boundary and missing every account that delegates to a DRep but not to a pool. `liveVotingPower`: no live per-DRep figure |
 | proposals    | `list`, `get` (+ `voterId`), `getEnacted`, `listVotes`, `listActivity`, aggregates                      |                                                                                                                                                                       |
 | pools        | `list`, `get`, `listVotes`                                                                               |                                                                                                                                                                       |
-| committee    | `getCommittee`, `getMember`, `getConstitution`                                                           |                                                                                                                                                                       |
+| committee    | `getCommittee` (+ past epochs), `getMember`, `getConstitution`                                           |                                                                                                                                                                       |
 | transactions | `get`                                                                                                    |                                                                                                                                                                       |
 
 Declared (`system.getCapabilities()`, `capabilities()`):
@@ -48,7 +59,7 @@ Declared (`system.getCapabilities()`, `capabilities()`):
   "filters": { "dreps": ["status", "kind"], "proposals": ["type", "status"] },
   "search": ["exactId"],
   "voteAggregate": ["stake", "count"],
-  "optionalArguments": ["protocolParams.epoch", "proposals.voterContextOnList"]
+  "optionalArguments": ["protocolParams.epoch", "stakeDistribution.epoch", "committee.epoch", "proposals.voterContextOnList"]
 }
 ```
 

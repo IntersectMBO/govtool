@@ -27,7 +27,7 @@ test.describe("Budget proposal dRep behaviour", () => {
       budgetDiscussionDetailsPage = new BudgetDiscussionDetailsPage(page);
       await budgetDiscussionDetailsPage.goto(proposalId);
 
-      await budgetDiscussionDetailsPage.verifyUserLink.click();
+      await budgetDiscussionDetailsPage.verifyIdentity();
       await budgetDiscussionDetailsPage.verifyDRepLink.click();
     });
 
@@ -91,7 +91,7 @@ test.describe("Budget proposal dRep behaviour", () => {
     const comment = faker.lorem.words(5);
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
-    await budgetDiscussionPage.verifyUserLink.click();
+    await budgetDiscussionPage.verifyIdentity();
     const budgetDiscussionDetailsPage =
       await budgetDiscussionPage.viewFirstProposal();
     await budgetDiscussionPage.verifyDRepLink.click();

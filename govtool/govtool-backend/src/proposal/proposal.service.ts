@@ -81,6 +81,8 @@ const LINEAGE_OF: Record<
 type ProposalSnapshotEntry = {
   proposal: ProposalResponse;
   status: GovActionStatus;
+  /** The contract entity the row was mapped from, for the outcomes routes. */
+  action: GovAction;
 };
 
 @Injectable()
@@ -243,6 +245,15 @@ export class ProposalService {
     );
   }
 
+  /**
+   * The contract entities behind the snapshot: every action, whatever its
+   * status, or with `search` (a CIP-129 id) the one it names. Shares the
+   * cached snapshot, so the outcomes routes cost no extra provider read.
+   */
+  async getActions(search = ''): Promise<GovAction[]> {
+    return (await this.getProposalSnapshot(search)).map(({ action }) => action);
+  }
+
   private getProposalSnapshot(
     search: string,
   ): Promise<ProposalSnapshotEntry[]> {
@@ -286,6 +297,7 @@ export class ProposalService {
       return elements.map((action) => ({
         proposal: this.toLegacyProposal(action, schedule),
         status: action.lifecycle.status,
+        action,
       }));
     });
   }

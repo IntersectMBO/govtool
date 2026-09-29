@@ -1,6 +1,6 @@
 import environments from "@constants/environments";
 import { bech32 } from "bech32";
-import { createHash } from "crypto";
+import { createHash, randomBytes } from "crypto";
 import * as fs from "fs";
 import { Ed25519KeyAsync } from "libcardano";
 import { HdWallet, ShelleyWallet, SimpleCip30Wallet } from "libcardano-wallet";
@@ -51,6 +51,19 @@ export function runId(): string {
 export function accountFor(name: string): number {
   const digest = createHash("sha256").update(`${runId()}:${name}`).digest();
   return digest.readUInt32BE(0) & 0x7fffffff;
+}
+
+/** Random per test process: a worker restart or a rerun gets a new one. */
+const PROCESS_NONCE = randomBytes(4).toString("hex");
+
+/**
+ * A name no earlier process has used, so `testWallet` of it is a new account
+ * with no chain history, even when HD_RUN_ID pins the run. For tests that need
+ * a clean state (not delegated, not registered as a DRep) and change it. The
+ * name is stable within one worker process, so a serial describe can share it.
+ */
+export function singleUseWalletName(name: string): string {
+  return `${name}@${PROCESS_NONCE}`;
 }
 
 let root: Promise<HdWallet> | undefined;

@@ -1,36 +1,47 @@
 import { uploadMetadataAndGetJsonHash } from "@helpers/metadata";
 import * as fs from "fs";
 import path = require("path");
-import { isDRepRegistered, registeredDRepWallet } from "./transactions";
+import {
+  ensureStakeRegistered,
+  isDRepRegistered,
+  registeredDRepWallet,
+} from "./transactions";
 import { runId, testWallet, TestWallet, withFileLock } from "./testWallets";
 
 /**
  * DReps that other tests delegate to or look up by name: dRep01 and dRep02,
  * and dRep03 for the budget discussion tests. Each is registered once per run
- * with CIP-119 metadata; the given name in that metadata is recorded here so
- * tests can search the DRep directory for it.
+ * with CIP-119 metadata and a registered stake key; the given name in that
+ * metadata is recorded here so tests can search the DRep directory for it.
  */
 export type SharedDRepName = "dRep01" | "dRep02" | "dRep03";
 
 const GIVEN_NAMES_FILE = path.resolve(__dirname, "../_mock/sharedDReps.json");
 const ROOT = path.resolve(__dirname, "../..");
 
-type GivenNames = { runId: string; givenNames: Record<string, string> };
+// One entry per run id, so suites running in parallel with different
+// HD_RUN_IDs do not overwrite each other's names. The older single-run shape
+// ({ runId, givenNames }) is still read.
+type GivenNamesFile = { runs: Record<string, Record<string, string>> };
+
+function readFile(): GivenNamesFile {
+  if (!fs.existsSync(GIVEN_NAMES_FILE)) return { runs: {} };
+  const file = JSON.parse(fs.readFileSync(GIVEN_NAMES_FILE, "utf-8"));
+  if (file && typeof file.runs === "object") return file as GivenNamesFile;
+  if (file && typeof file.runId === "string") {
+    return { runs: { [file.runId]: file.givenNames ?? {} } };
+  }
+  return { runs: {} };
+}
 
 function readGivenNames(): Record<string, string> {
-  if (!fs.existsSync(GIVEN_NAMES_FILE)) return {};
-  const file: GivenNames = JSON.parse(
-    fs.readFileSync(GIVEN_NAMES_FILE, "utf-8")
-  );
-  return file.runId === runId() ? file.givenNames : {};
+  return readFile().runs[runId()] ?? {};
 }
 
 function recordGivenName(name: string, givenName: string) {
   return withFileLock(path.join(ROOT, ".sharedDReps.lock"), async () => {
-    const file: GivenNames = {
-      runId: runId(),
-      givenNames: { ...readGivenNames(), [name]: givenName },
-    };
+    const file = readFile();
+    file.runs[runId()] = { ...file.runs[runId()], [name]: givenName };
     fs.writeFileSync(GIVEN_NAMES_FILE, JSON.stringify(file, null, 2));
   });
 }
@@ -47,7 +58,11 @@ export function sharedDRep(
     const wallet = await testWallet(name);
     const recorded = readGivenNames()[name];
     if (await isDRepRegistered(wallet)) {
-      if (recorded) return { wallet, givenName: recorded };
+      if (recorded) {
+        // A no-op once done; covers a DRep registered without its stake key.
+        await ensureStakeRegistered(wallet);
+        return { wallet, givenName: recorded };
+      }
       throw new Error(
         `${name} is registered but its given name was not recorded in ${GIVEN_NAMES_FILE}`
       );

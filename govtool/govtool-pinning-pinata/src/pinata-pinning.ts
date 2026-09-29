@@ -27,7 +27,7 @@ export interface PinataPinningOptions {
   fetch?: typeof fetch;
 }
 
-export const DEFAULT_UPLOAD_URL = 'https://upload.pinata.cloud/v3/files';
+export const DEFAULT_UPLOAD_URL = 'https://uploads.pinata.cloud/v3/files';
 export const DEFAULT_AUTH_CHECK_URL =
   'https://api.pinata.cloud/data/testAuthentication';
 /** Pinata's own public gateway; ipfs.io was retired on 2026-09-21. */

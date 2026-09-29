@@ -1,0 +1,14 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": "\\.e2e-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": "<rootDir>/../tsconfig.jest.json" }]
+  },
+  "transformIgnorePatterns": ["/node_modules/(?!@noble/)"],
+  "globalSetup": "<rootDir>/setup/global-setup.ts",
+  "setupFiles": ["<rootDir>/setup/env.ts"],
+  "setupFilesAfterEnv": ["<rootDir>/setup/after-env.ts"],
+  "testTimeout": 30000
+}

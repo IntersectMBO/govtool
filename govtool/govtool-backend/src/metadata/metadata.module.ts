@@ -9,5 +9,6 @@ import { MetadataService } from './metadata.service';
 @Module({
   controllers: [MetadataController],
   providers: [MetadataService, MetadataGatewayService, ConfigService],
+  exports: [MetadataService],
 })
 export class MetadataModule {}

@@ -1,0 +1,276 @@
+# GovTool's app stack for the isolated devnet test environment.
+#
+# The chain side (cardano-node, Kuber, db-sync and its Postgres) is started
+# separately by adaup (`cardano devnet up --docker`) on the external network
+# DEVNET_DOCKER_NETWORK; these services join it. Start everything with
+# ./up.sh. The variables come from .env.devnet, which up.sh/down.sh export
+# (lib.sh load_env) before calling docker compose.
+#
+# Services:
+#   backend          govtool-backend on the db-sync provider
+#   metadata         govtool-metadata-service (private, reached by the backend)
+#   metadata-db      its Postgres
+#   metadata-bucket  tests/test-metadata-api: anchor uploads, IPFS pinning
+#                    and the IPFS gateway (/ipfs/<cid>)
+#   blockfrost-shim  the three Blockfrost endpoints the tests call
+#   pdf              govtool-pdf-backend (proposal discussion forum)
+#   pdf-db           its Postgres
+#   frontend         the production frontend image (nginx)
+#
+# Every published port is bound to loopback.
+
+name: ${COMPOSE_PROJECT_NAME:-govtool-devnet}
+
+x-healthcheck-node: &node-health
+  interval: 10s
+  timeout: 5s
+  retries: 12
+  start_period: 20s
+
+networks:
+  default:
+  devnet:
+    name: ${DEVNET_DOCKER_NETWORK:?set DEVNET_DOCKER_NETWORK}
+    external: true
+
+services:
+  metadata-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: metadata
+      POSTGRES_PASSWORD: metadata
+      POSTGRES_DB: metadata
+    volumes:
+      - metadata-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metadata -d metadata"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  metadata:
+    image: ${COMPOSE_PROJECT_NAME:-govtool-devnet}-metadata
+    build:
+      context: ../../govtool/govtool-metadata-service
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://metadata:metadata@metadata-db:5432/metadata
+      # Test anchors live in the bucket and on adaup's anchor server, both on
+      # private networks.
+      METADATA_ALLOW_PRIVATE_ADDRESSES: "true"
+      # ipfs:// anchors resolve through the bucket only (gateway roots,
+      # without /ipfs): no public gateway is ever tried.
+      IPFS_PRIMARY_GATEWAY: ${METADATA_BUCKET_URL:?set METADATA_BUCKET_URL}
+      IPFS_GATEWAYS: ${METADATA_BUCKET_URL}
+    networks:
+      - default
+      # adaup's seeded anchors are at http://anchors:8080 on the devnet.
+      - devnet
+    depends_on:
+      metadata-db:
+        condition: service_healthy
+    healthcheck:
+      <<: *node-health
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+
+  metadata-bucket:
+    image: ${COMPOSE_PROJECT_NAME:-govtool-devnet}-metadata-bucket
+    build:
+      context: ../test-metadata-api
+    environment:
+      # Same port inside and out, so one URL works from host and containers.
+      PORT: ${METADATA_BUCKET_PORT:-3001}
+    volumes:
+      - metadata-bucket:/data
+    networks:
+      default:
+        aliases:
+          - ${METADATA_BUCKET_HOST:-metadata-bucket.localhost}
+      # db-sync fetches test anchors and ipfs:// content from the bucket.
+      devnet:
+        aliases:
+          - ${METADATA_BUCKET_HOST:-metadata-bucket.localhost}
+    ports:
+      - "127.0.0.1:${METADATA_BUCKET_PORT:-3001}:${METADATA_BUCKET_PORT:-3001}"
+      # docker-compose.ipv6.yml adds [::1] (macOS resolves *.localhost to
+      # ::1 only); up.sh adds it on macOS.
+    healthcheck:
+      <<: *node-health
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:'+process.env.PORT+'/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+
+  blockfrost-shim:
+    image: ${COMPOSE_PROJECT_NAME:-govtool-devnet}-blockfrost-shim
+    build:
+      context: ./blockfrost-shim
+    environment:
+      PORT: 3000
+      KUBER_URL: ${KUBER_INTERNAL_URL:?set KUBER_INTERNAL_URL}
+      DBSYNC_HOST: ${DBSYNC_HOST:?set DBSYNC_HOST}
+      DBSYNC_PORT: ${DBSYNC_PORT:-5432}
+      DBSYNC_DATABASE: ${DBSYNC_DATABASE:?set DBSYNC_DATABASE}
+      DBSYNC_USER: ${DBSYNC_USER:?set DBSYNC_USER}
+      DBSYNC_PASSWORD: ${DBSYNC_PASSWORD:-}
+    networks:
+      - default
+      - devnet
+    ports:
+      - "127.0.0.1:${BLOCKFROST_SHIM_PORT:-3100}:3000"
+
+  backend:
+    image: ${COMPOSE_PROJECT_NAME:-govtool-devnet}-backend
+    build:
+      # The backend depends on its sibling packages by relative path.
+      context: ../../govtool
+      dockerfile: govtool-backend/Dockerfile
+    environment:
+      NODE_ENV: production
+      GOVTOOL_HOST: 0.0.0.0
+      GOVTOOL_PORT: 9999
+      GOVTOOL_CHAIN_DATA_PROVIDER: dbsync
+      GOVTOOL_DBSYNC_HOST: ${DBSYNC_HOST}
+      GOVTOOL_DBSYNC_PORT: ${DBSYNC_PORT:-5432}
+      GOVTOOL_DBSYNC_DATABASE: ${DBSYNC_DATABASE}
+      GOVTOOL_DBSYNC_USER: ${DBSYNC_USER}
+      GOVTOOL_DBSYNC_PASSWORD: ${DBSYNC_PASSWORD:-}
+      GOVTOOL_DBSYNC_NETWORK: devnet
+      GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
+      GOVTOOL_METADATA_ALLOW_PRIVATE_URLS: "true"
+      # Expiry dates come from this run's Shelley genesis (the provider
+      # checks its systemStart against db-sync's meta.start_time).
+      GOVTOOL_DBSYNC_SHELLEY_GENESIS_PATH: /devnet-config/shelley-genesis.json
+      IPFS_GATEWAY: ${IPFS_GATEWAY_URL}
+      # Pins go to the bucket, never to Pinata.
+      GOVTOOL_PINNING_PROVIDER: test
+      GOVTOOL_TEST_PINNING_URL: ${METADATA_BUCKET_URL}
+      GOVTOOL_PDF_API_URL: http://pdf:1337/api
+      # config.json caches the DRep list for 600 s, sized for day-long
+      # epochs; with 60 s epochs that hides new DReps and voting power.
+      GOVTOOL_DREP_LIST_CACHE_DURATION_SECONDS: "20"
+    volumes:
+      - devnet-config:/devnet-config:ro
+    networks:
+      - default
+      - devnet
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-9999}:9999"
+    depends_on:
+      metadata:
+        condition: service_healthy
+    healthcheck:
+      <<: *node-health
+      # The first cache snapshot can take a while on a fresh db-sync.
+      start_period: 90s
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:9999/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+
+  pdf-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pdf
+      POSTGRES_PASSWORD: pdf
+      POSTGRES_DB: pdf
+    volumes:
+      - pdf-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pdf -d pdf"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pdf:
+    image: ${COMPOSE_PROJECT_NAME:-govtool-devnet}-pdf
+    build:
+      context: ../../govtool/govtool-pdf-backend
+    environment:
+      DATABASE_URL: postgresql://pdf:pdf@pdf-db:5432/pdf?schema=public
+      PORT: 1337
+      JWT_SECRET: ${PDF_JWT_SECRET:?set PDF_JWT_SECRET}
+      REFRESH_SECRET: ${PDF_REFRESH_SECRET:?set PDF_REFRESH_SECRET}
+      CORS_ORIGINS: ${PUBLIC_FRONTEND_URL:-http://127.0.0.1:8080},http://localhost:${FRONTEND_PORT:-8080}
+      CARDANO_NETWORK_ID: "0"
+      GOVTOOL_API_BASE_URL: http://backend:9999
+      PDF_ALLOW_PRIVATE_URLS: "true"
+      IPFS_GATEWAY_URL: ${IPFS_GATEWAY_URL}
+    ports:
+      - "127.0.0.1:${PDF_PORT:-1337}:1337"
+    depends_on:
+      pdf-db:
+        condition: service_healthy
+    healthcheck:
+      <<: *node-health
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:1337/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+
+  frontend:
+    image: ${COMPOSE_PROJECT_NAME:-govtool-devnet}-frontend
+    build:
+      context: ../../govtool/frontend
+      # Dockerfile builds from source; tests/devnet/frontend/prebuilt.Dockerfile
+      # serves a host-built dist/ (see .env.devnet).
+      dockerfile: ${FRONTEND_DOCKERFILE:-Dockerfile}
+    environment:
+      # Read by the browser, so host addresses, not service names.
+      VITE_BASE_URL: ${PUBLIC_BACKEND_URL:-http://127.0.0.1:9999}
+      VITE_METADATA_API_URL: ${PUBLIC_BACKEND_URL:-http://127.0.0.1:9999}/metadata
+      VITE_NETWORK_FLAG: "0"
+      # `test` makes pdf-ui accept anchor URLs with a port (the bucket's).
+      VITE_APP_ENV: test
+      VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "true"
+      VITE_PDF_API_URL: ${PUBLIC_PDF_URL:-http://127.0.0.1:1337}/
+      VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "true"
+      # Outcomes are served by govtool-backend under /outcomes.
+      VITE_OUTCOMES_API_URL: ${PUBLIC_BACKEND_URL:-http://127.0.0.1:9999}/outcomes
+      # Browser-facing: the bucket's /ipfs/<cid>.
+      VITE_IPFS_GATEWAY: ${IPFS_GATEWAY_URL}
+      # A runtime value starting with $VITE_ counts as unset, which also
+      # hides any value compiled in from a local frontend/.env: no Sentry,
+      # no Chatwoot, no dev tools.
+      VITE_IS_DEV: $$VITE_IS_DEV
+      VITE_SENTRY_DSN: $$VITE_SENTRY_DSN
+      VITE_CHATWOOT_URL: $$VITE_CHATWOOT_URL
+      VITE_CHATWOOT_WEBSITE_TOKEN: $$VITE_CHATWOOT_WEBSITE_TOKEN
+      TRUSTED_PROXY_CIDRS: none
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+      pdf:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+volumes:
+  metadata-db:
+  metadata-bucket:
+  pdf-db:
+  # adaup's node and genesis configuration for the running devnet.
+  devnet-config:
+    name: ${DEVNET_DOCKER_NETWORK}-config
+    external: true

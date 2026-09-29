@@ -14,7 +14,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --test test/*.test.mjs",
-    "conformance": "node scripts/conformance.mjs",
+    "live": "node scripts/live-network.mjs && node scripts/live-dreps.mjs && node scripts/live-proposals.mjs && node scripts/live-committee-pools.mjs",
     "verify": "npm run typecheck && npm run build && npm test"
   },
   "dependencies": {

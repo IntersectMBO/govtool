@@ -4,6 +4,7 @@ import { createKoiosProvider } from '@govtool/provider-koios';
 import { createFixtureProvider } from '@govtool/provider-fixture';
 import { createBlockfrostProvider } from '@govtool/provider-blockfrost';
 import { createPinataPinning } from '@govtool/pinning-pinata';
+import { createTestPinning } from '@govtool/pinning-test';
 import { createHttpMetadataService } from '@govtool/metadata-http';
 import type { ChainDataApiV1 } from '@govtool/data-providers/chain-data';
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
@@ -43,6 +44,10 @@ function createChainData(configService: ConfigService): ChainDataApiV1 {
       const db = config.dbSync!;
       return createDbSyncProvider({
         network: db.network,
+        ...(db.shelleyGenesisPath
+          ? { shelleyGenesisPath: db.shelleyGenesisPath }
+          : {}),
+        ...(db.networkName ? { dbNetworkName: db.networkName } : {}),
         connection: {
           host: db.host,
           port: db.port,
@@ -88,15 +93,22 @@ const chainDataProvider: Provider = {
 };
 
 /**
- * `null` when no Pinata JWT is configured. Pinning is optional — the backend
- * must start and serve every read route without it, and `/ipfs/upload`
- * answers 503 the way it always did.
+ * GOVTOOL_PINNING_PROVIDER picks the implementation. Under `pinata` (the
+ * default) it is `null` when no Pinata JWT is configured. Pinning is optional —
+ * the backend must start and serve every read route without it, and
+ * `/ipfs/upload` answers 503 the way it always did. Under `test` it pins to the
+ * local test metadata service, for isolated test environments.
  */
 const pinningProvider: Provider = {
   provide: PINNING,
   inject: [ConfigService],
   useFactory: (configService: ConfigService): PinningServiceV1 | null => {
-    const jwt = configService.get().pinataApiJwt;
+    const config = configService.get();
+    if (config.pinningProvider === 'test') {
+      // config.service guarantees the url is set when the provider is test.
+      return createTestPinning({ baseUrl: config.testPinningUrl! });
+    }
+    const jwt = config.pinataApiJwt;
     return jwt ? createPinataPinning({ jwt }) : null;
   },
 };

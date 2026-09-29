@@ -60,3 +60,12 @@ export function formatWithThousandSeparator(
     maximumFractionDigits: 3,
   });
 }
+
+/**
+ * Matches an ADA amount as pdf-ui shows it, with or without the "₳ " prefix,
+ * so the assertion holds whichever form the UI uses.
+ */
+export function adaAmountText(amount: number | string): RegExp {
+  const escaped = String(amount).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^\\s*(₳\\s*)?${escaped}\\s*$`);
+}

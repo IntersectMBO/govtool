@@ -52,7 +52,14 @@ type AppContextType = {
   networkName: string;
   network: Network;
   cExplorerBaseUrl: string;
+  /**
+   * The current protocol parameters, once the bootstrap fetch has landed.
+   * This state is the source of truth: the localStorage copy is only a cache
+   * and never re-renders its readers.
+   */
   epochParams?: EpochParams;
+  /** Resolves the params now, joining or starting the fetch if needed. */
+  ensureEpochParams: () => Promise<EpochParams | undefined>;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -63,7 +70,8 @@ const AppContext = createContext<AppContextType | null>(null);
  * @param children - The child components to render.
  */
 const AppContextProvider = ({ children }: PropsWithChildren) => {
-  const { fetchEpochParams, epochParams } = useGetEpochParams();
+  const { fetchEpochParams, epochParams, ensureEpochParams } =
+    useGetEpochParams();
   const { fetchNetworkInfo, networkInfo } = useGetNetworkInfo();
   const { fetchSystemFeatures } = useGetSystemFeatures();
 
@@ -132,8 +140,16 @@ const AppContextProvider = ({ children }: PropsWithChildren) => {
           (networkInfo?.networkName as keyof typeof NETWORK_NAMES) || "preview"
         ],
       epochParams,
+      ensureEpochParams,
     }),
-    [isAppInitializing, capabilitiesStatus, featureSet],
+    [
+      isAppInitializing,
+      capabilitiesStatus,
+      featureSet,
+      networkInfo?.networkName,
+      epochParams,
+      ensureEpochParams,
+    ],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

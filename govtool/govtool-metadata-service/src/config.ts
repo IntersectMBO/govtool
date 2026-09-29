@@ -21,7 +21,8 @@ export const HTTP_TIMEOUT_MS = 40 * 1000;
 /**
  * Public IPFS gateways, used for every IPFS anchor. Without a primary gateway
  * (IPFS_PRIMARY_GATEWAY) each request tries them in a random order; with one,
- * the primary goes first and these follow in this order. The public ipfs.io,
+ * the primary goes first and these follow in this order. IPFS_GATEWAYS (a
+ * comma-separated list) replaces this list. The public ipfs.io,
  * dweb.link, w3s.link and nftstorage.link gateways were retired on 2026-09-21.
  */
 export const IPFS_GATEWAYS = [

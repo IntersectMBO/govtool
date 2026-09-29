@@ -9,6 +9,7 @@ import {
   uploadScriptAndGenerateUrl,
 } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
+import { ensureConstitutionFixture } from "@helpers/invalidMetadataFixtures";
 import { invalid, valid } from "@mock/index";
 import { Download, Locator, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
@@ -18,6 +19,7 @@ import {
   ProposalType,
 } from "@types";
 import { testWallet } from "lib/wallet/testWallets";
+import { setUsernameIfPrompted } from "./pdfUsername";
 
 const formErrors = {
   proposalTitle: "title-input-error",
@@ -146,6 +148,7 @@ export default class ProposalSubmissionPage {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
 
     await this.verifyIdentityBtn.click();
+    await setUsernameIfPrompted(this.page);
     await this.proposalCreateBtn.click();
 
     await this.continueBtn.click();
@@ -547,7 +550,7 @@ export default class ProposalSubmissionPage {
     if (proposalType === ProposalType.updatesToTheConstitution) {
       proposal.prop_constitution_url = forValidation
         ? valid.url()
-        : environments.metadataBucketUrl + "/data.jsonId";
+        : await ensureConstitutionFixture();
 
       if (hasGuardrails) {
         if (!forValidation) {

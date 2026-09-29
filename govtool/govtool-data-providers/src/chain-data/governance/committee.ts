@@ -54,7 +54,14 @@ export interface Constitution {
 }
 
 export interface CommitteeApi {
-  getCommittee(): Promise<Envelope<Committee>>;
+  /**
+   * The current committee, or — when `epoch` is given and the provider
+   * declares `committee.epoch` — the one the ledger held at that epoch: the
+   * membership and quorum set by the last committee-lineage action enacted
+   * by then. Members are listed whatever their term; `termExpiryEpoch` says
+   * whether a seat was still in term at `epoch`.
+   */
+  getCommittee(q?: { epoch?: EpochNo }): Promise<Envelope<Committee>>;
   getMember(coldCredential: string): Promise<Envelope<CommitteeMember>>;
   getConstitution(): Promise<Envelope<Constitution>>;
 }

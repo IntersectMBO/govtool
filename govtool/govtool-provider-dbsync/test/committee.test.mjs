@@ -208,3 +208,35 @@ test('getConstitution: the enacted head replaces genesis and earlier ones', () =
 test('getConstitution: no genesis row and nothing enacted is refused', () => {
   assert.throws(() => assembleConstitution([]), (e) => e.code === 'INTERNAL');
 });
+
+test('getCommittee({ epoch }) stops the lineage at the epoch and binds it to the certificate query', async () => {
+  const rows = [
+    genesis([member(1, 1, false, 600)], ['1', '2']),
+    update(5, null, 520, [member(1, 1, false, 600), member(2, 2, false, 700)], ['2', '3']),
+  ];
+  const { api, db } = provider([
+    ['committee_member', rows],
+    ['committee_registration', []],
+    ['protocol_major >= 9', [{ epoch: 507 }]],
+  ]);
+  const before = (await api.getCommittee({ epoch: 519 })).data;
+  assert.equal(before.members.length, 1);
+  assert.deepEqual(before.quorum, { numerator: 1, denominator: 2 });
+  assert.equal(before.enactedBy, null);
+  const after = (await api.getCommittee({ epoch: 520 })).data;
+  assert.equal(after.members.length, 2);
+  assert.equal(after.enactedBy.index, 0);
+  assert.equal((await api.getCommittee()).data.members.length, 2);
+  const certParams = db.calls.filter((c) => c.sql.includes('committee_registration')).map((c) => c.params);
+  assert.deepEqual(certParams, [[519], [520], [null]]);
+});
+
+test('getCommittee({ epoch }) before Conway is NOT_FOUND; a bad epoch INVALID_INPUT', async () => {
+  const { api } = provider([
+    ['committee_member', [genesis([member(1, 1, false, 600)])]],
+    ['committee_registration', []],
+    ['protocol_major >= 9', [{ epoch: 507 }]],
+  ]);
+  await assert.rejects(api.getCommittee({ epoch: 400 }), (e) => e.code === 'NOT_FOUND');
+  await assert.rejects(api.getCommittee({ epoch: 1.5 }), (e) => e.code === 'INVALID_INPUT');
+});

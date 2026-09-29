@@ -238,14 +238,15 @@ for signatures.
 
 ### 5.1 Network
 
-| Read                           | Status                                             |
-| ------------------------------ | -------------------------------------------------- |
-| `getNetworkInfo()`             | **required**                                       |
-| `getProtocolParams()`          | **required**                                       |
-| `getProtocolParams({ epoch })` | optional — declare it                              |
-| `getStakeDistribution()`       | `totalActiveStake` **required**; the rest optional |
-| `getTreasury()`                | optional                                           |
-| `getGenesisParams()`           | optional                                           |
+| Read                              | Status                                             |
+| --------------------------------- | -------------------------------------------------- |
+| `getNetworkInfo()`                | **required**                                       |
+| `getProtocolParams()`             | **required**                                       |
+| `getProtocolParams({ epoch })`    | optional — declare it                              |
+| `getStakeDistribution()`          | `totalActiveStake` **required**; the rest optional |
+| `getStakeDistribution({ epoch })` | optional — declare it                              |
+| `getTreasury()`                   | optional                                           |
+| `getGenesisParams()`              | optional                                           |
 
 `ProtocolParams` is a **typed, named, camelCase** object — never a raw source
 row — carrying **every protocol parameter the ledger holds in the current
@@ -280,14 +281,19 @@ carried.
 genesis: `networkMagic`, `networkId`, `systemStart`, `epochLength`,
 `slotLength`, `activeSlotsCoefficient`, `securityParam`, `slotsPerKesPeriod`,
 `maxKesEvolutions`, `updateQuorum`, `maxLovelaceSupply`. They are optional
-because not every source keeps the genesis file (db-sync does not). They are
+because not every source keeps the genesis file (db-sync does not, so its
+provider serves them only when given the file's path). They are
 the Shelley values: on a network that began in Byron, such as mainnet, an
 epoch-to-time conversion also needs the era boundaries.
 
 `StakeDistribution` separates `totalActiveStake` (the only valid tally
 denominator) from `totalLiveStake` (moves within an epoch, never a denominator),
 and carries the governance breakdowns — DRep-controlled, pool-controlled, and
-the two predefined targets — as optional fields.
+the two predefined targets — as optional fields. `spoAlwaysAbstainVotingPower`
+and `spoAlwaysNoConfidenceVotingPower` are the pool voting power whose pool
+reward account delegates to a predefined target, which from protocol 10 is how
+a pool that did not vote is counted. With `{ epoch }` (declared
+`stakeDistribution.epoch`) every figure is the one computed for that epoch.
 
 Epoch and block listings are **not** in this interface. GovTool is not a block
 explorer; chain data is in scope only where a governance decision depends on it.
@@ -456,6 +462,9 @@ are add/remove **deltas**, so current membership is assembled from the genesis
 committee, every enacted `UpdateCommittee`, any enacted `NoConfidence`, the
 `AuthCommitteeHotCert` and `ResignCommitteeColdCert` certificates, and term
 expiry against the current epoch. It cannot be read off the latest action.
+`getCommittee({ epoch })`, declared `committee.epoch`, is the same assembly
+stopped at `epoch`: only lineage actions enacted by then and certificates
+issued by then count.
 
 **A committee member is identified by the cold credential.** The hot credential
 is rotatable — an id that changes on rotation breaks every reference. Hot is a

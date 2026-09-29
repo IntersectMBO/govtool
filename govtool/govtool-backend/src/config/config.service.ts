@@ -8,6 +8,7 @@ import {
   BackendConfigFile,
   ChainDataProviderName,
   DbSyncConfig,
+  PinningProviderName,
 } from './config.types';
 
 const CHAIN_DATA_PROVIDERS: ChainDataProviderName[] = [
@@ -16,6 +17,8 @@ const CHAIN_DATA_PROVIDERS: ChainDataProviderName[] = [
   'blockfrost',
   'fixture',
 ];
+
+const PINNING_PROVIDERS: PinningProviderName[] = ['pinata', 'test'];
 
 @Injectable()
 export class ConfigService {
@@ -76,12 +79,14 @@ export class ConfigService {
           'GOVTOOL_PINATA_API_JWT',
           rawConfig.pinataapijwt ?? '',
         ) || null,
+      ...this.pinningConfig(),
       metadataServiceUrl:
         this.envString('GOVTOOL_METADATA_SERVICE_URL', '').trim() || null,
       metadataAllowPrivateUrls:
         this.envString('GOVTOOL_METADATA_ALLOW_PRIVATE_URLS', 'false')
           .trim()
           .toLowerCase() === 'true',
+      pdfApiUrl: this.httpUrl('GOVTOOL_PDF_API_URL'),
       port: this.envNumber('GOVTOOL_PORT', rawConfig.port),
       host: this.envString('GOVTOOL_HOST', rawConfig.host),
       cacheDurationSeconds: this.envNumber(
@@ -95,6 +100,22 @@ export class ConfigService {
       sentryDsn: this.envString('GOVTOOL_SENTRY_DSN', rawConfig.sentrydsn),
       sentryEnv: this.envString('GOVTOOL_SENTRY_ENV', rawConfig.sentryenv),
     };
+  }
+
+  /** An optional http(s) base url, trailing slashes dropped; null when unset. */
+  private httpUrl(name: string): string | null {
+    const raw = this.envString(name, '').trim();
+    if (raw === '') return null;
+    let url: URL;
+    try {
+      url = new URL(raw);
+    } catch {
+      throw new Error(`${name} must be an http(s) url`);
+    }
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      throw new Error(`${name} must be an http(s) url`);
+    }
+    return raw.replace(/\/+$/, '');
   }
 
   private positiveInteger(name: string, fallback: number): number {
@@ -118,6 +139,42 @@ export class ConfigService {
     return raw as ChainDataProviderName;
   }
 
+  /**
+   * GOVTOOL_PINNING_PROVIDER: `pinata` (default) or `test`. `test` demands
+   * GOVTOOL_TEST_PINNING_URL, an http(s) url of tests/test-metadata-api, and
+   * is for isolated test environments only.
+   */
+  private pinningConfig(): Pick<
+    BackendConfig,
+    'pinningProvider' | 'testPinningUrl'
+  > {
+    const raw = this.envString('GOVTOOL_PINNING_PROVIDER', 'pinata')
+      .trim()
+      .toLowerCase();
+    if (!PINNING_PROVIDERS.includes(raw as PinningProviderName)) {
+      throw new Error(
+        `GOVTOOL_PINNING_PROVIDER must be one of ${PINNING_PROVIDERS.join(', ')}; got '${raw}'`,
+      );
+    }
+    const pinningProvider = raw as PinningProviderName;
+    if (pinningProvider !== 'test') {
+      return { pinningProvider, testPinningUrl: null };
+    }
+    const url = this.requiredEnvString('GOVTOOL_TEST_PINNING_URL').trim();
+    let protocol: string;
+    try {
+      protocol = new URL(url).protocol;
+    } catch {
+      protocol = '';
+    }
+    if (protocol !== 'http:' && protocol !== 'https:') {
+      throw new Error(
+        `GOVTOOL_TEST_PINNING_URL must be an http(s) url; got '${url}'`,
+      );
+    }
+    return { pinningProvider, testPinningUrl: url };
+  }
+
   private dbSyncConfig(): DbSyncConfig {
     return {
       host: this.requiredEnvString('GOVTOOL_DBSYNC_HOST'),
@@ -126,17 +183,30 @@ export class ConfigService {
       password: this.requiredEnvString('GOVTOOL_DBSYNC_PASSWORD'),
       port: this.envNumber('GOVTOOL_DBSYNC_PORT', 5432),
       network: this.dbSyncNetwork(),
+      shelleyGenesisPath:
+        this.envString('GOVTOOL_DBSYNC_SHELLEY_GENESIS_PATH', '').trim() ||
+        null,
+      networkName:
+        this.envString('GOVTOOL_DBSYNC_NETWORK_NAME', '').trim() || null,
     };
   }
 
-  /** A mainnet/preprod/preview setting; also read for Blockfrost's network. */
+  /**
+   * A mainnet/preprod/preview/devnet setting; also read for Blockfrost's
+   * network. `devnet` is any custom testnet (network id 0).
+   */
   private dbSyncNetwork(
     name = 'GOVTOOL_DBSYNC_NETWORK',
   ): DbSyncConfig['network'] {
     const raw = this.envString(name, 'mainnet').toLowerCase();
-    if (raw !== 'mainnet' && raw !== 'preprod' && raw !== 'preview') {
+    if (
+      raw !== 'mainnet' &&
+      raw !== 'preprod' &&
+      raw !== 'preview' &&
+      raw !== 'devnet'
+    ) {
       throw new Error(
-        `${name} must be mainnet, preprod or preview; got '${raw}'`,
+        `${name} must be mainnet, preprod, preview or devnet; got '${raw}'`,
       );
     }
     return raw;

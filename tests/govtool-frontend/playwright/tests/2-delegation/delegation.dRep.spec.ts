@@ -7,7 +7,8 @@ import { createNewPageWithWallet } from "@helpers/page";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 import { LinkType } from "@types";
-import { ensureFunded, testWallet } from "lib/wallet/testWallets";
+import { singleUseWalletName } from "lib/wallet/testWallets";
+import { stakeRegisteredWallet } from "lib/wallet/transactions";
 
 test.beforeEach(async () => {
   await setAllureEpic("2. Delegation");
@@ -19,8 +20,12 @@ test("2N. Should show DRep information on details page", async ({
 }, testInfo) => {
   test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-  const wallet = await testWallet("2N:dRep");
-  await ensureFunded(wallet, 600);
+  // Registers as a DRep: single use, with a registered stake key as the old
+  // registerDRep wallets had.
+  const wallet = await stakeRegisteredWallet(
+    singleUseWalletName("2N:dRep"),
+    600
+  );
 
   const dRepPage = await createNewPageWithWallet(browser, { wallet });
 

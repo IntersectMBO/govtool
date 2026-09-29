@@ -15,6 +15,7 @@ import removeAllSpaces from "@helpers/removeAllSpaces";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { InvalidMetadata } from "@constants/index";
+import { ensureInvalidMetadataFixtures } from "@helpers/invalidMetadataFixtures";
 import { isMobile } from "@helpers/mobile";
 
 test.beforeEach(async () => {
@@ -314,6 +315,10 @@ test("4K. Should display correct vote counts on governance details page for disc
 });
 
 test.describe("Invalid Live voting Metadata", () => {
+  test.beforeAll(async () => {
+    await ensureInvalidMetadataFixtures();
+  });
+
   InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
     test(`4P_${index + 1}: Should display ${type} message in live voting when ${reason}`, async ({
       page,

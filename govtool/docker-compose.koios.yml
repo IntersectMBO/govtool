@@ -93,7 +93,10 @@ services:
       VITE_METADATA_API_URL: ${METADATA_API_URL:-}
       VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-https://ipfs.io/ipfs}
       VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false"
+      # Off because the Koios provider cannot serve
+      # /outcomes/misc/network/metrics (501, D143); the URL is ready for it.
       VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "false"
+      VITE_OUTCOMES_API_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}/outcomes
     ports:
       - "${FRONTEND_PORT:-8080}:80"
     depends_on:

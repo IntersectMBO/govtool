@@ -320,7 +320,9 @@ Any IPFS url is fetched through the service's own gateways (D130):
 - **Order.** `IPFS_PRIMARY_GATEWAY`, when set, goes first, then the list in
   `config.ts` in order. Without a primary, the list is tried in a random order
   (D127). Default list: `ipfs.blockfrost.dev`, `c-ipfs-gw.nmkr.io`,
-  `ipfs.filebase.io`, `gateway.pinata.cloud` (D129).
+  `ipfs.filebase.io`, `gateway.pinata.cloud` (D129). `IPFS_GATEWAYS`, a
+  comma-separated list of http(s) urls, replaces the default list; an
+  isolated test environment points it at `tests/test-metadata-api`.
 - **Failover.** Gateways are trusted (D126). The first `200` ends the search,
   and a hash mismatch or parse error from it is final. Anything else moves on:
   a network error, a timeout (15 s idle per stage), or a non-`200`.

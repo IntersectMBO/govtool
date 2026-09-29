@@ -85,9 +85,8 @@ const isBlacklisted = (gateway: string) => {
   return false;
 };
 
-/** The primary gateway from the environment, when it is a valid http(s) url. */
-const primaryGateway = (): string | undefined => {
-  const value = process.env.IPFS_PRIMARY_GATEWAY?.trim().replace(/\/+$/, "");
+const httpUrl = (raw: string | undefined): string | undefined => {
+  const value = raw?.trim().replace(/\/+$/, "");
   if (!value) return undefined;
   try {
     const u = new URL(value);
@@ -95,6 +94,22 @@ const primaryGateway = (): string | undefined => {
   } catch {
     return undefined;
   }
+};
+
+/** The primary gateway from the environment, when it is a valid http(s) url. */
+const primaryGateway = (): string | undefined => httpUrl(process.env.IPFS_PRIMARY_GATEWAY);
+
+/**
+ * IPFS_GATEWAYS, a comma-separated list of http(s) urls, replaces the default
+ * public list when it names at least one valid url. An isolated test
+ * environment sets it to its local gateway so no public one is ever tried.
+ */
+const configuredGateways = (): string[] | undefined => {
+  const list = (process.env.IPFS_GATEWAYS ?? "")
+    .split(",")
+    .map((g) => httpUrl(g))
+    .filter((g): g is string => g !== undefined);
+  return list.length ? list : undefined;
 };
 
 const shuffle = <T>(items: T[]): T[] => {
@@ -112,7 +127,7 @@ const shuffle = <T>(items: T[]): T[] => {
  * the list in a random order, so load spreads across gateways.
  */
 export const gatewayOrder = (): { order: string[]; skipped: string[] } => {
-  const configured = (gatewaysOverride ?? IPFS_GATEWAYS).map((g) => g.replace(/\/+$/, ""));
+  const configured = (gatewaysOverride ?? configuredGateways() ?? IPFS_GATEWAYS).map((g) => g.replace(/\/+$/, ""));
   const primary = primaryGateway();
   const all = primary ? [primary, ...configured.filter((g) => g !== primary)] : shuffle(configured);
   return {

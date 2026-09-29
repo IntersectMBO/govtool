@@ -199,6 +199,15 @@ export interface StakeDistribution {
    */
   alwaysAbstainVotingPower?: Lovelace;
   alwaysNoConfidenceVotingPower?: Lovelace;
+  /**
+   * Pool voting power whose pool reward account delegates its vote to the
+   * predefined targets. From protocol version 10 a pool that does not vote
+   * counts as Abstain (`alwaysAbstain`) or, on NoConfidence, as Yes
+   * (`alwaysNoConfidence`), so the SPO tally needs them the way the DRep
+   * tally needs the two above.
+   */
+  spoAlwaysAbstainVotingPower?: Lovelace;
+  spoAlwaysNoConfidenceVotingPower?: Lovelace;
 }
 
 export interface Treasury {
@@ -220,7 +229,13 @@ export interface NetworkApi {
    */
   getProtocolParams(q?: { epoch?: EpochNo }): Promise<Envelope<ProtocolParams>>;
 
-  getStakeDistribution(): Promise<Envelope<StakeDistribution>>;
+  /**
+   * The distribution in force, or — when `epoch` is given and the provider
+   * declares `stakeDistribution.epoch` — the one computed for a past epoch.
+   */
+  getStakeDistribution(q?: {
+    epoch?: EpochNo;
+  }): Promise<Envelope<StakeDistribution>>;
 
   /** Optional. */
   getTreasury?(q?: { epoch?: EpochNo }): Promise<Envelope<Treasury>>;

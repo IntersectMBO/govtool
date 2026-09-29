@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getVoteContextTextFromFile } from "@/services";
 import { QUERY_KEYS } from "@/consts";
 import { useCardano } from "@/context";
+import { ipfsGatewayUrl } from "@/utils/ipfsGateway";
 import { useGetVoterInfo } from ".";
 
 export const useGetVoteContextTextFromFile = (url: string | undefined,
@@ -11,7 +12,7 @@ export const useGetVoteContextTextFromFile = (url: string | undefined,
   const { voter } = useGetVoterInfo();
 
   if (url && url.startsWith("ipfs://")) {
-      url = url.replace("ipfs://", "https://ipfs.io/ipfs/");
+      url = ipfsGatewayUrl(url.slice("ipfs://".length));
   }
 
   const { data, isLoading } = useQuery({

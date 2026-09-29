@@ -5,12 +5,8 @@ import { Link } from "@mui/material";
 import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { CenteredBoxBottomButtons } from "@molecules";
-import {
-  correctVoteAdaFormat,
-  getItemFromLocalStorage,
-  openInNewTab,
-  PROTOCOL_PARAMS_KEY,
-} from "@utils";
+import { useAppContext } from "@context";
+import { correctVoteAdaFormat, openInNewTab } from "@utils";
 import { LINKS } from "@/consts/links";
 
 export const RolesAndResponsibilities = ({
@@ -21,7 +17,7 @@ export const RolesAndResponsibilities = ({
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
-  const epochParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
+  const { epochParams } = useAppContext();
 
   const onClickContinue = () => setStep(2);
 
@@ -51,7 +47,11 @@ export const RolesAndResponsibilities = ({
             />,
           ]}
           i18nKey="registration.rolesAndResponsibilitiesDescription"
-          values={{ deposit: correctVoteAdaFormat(epochParams?.drep_deposit) }}
+          values={{
+            deposit: correctVoteAdaFormat(
+              epochParams?.drep_deposit ?? undefined,
+            ),
+          }}
         />
       </Typography>
       <CenteredBoxBottomButtons

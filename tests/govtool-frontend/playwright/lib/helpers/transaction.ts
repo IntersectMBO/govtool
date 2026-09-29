@@ -41,10 +41,12 @@ export async function waitForTxConfirmation(
 ) {
   let transactionHash: string | undefined;
   try {
-    await triggerCallback?.call(this);
+    // Listen before triggering, so a status poll that starts while the
+    // trigger is still running is not missed.
     const transactionStatusPromise = page.waitForRequest((request) => {
       return request.url().includes("/transaction/status/");
     });
+    await triggerCallback?.call(this);
 
     await expect(
       page

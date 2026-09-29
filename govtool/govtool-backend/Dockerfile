@@ -38,6 +38,11 @@ RUN cd govtool-provider-fixture && npm ci && npm run build && npm prune --omit=d
 COPY govtool-pinning-pinata ./govtool-pinning-pinata
 RUN cd govtool-pinning-pinata && npm ci && npm run build && npm prune --omit=dev
 
+# Pins to the local test metadata service when GOVTOOL_PINNING_PROVIDER=test;
+# for isolated test environments only.
+COPY govtool-pinning-test ./govtool-pinning-test
+RUN cd govtool-pinning-test && npm ci && npm run build && npm prune --omit=dev
+
 # The client for the private metadata service; GOVTOOL_METADATA_SERVICE_URL decides
 # at runtime whether it is used.
 COPY govtool-metadata-http ./govtool-metadata-http

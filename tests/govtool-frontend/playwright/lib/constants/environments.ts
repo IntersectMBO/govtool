@@ -10,12 +10,18 @@ const NETWORK = process.env.NETWORK || "preview";
 const environments = {
   frontendUrl: SERVER_HOST_URL,
   blockfrostApiKey: process.env.BLOCKFROST_API_KEY,
-  blockfrostApiUrl: "https://cardano-" + NETWORK + ".blockfrost.io/api",
+  // BLOCKFROST_URL points at any Blockfrost-compatible API, e.g. the devnet
+  // shim in tests/devnet/blockfrost-shim.
+  blockfrostApiUrl:
+    process.env.BLOCKFROST_URL ||
+    "https://cardano-" + NETWORK + ".blockfrost.io/api",
   apiUrl: `${SERVER_HOST_URL}/api`,
   docsUrl: process.env.DOCS_URL || "https://docs.gov.tools/cardano-govtool",
   networkId: NETWORK === "mainnet" ? 1 : 0,
   faucet: {
-    apiUrl: `https://faucet.${NETWORK}.world.dev.cardano.org`,
+    apiUrl:
+      process.env.FAUCET_API_URL ||
+      `https://faucet.${NETWORK}.world.dev.cardano.org`,
     address: process.env.FAUCET_ADDRESS,
     payment: { private: process.env.FAUCET_PAYMENT_PRIVATE },
     stake: {
@@ -23,7 +29,7 @@ const environments = {
     },
   },
   kuber: {
-    apiUrl: `https://${NETWORK}.kuber.cardanoapi.io`,
+    apiUrl: process.env.KUBER_URL || `https://${NETWORK}.kuber.cardanoapi.io`,
     apiKey: process.env.KUBER_API_KEY || "",
   },
   txTimeOut: parseInt(process.env.TX_TIMEOUT) || 240000,

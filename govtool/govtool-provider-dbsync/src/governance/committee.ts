@@ -5,6 +5,7 @@ import { notFound } from '../errors';
 import { decodeCommitteeColdId, encodeCommitteeColdId } from '../ids';
 import { readConstitution } from './committee/constitution';
 import { readCommittee } from './committee/membership';
+import { parseEpoch } from '../network/chain';
 
 /**
  * `/governance/committee`: membership (SPEC.md §5.5, D68, D71) and the
@@ -16,7 +17,7 @@ import { readCommittee } from './committee/membership';
  */
 export function createCommitteeApi(ctx: Ctx): CommitteeApi {
   return {
-    getCommittee: async () => ctx.envelope(await readCommittee(ctx)),
+    getCommittee: async (q) => ctx.envelope(await readCommittee(ctx, parseEpoch(q?.epoch))),
 
     getMember: async (coldCredential) => {
       const credential = decodeCommitteeColdId(coldCredential);

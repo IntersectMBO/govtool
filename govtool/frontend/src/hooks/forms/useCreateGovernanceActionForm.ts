@@ -23,8 +23,6 @@ import {
   downloadJson,
   generateJsonld,
   generateMetadataBody,
-  getItemFromLocalStorage,
-  PROTOCOL_PARAMS_KEY,
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
 import { MetadataValidationStatus } from "@models";
@@ -55,8 +53,6 @@ export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
     storeData: false,
     storingURL: "",
   };
-
-const protocolParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
 export const useCreateGovernanceActionForm = (
   setStep?: Dispatch<SetStateAction<number>>,
@@ -102,10 +98,10 @@ export const useCreateGovernanceActionForm = (
   const govActionType = watch("governance_action_type");
 
   useEffect(() => {
-    if (govActionType === GovernanceActionType.ParameterChange) {
-      setValue("protocolParameters", JSON.stringify(protocolParams));
+    if (govActionType === GovernanceActionType.ParameterChange && epochParams) {
+      setValue("protocolParameters", JSON.stringify(epochParams));
     }
-  }, [govActionType]);
+  }, [govActionType, epochParams]);
 
   // Navigation
   const backToForm = useCallback(() => {
@@ -124,7 +120,9 @@ export const useCreateGovernanceActionForm = (
       const normalized = surveyTxId?.trim().toLowerCase();
       if (!normalized) return;
       if (!/^[0-9a-f]{64}$/.test(normalized)) {
-        throw new Error("Survey transaction hash must be 64 hexadecimal characters");
+        throw new Error(
+          "Survey transaction hash must be 64 hexadecimal characters",
+        );
       }
       if (
         epochParams?.epoch_no === null ||
@@ -407,7 +405,9 @@ export const useCreateGovernanceActionForm = (
           openWalletErrorModal({
             error: isInsufficientBalance
               ? t("errors.insufficientBalanceDescription", {
-                  ada: correctVoteAdaFormat(protocolParams?.gov_action_deposit),
+                  ada: correctVoteAdaFormat(
+                    epochParams?.gov_action_deposit ?? undefined,
+                  ),
                 })
               : error,
             title: isInsufficientBalance
@@ -425,6 +425,7 @@ export const useCreateGovernanceActionForm = (
       buildTransaction,
       buildSignSubmitConwayCertTx,
       validateSurveyLink,
+      epochParams?.gov_action_deposit,
     ],
   );
 

@@ -90,11 +90,14 @@ export class MetadataService {
     }
   }
 
-  async validateMetadata({
-    hash,
-    url,
-    standard: paramStandard,
-  }: ValidateMetadataDto): Promise<ValidateMetadataResult> {
+  /**
+   * `options.includeAuthors` adds the document's CIP-100 `authors` to
+   * `metadata`, as the outcomes UI reads them; the legacy route omits them.
+   */
+  async validateMetadata(
+    { hash, url, standard: paramStandard }: ValidateMetadataDto,
+    options: { includeAuthors?: boolean } = {},
+  ): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus | undefined;
     let metadata: Record<string, unknown> | undefined;
     let standard = paramStandard;
@@ -140,6 +143,11 @@ export class MetadataService {
         metadata = this.parseMetadata(
           parsedData.body as Record<string, unknown>,
         );
+        if (options.includeAuthors) {
+          metadata.authors = Array.isArray(parsedData.authors)
+            ? parsedData.authors
+            : [];
+        }
       }
 
       if (rawData !== undefined) {
@@ -170,6 +178,19 @@ export class MetadataService {
       valid: !status,
       metadata,
     };
+  }
+
+  /**
+   * The raw document at `url` (an `ipfs://` url through the gateway), under
+   * the same guards as validation: no private addresses, no redirects, a
+   * size cap and a timeout. Throws a `MetadataValidationStatus` or a
+   * `MetadataFetchError`.
+   */
+  fetchDocumentText(url: string): Promise<string> {
+    return this.fetchMetadata(
+      this.resolveMetadataUrl(url),
+      url.startsWith('ipfs://'),
+    );
   }
 
   private resolveMetadataUrl(url: string): string {

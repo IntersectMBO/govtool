@@ -17,6 +17,7 @@ vi.mock("./appContext");
 const mockUseAppContext = useAppContext as MockedFunction<typeof useAppContext>;
 
 const mockUseAppContextReturnValue = {
+  ensureEpochParams: async () => undefined,
   cExplorerBaseUrl: "http://mock.cexplorer",
   isAppInitializing: false,
   isInBootstrapPhase: false,

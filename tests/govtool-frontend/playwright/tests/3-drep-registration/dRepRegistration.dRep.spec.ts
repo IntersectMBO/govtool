@@ -11,19 +11,24 @@ import { expect } from "@playwright/test";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { GovernanceActionType } from "@types";
 import { sharedDRep } from "lib/wallet/sharedDReps";
-import { ensureFunded, randomAddress, testWallet } from "lib/wallet/testWallets";
-import { registeredDRepWallet } from "lib/wallet/transactions";
+import { randomAddress, singleUseWalletName } from "lib/wallet/testWallets";
+import {
+  registeredDRepWallet,
+  stakeRegisteredWallet,
+} from "lib/wallet/transactions";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfMainnet();
 });
 
-/** A funded wallet whose DRep key is not registered yet. */
-async function unregisteredDRepWallet(name: string) {
-  const wallet = await testWallet(name);
-  await ensureFunded(wallet, 600);
-  return wallet;
+/**
+ * A funded wallet whose DRep key is not registered yet, new in each test
+ * process since the tests register it. Its stake key is registered, as the old
+ * registerDRep wallets had it.
+ */
+function unregisteredDRepWallet(name: string) {
+  return stakeRegisteredWallet(singleUseWalletName(name), 600);
 }
 
 test.describe("Logged in DReps", () => {

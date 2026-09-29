@@ -22,7 +22,7 @@ test.describe("Proposal created logged in state", () => {
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
 
-    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
+    await proposalDiscussionDetailsPage.verifyIdentity();
   });
 
   test("8G. Should display the proper likes and dislikes count", async ({
@@ -79,7 +79,7 @@ test.describe("Proposal created with poll enabled (user auth)", () => {
     test.slow();
     proposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(page);
     await proposalDiscussionDetailsPage.goto(proposalId);
-    await proposalDiscussionDetailsPage.verifyIdentityBtn.click();
+    await proposalDiscussionDetailsPage.verifyIdentity();
   });
 
   test("8Q. Should vote on poll.", async ({ page }) => {
@@ -144,8 +144,8 @@ test.describe("Proposal created with poll enabled (proposal auth)", () => {
     ownerProposalDiscussionDetailsPage = new ProposalDiscussionDetailsPage(
       proposalPage
     );
-    ownerProposalDiscussionDetailsPage.goto(proposalId);
-    await ownerProposalDiscussionDetailsPage.verifyIdentityBtn.click();
+    await ownerProposalDiscussionDetailsPage.goto(proposalId);
+    await ownerProposalDiscussionDetailsPage.verifyIdentity();
   });
 
   test("8P. Should add poll on own proposal", async ({}) => {

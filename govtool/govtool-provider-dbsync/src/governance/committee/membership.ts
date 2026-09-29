@@ -29,7 +29,7 @@
 import type { Committee, CommitteeMember, GovActionRef, Ratio } from '@govtool/data-providers/chain-data';
 
 import type { Ctx } from '../../context';
-import { internal } from '../../errors';
+import { internal, notFound } from '../../errors';
 import { encodeCommitteeColdId, encodeCommitteeHotId, encodeGovActionId } from '../../ids';
 import { toInt, toNullableInt } from '../../numbers';
 import { orderLineage } from './lineage';
@@ -96,7 +96,8 @@ export const COMMITTEE_STEPS_SQL = `
 /**
  * The latest hot-key certificate per cold credential: an authorisation names
  * the hot credential, a resignation ends the seat's ability to vote. The two
- * tables are small on every network (one row per certificate ever issued).
+ * tables are small on every network (one row per certificate ever issued), so
+ * joining each to its block for the `$1` epoch cutoff (null: none) is cheap.
  */
 export const COMMITTEE_CERTS_SQL = `
   SELECT DISTINCT ON (x.cold_key_id) x.cold_key_id::text AS cold_key_id, x.resigned,
@@ -105,6 +106,8 @@ export const COMMITTEE_CERTS_SQL = `
           UNION ALL
           SELECT cold_key_id, NULL::bigint, tx_id, cert_index, true FROM committee_de_registration) x
     LEFT JOIN committee_hash h ON h.id = x.hot_key_id
+   WHERE $1::int IS NULL
+      OR (SELECT b.epoch_no FROM tx t JOIN block b ON b.id = t.block_id WHERE t.id = x.tx_id) <= $1::int
    ORDER BY x.cold_key_id, x.tx_id DESC, x.cert_index DESC`;
 
 /** The first Conway epoch, where the genesis committee's terms begin. */
@@ -216,11 +219,25 @@ export function assembleCommittee(
   return { members, quorum, enactedBy: head.ref, isDissolved: head.dissolves };
 }
 
-export async function readCommittee(ctx: Ctx): Promise<Committee> {
+/**
+ * The steps in force at `epoch`: the genesis committee and every lineage
+ * action enacted by then. The enacted ones form a prefix of the lineage, so
+ * ordering what is left is still ordering one chain.
+ */
+export function stepsAtEpoch(rows: readonly CommitteeStepRow[], epoch: number): CommitteeStepRow[] {
+  return rows.filter((row) => row.id === null || (row.enacted_epoch !== null && row.enacted_epoch <= epoch));
+}
+
+/** The current committee, or with `epoch` the one the ledger held then. */
+export async function readCommittee(ctx: Ctx, epoch?: number): Promise<Committee> {
   const [stepRows, certRows, conway] = await Promise.all([
     ctx.db.query<CommitteeStepRow>(COMMITTEE_STEPS_SQL),
-    ctx.db.query<CertRow>(COMMITTEE_CERTS_SQL),
+    ctx.db.query<CertRow>(COMMITTEE_CERTS_SQL, [epoch ?? null]),
     ctx.db.query<{ epoch: number | null }>(CONWAY_START_SQL),
   ]);
-  return assembleCommittee(stepRows, certRows, toNullableInt(conway[0]?.epoch ?? null));
+  const conwayStart = toNullableInt(conway[0]?.epoch ?? null);
+  if (epoch !== undefined && conwayStart !== null && epoch < conwayStart) {
+    throw notFound(`epoch ${epoch} predates the Conway committee`, { epoch });
+  }
+  return assembleCommittee(epoch === undefined ? stepRows : stepsAtEpoch(stepRows, epoch), certRows, conwayStart);
 }

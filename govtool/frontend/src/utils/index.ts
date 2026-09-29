@@ -22,6 +22,7 @@ export * from "./getGovActionVotingThresholdKey";
 export * from "./getLengthInBytes";
 export * from "./getMetadataDataMissingStatusTranslation";
 export * from "./getProposalTypeLabel";
+export * from "./ipfsGateway";
 export * from "./isValidFormat";
 export * from "./jsonUtils";
 export * from "./localStorage";

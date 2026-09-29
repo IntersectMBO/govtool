@@ -40,6 +40,17 @@ export async function resolveBody(
   anchor: Anchor,
   timeoutMs = ENRICH_TIMEOUT_MS,
 ): Promise<Json | undefined> {
+  const document = await resolveDocument(service, anchor, timeoutMs);
+  const body = document?.['body'];
+  return isObject(body) ? body : undefined;
+}
+
+/** The whole anchored document, or undefined when it cannot be had in time. */
+export async function resolveDocument(
+  service: MetadataServiceV1 | null,
+  anchor: Anchor,
+  timeoutMs = ENRICH_TIMEOUT_MS,
+): Promise<Json | undefined> {
   if (!service || !anchor.url || !anchor.hash) return undefined;
   let timer: NodeJS.Timeout | undefined;
   const timeout = new Promise<undefined>((resolve) => {
@@ -53,8 +64,7 @@ export async function resolveBody(
       timeout,
     ]);
     if (!result || !result.ok) return undefined;
-    const body = isObject(result.body) ? result.body['body'] : undefined;
-    return isObject(body) ? body : undefined;
+    return isObject(result.body) ? result.body : undefined;
   } finally {
     clearTimeout(timer);
   }

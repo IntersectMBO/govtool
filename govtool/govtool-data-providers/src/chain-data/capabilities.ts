@@ -52,6 +52,10 @@ export type VoteAggregateRepresentation = 'stake' | 'count' | 'percent';
 export type OptionalArgument =
   /** `getProtocolParams({ epoch })` — parameters at a past epoch. */
   | 'protocolParams.epoch'
+  /** `getStakeDistribution({ epoch })` — the distribution at a past epoch. */
+  | 'stakeDistribution.epoch'
+  /** `getCommittee({ epoch })` — the committee as it stood at a past epoch. */
+  | 'committee.epoch'
   /** A voter id on a PROPOSAL LISTING, to annotate or filter a whole page.
    *  The single-action form is required and is not declared. */
   | 'proposals.voterContextOnList';

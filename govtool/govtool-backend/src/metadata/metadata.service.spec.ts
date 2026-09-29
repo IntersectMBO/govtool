@@ -146,6 +146,29 @@ describe('validation through the metadata service', () => {
     expect(fetchMetadataText).not.toHaveBeenCalled();
   });
 
+  it('adds the document authors only when asked', async () => {
+    const authors = [{ name: 'A', witness: { witnessAlgorithm: 'ed25519' } }];
+    const service = new MetadataService(
+      config,
+      stub(() =>
+        Promise.resolve({
+          ok: true,
+          hash: 'ab'.repeat(32),
+          body: { ...doc, authors },
+          fetchedAt: '2026-09-24T00:00:00Z',
+        }),
+      ),
+    );
+    await expect(
+      service.validateMetadata(input, { includeAuthors: true }),
+    ).resolves.toMatchObject({ metadata: { givenName: 'HOSKY', authors } });
+    await expect(service.validateMetadata(input)).resolves.toMatchObject({
+      metadata: { givenName: 'HOSKY' },
+    });
+    const plain = await service.validateMetadata(input);
+    expect(plain.metadata).not.toHaveProperty('authors');
+  });
+
   it.each([
     ['FETCH_ERROR', 'No IPFS gateway served the content', 'URL_NOT_FOUND'],
     [

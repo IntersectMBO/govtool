@@ -1,4 +1,5 @@
 import { InvalidMetadata } from "@constants/index";
+import { ensureInvalidMetadataFixtures } from "@helpers/invalidMetadataFixtures";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import OutcomeDetailsPage from "@pages/outcomeDetailsPage";
@@ -95,6 +96,10 @@ test.describe("Outcome details", () => {
   });
 
   test.describe("Invalid Outcome Metadata", () => {
+    test.beforeAll(async () => {
+      await ensureInvalidMetadataFixtures();
+    });
+
     InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
       test(`9H_${index + 1}B: Should display "${type}" message in outcomes when ${reason}`, async ({
         page,

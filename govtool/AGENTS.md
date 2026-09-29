@@ -33,10 +33,17 @@ govtool-provider-fixture: all six components over a committed mainnet capture.
 No network, database or credentials; develop and test against this.
 govtool-provider-dbsync, -koios, -blockfrost: chain data only.
 govtool-pinning-pinata: the pinning contract.
+govtool-pinning-test: the pinning contract over tests/test-metadata-api, for
+isolated test runs (GOVTOOL_PINNING_PROVIDER=test).
 govtool-metadata-http: the metadata contract as a client of
 govtool-metadata-service, which is private to the backend.
 govtool-backend: backend-ts forked onto the contract; same routes and bodies
-plus /system/capabilities, /system/features and four metadata routes.
+plus /system/capabilities, /system/features, four metadata routes and the
+outcomes UI's routes under /outcomes (D143).
+govtool-pdf-backend: the proposal discussion forum (pdf) backend, NestJS +
+Prisma + its own Postgres, wire-compatible with the Strapi v4 surface the
+vendored pdf-ui (frontend/src/pdf-ui) calls. Standalone: no file: deps. Its
+SPEC.md is the decided state; src/README.md maps the shared building blocks.
 
 Edges are file: paths: every provider and client depends on the contract; the
 backend depends on the contract, the four chain-data providers, pinning and
@@ -79,7 +86,7 @@ First build, from this folder, in this order:
 ```bash
 for p in govtool-data-providers govtool-provider-fixture govtool-provider-dbsync \
          govtool-provider-koios govtool-provider-blockfrost govtool-pinning-pinata \
-         govtool-metadata-http govtool-backend; do
+         govtool-pinning-test govtool-metadata-http govtool-backend; do
   (cd $p && npm install && npm run build)
 done
 ```
@@ -132,7 +139,8 @@ Adding a provider: the four places under Build order, then a README in the
 package saying what it serves and omits.
 
 Local-run traps: under dbsync, GOVTOOL_DBSYNC_NETWORK must match the database
-or every route answers 500. Two backends run as the identical command line
+or every route answers 500. On a local devnet use devnet plus
+GOVTOOL_DBSYNC_SHELLEY_GENESIS_PATH, or expiry dates are null (D142). Two backends run as the identical command line
 node dist/main.js, so stop one by PID from its cwd, not by pkill on the path.
 A stale frontend/node_modules shows as Vite failing to resolve an import;
 npm install there fixes it.

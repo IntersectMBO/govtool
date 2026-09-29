@@ -29,7 +29,7 @@ test.describe("Budget proposal 01 wallet", () => {
   }) => {
     await page.goto("/");
     await page.getByTestId("budget-discussion-link").click();
-    await page.getByTestId("verify-user-link").first().click();
+    await new BudgetDiscussionPage(page).verifyIdentity();
 
     await expect(
       page.getByTestId("propose-a-budget-discussion-button")

@@ -262,6 +262,9 @@ const stakeRow = {
   pool_rows: '682',
   pool_rows_with_vp: '682',
   pool_voting_power: '1553042315738513',
+  tip_epoch: 1430,
+  spo_always_abstain: '41000000000000',
+  spo_always_no_confidence: null,
 };
 
 test('getStakeDistribution maps every computed field and never serves live stake', async () => {
@@ -274,7 +277,34 @@ test('getStakeDistribution maps every computed field and never serves live stake
     totalStakeControlledBySPOs: '1553042315738513',
     alwaysAbstainVotingPower: '127158395299138',
     alwaysNoConfidenceVotingPower: '3729119157372',
+    spoAlwaysAbstainVotingPower: '41000000000000',
+    spoAlwaysNoConfidenceVotingPower: '0',
   });
+});
+
+test('getStakeDistribution({ epoch }) binds the epoch; without one it binds null', async () => {
+  const { chainData, db } = provider([[STAKE_DISTRIBUTION_SQL, (params) => [{ ...stakeRow, epoch_no: params[0] ?? 1430 }]]]);
+  assert.equal((await chainData.network.getStakeDistribution({ epoch: 1400 })).data.epoch, 1400);
+  await chainData.network.getStakeDistribution();
+  assert.deepEqual(db.calls.map((c) => c.params), [[1400], [null]]);
+});
+
+test('getStakeDistribution({ epoch }): future or never-snapshotted epochs are NOT_FOUND', async () => {
+  const future = provider([[STAKE_DISTRIBUTION_SQL, [{ ...stakeRow, epoch_no: 1431 }]]]);
+  await rejectsWith(() => future.chainData.network.getStakeDistribution({ epoch: 1431 }), 'NOT_FOUND');
+  const missing = provider([[STAKE_DISTRIBUTION_SQL, [{ ...stakeRow, epoch_no: 3, stake_complete: null, active_stake: null }]]]);
+  await rejectsWith(() => missing.chainData.network.getStakeDistribution({ epoch: 3 }), 'NOT_FOUND');
+  // The current epoch still unfinished stays retryable.
+  const current = provider([[STAKE_DISTRIBUTION_SQL, [{ ...stakeRow, stake_complete: false }]]]);
+  await rejectsWith(() => current.chainData.network.getStakeDistribution({ epoch: 1430 }), 'STALE_DATA');
+  await rejectsWith(() => current.chainData.network.getStakeDistribution({ epoch: -1 }), 'INVALID_INPUT');
+});
+
+test('getStakeDistribution: SPO default-vote sums are omitted with the SPO total', async () => {
+  const { chainData } = provider([[STAKE_DISTRIBUTION_SQL, [{ ...stakeRow, pool_rows_with_vp: '600' }]]]);
+  const { data } = await chainData.network.getStakeDistribution();
+  assert.ok(!('spoAlwaysAbstainVotingPower' in data));
+  assert.ok(!('spoAlwaysNoConfidenceVotingPower' in data));
 });
 
 test('getStakeDistribution: an uncomputed DRep distribution omits the DRep fields', async () => {
@@ -363,4 +393,27 @@ test('a driver failure surfaces as PROVIDER_UNAVAILABLE through the guard', asyn
   const { chainData } = createDbSyncProvider({ network: 'preview', db });
   await rejectsWith(() => chainData.network.getProtocolParams(), 'PROVIDER_UNAVAILABLE');
   await rejectsWith(() => chainData.transactions.get(HASH), 'PROVIDER_UNAVAILABLE');
+});
+
+/* -- custom networks -------------------------------------------------------- */
+
+test('a devnet accepts whatever non-public name db-sync was configured with', async () => {
+  for (const name of ['devnet', 'testnet', 'private']) {
+    const { chainData } = provider([[(s) => s.includes('FROM meta'), [{ ...tipBlock, network_name: name }]]], 'devnet');
+    const { data } = await chainData.network.getNetworkInfo();
+    assert.equal(data.network, 'devnet');
+  }
+});
+
+test('a devnet still refuses a database following a public network', async () => {
+  const { chainData } = provider([[(s) => s.includes('FROM meta'), [{ ...tipBlock, network_name: 'preview' }]]], 'devnet');
+  await rejectsWith(() => chainData.network.getNetworkInfo(), 'INTERNAL');
+});
+
+test('dbNetworkName pins the expected meta.network_name', async () => {
+  const routes = (name) => [[(s) => s.includes('FROM meta'), [{ ...tipBlock, network_name: name }]]];
+  const make = (name) =>
+    createDbSyncProvider({ network: 'devnet', dbNetworkName: 'preview', db: fakeDb(routes(name)) }).chainData;
+  assert.equal((await make('preview').network.getNetworkInfo()).data.network, 'devnet');
+  await rejectsWith(() => make('devnet').network.getNetworkInfo(), 'INTERNAL');
 });

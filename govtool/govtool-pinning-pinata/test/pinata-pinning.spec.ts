@@ -60,7 +60,7 @@ describe('pinData', () => {
     expect(cid).toBe('bafkreiexample');
     expect(calls).toHaveLength(1);
     const [call] = calls;
-    expect(call!.url).toBe('https://upload.pinata.cloud/v3/files');
+    expect(call!.url).toBe('https://uploads.pinata.cloud/v3/files');
     expect(call!.init?.method).toBe('POST');
     expect((call!.init?.headers as Record<string, string>).Authorization).toBe(
       'Bearer test-jwt',

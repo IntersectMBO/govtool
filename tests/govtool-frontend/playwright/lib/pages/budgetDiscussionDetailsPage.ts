@@ -1,7 +1,8 @@
-import { formatWithThousandSeparator } from "@helpers/adaFormat";
+import { adaAmountText, formatWithThousandSeparator } from "@helpers/adaFormat";
 import { expect, Page } from "@playwright/test";
 import { BudgetProposalProps, CommentResponse } from "@types";
 import environments from "lib/constants/environments";
+import { setUsernameIfPrompted } from "./pdfUsername";
 
 export default class BudgetDiscussionDetailsPage {
   // buttons
@@ -89,6 +90,12 @@ export default class BudgetDiscussionDetailsPage {
     await this.page.goto(
       `${environments.frontendUrl}/budget_discussion/${proposalId}`
     );
+  }
+
+  /** Signs in to pdf and sets a username if pdf-ui asks for one. */
+  async verifyIdentity() {
+    await this.verifyUserLink.click();
+    await setUsernameIfPrompted(this.page);
   }
 
   async sortAndValidate(
@@ -205,7 +212,9 @@ export default class BudgetDiscussionDetailsPage {
 
     // costing validation
     await expect(this.costingAmountContent).toHaveText(
-      `₳ ${formatWithThousandSeparator(budgetProposal.costing.adaAmount)}`
+      adaAmountText(
+        formatWithThousandSeparator(budgetProposal.costing.adaAmount)
+      )
     );
     await expect(this.costingConversionRateContent).toHaveText(
       budgetProposal.costing.usdToAdaConversionRate.toString()

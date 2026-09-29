@@ -1,4 +1,9 @@
-import { faker } from "@faker-js/faker";
+import {
+  incorrectFormatFixture,
+  missingMetadataUrl,
+  UNMATCHED_METADATA_HASH,
+  validCip108Fixture,
+} from "@helpers/invalidMetadataFixtures";
 import { BudgetProposalFilterTypes, InvalidMetadataType } from "@types";
 
 export const SECURITY_RELEVANT_PARAMS_MAP: Record<string, string> = {
@@ -35,30 +40,32 @@ export const outcomeStatusType = [
   "Live",
 ];
 
+// Anchors are uploaded by ensureInvalidMetadataFixtures(); call it in a
+// beforeAll of any test that uses them.
 export const InvalidMetadata: InvalidMetadataType[] = [
   {
     type: "Data Formatted Incorrectly",
     reason: "hash is valid but incorrect metadata format.",
-    url: "https://metadata-govtool.cardanoapi.io/data/Lolita",
-    hash: "62a37df07103f0a69690c8975700e06b7c3c3069cb3d105abec00e820e831dda",
+    url: incorrectFormatFixture.url,
+    hash: incorrectFormatFixture.hash,
   },
   {
     type: "Data Missing",
     reason: "metadata URL could not be found.",
-    url: faker.internet.url() + "/test.jsonld",
-    hash: "99a19b124ceb89bbd92354e8d11f913d1aec7280ce19ac4c1c6cc72f0ea91884",
+    url: missingMetadataUrl,
+    hash: UNMATCHED_METADATA_HASH,
   },
   {
     type: "Data Not Verifiable",
     reason: "metadata hash and URL do not match.",
-    url: "https://metadata-govtool.cardanoapi.io/data/data.jsonld",
-    hash: "e71bf6171adda3754a87fff5c2d8d9e404eb3366428a5be13f7e76357a39004f",
+    url: validCip108Fixture.url,
+    hash: UNMATCHED_METADATA_HASH,
   },
   {
     type: "Data Not Verifiable",
     reason: "metadata hash and URL do not match and is incorrect ga format",
-    url: "https://metadata-govtool.cardanoapi.io/data/Lolita",
-    hash: "e71bf6171adda3754a87fff5c2d8d9e404eb3366428a5be13f7e76357a39004f",
+    url: incorrectFormatFixture.url,
+    hash: UNMATCHED_METADATA_HASH,
   },
 ];
 

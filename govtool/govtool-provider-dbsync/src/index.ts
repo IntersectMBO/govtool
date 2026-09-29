@@ -17,12 +17,28 @@ import { createSystemApi } from './system';
 import { createTransactionsApi } from './transactions';
 
 export interface DbSyncProviderOptions {
-  /** The network the database follows. Decides stake address prefixes. */
+  /**
+   * The network the database follows. Decides stake address prefixes: only
+   * `mainnet` is network id 1, so a custom name such as `devnet` is a testnet.
+   */
   network: NetworkId;
   /** Connection settings; the provider opens and owns a pool. */
   connection?: PgDbOptions;
   /** Or a database the caller owns, such as a test double. */
   db?: Db;
+  /**
+   * Path to the Shelley genesis file db-sync was started with. Optional:
+   * db-sync keeps no genesis constants, so `network.getGenesisParams` exists
+   * only when this is set. A custom network (a devnet) needs it to date
+   * epochs, because its system start and epoch length are not public.
+   */
+  shelleyGenesisPath?: string;
+  /**
+   * The `meta.network_name` the database must report. Defaults to `network`
+   * for a public network; a custom network accepts any non-public name
+   * unless this pins one.
+   */
+  dbNetworkName?: string;
 }
 
 export interface DbSyncProvider {
@@ -38,7 +54,10 @@ export function createDbSyncProvider(options: DbSyncProviderOptions): DbSyncProv
   const ctx = createCtx(db, options.network);
   return {
     chainData: {
-      network: createNetworkApi(ctx),
+      network: createNetworkApi(ctx, {
+        shelleyGenesisPath: options.shelleyGenesisPath,
+        dbNetworkName: options.dbNetworkName,
+      }),
       accounts: createAccountsApi(ctx),
       governance: createGovernanceApi(ctx),
       transactions: createTransactionsApi(ctx),

@@ -5,42 +5,29 @@ import { createNewPageWithWallet, logWalletDetails } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { skipIfMainnet, skipIfScheduledWorkflow } from "@helpers/cardano";
 import { valid as mockValid, invalid as mockInvalid } from "@mock/index";
 import { getProposalType } from "@helpers/index";
 import { faker } from "@faker-js/faker";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
 import kuberService from "@services/kuberService";
-import { ensureFunded, testWallet, TestWallet } from "lib/wallet/testWallets";
+import { TestWallet } from "lib/wallet/testWallets";
+import { stakeRegisteredWallet } from "lib/wallet/transactions";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
   await skipIfMainnet();
 });
 
-/** The named wallet, funded with the governance action deposit and fees. */
+/**
+ * The named wallet, funded with the governance action deposit and fees. Its
+ * stake key, the deposit return account, is registered, as the faucet stake
+ * key the old proposal wallets used was.
+ */
 async function proposalSubmissionWallet(name: string): Promise<TestWallet> {
   const { govActionDeposit } = await kuberService.queryProtocolParams();
-  const wallet = await testWallet(name);
-  await ensureFunded(wallet, govActionDeposit / 1_000_000 + 22);
-  return wallet;
-}
-
-async function setUsernameIfNeeded(page: Page) {
-  const proposalDiscussionPage = new ProposalDiscussionPage(page);
-  await proposalDiscussionPage.goto();
-  await proposalDiscussionPage.verifyIdentityBtn.click();
-
-  try {
-    await expect(page.getByTestId("username-input")).toBeVisible({
-      timeout: 10_000,
-    });
-    await proposalDiscussionPage.setUsername(mockValid.username());
-  } catch (error) {
-    // Ignore error if username is already set
-    console.log("Username is already set");
-  }
+  return stakeRegisteredWallet(name, govActionDeposit / 1_000_000 + 22);
 }
 
 getProposalType().forEach((proposalType, index) => {
@@ -56,8 +43,9 @@ getProposalType().forEach((proposalType, index) => {
 
     const userPage = await createNewPageWithWallet(browser, { wallet });
 
-    await setUsernameIfNeeded(userPage);
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
+    await proposalDiscussionPage.goto();
+    await proposalDiscussionPage.verifyIdentity();
 
     const proposalSubmissionPage = new ProposalSubmissionPage(userPage);
     await proposalSubmissionPage.proposalCreateBtn.click();
@@ -88,27 +76,31 @@ getProposalType().forEach((proposalType, index) => {
 
 test.describe("Proposed as a governance action", async () => {
   let proposalSubmissionPage: ProposalSubmissionPage;
-  let proposalDiscussionDetailPage: ProposalDiscussionDetailsPage;
-  let proposalId: number;
+  let proposalDiscussionDetailPage: ProposalDiscussionDetailsPage | undefined;
+  let proposalId: number | undefined;
 
   test.beforeEach(async ({ browser }, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
+    // Left unset if this hook fails early, so afterEach has nothing to delete
+    // rather than the previous test's proposal.
+    proposalDiscussionDetailPage = undefined;
+    proposalId = undefined;
 
     const wallet = await proposalSubmissionWallet("7:gaProposer");
     await logWalletDetails(wallet.address);
 
     const page = await createNewPageWithWallet(browser, { wallet });
-    await setUsernameIfNeeded(page);
 
     proposalSubmissionPage = new ProposalSubmissionPage(page);
     await proposalSubmissionPage.goto();
 
-    proposalDiscussionDetailPage = new ProposalDiscussionDetailsPage(page);
+    const detailsPage = new ProposalDiscussionDetailsPage(page);
+    proposalDiscussionDetailPage = detailsPage;
 
     proposalId = await proposalSubmissionPage.createProposal(
       wallet.stakeAddress
     );
-    await proposalDiscussionDetailPage.submitAsGABtn.click();
+    await detailsPage.submitAsGABtn.click();
     await proposalSubmissionPage.currentPage
       .getByTestId("agree-checkbox")
       .click();
@@ -117,17 +109,22 @@ test.describe("Proposed as a governance action", async () => {
 
   test.afterEach(async () => {
     await skipIfMainnet();
-    // cleanup
-    await proposalDiscussionDetailPage.goto(proposalId);
+    // cleanup: nothing to delete when beforeEach failed before creating it
+    if (!proposalDiscussionDetailPage || proposalId === undefined) return;
+    const detailsPage = proposalDiscussionDetailPage;
+    await detailsPage.goto(proposalId);
 
-    const isVerifyIdentityBtnVisible =
-      await proposalDiscussionDetailPage.verifyIdentityBtn.isVisible();
-
-    if (isVerifyIdentityBtnVisible) {
-      await proposalDiscussionDetailPage.verifyIdentityBtn.click();
+    // After the reload pdf-ui shows either the sign-in link or, once signed
+    // in, the owner's menu; the link takes a few seconds to appear, so wait
+    // for one of them rather than checking right away.
+    await expect(
+      detailsPage.verifyIdentityBtn.or(detailsPage.menuBtn).first()
+    ).toBeVisible({ timeout: 60_000 });
+    if (await detailsPage.verifyIdentityBtn.isVisible()) {
+      await detailsPage.verifyIdentity();
     }
 
-    await proposalDiscussionDetailPage.deleteProposal();
+    await detailsPage.deleteProposal();
   });
 
   test.describe("Metadata anchor validation", () => {

@@ -1,0 +1,4 @@
+{
+  "name": "Lolita",
+  "note": "Valid JSON but not a CIP-100 or CIP-108 document: it has no body. Playwright uses it for the Data Formatted Incorrectly and Data Not Verifiable invalid-metadata cases."
+}

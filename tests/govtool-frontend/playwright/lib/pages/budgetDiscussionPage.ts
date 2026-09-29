@@ -7,6 +7,7 @@ import {
 } from "@types";
 import environments from "lib/constants/environments";
 import BudgetDiscussionDetailsPage from "./budgetDiscussionDetailsPage";
+import { setPdfUsername, setUsernameIfPrompted } from "./pdfUsername";
 
 export default class BudgetDiscussionPage {
   // Buttons
@@ -184,12 +185,12 @@ export default class BudgetDiscussionPage {
   }
 
   async setUsername(name: string) {
-    await this.page.getByTestId("username-input").fill(name);
+    await setPdfUsername(this.page, name);
+  }
 
-    const proceedBtn = this.page.getByTestId("proceed-button");
-    await proceedBtn.click();
-    await proceedBtn.click();
-
-    await this.page.getByTestId("close-button").click();
+  /** Signs in to pdf and sets a username if pdf-ui asks for one. */
+  async verifyIdentity() {
+    await this.verifyUserLink.click();
+    await setUsernameIfPrompted(this.page);
   }
 }

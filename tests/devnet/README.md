@@ -70,7 +70,9 @@ read first, so derived URLs follow it). Useful knobs:
   (10 more enacted withdrawals: outcomes need a second page), `FAUCET_FUND_ADA`,
   `DEVNET_TEST_WORKERS` (4), `DEVNET_TX_TIMEOUT` (120000 ms).
 - Playwright selection: `DEVNET_PLAYWRIGHT_PROJECTS`,
-  `DEVNET_PLAYWRIGHT_FILES`, `DEVNET_PLAYWRIGHT_GREP_INVERT`.
+  `DEVNET_PLAYWRIGHT_FILES`, `DEVNET_PLAYWRIGHT_GREP_INVERT`. Failures keep
+  a trace in `test-results/` (`DEVNET_PLAYWRIGHT_TRACE`, default
+  `retain-on-failure`; `off` drops it).
 
 The bucket URL (`http://metadata-bucket.localhost:<port>`) must work from
 the host and the containers: it is a network alias in Docker and loopback on

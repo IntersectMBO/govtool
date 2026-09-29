@@ -41,6 +41,10 @@ case "$suite" in
       for name in "${names[@]}"; do args+=("--project=$name"); done
     fi
     [ -z "$grep_invert" ] || args+=(--grep-invert "$grep_invert")
+    # The config traces only on retry and retries are 0, so keep a trace of
+    # every failure (network, console, DOM) in test-results/, which CI
+    # uploads. DEVNET_PLAYWRIGHT_TRACE=off drops it.
+    args+=(--trace "${DEVNET_PLAYWRIGHT_TRACE:-retain-on-failure}")
     exec npx playwright test ${args[@]+"${args[@]}"} "$file_filter" "$@"
     ;;
   *)

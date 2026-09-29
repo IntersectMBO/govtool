@@ -180,7 +180,6 @@ const VoteMetricsTable = ({
               >
                 <TableCell sx={{ p: "inherit", textAlign: "start" }}>
                   <Typography
-                    data-testid={metric.testId}
                     sx={{
                       fontWeight: metric.isHighlighted ? 600 : 400,
                       fontSize: 14,
@@ -192,7 +191,11 @@ const VoteMetricsTable = ({
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ p: "inherit", textAlign: "end" }}>
-                  <Box component="span" sx={{ color: "textBlack" }}>
+                  <Box
+                    component="span"
+                    data-testid={metric.testId}
+                    sx={{ color: "textBlack" }}
+                  >
                     {isCC
                       ? metric.value
                       : lovelaceToRoundedUpAda(
@@ -209,7 +212,7 @@ const VoteMetricsTable = ({
       {!isCC && (
         <Box
           onClick={toggleExpand}
-          data-testid={`${title}-expand-button`}
+          data-testid={`${title}-${expanded ? "collapse" : "expand"}-button`}
           sx={{
             alignItems: "center",
             color: "primaryBlue",
@@ -286,29 +289,41 @@ export const OutcomeVoteSection = ({
     return <VoteSectionLoader title={title} />;
   }
 
-  const collapsedMetrics: VoteMetric[] = [
-    {
-      label: isCC
-        ? t("outcome.votes.numberOfCCs")
-        : t("outcome.votes.totalActiveStake"),
-      value: totalControlled,
-      testId: `${title}-total-controlled-amount`,
-    },
-    {
-      label: isCC
-        ? t("outcome.votes.abstainVotes")
-        : t("outcome.votes.totalAbstain"),
-      value: totalAbstainVotes,
-      testId: `${title}-abstain-votes`,
-    },
-    {
-      label: isCC
-        ? t("outcome.votes.notVoted")
-        : t("outcome.votes.ratificationThreshold"),
-      value: isCC ? notVotedVotes : ratificationThreshold,
-      testId: `${title}-ratification-threshold`,
-    },
-  ];
+  const collapsedMetrics: VoteMetric[] = isCC
+    ? [
+        {
+          label: t("outcome.votes.numberOfCCs"),
+          value: totalControlled,
+          testId: "active-constitutional-committee-count",
+        },
+        {
+          label: t("outcome.votes.abstainVotes"),
+          value: totalAbstainVotes,
+          testId: "constitutional-committee-abstain-votes",
+        },
+        {
+          label: t("outcome.votes.notVoted"),
+          value: notVotedVotes,
+          testId: "constitutional-committee-not-voted-votes",
+        },
+      ]
+    : [
+        {
+          label: t("outcome.votes.totalActiveStake"),
+          value: totalControlled,
+          testId: `${title}-total-controlled-amount`,
+        },
+        {
+          label: t("outcome.votes.totalAbstain"),
+          value: totalAbstainVotes,
+          testId: `${title}-abstain-votes`,
+        },
+        {
+          label: t("outcome.votes.ratificationThreshold"),
+          value: ratificationThreshold,
+          testId: `${title}-ratification-threshold`,
+        },
+      ];
 
   const expandedMetrics: VoteMetric[] = [
     {
@@ -357,13 +372,13 @@ export const OutcomeVoteSection = ({
     {
       label: t("outcome.votes.autoAbstain"),
       value: autoAbstainVotes,
-      testId: `${title}-abstain-votes`,
+      testId: `${title}-auto-abstain`,
       indentDepth: 2,
     },
     {
       label: t("outcome.votes.explicit"),
       value: explicitAbstainVotes,
-      testId: `${title}-abstain-votes`,
+      testId: `${title}-explicit-abstain`,
       indentDepth: 2,
     },
   ];
@@ -375,7 +390,13 @@ export const OutcomeVoteSection = ({
     : 0;
 
   return (
-    <Box data-testid={dataTestId} mb={3}>
+    <Box
+      data-testid={dataTestId}
+      mb={3}
+      // Plain Box text (bar labels, totals, expand) otherwise falls back to
+      // the browser's serif; only Typography gets the theme font.
+      sx={{ fontFamily: "Poppins, Arial" }}
+    >
       <Typography
         data-testid={`${title}-outcome-voter-label`}
         sx={{ fontWeight: 600, fontSize: 16, mb: 1.875 }}

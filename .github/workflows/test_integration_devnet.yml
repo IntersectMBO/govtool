@@ -121,11 +121,14 @@ jobs:
       - name: Expose the Actions cache to BuildKit
         uses: crazy-max/ghaction-github-runtime@v3
 
+      # Bake resolves the compose file's build contexts from the working
+      # directory, not from the file's own directory.
       - name: Build app images
+        working-directory: tests/devnet
         run: |
-          source tests/devnet/lib.sh
+          source lib.sh
           load_env
-          docker buildx bake --file tests/devnet/docker-compose.yml --load \
+          docker buildx bake --file docker-compose.yml --load \
             --set '*.cache-from=type=gha' --set '*.cache-to=type=gha,mode=max'
 
       - name: Start devnet and app stack

@@ -22,6 +22,38 @@ export const getOutcomeProposalStatus = (
 };
 
 /**
+ * How and when the vote on an action ended, or null while it is live. The
+ * vote ends at ratification (an enacted action was ratified an epoch
+ * earlier), expiry, or when the action is dropped.
+ */
+export const getOutcomeVoteEnd = (
+  action: Pick<OutcomeGovernanceAction, "status" | "status_times">,
+): {
+  outcome: Exclude<OutcomeProposalStatus, "Live">;
+  time: string | null;
+  epoch: number | null;
+} | null => {
+  const outcome = getOutcomeProposalStatus(action.status);
+  const { status, status_times: times } = action;
+  switch (outcome) {
+    case "Live":
+      return null;
+    case "Expired":
+      return { outcome, time: times.expired_time, epoch: status.expired_epoch };
+    case "Not Ratified":
+      return { outcome, time: times.dropped_time, epoch: status.dropped_epoch };
+    default:
+      return status.ratified_epoch !== null
+        ? {
+            outcome,
+            time: times.ratified_time,
+            epoch: status.ratified_epoch,
+          }
+        : { outcome, time: times.enacted_time, epoch: status.enacted_epoch };
+  }
+};
+
+/**
  * `Tue Mar 04 2025 10:00:00 AM` (full) or `Tue Mar 04 2025` (short), in the
  * viewer's time zone. The playwright outcomes suite parses the full form.
  */

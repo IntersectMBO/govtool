@@ -67,6 +67,10 @@ import UserValidation from '../../../components/UserValidation/UserValidation';
 import { PdfModal } from '../../../components/PdfModal';
 import { PdfTextArea } from '../../../components/PdfFields';
 import { cyan, errorRed, gray } from '@/consts/colors';
+import { OUTCOMES_PATHS } from '@/consts/paths';
+import { useFeatureFlag } from '@/context/featureFlag';
+import { useGetOutcomeGovernanceActionQuery } from '@/hooks/queries/useGetOutcomeGovernanceActionQuery';
+import { getOutcomeVoteEnd } from '@/utils/outcomes';
 
 // Layout follows GovTool's GovernanceActionDetailsCard: a two-column card
 // (data on the left, actions on the right) with radius 20 and boxShadow2.
@@ -242,6 +246,23 @@ const SingleGovernanceAction = ({ id }) => {
     const [unactivePollList, setUnactivePollList] = useState([]);
     const [activePoll, setActivePoll] = useState(null);
     const [openAlertDialog, setOpenAlertDialog] = useState(false);
+
+    // Once the submitted action is decided, the page reports the vote's end
+    // and links to its outcome instead of asking for votes (#3301).
+    const { isGovernanceOutcomesPillarEnabled } = useFeatureFlag();
+    const submissionTxHash =
+        proposal?.attributes?.content?.attributes?.prop_submission_tx_hash;
+    const { governanceAction: submittedAction } =
+        useGetOutcomeGovernanceActionQuery(
+            isGovernanceOutcomesPillarEnabled && submissionTxHash
+                ? `${submissionTxHash}#0`
+                : ''
+        );
+    const voteEnd = submittedAction ? getOutcomeVoteEnd(submittedAction) : null;
+    const seeOutcome = () =>
+        navigate(
+            `${OUTCOMES_PATHS.governanceActionsOutcomes}/governance_actions/${submissionTxHash}#0`
+        );
 
     const targetRef = useRef();
     const menuRef = useRef();
@@ -1542,13 +1563,39 @@ const SingleGovernanceAction = ({ id }) => {
                                     <Typography variant='body1' sx={valueSx}>
                                         {proposal?.attributes?.content
                                             ?.attributes?.prop_submitted
-                                            ? `${formatIsoDate(proposal?.attributes?.content?.attributes?.prop_submission_date)}`
+                                            ? `${formatIsoDate(proposal?.attributes?.content?.attributes?.prop_submission_date)}${
+                                                  submittedAction
+                                                      ? ` (Epoch ${submittedAction.epoch_no})`
+                                                      : ''
+                                              }`
                                             : `${formatIsoDate(
                                                   proposal?.attributes
                                                       ?.createdAt
                                               )}`}
                                     </Typography>
                                 </DetailRow>
+                                {voteEnd && (
+                                    <>
+                                        <DetailRow label='Vote ended on:'>
+                                            <Typography
+                                                variant='body1'
+                                                sx={valueSx}
+                                                data-testid='vote-ended-date'
+                                            >
+                                                {`${formatIsoDate(voteEnd.time) || '-'} (Epoch ${voteEnd.epoch ?? '-'})`}
+                                            </Typography>
+                                        </DetailRow>
+                                        <DetailRow label='Outcome:'>
+                                            <Typography
+                                                variant='body1'
+                                                sx={valueSx}
+                                                data-testid='vote-outcome'
+                                            >
+                                                {`Voting has been completed for this Action. This action was ${voteEnd.outcome.toLowerCase()}.`}
+                                            </Typography>
+                                        </DetailRow>
+                                    </>
+                                )}
                                 {proposal?.attributes?.content?.attributes
                                     ?.prop_submitted && (
                                     <DetailRow label='Proposed on:'>
@@ -1653,6 +1700,16 @@ const SingleGovernanceAction = ({ id }) => {
                                             ) : null}
                                             {proposal?.attributes?.content
                                                 ?.attributes?.prop_submitted ? (
+                                                voteEnd ? (
+                                                    <Link
+                                                        variant='outlined'
+                                                        data-testid='see-outcome-link'
+                                                        onClick={seeOutcome}
+                                                        sx={textLinkSx}
+                                                    >
+                                                        See Outcome
+                                                    </Link>
+                                                ) : (
                                                 <Link
                                                     variant='outlined'
                                                     data-testid='review-and-vote-link'
@@ -1665,6 +1722,7 @@ const SingleGovernanceAction = ({ id }) => {
                                                 >
                                                     Vote
                                                 </Link>
+                                                )
                                             ) : null}
                                 </Box>
 

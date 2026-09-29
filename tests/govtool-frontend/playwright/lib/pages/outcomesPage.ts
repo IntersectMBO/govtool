@@ -35,12 +35,17 @@ export default class OutComesPage {
 
   constructor(private readonly page: Page) {}
 
-  async goto(params: { filter?: string; sort?: string } = {}): Promise<void> {
-    const { filter, sort = "newestFirst" } = params;
+  async goto(
+    params: { filter?: string; sort?: string; status?: string } = {}
+  ): Promise<void> {
+    const { filter, sort = "newestFirst", status } = params;
     const url = new URL(`${environments.frontendUrl}/outcomes`);
     url.searchParams.append("sort", sort);
     if (filter) {
       url.searchParams.append("type", filter);
+    }
+    if (status) {
+      url.searchParams.append("status", status);
     }
     await this.page.goto(url.toString());
   }
@@ -323,17 +328,25 @@ export default class OutComesPage {
     );
   }
 
+  // Cards show the date that ended the action (Enacted, Not Ratified,
+  // Expired) or, while live, its expiry, so only the expired filter can
+  // promise an "Expired" date on every card.
   async verifyAllOutcomesAreExpired() {
+    await this.goto({ status: "expired" });
     const proposalCards = await this.getAllOutcomes();
 
     for (const proposalCard of proposalCards) {
       const expiryDateEl = proposalCard.locator(
         '[data-testid$="-Expired-date"]'
       );
-      const expiryDateTxt = await expiryDateEl.innerText();
-      const expiryDate = extractExpiryDateFromText(expiryDateTxt);
-      const today = new Date();
-      expect(today >= expiryDate).toBeTruthy();
+      await expect(expiryDateEl).toBeVisible();
+      // e.g. "Expired: Thu Oct 01, 2026 (Epoch 2883)"
+      const match = (await expiryDateEl.innerText()).match(
+        /(\w{3}) (\d{1,2}), (\d{4})/
+      );
+      expect(match, "expired date is not readable").not.toBeNull();
+      const expiryDate = new Date(`${match[1]} ${match[2]}, ${match[3]}`);
+      expect(new Date() >= expiryDate).toBeTruthy();
     }
   }
 

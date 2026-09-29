@@ -45,8 +45,6 @@ test.describe("Outcomes page", () => {
   });
 
   test("9E_2. Should verify all of the displayed governance actions have expired", async () => {
-    await outcomePage.goto();
-
     await outcomePage.verifyAllOutcomesAreExpired();
   });
 

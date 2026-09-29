@@ -44,8 +44,6 @@ test.describe("Outcomes page", () => {
   });
 
   test("9E_1. Should verify all of the displayed governance actions have expired in disconnect state", async () => {
-    await outcomePage.goto();
-
     await outcomePage.verifyAllOutcomesAreExpired();
   });
 

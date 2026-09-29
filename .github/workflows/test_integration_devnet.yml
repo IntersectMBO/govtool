@@ -4,7 +4,9 @@ name: Integration tests (devnet)
 # against a local Cardano devnet (tests/devnet): adaup's cardano-node, Kuber
 # and db-sync, plus GovTool's app stack built from this commit. Nothing
 # reaches a public network, hosted Kuber, Blockfrost, a faucet or Pinata,
-# and no secrets are needed.
+# and the test run itself needs no secrets. Only the report publishing jobs
+# use DEPLOY_KEY, to push the Playwright Allure report to govtool-test-reports
+# the same way test_integration_playwright.yml does (group "devnet").
 
 on:
   push:
@@ -29,6 +31,11 @@ permissions:
   contents: read
 
 env:
+  DEPLOYMENT: devnet
+  HOST_URL: devnet
+  REPORT_NAME: govtool-frontend
+  GH_PAGES: ${{ vars.GH_PAGES }}
+  COMMIT_SHA: ${{ github.sha }}
   # adaup provides `cardano devnet --docker` (from 0.3.0, on PyPI).
   ADAUP_VERSION: 0.3.0
   SUITES: ${{ inputs.suites || 'both' }}
@@ -38,7 +45,15 @@ jobs:
   devnet:
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    outputs:
+      start_time: ${{ steps.start.outputs.timestamp }}
+      status: ${{ steps.playwright.outcome }}
+      has_allure: ${{ steps.allure.outputs.present }}
     steps:
+      - name: Record start time
+        id: start
+        run: echo "timestamp=$(date +%s)" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
@@ -147,6 +162,7 @@ jobs:
           tests/devnet/run-tests.sh pytest --junitxml="$GITHUB_WORKSPACE/test-reports/pytest.xml"
 
       - name: Playwright
+        id: playwright
         if: ${{ !cancelled() && steps.up.outcome == 'success' && env.SUITES != 'pytest' }}
         env:
           PLAYWRIGHT_ARGS: ${{ inputs.playwright_args }}
@@ -165,6 +181,25 @@ jobs:
           bash -c 'source tests/devnet/lib.sh; load_env; compose logs --no-color' > devnet-logs/app.log 2>&1 || true
           (cd ~/.cardano/devnet-docker 2>/dev/null && docker compose logs --no-color) > devnet-logs/chain.log 2>&1 || true
 
+      - name: Check for Allure results
+        id: allure
+        if: always()
+        run: |
+          if ls tests/govtool-frontend/playwright/allure-results/*.json >/dev/null 2>&1; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Only the Allure JSON goes to the publish job; the bulky screenshots
+      # and traces stay in devnet-test-results.
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always() && steps.allure.outputs.present == 'true'
+        with:
+          name: allure-results
+          path: tests/govtool-frontend/playwright/allure-results
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -180,3 +215,100 @@ jobs:
       - name: Stop
         if: always()
         run: tests/devnet/down.sh
+
+  publish-report:
+    runs-on: ubuntu-latest
+    needs: devnet
+    if: ${{ !cancelled() && vars.GH_PAGES != '' && needs.devnet.outputs.has_allure == 'true' }}
+    # Runs push to the same gh-pages branch; never publish two at once.
+    concurrency:
+      group: govtool-test-reports
+      cancel-in-progress: false
+    outputs:
+      report_number: ${{ steps.report-details.outputs.report_number }}
+      group_name: ${{ steps.set-deployment-url.outputs.group_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download report
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+          repository: ${{ vars.GH_PAGES }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Set Deployment Environment
+        id: set-deployment-url
+        run: |
+          chmod +x .github/scripts/set_deployment_environment.sh
+          .github/scripts/set_deployment_environment.sh
+
+      - name: Remove oldest report to save space
+        run: |
+          chmod +x .github/scripts/remove_oldest_report.sh
+          .github/scripts/remove_oldest_report.sh
+
+      - name: Generate report details
+        id: report-details
+        run: |
+          chmod +x .github/scripts/generate_report_details.sh
+          .github/scripts/generate_report_details.sh
+
+      - name: Build report
+        uses: simple-elf/allure-report-action@master
+        id: allure-report
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages/${{ steps.set-deployment-url.outputs.group_name }}/${{ env.REPORT_NAME }}
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 2000
+          report_url: ${{ steps.report-details.outputs.report_url }}
+          github_run_num: ${{ steps.report-details.outputs.report_number }}
+
+      - name: Generate Latest Report
+        run: |
+          chmod +x .github/scripts/generate_latest_report_redirect.sh
+          .github/scripts/generate_latest_report_redirect.sh ${{ steps.report-details.outputs.report_number }}
+
+      - name: Deploy report to Github Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          repository-name: ${{ vars.GH_PAGES }}
+          branch: gh-pages
+          folder: build
+          target-folder: ${{ steps.set-deployment-url.outputs.group_name }}/${{ env.REPORT_NAME }}
+
+  publish-status:
+    runs-on: ubuntu-latest
+    needs: [devnet, publish-report]
+    if: ${{ !cancelled() && needs.publish-report.result == 'success' }}
+    permissions:
+      contents: read
+      statuses: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Set Commit Status
+        run: |
+          chmod +x .github/scripts/set_commit_status.sh
+          .github/scripts/set_commit_status.sh
+        env:
+          START_TIME: ${{ needs.devnet.outputs.start_time }}
+          TEST_STATUS: ${{ needs.devnet.outputs.status }}
+          REPORT_NUMBER: ${{ needs.publish-report.outputs.report_number }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GROUP_NAME: ${{ needs.publish-report.outputs.group_name }}

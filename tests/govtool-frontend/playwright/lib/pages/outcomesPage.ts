@@ -19,6 +19,11 @@ enum SortOption {
   HighestAmountYesVote = "Highest amount of yes votes",
 }
 
+// Card reads run inside retry loops: a filter or sort change can replace
+// the cards between counting and reading them, and an unbounded read then
+// waits for a card that is gone until the test times out.
+const CARD_READ_TIMEOUT = 10_000;
+
 export default class OutComesPage {
   // Buttons
   readonly filterBtn = this.page.getByTestId("filters-button");
@@ -57,7 +62,7 @@ export default class OutComesPage {
     for (const dRep of dRepCards) {
       const dRepIdTextContent = await dRep
         .locator('[data-testid$="-CIP-105-id"]')
-        .textContent();
+        .textContent({ timeout: CARD_READ_TIMEOUT });
       dRepIds.push(dRepIdTextContent.replace(/^.*ID/, ""));
     }
 
@@ -131,7 +136,7 @@ export default class OutComesPage {
           if (await proposalCard.isVisible()) {
             const type = await proposalCard
               .locator('[data-testid$="-type"]')
-              .textContent();
+              .textContent({ timeout: CARD_READ_TIMEOUT });
             const outcomeType = type.replace(/^.*Type/, "");
             const hasFilter = await validateFunction(proposalCard, filters);
             if (!hasFilter) {
@@ -204,12 +209,12 @@ export default class OutComesPage {
           const outcomeProposalFromAPI = outcomeProposalList[index];
           const proposalTypeFromUI = await outcomeCard
             .locator('[data-testid$="-type"]')
-            .textContent();
+            .textContent({ timeout: CARD_READ_TIMEOUT });
           const proposalTypeFromApi = outcomeType[outcomeProposalFromAPI.type];
 
           const cip105IdFromUI = await outcomeCard
             .locator('[data-testid$="-CIP-105-id"]')
-            .textContent();
+            .textContent({ timeout: CARD_READ_TIMEOUT });
           const cip105IdFromApi = `${outcomeProposalFromAPI.tx_hash}#${outcomeProposalFromAPI.index}`;
 
           expect(proposalTypeFromUI.replace(/^.*Type/, "")).toContain(
@@ -233,7 +238,7 @@ export default class OutComesPage {
   ): Promise<boolean> {
     const type = await proposalCard
       .locator('[data-testid$="-type"]')
-      .textContent();
+      .textContent({ timeout: CARD_READ_TIMEOUT });
     const outcomeType = type.replace(/^.*Type/, "");
     return filters.includes(outcomeType);
   }
@@ -244,7 +249,7 @@ export default class OutComesPage {
   ): Promise<boolean> {
     const status = await proposalCard
       .locator('[data-testid$="-status"]')
-      .textContent();
+      .textContent({ timeout: CARD_READ_TIMEOUT });
     const outcomeStatus = outcomeStatusType.filter((statusType) => {
       if (statusType === "Live") {
         return "In Progress";
@@ -493,7 +498,7 @@ export default class OutComesPage {
         for (const outcomeCard of idSearchOutcomeCards) {
           const id = await outcomeCard
             .locator('[data-testid$="-CIP-105-id"]')
-            .textContent();
+            .textContent({ timeout: CARD_READ_TIMEOUT });
           expect(id.replace(/^.*ID/, "")).toContain(governanceActionId);
         }
       },
@@ -523,7 +528,7 @@ export default class OutComesPage {
         for (const outcomeCard of titleSearchOutcomeCards) {
           const title = await outcomeCard
             .locator('[data-testid$="-card-title"]')
-            .textContent();
+            .textContent({ timeout: CARD_READ_TIMEOUT });
           expect(title.toLowerCase()).toContain(
             governanceActionTitle.toLowerCase()
           );

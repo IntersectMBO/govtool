@@ -5325,3 +5325,19 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
   touches a network-group parameter use `pvtpp_security_group`; `getGovActionVotingThresholdKey` never
   answers SPOs there (its branch for it is unreachable).
 - `/my/votes_and_favorites` still renders nothing of substance (the pillar showed a placeholder).
+
+## D150 — SPOs on a ParameterChange use the security group threshold
+
+**Date:** 2026-09-29
+**Amends:** D149 (the outcomes page kept its own SPO rule).
+
+- `getGovActionVotingThresholdKey` returned early for every voter but DReps on a ParameterChange, so its
+  `pvtpp_security_group` branch never ran and SPOs had no threshold (the bar fell back to "> 50%").
+- SPOs now get `pvtpp_security_group` whenever the action changes any parameter in
+  `SECURITY_RELEVANT_PARAMS_MAP`, whichever DRep group it belongs to, as the ledger's security group
+  cuts across the network, economic and governance groups. That is the same set both vote displays
+  already use to decide whether SPOs vote at all. No security parameter: no SPO threshold.
+- The outcomes pillar's rule (network group only, and not when an economic or governance parameter came
+  first) is dropped with the local copy of it; it missed e.g. `txFeePerByte` and `govActionDeposit`.
+- The live action page (`VotesSubmitted`) now shows the SPO threshold on such actions too.
+- DRep keys are unchanged (the first group that matches, not the highest of the groups touched).

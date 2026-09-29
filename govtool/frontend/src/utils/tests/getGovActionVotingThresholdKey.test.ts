@@ -72,4 +72,62 @@ describe("getGovActionVotingThresholdKey", () => {
     });
     expect(result).toBeUndefined();
   });
+
+  describe("ParameterChange", () => {
+    const govActionType = GovernanceActionType.ParameterChange;
+
+    it("gives SPOs the security group threshold for a network-group security parameter", () => {
+      expect(
+        getGovActionVotingThresholdKey({
+          govActionType,
+          protocolParams: { max_block_size: 90112, collateral_percent: null },
+          voterType: "sPos",
+        }),
+      ).toBe("pvtpp_security_group");
+    });
+
+    it("gives SPOs the security group threshold for an economic security parameter", () => {
+      expect(
+        getGovActionVotingThresholdKey({
+          govActionType,
+          protocolParams: { min_fee_a: 44, max_tx_size: 16384 },
+          voterType: "sPos",
+        }),
+      ).toBe("pvtpp_security_group");
+      expect(
+        getGovActionVotingThresholdKey({
+          govActionType,
+          protocolParams: { min_fee_a: 44, max_tx_size: 16384 },
+          voterType: "dReps",
+        }),
+      ).toBe("dvt_p_p_economic_group");
+    });
+
+    it("gives SPOs no threshold when no security parameter changes", () => {
+      expect(
+        getGovActionVotingThresholdKey({
+          govActionType,
+          protocolParams: { max_tx_ex_mem: 14000000, max_block_size: null },
+          voterType: "sPos",
+        }),
+      ).toBeUndefined();
+      expect(
+        getGovActionVotingThresholdKey({
+          govActionType,
+          protocolParams: { max_tx_ex_mem: 14000000 },
+          voterType: "dReps",
+        }),
+      ).toBe("dvt_p_p_network_group");
+    });
+
+    it("gives the committee no threshold key", () => {
+      expect(
+        getGovActionVotingThresholdKey({
+          govActionType,
+          protocolParams: { max_block_size: 90112 },
+          voterType: "ccCommittee",
+        }),
+      ).toBeUndefined();
+    });
+  });
 });

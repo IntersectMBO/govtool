@@ -1,12 +1,7 @@
 import { Box, Divider } from "@mui/material";
 
 import { Typography } from "@atoms";
-import {
-  PPU_ECONOMIC_GROUP_PARAMS_KEYS,
-  PPU_GOVERNANCE_GROUP_PARAMS_KEYS,
-  PPU_NETWORK_GROUP_PARAMS_KEYS,
-  SECURITY_RELEVANT_PARAMS_MAP,
-} from "@consts";
+import { SECURITY_RELEVANT_PARAMS_MAP } from "@consts";
 import { useGetOutcomeNetworkMetrics, useTranslation } from "@hooks";
 import { EpochParams, OutcomeGovernanceAction } from "@models";
 import {
@@ -51,36 +46,12 @@ export const OutcomeGovernanceVoting = ({
     (paramKey) => proposalParams?.[paramKey as keyof EpochParams] !== null,
   );
 
-  // getGovActionVotingThresholdKey never answers SPOs on a ParameterChange;
-  // the outcomes pillar did: the security group threshold once a network
-  // group parameter changes, unless an economic or governance one comes first.
-  const getSPOParameterChangeKey = (): keyof EpochParams | undefined => {
-    if (!proposalParams) return undefined;
-    const changedKeys = Object.entries(proposalParams)
-      .filter(([, value]) => ["number", "string"].includes(typeof value))
-      .map(([key]) => key);
-    const changes = (keys: string[]) =>
-      keys.some((key) => changedKeys.includes(key));
-    if (
-      changes(PPU_ECONOMIC_GROUP_PARAMS_KEYS) ||
-      changes(PPU_GOVERNANCE_GROUP_PARAMS_KEYS)
-    ) {
-      return undefined;
-    }
-    return changes(PPU_NETWORK_GROUP_PARAMS_KEYS)
-      ? "pvtpp_security_group"
-      : undefined;
-  };
-
   const getThreshold = (voterType: VoterType) => {
-    const key =
-      voterType === "sPos" && type === GovernanceActionType.ParameterChange
-        ? getSPOParameterChangeKey()
-        : getGovActionVotingThresholdKey({
-            govActionType: type,
-            protocolParams: proposalParams,
-            voterType,
-          });
+    const key = getGovActionVotingThresholdKey({
+      govActionType: type,
+      protocolParams: proposalParams,
+      voterType,
+    });
     const value = key ? epochParams?.[key] : undefined;
     return typeof value === "number" ? value : undefined;
   };

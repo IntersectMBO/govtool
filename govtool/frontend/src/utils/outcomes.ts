@@ -138,3 +138,12 @@ export const lovelaceToRoundedUpAda = (lovelace: number | undefined) => {
   if (!lovelace) return 0;
   return Math.ceil(lovelace / LOVELACE);
 };
+
+/**
+ * The URL's query as it is now. Click handlers build the next query from
+ * this rather than from `useSearchParams`, whose value is the last render's:
+ * two clicks before a re-render would otherwise start from the same query
+ * and the first would be lost (untick A, tick B ended as A,B).
+ */
+export const getCurrentSearchParams = () =>
+  new URLSearchParams(window.location.search);

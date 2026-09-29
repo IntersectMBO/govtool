@@ -14,6 +14,7 @@ import {
 } from "@consts";
 import { OutcomesFilters, OutcomesSorting } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { getCurrentSearchParams } from "@utils";
 
 type FilterParam = "type" | "status";
 
@@ -105,7 +106,7 @@ export const OutcomesSearchFiltersSortBar = () => {
     if (isInitializing) return;
     const timer = setTimeout(() => {
       if ((searchParams.get("q") ?? "") === searchTerm) return;
-      const newParams = new URLSearchParams(searchParams);
+      const newParams = getCurrentSearchParams();
       if (searchTerm) {
         newParams.set("q", searchTerm);
       } else {
@@ -117,7 +118,7 @@ export const OutcomesSearchFiltersSortBar = () => {
   }, [searchTerm, searchParams, setSearchParams, isInitializing]);
 
   const removeFilter = (name: FilterParam, value: string) => {
-    const newParams = new URLSearchParams(searchParams);
+    const newParams = getCurrentSearchParams();
     const updated = (newParams.get(name) ?? "")
       .split(",")
       .filter((item) => item && item !== value);

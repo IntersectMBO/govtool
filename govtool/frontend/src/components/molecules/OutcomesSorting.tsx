@@ -14,6 +14,7 @@ import { useSearchParams } from "react-router";
 import { Typography } from "@atoms";
 import { fadedPurple, OUTCOMES_SORT_OPTIONS } from "@consts";
 import { useTranslation } from "@hooks";
+import { getCurrentSearchParams } from "@utils";
 
 import { OutcomesMenuButton } from "./OutcomesMenuButton";
 
@@ -30,7 +31,7 @@ export const OutcomesSorting = () => {
       ?.displayLabel || sort;
 
   const setSort = (value: string) => {
-    const newParams = new URLSearchParams(searchParams);
+    const newParams = getCurrentSearchParams();
     newParams.set("sort", value);
     setSearchParams(newParams);
   };

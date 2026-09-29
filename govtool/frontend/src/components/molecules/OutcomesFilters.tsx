@@ -16,6 +16,7 @@ import {
   OUTCOMES_TYPE_FILTERS,
 } from "@consts";
 import { useTranslation } from "@hooks";
+import { getCurrentSearchParams } from "@utils";
 
 import { OutcomesMenuButton } from "./OutcomesMenuButton";
 
@@ -35,7 +36,7 @@ export const OutcomesFilters = () => {
     getValues(searchParams, name).includes(value);
 
   const toggle = (name: FilterParam, value: string) => {
-    const newParams = new URLSearchParams(searchParams);
+    const newParams = getCurrentSearchParams();
     const current = getValues(newParams, name);
     const updated = current.includes(value)
       ? current.filter((item) => item !== value)
@@ -50,7 +51,7 @@ export const OutcomesFilters = () => {
   };
 
   const clearFilters = () => {
-    const newParams = new URLSearchParams(searchParams);
+    const newParams = getCurrentSearchParams();
     newParams.delete("type");
     newParams.delete("status");
     setSearchParams(newParams);

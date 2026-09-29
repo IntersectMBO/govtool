@@ -5277,3 +5277,16 @@ investigation and then implementation"
 - pdf-ui converts withdrawal amounts to lovelace on the digits (`adaToLovelace`): `prop_amount * 1e6`
   gave fractional strings for about 2% of two-decimal amounts (1.005 → 1004999.9999999999), which the
   serialisation library refuses. Its submit `catch` no longer throws on an `Error` (#3949).
+
+## D148 — A decision never references another file
+
+**Date:** 2026-09-29
+**Said:** "decisions file should never reference another file"
+
+- Every entry stands on its own: it states the fact, number, reason and outcome itself. It never points to a
+  plan, report, audit, spec section, other document or source path in place of saying it; those move or are
+  deleted, and this file is append-only, so a pointer rots while the entry cannot be fixed.
+- Earlier entries that point elsewhere are read on their own text; the pointer carries nothing. Three targets
+  are already gone: the pdf-ui plan and investigations (D144, F53), the 2026-09-28 pdf-ui alignment report
+  (F53) and the 2026-09-23 external audit (the audit response). What they decided or measured is in those
+  entries' bullets.

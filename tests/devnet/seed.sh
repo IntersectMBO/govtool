@@ -2,7 +2,8 @@
 # Seed, run by up.sh once the app stack is healthy. Safe to re-run: every
 # run adds a new set of proposals.
 #   1. uploads seed/bucket/* to the metadata bucket (fixture anchors the
-#      Playwright invalid-metadata cases point at)
+#      Playwright invalid-metadata cases point at) and the pdf backend's
+#      demo rows (users, proposals, budget discussions)
 #   2. `cardano devnet smoke` round 1: DReps, delegations, committee hot keys
 #      and one proposal of each DEVNET_SEED_ACTIONS type; DEVNET_SEED_RATIFY
 #      get yes votes and are enacted (outcomes data), the others no votes;
@@ -27,6 +28,13 @@ for file in "$DEVNET_DIR"/seed/bucket/*; do
     die "could not upload $name to the metadata bucket"
 done
 log "bucket seeded"
+
+# The forum's demo rows (govtool-pdf-backend SPEC §11.5): users, proposals
+# and budget discussions with comments and polls, which the budget and
+# discussion specs open. Idempotent.
+compose exec -T pdf node dist/seed/demo.js >/dev/null ||
+  die "could not seed the pdf backend's demo data"
+log "pdf demo data seeded"
 
 [ "${SKIP_CHAIN_SEED:-0}" = "1" ] && exit 0
 

@@ -14,6 +14,7 @@ export * from "./getTransactionStatus";
 export * from "./getVoteContextTextFromFile";
 export * from "./getVoterInfo";
 export * from "./metadataValidation";
+export * from "./outcomes";
 export * from "./postAdaHolderDelegate";
 export * from "./postAdaHolderDelegateAbstain";
 export * from "./postAdaHolderDelegateNo";

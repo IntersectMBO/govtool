@@ -16,3 +16,8 @@ export * from "./useGetVoteContextTextFromFile";
 export * from "./useGetVoterInfoQuery";
 export * from "./useGetDRepVotingPowerList";
 export * from "./useGetMetadataReports";
+export * from "./useGetOutcomeGovActionMetadata";
+export * from "./useGetOutcomeGovernanceActionQuery";
+export * from "./useGetOutcomeGovernanceActionsQuery";
+export * from "./useGetOutcomeNetworkMetrics";
+export * from "./useGetOutcomeProposalDiscussionQuery";

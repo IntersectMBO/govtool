@@ -80,6 +80,7 @@ export const DataMissingInfoBox = ({
         />
       ) : (
         <Typography
+          data-testid="metadata-error-message"
           sx={{
             fontSize: "18px",
             fontWeight: 500,
@@ -99,6 +100,7 @@ export const DataMissingInfoBox = ({
         />
       ) : (
         <Typography
+          data-testid="metadata-error-description"
           sx={{
             fontWeight: 400,
             color: "errorRed",
@@ -112,6 +114,7 @@ export const DataMissingInfoBox = ({
         <Skeleton width="128px" height="24px" variant="text" />
       ) : (
         <Link
+          data-testid="metadata-error-learn-more"
           onClick={() => openInNewTab(LINKS.DREP_ERROR_CONDITIONS)}
           sx={{
             fontFamily: "Poppins",

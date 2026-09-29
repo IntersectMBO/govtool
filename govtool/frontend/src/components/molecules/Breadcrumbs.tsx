@@ -1,5 +1,5 @@
 import { NavLink, To } from "react-router";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import Divider from "@mui/material/Divider";
 
 import { useScreenDimension } from "@hooks";
@@ -12,6 +12,7 @@ type BreadcrumbsProps = {
   elementOnePath: To;
   elementTwo: string;
   isDataMissing: MetadataValidationStatus | null;
+  isMetadataLoading?: boolean;
 };
 
 export const Breadcrumbs = ({
@@ -19,10 +20,12 @@ export const Breadcrumbs = ({
   elementOnePath,
   elementTwo,
   isDataMissing,
+  isMetadataLoading,
 }: BreadcrumbsProps) => {
   const { isMobile } = useScreenDimension();
   return (
     <Box
+      data-testid="breadcrumb-component"
       sx={{
         display: "flex",
         alignItems: "center",
@@ -46,21 +49,25 @@ export const Breadcrumbs = ({
         color="textBlack"
         sx={{ margin: "0 6px" }}
       />
-      <Typography
-        variant="caption"
-        sx={{
-          fontWeight: 500,
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {(isDataMissing &&
-          getMetadataDataMissingStatusTranslation(
-            isDataMissing as MetadataValidationStatus,
-          )) ||
-          elementTwo}
-      </Typography>
+      {isMetadataLoading ? (
+        <Skeleton variant="rounded" width={200} height={15} />
+      ) : (
+        <Typography
+          variant="caption"
+          sx={{
+            fontWeight: 500,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {(isDataMissing &&
+            getMetadataDataMissingStatusTranslation(
+              isDataMissing as MetadataValidationStatus,
+            )) ||
+            elementTwo}
+        </Typography>
+      )}
     </Box>
   );
 };

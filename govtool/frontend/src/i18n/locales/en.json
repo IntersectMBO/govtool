@@ -431,6 +431,183 @@
       "invalidValueType": "Invalid value type"
     }
   },
+  "outcome": {
+    "label": "Outcome",
+    "abstract": "Abstract",
+    "motivation": "Motivation",
+    "rationale": "Rationale",
+    "existing": "Existing",
+    "proposed": "Proposed",
+    "currentVersion": "Current version",
+    "proposedVersion": "Proposed version",
+    "prevGovernanceActionId": "Previous Governance Action ID",
+    "membersToBeAddedToCommittee": "Members to be added to the Committee",
+    "membersToBeRemovedToCommittee": "Members to be removed from the Committee",
+    "changeToTermsOfExistingMembers": "Change to terms of existing members",
+    "governanceActionType": "Governance Action Type",
+    "governanceActionId105": "Governance Action ID",
+    "governanceActionId129": "(CIP-129) Governance Action ID",
+    "metadataLink": "Metadata anchor link",
+    "metadataHash": "Metadata anchor hash",
+    "newConstitutionLink": "New constitution link",
+    "newConstitutionHash": "New constitution hash",
+    "newConstitutionScriptHash": "New constitution script hash",
+    "epoch": "Epoch",
+    "expirationEpoch": "Expiration epoch",
+    "newExpirationEpoch": "New expiration epoch",
+    "newThreshold": "New threshold value",
+    "supportingLinks": "Supporting links",
+    "treasury": {
+      "receivingAddress": "Receiving Address:",
+      "amount": "Amount:"
+    },
+    "authors": {
+      "noDataAvailable": "No author data available",
+      "title": "Author(s)",
+      "publicKey": "Public Key",
+      "signature": "Signature",
+      "witnessAlgorithm": "Witness Algorithm",
+      "verificationFailed": "Witness Verification Failed",
+      "witnessVerified": "Witness Verified"
+    },
+    "status": {
+      "title": "Status",
+      "fullTitle": "Governance Action Status",
+      "inProgress": "In Progress",
+      "ratified": "Ratified",
+      "enacted": "Enacted",
+      "expired": "Expired",
+      "dropped": "Not Ratified"
+    },
+    "dates": {
+      "submission": {
+        "title": "Submission Date",
+        "description": "The date when the governance action was submitted on-chain."
+      },
+      "expired": {
+        "title": "Expiration Date",
+        "label": "Expired:",
+        "paragraphOne": "The date when the governance action expired.",
+        "paragraphTwo": "IMPORTANT: If the governance action is ratified before the expiry date it will be considered ratified and it will not be available to vote on afterwards."
+      },
+      "notRatified": {
+        "title": "Not Ratified Date",
+        "label": "Not Ratified:",
+        "paragraphOne": "The date when the governance action was dropped without being ratified."
+      },
+      "enacted": {
+        "title": "Enactment Date",
+        "label": "Enacted:",
+        "paragraphOne": "The date when the governance action was enacted on-chain."
+      },
+      "expiry": {
+        "title": "Expiry Date",
+        "paragraphOne": "The date when the governance action will expire if it doesn't reach ratification thresholds.",
+        "paragraphTwo": "IMPORTANT: If the governance action is ratified before the expiry date it will be considered ratified and it will not be available to vote on afterwards."
+      },
+      "expires": "Expires:",
+      "submitted": "Submitted:"
+    },
+    "votes": {
+      "title": "Votes Submitted for this Governance Action:",
+      "dReps": "DReps",
+      "sPos": "SPOs",
+      "cCommitteeFull": "Constitutional Committee",
+      "cCommitteeShort": "CC",
+      "yes": "Yes",
+      "no": "No",
+      "noConfidence": "No Confidence",
+      "notVoted": "Not Voted",
+      "abstainVotes": "Abstain Votes",
+      "votingNotAvailable": "do not vote",
+      "onThisTypeOfAction": "on this type of action",
+      "totalStake": "Total Votes",
+      "numberOfCCs": "Number of Active CCs",
+      "metric": "Metric",
+      "value": "Value",
+      "totalActiveStake": "Total Active Stake",
+      "totalAbstain": "Total Abstain",
+      "autoAbstain": "Auto-Abstain",
+      "explicit": "Explicit",
+      "ratificationThreshold": "Ratification Threshold Stake"
+    },
+    "ratifiedStatus": {
+      "title": "Outcome",
+      "valueRatified": "Ratified",
+      "valueNotRatified": "Not Ratified"
+    },
+    "tabs": {
+      "reasoning": "Reasoning",
+      "parameters": "Parameters",
+      "details": "Details"
+    },
+    "viewDetails": "View Details",
+    "seeDiscussion": "See discussion",
+    "noResults": {
+      "title": "Governance action not found",
+      "description": "The governance action you're looking for could not be found. The ID might be incorrect, or there could be a temporary issue loading the data."
+    },
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "shareAction": "Share governance action",
+    "loaders": {
+      "loading": "Loading...",
+      "loadingTitle": "Loading governance action title...",
+      "loadingAbstract": "Loading governance action abstract, Loading governance action abstract, Loading governance action abstract..."
+    },
+    "proposalDiscussion": {
+      "title": "Discussion forum",
+      "notFound": "No discussion for this action in GovTool.",
+      "proposedOn": "Proposed on:"
+    }
+  },
+  "outcomesList": {
+    "title": "Outcomes",
+    "noResults": {
+      "title": "No governance actions found",
+      "description": "Governance actions are searchable by their ID both CIP-105 (legacy) and CIP-129 formats, title and abstract contents."
+    },
+    "showMore": "Show More Actions",
+    "searchPlaceholder": "Search Action...",
+    "clearSearchInput": "Clear search input",
+    "filters": {
+      "title": "Filters",
+      "clear": "Clear",
+      "types": {
+        "InfoAction": "Info Action",
+        "TreasuryWithdrawals": "Treasury Withdrawals",
+        "HardForkInitiation": "Hard-Fork Initiation",
+        "NewCommittee": "Update Committee",
+        "NoConfidence": "Motion of no Confidence",
+        "NewConstitution": "New Constitution",
+        "ParameterChange": "Protocol Parameter Change"
+      },
+      "statuses": {
+        "live": "Live",
+        "enacted": "Enacted",
+        "ratified": "Ratified",
+        "expired": "Expired"
+      }
+    },
+    "sort": {
+      "title": "Sort",
+      "fullTitle": "Sort Governance Actions",
+      "options": {
+        "newestFirst": {
+          "label": "Newest First",
+          "displayLabel": "Newest first"
+        },
+        "oldestFirst": {
+          "label": "Oldest First",
+          "displayLabel": "Oldest first"
+        },
+        "highestYesVotes": {
+          "label": "Highest amount of yes votes",
+          "displayLabel": "Yes votes"
+        }
+      }
+    }
+  },
   "proposalDiscussion": {
     "title": "Proposals",
     "proposeAGovernanceAction": "Propose a Governance Action"

@@ -5290,3 +5290,38 @@ investigation and then implementation"
   are already gone: the pdf-ui plan and investigations (D144, F53), the 2026-09-28 pdf-ui alignment report
   (F53) and the 2026-09-23 external audit (the audit response). What they decided or measured is in those
   entries' bullets.
+
+## D149 — The outcomes UI lives in the frontend, on GovTool's components
+
+**Date:** 2026-09-29
+**Said:** "merge into the repository … frontend … we dont have to make new folder for it simply merge in the
+existing frontend code"; where a component exists in both, "Reuse govtool's".
+**Amends:** D143 (the UI was the `@intersect.mbo/govtool-outcomes-pillar-ui` package).
+
+- Source: the outcomes pillar's UI at `919164c`: v1.5.11, the version the frontend pinned, plus two later
+  fixes (terminal-status dates by status, #4150, and a dependency vulnerability fix). The dependency, its
+  module declaration and its Sentry version tag are removed. Unlike pdf-ui (D139) the code has no folder of
+  its own: it sits in the frontend's existing models, services, query hooks, constants, utilities,
+  molecules, organisms and the outcomes page, named `Outcome*`.
+- GovTool's own code replaces the pillar's copies of it: contexts (wallet, modal, snackbar, i18next and
+  the shared QueryClient instead of the pillar's), theme, Typography, Button, Tooltip, CopyButton, Share,
+  Breadcrumbs, DataMissingInfoBox, GovernanceActionCardHeader/-Element, the diff view, supporting links,
+  the constitution and treasury elements, ada formatting, CIP-129 helpers, threshold keys and the PPU
+  groups. Those gained only optional props and test ids (card header `dataTestId`, breadcrumb
+  `isMetadataLoading`, `metadata-error-*`, `parameter-changes-labels`, `parameters-diff-value`).
+- Kept from the pillar, rebuilt on GovTool atoms: the list card, dates box, status chips, filters, sort
+  and search bar (URL state and localStorage keys unchanged), committee and hard-fork tabs, authors with
+  witness verification, and the vote sections and outcome indicators. GovTool's DataActionsBar and
+  committee tab were not reused: their test ids and behaviour differ from what the outcomes suite asserts.
+- Unchanged for the outcomes suite: every test id, asserted string, route, request path and query
+  parameter order. Requests go through their own axios client, `OutcomesAPI`, on `VITE_OUTCOMES_API_URL`,
+  with the pillar's fallback hosts when unset, and without `API`'s redirect to the error page on a 500.
+- Strings moved into the English locale under `outcome` and `outcomesList`. The pillar registered its bundle
+  over GovTool's, so on `/outcomes` it overwrote `proposalDiscussion.title` ("Proposals" became "Discussion
+  forum") and `learnMore`; its own values now live under `outcome.proposalDiscussion`.
+- Fixed on the way: a CIP-129 search or link with index ≥ 10 was sent as hex (`#a`); it is now decimal.
+  The search box no longer rewrites the URL every 300 ms.
+- Kept as the pillar computed it, though GovTool's helper differs: SPOs on a ParameterChange that
+  touches a network-group parameter use `pvtpp_security_group`; `getGovActionVotingThresholdKey` never
+  answers SPOs there (its branch for it is unreachable).
+- `/my/votes_and_favorites` still renders nothing of substance (the pillar showed a placeholder).

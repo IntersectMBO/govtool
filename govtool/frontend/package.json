@@ -30,7 +30,6 @@
     "@emotion/styled": "^11.14.1",
     "@emurgo/cardano-serialization-lib-asmjs": "^14.1.1",
     "@hookform/resolvers": "^3.10.0",
-    "@intersect.mbo/govtool-outcomes-pillar-ui": "1.5.11",
     "@intersect.mbo/intersectmbo.org-icons-set": "^1.0.8",
     "@mattpiz/tlock-js": "0.10.0",
     "@mui/icons-material": "^5.18.0",

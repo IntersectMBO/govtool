@@ -40,11 +40,6 @@ if (env.VITE_SENTRY_DSN) {
 });
 }
 
-Sentry.setTag(
-  "govtool_outcomes_pillar_ui_version",
-  pkg.dependencies["@intersect.mbo/govtool-outcomes-pillar-ui"],
-);
-
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>

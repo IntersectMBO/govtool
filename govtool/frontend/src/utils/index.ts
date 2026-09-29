@@ -30,6 +30,7 @@ export * from "./mapArrayToObjectByKeys";
 export * from "./mapDtoToDrep";
 export * from "./numberValidation";
 export * from "./openInNewTab";
+export * from "./outcomes";
 export * from "./removeDuplicatedProposals";
 export * from "./removeMarkdown";
 export * from "./setProtocolParameterUpdate";

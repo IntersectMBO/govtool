@@ -1,0 +1,66 @@
+/* Container queries for the outcomes pages. They live here rather than in
+   sx because emotion's stylis (4.2) does not parse @container. */
+
+.outcomes-container {
+  container-type: inline-size;
+  container-name: outcomes-container;
+}
+
+.outcomes-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+@container outcomes-container (min-width: 600px) {
+  .outcomes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container outcomes-container (min-width: 1120px) {
+  .outcomes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@container outcomes-container (min-width: 1500px) {
+  .outcomes-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.outcome-container {
+  container-type: inline-size;
+  container-name: outcome-container;
+  width: 100%;
+}
+
+.outcome-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "details"
+    "votes";
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+}
+
+@container outcome-container (min-width: 1000px) {
+  .outcome-details-grid {
+    grid-template-columns: 7.5fr 4.5fr;
+    grid-template-areas: "details votes";
+  }
+}
+
+.outcome-details {
+  grid-area: details;
+  min-width: 0;
+}
+
+.outcome-votes {
+  grid-area: votes;
+  min-width: 0;
+}

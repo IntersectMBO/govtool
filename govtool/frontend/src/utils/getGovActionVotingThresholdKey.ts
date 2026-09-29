@@ -85,3 +85,25 @@ export const getGovActionVotingThresholdKey = ({
 
   return govActionThresholds[govActionType] ?? undefined;
 };
+
+/**
+ * The ratification threshold as a fraction, for drawing and comparing a vote
+ * bar. Info actions have no threshold parameter: the ledger never ratifies
+ * them, so DReps and SPOs are shown against 100%.
+ */
+export const getGovActionVotingThreshold = ({
+  epochParams,
+  ...options
+}: GetGovActionVotingThresholdKeyOptions & {
+  epochParams?: Partial<EpochParams> | null;
+}): number | undefined => {
+  if (
+    options.govActionType === GovernanceActionType.InfoAction &&
+    (options.voterType === "dReps" || options.voterType === "sPos")
+  ) {
+    return 1;
+  }
+  const key = getGovActionVotingThresholdKey(options);
+  const value = key ? epochParams?.[key] : undefined;
+  return typeof value === "number" ? value : undefined;
+};

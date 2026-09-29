@@ -9,7 +9,7 @@ import {
   useTranslation,
 } from "@hooks";
 import {
-  getGovActionVotingThresholdKey,
+  getGovActionVotingThreshold,
   correctAdaFormatWithSuffix,
 } from "@utils";
 import { SubmittedVotesData } from "@models";
@@ -212,16 +212,12 @@ export const VotesSubmitted = ({
             abstainVotes={totalAbstainVotes}
             notVotedVotes={dRepNotVotedVotes}
             notVotedPercentage={dRepNotVotedVotesPercentage}
-            threshold={
-              (() => {
-                const votingThresholdKey = getGovActionVotingThresholdKey({
-                  govActionType: type,
-                  protocolParams,
-                  voterType: "dReps",
-                });
-                return votingThresholdKey && epochParams?.[votingThresholdKey];
-              })() as number
-            }
+            threshold={getGovActionVotingThreshold({
+              govActionType: type,
+              protocolParams,
+              voterType: "dReps",
+              epochParams,
+            })}
           />
         )}
         {areSPOVoteTotalsDisplayed(type, isSecurityGroup()) && (
@@ -234,16 +230,12 @@ export const VotesSubmitted = ({
             abstainVotes={poolAbstainVotes}
             notVotedVotes={poolNotVotedVotes}
             notVotedPercentage={poolNotVotedVotesPercentage}
-            threshold={
-              (() => {
-                const votingThresholdKey = getGovActionVotingThresholdKey({
-                  govActionType: type,
-                  protocolParams,
-                  voterType: "sPos",
-                });
-                return votingThresholdKey && epochParams?.[votingThresholdKey];
-              })() as number
-            }
+            threshold={getGovActionVotingThreshold({
+              govActionType: type,
+              protocolParams,
+              voterType: "sPos",
+              epochParams,
+            })}
           />
         )}
         {areCCVoteTotalsDisplayed(type) && areCommitteeMetricsAvailable && (

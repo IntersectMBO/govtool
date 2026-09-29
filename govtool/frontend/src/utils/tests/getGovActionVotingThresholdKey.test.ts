@@ -1,6 +1,9 @@
 import { VoterType } from "@/components/molecules";
 import { GovernanceActionType } from "@/types/governanceAction";
-import { getGovActionVotingThresholdKey } from "../getGovActionVotingThresholdKey";
+import {
+  getGovActionVotingThreshold,
+  getGovActionVotingThresholdKey,
+} from "../getGovActionVotingThresholdKey";
 
 describe("getGovActionVotingThresholdKey", () => {
   it("should return the correct voting threshold key for NewCommittee and dReps voter type", () => {
@@ -126,6 +129,52 @@ describe("getGovActionVotingThresholdKey", () => {
           govActionType,
           protocolParams: { max_block_size: 90112 },
           voterType: "ccCommittee",
+        }),
+      ).toBeUndefined();
+    });
+  });
+
+  describe("getGovActionVotingThreshold", () => {
+    const epochParams = {
+      dvt_treasury_withdrawal: 0.67,
+      pvt_committee_normal: 0.51,
+    };
+
+    it("shows DReps and SPOs against 100% on an info action", () => {
+      (["dReps", "sPos"] as VoterType[]).forEach((voterType) => {
+        expect(
+          getGovActionVotingThreshold({
+            govActionType: GovernanceActionType.InfoAction,
+            voterType,
+            epochParams,
+          }),
+        ).toBe(1);
+      });
+    });
+
+    it("gives the committee no threshold on an info action", () => {
+      expect(
+        getGovActionVotingThreshold({
+          govActionType: GovernanceActionType.InfoAction,
+          voterType: "ccCommittee",
+          epochParams,
+        }),
+      ).toBeUndefined();
+    });
+
+    it("reads the parameter's value for other actions", () => {
+      expect(
+        getGovActionVotingThreshold({
+          govActionType: GovernanceActionType.TreasuryWithdrawals,
+          voterType: "dReps",
+          epochParams,
+        }),
+      ).toBe(0.67);
+      expect(
+        getGovActionVotingThreshold({
+          govActionType: GovernanceActionType.NewCommittee,
+          voterType: "sPos",
+          epochParams: null,
         }),
       ).toBeUndefined();
     });

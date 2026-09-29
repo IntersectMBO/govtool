@@ -10,7 +10,7 @@ import {
   OutcomeVoteSection,
   VoterType,
 } from "@molecules";
-import { getGovActionVotingThresholdKey } from "@utils";
+import { getGovActionVotingThreshold } from "@utils";
 import { GovernanceActionType } from "@/types/governanceAction";
 
 type OutcomeGovernanceVotingProps = {
@@ -46,15 +46,13 @@ export const OutcomeGovernanceVoting = ({
     (paramKey) => proposalParams?.[paramKey as keyof EpochParams] !== null,
   );
 
-  const getThreshold = (voterType: VoterType) => {
-    const key = getGovActionVotingThresholdKey({
+  const getThreshold = (voterType: VoterType) =>
+    getGovActionVotingThreshold({
       govActionType: type,
       protocolParams: proposalParams,
       voterType,
+      epochParams,
     });
-    const value = key ? epochParams?.[key] : undefined;
-    return typeof value === "number" ? value : undefined;
-  };
 
   const getStatus = () => {
     if (status.enacted_epoch) return t("outcome.status.enacted");

@@ -943,8 +943,6 @@
       "beCareful": "Be Careful!",
       "continueTo": "Continue to external link",
       "description": "Exercise caution and verify the website's authenticity before sharing personal information. To proceed, click 'Continue'. To stay on Cardano, click 'Cancel'.",
-      "safety": "External Link Safety",
-      "thisIs": "This is an external link:",
       "youAreAboutToOpen": "You are about to open an external link to:"
     },
     "registration": {

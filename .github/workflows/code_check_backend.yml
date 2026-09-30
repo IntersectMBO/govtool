@@ -39,10 +39,6 @@ jobs:
         working-directory: govtool/govtool-backend
         run: npm ci
 
-      - name: Check format
-        working-directory: govtool/govtool-backend
-        run: npx prettier --check "src/**/*.ts" "test/**/*.ts"
-
-      - name: Lint, typecheck, test and build
+      - name: Format, lint, typecheck, test and build
         working-directory: govtool/govtool-backend
         run: npm run verify

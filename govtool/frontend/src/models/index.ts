@@ -2,3 +2,5 @@ export * from "./api";
 export * from "./snackbar";
 export * from "./wallet";
 export * from "./metadataValidation";
+export * from "./metadataReport";
+export * from "./outcomes";

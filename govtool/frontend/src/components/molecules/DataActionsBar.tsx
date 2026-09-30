@@ -17,6 +17,12 @@ type DataActionsBarProps = {
   filtersOpen?: boolean;
   filtersTitle?: string;
   isFiltering?: boolean;
+  /**
+   * False hides the sort chip and its menu. Passed by lists whose provider
+   * refuses every sort key: the contract's rule is hide the control, never
+   * render an empty dropdown.
+   */
+  isSorting?: boolean;
   searchText: string;
   placeholder?: string;
   setChosenFilters?: Dispatch<SetStateAction<string[]>>;
@@ -38,6 +44,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
   filtersOpen,
   filtersTitle,
   isFiltering = true,
+  isSorting = true,
   searchText,
   setChosenFilters = () => {},
   setChosenSorting,
@@ -142,6 +149,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
             chosenFiltersLength={chosenFiltersLength}
             filtersOpen={effectiveFiltersOpen}
             isFiltering={isFiltering}
+            isSorting={isSorting}
             setFiltersOpen={setEffectiveFiltersOpen}
             chosenSorting={chosenSortingLabel}
             setSortOpen={setEffectiveSortOpen}
@@ -156,7 +164,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
                 title={filtersTitle}
               />
             )}
-            {effectiveSortOpen && (
+            {isSorting && effectiveSortOpen && (
               <DataActionsSorting
                 chosenSorting={chosenSorting}
                 setChosenSorting={setChosenSorting}

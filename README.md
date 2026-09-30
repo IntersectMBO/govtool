@@ -36,7 +36,7 @@ Learn more; [docs.gov.tools](https://docs.gov.tools/cardano-govtool/using-govtoo
 
 ## 📍 Navigation
 
-- [Backend](./govtool/backend/README.md)
+- [Backend](./govtool/govtool-backend/README.md)
 - [Frontend](./govtool/frontend/README.md)
 - [In repo documentation](./docs/)
 - [Tests](./tests/)

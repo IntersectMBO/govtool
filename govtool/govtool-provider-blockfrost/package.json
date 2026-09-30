@@ -1,0 +1,31 @@
+{
+  "name": "@govtool/provider-blockfrost",
+  "version": "0.1.0",
+  "description": "A GovTool chain-data provider over the hosted Blockfrost API, implementing ChainDataApiV1.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "clean": "node --eval \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "live": "node scripts/live.mjs",
+    "verify": "npm run typecheck && npm run build && npm test"
+  },
+  "dependencies": {
+    "@govtool/data-providers": "file:../govtool-data-providers",
+    "bech32": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

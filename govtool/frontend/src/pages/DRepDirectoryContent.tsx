@@ -3,8 +3,13 @@ import { Trans, useTranslation } from "react-i18next";
 import { Box, CircularProgress } from "@mui/material";
 
 import { Typography } from "@atoms";
-import { DREP_DIRECTORY_FILTERS, DREP_DIRECTORY_SORTING } from "@consts";
-import { useCardano, useDataActionsBar, usePagination } from "@context";
+import { DREP_DIRECTORY_FILTERS } from "@consts";
+import {
+  useCardano,
+  useDataActionsBar,
+  useFeatureFlag,
+  usePagination,
+} from "@context";
 import {
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
@@ -51,6 +56,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   isConnected,
 }) => {
   const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
+  const { dRepDirectorySort } = useFeatureFlag();
   const { t } = useTranslation();
 
   const {
@@ -97,9 +103,24 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     }
   }, []);
 
+  // GovTool forces `Activity` on mount and keeps it across navigation, so it is
+  // the selection most likely to be gated away. When the provider can order the
+  // directory by nothing at all (the real Koios case), clear the selection
+  // rather than sending a key the list cannot honour.
   useEffect(() => {
-    if (!chosenSorting) setChosenSorting(DRepListSort.Activity);
-  }, [chosenSorting, setChosenSorting]);
+    if (!dRepDirectorySort.isAvailable) {
+      if (chosenSorting) setChosenSorting("");
+      return;
+    }
+    if (
+      !chosenSorting ||
+      dRepDirectorySort.isSelectionStale(chosenSorting)
+    ) {
+      setChosenSorting(
+        dRepDirectorySort.fallbackSelection(DRepListSort.Activity) ?? "",
+      );
+    }
+  }, [chosenSorting, setChosenSorting, dRepDirectorySort]);
 
   useUpdateEffect(() => {
     setPage(1);
@@ -274,7 +295,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           setSearchText={setSearchText}
           filterOptions={DREP_DIRECTORY_FILTERS}
           filtersTitle={t("dRepDirectory.filterTitle")}
-          sortOptions={DREP_DIRECTORY_SORTING}
+          sortOptions={dRepDirectorySort.options}
+          isSorting={dRepDirectorySort.isAvailable}
           placeholder={t("dRepDirectory.searchBarPlaceholder")}
         />
 

@@ -105,7 +105,7 @@ Welcome to contributing to `GovTool`! Whether you're fixing a bug, adding a feat
 
 1. **Set Up Your Environment**:
    - Follow the [local development instructions](./README.md#-local-development) to clone the repository, select the required Node.js version, create the environment file, install dependencies, and start the frontend.
-   - For another component, use its setup guide: [frontend](./govtool/frontend/README.md), [backend](./govtool/backend/README.md), or [Docker Compose](./docker/README.md).
+   - For another component, use its setup guide: [frontend](./govtool/frontend/README.md), [backend](./govtool/govtool-backend/README.md), or [Docker Compose](./docker/README.md).
    - Make sure you're using the latest version of the project to avoid potential conflicts.
 
 2. **Find an Issue to Work On**:
@@ -258,9 +258,9 @@ Please see [CSS in Javascript Style Guide](./docs/style-guides/css-in-js/).
 
 Please see [CSS / SASS Style Guide](./docs/style-guides/css-sass/).
 
-#### Haskell
+#### TypeScript backend
 
-Please see [stylish-haskell configuration](./govtool/backend/.stylish-haskell.yaml).
+The backend and its packages use Prettier and ESLint. In `govtool/govtool-backend`, `npm run format` and `npm run lint` fix what they can, and `npm run verify` runs the same checks CI does.
 
 ## Development Processes
 

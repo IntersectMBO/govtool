@@ -1,7 +1,3 @@
-import {
-  CIP30Instance,
-  Cip95Instance,
-} from "@cardanoapi/cardano-test-wallet/types";
 import { isMobile, openDrawer } from "@helpers/mobile";
 import { Page, expect } from "@playwright/test";
 
@@ -30,11 +26,12 @@ export default class LoginPage {
 
     const { stakeKeys, rewardAddresses } = await this.page.evaluate(
       async () => {
-        const walletInstance: CIP30Instance | Cip95Instance =
-          await window["cardano"]["demos"].enable();
+        const walletInstance = await (window as any)["cardano"][
+          "demos"
+        ].enable();
 
-        let stakeKeys = [];
-        let rewardAddresses = [];
+        let stakeKeys: string[] = [];
+        let rewardAddresses: string[] = [];
         if ("cip95" in walletInstance) {
           stakeKeys = await walletInstance.cip95.getRegisteredPubStakeKeys();
           rewardAddresses = await walletInstance.getRewardAddresses();

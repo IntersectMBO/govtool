@@ -1,0 +1,7 @@
+# Also publish the metadata bucket on [::1]: macOS resolves *.localhost to
+# ::1 only. up.sh adds this file on macOS; add it by hand elsewhere if your
+# resolver does the same and Docker can bind IPv6 loopback.
+services:
+  metadata-bucket:
+    ports:
+      - "[::1]:${METADATA_BUCKET_PORT:-3001}:${METADATA_BUCKET_PORT:-3001}"

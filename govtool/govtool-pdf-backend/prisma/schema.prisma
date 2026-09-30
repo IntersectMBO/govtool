@@ -1,0 +1,565 @@
+// Data model of SPEC.md §5. Prisma field names follow the spec; the wire names
+// live in the resource descriptors under src/. Partial unique indexes and the
+// comment target CHECK are raw SQL in the init migration (Prisma cannot declare
+// them), so `prisma migrate dev` must never be allowed to drop them.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// §5.1 Users and auth
+
+model User {
+  id              Int      @id @default(autoincrement())
+  username        String   @unique @db.VarChar(58)
+  govtoolUsername String?  @unique @map("govtool_username") @db.VarChar(30)
+  isValidated     Boolean  @default(false) @map("is_validated")
+  blocked         Boolean  @default(false)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  proposals        Proposal[]
+  proposalContents ProposalContent[]
+  proposalVotes    ProposalVote[]
+  pollVotes        PollVote[]
+  comments         Comment[]
+  reportsFiled     CommentsReport[]  @relation("CommentsReportReporter")
+  reportsModerated CommentsReport[]  @relation("CommentsReportModerator")
+  bds              Bd[]
+  bdPollVotes      BdPollVote[]
+  bdDrafts         BdDraft[]
+
+  @@map("users")
+}
+
+model AuthChallenge {
+  id         Int      @id @default(autoincrement())
+  identifier String   @db.VarChar(58)
+  nonce      String   @unique @db.Char(32)
+  message    String
+  timestamp  DateTime @db.Timestamptz(3)
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@index([expiresAt])
+  @@map("auth_challenges")
+}
+
+// §5.2 Proposals
+
+model GovernanceActionType {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(80)
+  publishedAt DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  contents ProposalContent[]
+
+  @@map("governance_action_types")
+}
+
+model Proposal {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  likes          Int      @default(0)
+  dislikes       Int      @default(0)
+  commentsNumber Int      @default(0) @map("comments_number")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user     User              @relation(fields: [userId], references: [id])
+  contents ProposalContent[]
+  votes    ProposalVote[]
+  polls    Poll[]
+  comments Comment[]
+
+  @@index([userId])
+  @@map("proposals")
+}
+
+model ProposalContent {
+  id                Int       @id @default(autoincrement())
+  proposalId        Int       @map("proposal_id")
+  userId            Int       @map("user_id")
+  govActionTypeId   Int       @map("gov_action_type_id")
+  name              String    @db.VarChar(80)
+  abstract          String    @default("")
+  motivation        String    @default("")
+  rationale         String    @default("")
+  revActive         Boolean   @default(false) @map("rev_active")
+  isDraft           Boolean   @default(false) @map("is_draft")
+  submitted         Boolean   @default(false)
+  isLocked          Boolean   @default(false) @map("is_locked")
+  submissionTxHash  String?   @unique @map("submission_tx_hash") @db.Char(64)
+  submissionDate    DateTime? @map("submission_date") @db.Date
+  hardForkContentId Int?      @unique @map("hard_fork_content_id")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  proposal            Proposal                     @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  user                User                         @relation(fields: [userId], references: [id])
+  govActionType       GovernanceActionType         @relation(fields: [govActionTypeId], references: [id])
+  hardForkContent     ProposalHardForkContent?     @relation(fields: [hardForkContentId], references: [id], onDelete: SetNull)
+  constitutionContent ProposalConstitutionContent?
+  links               ProposalLink[]
+  withdrawals         ProposalWithdrawal[]
+
+  @@index([proposalId, revActive, isDraft])
+  @@index([userId, isDraft])
+  @@index([govActionTypeId])
+  @@map("proposal_contents")
+}
+
+model ProposalLink {
+  id        Int     @id @default(autoincrement())
+  contentId Int     @map("content_id")
+  position  Int
+  link      String  @db.VarChar(2048)
+  text      String? @db.VarChar(255)
+
+  content ProposalContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([contentId, position])
+  @@map("proposal_links")
+}
+
+model ProposalWithdrawal {
+  id               Int     @id @default(autoincrement())
+  contentId        Int     @map("content_id")
+  position         Int
+  receivingAddress String? @map("receiving_address") @db.VarChar(200)
+  amount           Float?
+
+  content ProposalContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([contentId, position])
+  @@map("proposal_withdrawals")
+}
+
+model ProposalConstitutionContent {
+  id                   Int      @id @default(autoincrement())
+  contentId            Int      @unique @map("content_id")
+  constitutionUrl      String?  @map("constitution_url") @db.VarChar(2048)
+  haveGuardrailsScript Boolean? @map("have_guardrails_script")
+  guardrailsScriptUrl  String?  @map("guardrails_script_url") @db.VarChar(2048)
+  guardrailsScriptHash String?  @map("guardrails_script_hash") @db.VarChar(255)
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  content ProposalContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@map("proposal_constitution_contents")
+}
+
+model ProposalHardForkContent {
+  id             Int      @id @default(autoincrement())
+  previousGaHash String?  @map("previous_ga_hash") @db.VarChar(255)
+  previousGaId   String?  @map("previous_ga_id") @db.VarChar(255)
+  major          String?  @db.VarChar(255)
+  minor          String?  @db.VarChar(255)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  content ProposalContent?
+
+  @@map("proposal_hard_fork_contents")
+}
+
+model ProposalVote {
+  id         Int      @id @default(autoincrement())
+  proposalId Int      @map("proposal_id")
+  userId     Int      @map("user_id")
+  voteResult Boolean  @map("vote_result")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@unique([proposalId, userId])
+  @@index([userId])
+  @@map("proposal_votes")
+}
+
+model Poll {
+  id         Int       @id @default(autoincrement())
+  proposalId Int       @map("proposal_id")
+  yes        Int       @default(0)
+  no         Int       @default(0)
+  startDt    DateTime? @map("start_dt") @db.Timestamptz(3)
+  isActive   Boolean   @default(false) @map("is_active")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  proposal Proposal   @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  votes    PollVote[]
+
+  // Partial unique (proposal_id) WHERE is_active: raw SQL in the migration.
+  @@index([proposalId, isActive, createdAt])
+  @@map("polls")
+}
+
+model PollVote {
+  id         Int      @id @default(autoincrement())
+  pollId     Int      @map("poll_id")
+  userId     Int      @map("user_id")
+  voteResult Boolean  @map("vote_result")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  poll Poll @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([pollId, userId])
+  @@index([userId])
+  @@map("poll_votes")
+}
+
+// §5.3 Comments
+
+model Comment {
+  id         Int      @id @default(autoincrement())
+  proposalId Int?     @map("proposal_id")
+  bdMasterId Int?     @map("bd_master_id")
+  parentId   Int?     @map("parent_id")
+  userId     Int      @map("user_id")
+  text       String
+  drepId     String?  @map("drep_id") @db.Char(56)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  proposal Proposal?        @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  bdMaster Bd?              @relation(fields: [bdMasterId], references: [id], onDelete: Cascade)
+  parent   Comment?         @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[]        @relation("CommentReplies")
+  user     User             @relation(fields: [userId], references: [id])
+  reports  CommentsReport[]
+
+  // CHECK exactly one of proposal_id / bd_master_id: raw SQL in the migration.
+  @@index([proposalId, parentId, createdAt])
+  @@index([bdMasterId, parentId, createdAt])
+  @@index([parentId])
+  @@index([userId])
+  @@map("comments")
+}
+
+model CommentsReport {
+  id               Int      @id @default(autoincrement())
+  commentId        Int      @map("comment_id")
+  reporterId       Int      @map("reporter_id")
+  moderatorId      Int?     @map("moderator_id")
+  moderationStatus Boolean? @map("moderation_status")
+  hash             String   @unique @db.Char(89)
+  publishedAt      DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporter  User    @relation("CommentsReportReporter", fields: [reporterId], references: [id])
+  moderator User?   @relation("CommentsReportModerator", fields: [moderatorId], references: [id], onDelete: SetNull)
+
+  @@unique([commentId, reporterId])
+  @@index([reporterId])
+  @@map("comments_reports")
+}
+
+// §5.4 Budget discussions
+
+model Bd {
+  id                          Int       @id @default(autoincrement())
+  creatorId                   Int       @map("creator_id")
+  masterId                    Int?      @map("master_id")
+  isActive                    Boolean   @default(true) @map("is_active")
+  privacyPolicy               Boolean   @map("privacy_policy")
+  intersectNamedAdministrator Boolean   @default(false) @map("intersect_named_administrator")
+  intersectAdminFurtherText   String?   @map("intersect_admin_further_text")
+  commentsNumber              Int       @default(0) @map("comments_number")
+  submittedForVote            DateTime? @map("submitted_for_vote") @db.Timestamptz(3)
+  costingId                   Int?      @unique @map("costing_id")
+  proposalDetailId            Int?      @unique @map("proposal_detail_id")
+  psapbId                     Int?      @unique @map("psapb_id")
+  proposalOwnershipId         Int?      @unique @map("proposal_ownership_id")
+  furtherInformationId        Int?      @unique @map("further_information_id")
+  contactInformationId        Int?      @unique @map("contact_information_id")
+  createdAt                   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  creator            User                  @relation(fields: [creatorId], references: [id])
+  master             Bd?                   @relation("BdVersions", fields: [masterId], references: [id], onDelete: Cascade)
+  versions           Bd[]                  @relation("BdVersions")
+  costing            BdCosting?            @relation(fields: [costingId], references: [id], onDelete: SetNull)
+  proposalDetail     BdProposalDetail?     @relation(fields: [proposalDetailId], references: [id], onDelete: SetNull)
+  psapb              BdPsapb?              @relation(fields: [psapbId], references: [id], onDelete: SetNull)
+  proposalOwnership  BdProposalOwnership?  @relation(fields: [proposalOwnershipId], references: [id], onDelete: SetNull)
+  furtherInformation BdFurtherInformation? @relation(fields: [furtherInformationId], references: [id], onDelete: SetNull)
+  contactInformation BdContactInformation? @relation(fields: [contactInformationId], references: [id], onDelete: SetNull)
+  comments           Comment[]
+  polls              BdPoll[]
+
+  // Partial unique (master_id) WHERE is_active: raw SQL in the migration.
+  @@index([masterId, createdAt])
+  @@index([isActive, createdAt])
+  @@index([creatorId])
+  @@map("bds")
+}
+
+model BdCosting {
+  id                             Int      @id @default(autoincrement())
+  costBreakdown                  String?  @map("cost_breakdown")
+  preferredCurrencyId            Int?     @map("preferred_currency_id")
+  adaAmount                      String?  @map("ada_amount") @db.VarChar(255)
+  amountInPreferredCurrency      String?  @map("amount_in_preferred_currency") @db.VarChar(255)
+  usdToAdaConversionRate         String?  @map("usd_to_ada_conversion_rate") @db.VarChar(255)
+  adaAmountClone                 Float    @default(0) @map("ada_amount_clone")
+  amountInPreferredCurrencyClone Float    @default(0) @map("amount_in_preferred_currency_clone")
+  usdToAdaConversionRateClone    Float    @default(0) @map("usd_to_ada_conversion_rate_clone")
+  createdAt                      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  preferredCurrency BdCurrency? @relation(fields: [preferredCurrencyId], references: [id])
+  bd                Bd?
+
+  @@map("bd_costings")
+}
+
+model BdProposalDetail {
+  id                          Int      @id @default(autoincrement())
+  proposalName                String?  @map("proposal_name")
+  proposalDescription         String?  @map("proposal_description")
+  keyDependencies             String?  @map("key_dependencies")
+  maintainAndSupport          String?  @map("maintain_and_support")
+  keyProposalDeliverables     String?  @map("key_proposal_deliverables")
+  resourcingDurationEstimates String?  @map("resourcing_duration_estimates")
+  experience                  String?
+  otherContractType           String?  @map("other_contract_type")
+  contractTypeId              Int?     @map("contract_type_id")
+  createdAt                   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  contractType BdContractType? @relation(fields: [contractTypeId], references: [id])
+  bd           Bd?
+
+  @@map("bd_proposal_details")
+}
+
+model BdPsapb {
+  id                       Int      @id @default(autoincrement())
+  problemStatement         String?  @map("problem_statement")
+  proposalBenefit          String?  @map("proposal_benefit")
+  supplementaryEndorsement String?  @map("supplementary_endorsement")
+  explainProposalRoadmap   String?  @map("explain_proposal_roadmap")
+  typeId                   Int?     @map("type_id")
+  roadmapId                Int?     @map("roadmap_id")
+  committeeId              Int?     @map("committee_id")
+  createdAt                DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  type      BdType?               @relation(fields: [typeId], references: [id])
+  roadmap   BdRoadMap?            @relation(fields: [roadmapId], references: [id])
+  committee BdIntersectCommittee? @relation(fields: [committeeId], references: [id])
+  bd        Bd?
+
+  @@index([typeId])
+  @@map("bd_psapbs")
+}
+
+model BdProposalOwnership {
+  id                     Int      @id @default(autoincrement())
+  agreed                 Boolean?
+  groupName              String?  @map("group_name") @db.VarChar(255)
+  companyName            String?  @map("company_name") @db.VarChar(255)
+  typeOfGroup            String?  @map("type_of_group") @db.VarChar(255)
+  socialHandles          String?  @map("social_handles") @db.VarChar(255)
+  submitedOnBehalf       String?  @map("submited_on_behalf") @db.VarChar(255)
+  companyDomainName      String?  @map("company_domain_name") @db.VarChar(255)
+  proposalPublicChampion String?  @map("proposal_public_champion") @db.VarChar(255)
+  keyInfoToIdentifyGroup String?  @map("key_info_to_identify_group")
+  beCountryId            Int?     @map("be_country_id")
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  beCountry CountryList? @relation(fields: [beCountryId], references: [id])
+  bd        Bd?
+
+  @@map("bd_proposal_ownerships")
+}
+
+model BdFurtherInformation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  links BdLink[]
+  bd    Bd?
+
+  @@map("bd_further_informations")
+}
+
+model BdLink {
+  id                   Int     @id @default(autoincrement())
+  furtherInformationId Int     @map("further_information_id")
+  position             Int
+  link                 String  @db.VarChar(2048)
+  text                 String? @db.VarChar(255)
+
+  furtherInformation BdFurtherInformation @relation(fields: [furtherInformationId], references: [id], onDelete: Cascade)
+
+  @@index([furtherInformationId, position])
+  @@map("bd_links")
+}
+
+model BdContactInformation {
+  id                     Int      @id @default(autoincrement())
+  beFullName             String?  @map("be_full_name") @db.VarChar(255)
+  beEmail                String?  @map("be_email") @db.VarChar(255)
+  submissionLeadFullName String?  @map("submission_lead_full_name") @db.VarChar(255)
+  submissionLeadEmail    String?  @map("submission_lead_email") @db.VarChar(255)
+  otherContractType      String?  @map("other_contract_type") @db.VarChar(255)
+  beCountryOfResId       Int?     @map("be_country_of_res_id")
+  beNationalityId        Int?     @map("be_nationality_id")
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  beCountryOfRes CountryList? @relation("ContactCountryOfRes", fields: [beCountryOfResId], references: [id])
+  beNationality  CountryList? @relation("ContactNationality", fields: [beNationalityId], references: [id])
+  bd             Bd?
+
+  @@map("bd_contact_informations")
+}
+
+model BdPoll {
+  id         Int      @id @default(autoincrement())
+  bdMasterId Int      @map("bd_master_id")
+  yes        Int      @default(0)
+  no         Int      @default(0)
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  bdMaster Bd           @relation(fields: [bdMasterId], references: [id], onDelete: Cascade)
+  votes    BdPollVote[]
+
+  // Partial unique (bd_master_id) WHERE is_active: raw SQL in the migration.
+  @@index([bdMasterId, isActive, createdAt])
+  @@map("bd_polls")
+}
+
+model BdPollVote {
+  id              Int      @id @default(autoincrement())
+  bdPollId        Int      @map("bd_poll_id")
+  userId          Int      @map("user_id")
+  voteResult      Boolean  @map("vote_result")
+  drepId          String   @map("drep_id") @db.Char(56)
+  drepVotingPower String   @map("drep_voting_power") @db.VarChar(255)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  bdPoll BdPoll @relation(fields: [bdPollId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([bdPollId, userId])
+  @@unique([bdPollId, drepId])
+  @@index([userId])
+  @@map("bd_poll_votes")
+}
+
+model BdDraft {
+  id        Int      @id @default(autoincrement())
+  creatorId Int      @map("creator_id")
+  draftData Json     @map("draft_data")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  creator User @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
+  @@map("bd_drafts")
+}
+
+// §5.5 Lookup tables (seeded, read-only over the API)
+
+model BdType {
+  id          Int      @id @default(autoincrement())
+  typeName    String   @map("type_name") @db.VarChar(255)
+  publishedAt DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  psapbs BdPsapb[]
+
+  @@map("bd_types")
+}
+
+model BdRoadMap {
+  id          Int      @id @default(autoincrement())
+  roadmapName String   @map("roadmap_name") @db.VarChar(255)
+  publishedAt DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  psapbs BdPsapb[]
+
+  @@map("bd_road_maps")
+}
+
+model BdIntersectCommittee {
+  id            Int      @id @default(autoincrement())
+  committeeName String   @map("committee_name") @db.VarChar(255)
+  publishedAt   DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  psapbs BdPsapb[]
+
+  @@map("bd_intersect_committees")
+}
+
+model BdContractType {
+  id               Int      @id @default(autoincrement())
+  contractTypeName String   @map("contract_type_name") @db.VarChar(255)
+  publishedAt      DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  proposalDetails BdProposalDetail[]
+
+  @@map("bd_contract_types")
+}
+
+model BdCurrency {
+  id                 Int      @id @default(autoincrement())
+  currencyName       String   @map("currency_name") @db.VarChar(255)
+  currencyLetterCode String   @map("currency_letter_code") @db.VarChar(255)
+  currencyNumberCode String   @map("currency_number_code") @db.VarChar(255)
+  publishedAt        DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  costings BdCosting[]
+
+  @@map("bd_currency_lists")
+}
+
+model CountryList {
+  id          Int      @id @default(autoincrement())
+  countryName String   @map("country_name") @db.VarChar(255)
+  alfa2Code   String   @map("alfa_2_code") @db.VarChar(255)
+  alfa3Code   String   @map("alfa_3_code") @db.VarChar(255)
+  publishedAt DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  ownerships           BdProposalOwnership[]
+  contactsCountryOfRes BdContactInformation[] @relation("ContactCountryOfRes")
+  contactsNationality  BdContactInformation[] @relation("ContactNationality")
+
+  @@map("country_lists")
+}

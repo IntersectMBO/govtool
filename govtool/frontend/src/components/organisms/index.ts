@@ -31,3 +31,7 @@ export * from "./VoteContext";
 export * from "./VoteContext/VoteContextChoice";
 export * from "./VoteContext/VoteContextGovTool";
 export * from "./WrongRouteInfo";
+export * from "./OutcomeDetails";
+export * from "./OutcomeGovernanceVoting";
+export * from "./OutcomesList";
+export * from "./OutcomesSearchFiltersSortBar";

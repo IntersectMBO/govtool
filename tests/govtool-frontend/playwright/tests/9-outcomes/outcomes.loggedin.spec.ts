@@ -1,6 +1,5 @@
-import { user01AuthFile } from "@constants/auth";
 import { InvalidMetadata } from "@constants/index";
-import { user01Wallet } from "@constants/staticWallets";
+import { ensureInvalidMetadataFixtures } from "@helpers/invalidMetadataFixtures";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import OutcomeDetailsPage from "@pages/outcomeDetailsPage";
@@ -13,10 +12,7 @@ test.beforeEach(async () => {
   await setAllureEpic("9. Outcomes");
 });
 
-test.use({
-  storageState: user01AuthFile,
-  wallet: user01Wallet,
-});
+test.use({ walletName: "user01", walletFundsAda: 0 });
 
 test.describe("Outcomes page", () => {
   let outcomePage: OutComesPage;
@@ -49,8 +45,6 @@ test.describe("Outcomes page", () => {
   });
 
   test("9E_2. Should verify all of the displayed governance actions have expired", async () => {
-    await outcomePage.goto();
-
     await outcomePage.verifyAllOutcomesAreExpired();
   });
 
@@ -100,6 +94,10 @@ test.describe("Outcome details", () => {
   });
 
   test.describe("Invalid Outcome Metadata", () => {
+    test.beforeAll(async () => {
+      await ensureInvalidMetadataFixtures();
+    });
+
     InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
       test(`9H_${index + 1}B: Should display "${type}" message in outcomes when ${reason}`, async ({
         page,

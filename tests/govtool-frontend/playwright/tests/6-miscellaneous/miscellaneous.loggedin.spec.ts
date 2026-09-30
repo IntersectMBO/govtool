@@ -1,4 +1,3 @@
-import { user01AuthFile } from "@constants/auth";
 import {
   ABSTAIN_VOTE_DOC_URL,
   DELEGATION_DOC_URL,
@@ -8,26 +7,21 @@ import {
   REGISTER_DREP_DOC_URL,
   SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL,
 } from "@constants/docsUrl";
-import { user01Wallet } from "@constants/staticWallets";
-import { createTempUserAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
-import { createNewPageWithWallet } from "@helpers/page";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { Page, expect } from "@playwright/test";
+import { connectTestWallet } from "lib/wallet/pageWallet";
+import { randomWallet } from "lib/wallet/testWallets";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
 });
 
 test.describe("Logged in user", () => {
-  test.use({
-    storageState: user01AuthFile,
-    wallet: user01Wallet,
-  });
+  test.use({ walletName: "user01", walletFundsAda: 0 });
 
   test("6E. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in connected state.", async ({
     page,
@@ -108,13 +102,9 @@ test.describe("Temporary user", () => {
   let userPage: Page;
   let proposalDiscussionPage: ProposalDiscussionPage;
 
-  test.beforeEach(async ({ page, browser }) => {
-    const wallet = (await ShelleyWallet.generate()).json();
-    const tempUserAuth = await createTempUserAuth(page, wallet);
-    userPage = await createNewPageWithWallet(browser, {
-      storageState: tempUserAuth,
-      wallet,
-    });
+  test.beforeEach(async ({ page }) => {
+    await connectTestWallet(page, await randomWallet());
+    userPage = page;
 
     proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
@@ -143,5 +133,20 @@ test.describe("Temporary user", () => {
       await expect(userPage.getByTestId("username-error-text")).toBeVisible();
       await expect(userPage.getByTestId("proceed-button")).toBeDisabled();
     }
+  });
+});
+
+test.describe("Temporary budget discussion user", () => {
+  test("6P. Should prompt for a username after clicking on budget discussion link if username is not set", async ({
+    page,
+  }) => {
+    await connectTestWallet(page, await randomWallet());
+
+    await page.goto("/");
+    await page.getByTestId("budget-discussion-link").click();
+    await page.getByTestId("verify-user-link").first().click();
+
+    await expect(page.getByTestId("setup-username-modal")).toBeVisible();
+    await expect(page.getByTestId("username-input")).toBeVisible();
   });
 });

@@ -49,7 +49,7 @@ export const useRegisterAsdRepForm = (
     buildSignSubmitConwayCertTx,
     buildVoteDelegationCert,
     dRepID,
-    registeredStakeKeysListState,
+    isStakeKeyRegistered,
     buildStakeKeyRegCert,
   } = useCardano();
 
@@ -136,7 +136,7 @@ export const useRegisterAsdRepForm = (
 
       certBuilder.add(registerCert);
 
-      if (!registeredStakeKeysListState.length) {
+      if (!isStakeKeyRegistered()) {
         const stakeKeyRegCert = await buildStakeKeyRegCert();
         certBuilder.add(stakeKeyRegCert);
       }
@@ -149,7 +149,11 @@ export const useRegisterAsdRepForm = (
     [
       buildDRepRegCert,
       buildDRepUpdateCert,
+      buildStakeKeyRegCert,
+      buildVoteDelegationCert,
+      dRepID,
       hash,
+      isStakeKeyRegistered,
       voter?.isRegisteredAsSoleVoter,
     ],
   );
@@ -212,6 +216,7 @@ export const useRegisterAsdRepForm = (
               ...storageInformationErrorModals[
                 error as MetadataValidationStatus
               ],
+              metadataAnchor: { url: data.storingURL, hash: hash ?? "" },
               onSubmit: backToForm,
               onCancel: backToDashboard,
             },

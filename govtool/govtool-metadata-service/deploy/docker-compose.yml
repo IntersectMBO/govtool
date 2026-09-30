@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  metadata-api:
+    image: registry.sireto.io/cardanoapi/metadata-fetch:${COMMIT_SHA}
+    build: 
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      VIRTUAL_HOST: https://metadata.drep.id/api/ -> /api/
+      CORS_ENABLE: "true"
+      DATABASE_URL: ${METADATA_API_DATABASE_URL}
+      ELASTIC_APM_ENVIRONMENT: production
+      ELASTIC_APM_SERVER_URL: https://apm.sireto.io
+      ELASTIC_APM_API_KEY: ${ELASTIC_APM_API_KEY}
+
+    networks:
+      - metadata
+      - default
+      - frontend
+      - postgres
+    deploy:
+      placement:
+        constraints:
+          - node.labels.caat==true
+
+networks:
+  frontend:
+    name: frontend
+    external: true
+  postgres:
+    external: true
+  metadata:
+    name: metadata
+    attachable: true

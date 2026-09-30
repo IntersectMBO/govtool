@@ -168,6 +168,7 @@ export const useEditDRepInfoForm = (
               ...storageInformationErrorModals[
                 error as MetadataValidationStatus
               ],
+              metadataAnchor: { url, hash: hash ?? "" },
               onSubmit: backToForm,
               onCancel: backToDashboard,
             },

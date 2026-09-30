@@ -3,7 +3,9 @@
 DEPLOYMENT=${DEPLOYMENT:-"govtool.cardanoapi.io/api"}
 GROUP_NAME="qa"
 
-if [[ "$DEPLOYMENT" == "preview.gov.tools" || "$DEPLOYMENT" == "be.preview.gov.tools" || "$DEPLOYMENT" == "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr" ]]; then
+if [[ "$DEPLOYMENT" == "devnet" ]]; then
+    GROUP_NAME="devnet"
+elif [[ "$DEPLOYMENT" == "preview.gov.tools" || "$DEPLOYMENT" == "be.preview.gov.tools" || "$DEPLOYMENT" == "z6b8d2f7a-zca4a4c45-gtw.z937eb260.rustrocks.fr" ]]; then
     GROUP_NAME="preview"
 elif [[ "$DEPLOYMENT" == "gov.tools" || "$DEPLOYMENT" == "be.gov.tools" ]]; then
     GROUP_NAME="mainnet"

@@ -1,0 +1,368 @@
+openapi: 3.0.0
+info:
+  title: Metadata API
+  version: 1.0.0
+  description: API to fetch metadata based on provided URL and hash.
+paths:
+  /api/metadata:
+    get:
+      summary: Fetch metadata
+      description: |
+        Resolves a document by its blake2b-256 hash.
+
+        Content is cached permanently under the hash of the bytes actually
+        served. Once content for a hash is cached, it is returned for that hash
+        with no fetch, and the url is ignored.
+
+        The url is only a hint for where to fetch on a miss. Failures are
+        cached for one minute per (url, hash) pair, HASH_MISMATCH included,
+        because a url can change what it serves.
+      parameters:
+        - name: url
+          in: query
+          description: Where to fetch the document if the hash is not cached. Ignored on a cache hit.
+          required: false
+          schema:
+            type: string
+        - name: hash
+          in: query
+          description: blake2b-256 of the document bytes, 64 hex characters.
+          required: true
+          schema:
+            type: string
+        - name: cip
+          in: query
+          description: Not available yet. Any value answers 501.
+          required: false
+          schema:
+            type: integer
+        - name: Cache-Control
+          in: header
+          description: Set to "invalidate" to refetch past a cached failure, at most once per minute per (url, hash). Has no effect on cached content, which cannot go stale.
+          required: false
+          schema:
+            type: string
+            example: ''
+      responses:
+        '200':
+          description: The document. Served from cache or freshly fetched.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hash:
+                    type: string
+                  fetchedAt:
+                    type: string
+                    format: date-time
+                  url:
+                    type: string
+                  metadata:
+                    type: object
+                    additionalProperties: true
+        '400':
+          description: Invalid hash or url, or a cache miss with no url to fetch.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '409':
+          description: HASH_MISMATCH. The url served content with a different hash. That content is cached under servedHash.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataFailure'
+        '413':
+          description: EXCEEDS_LIMIT. The document is larger than the service accepts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataFailure'
+        '422':
+          description: JSON_PARSE_ERROR, or SCHEMA_INVALID for an invalid hashAlgorithm field.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataFailure'
+        '502':
+          description: FETCH_ERROR. DNS, refusal, TLS, or an unexpected upstream status. Detail is in message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataFailure'
+        '504':
+          description: FETCH_ERROR caused by a timeout.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataFailure'
+      tags:
+        - Metadata
+
+  /api/metadata/{hash}/refresh:
+    post:
+      summary: Retry a failed fetch
+      description: |
+        Refetches past a cached failure, at most once per minute per (url, hash),
+        whoever asks. Inside the window nothing is fetched and the latest result
+        is returned with retryAfterSeconds. A cached hash is returned without a
+        fetch.
+      parameters:
+        - { name: hash, in: path, required: true, schema: { type: string } }
+        - { name: url, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Always 200. Retry-After is set when the window has not elapsed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refetched: { type: boolean }
+                  retryAfterSeconds: { type: integer }
+                  result: { type: object, additionalProperties: true }
+        '400':
+          description: Invalid hash, or url missing.
+      tags:
+        - Metadata
+
+  /api/metadata/reports:
+    get:
+      summary: List fetch reports for an anchor
+      description: Every report for (url, hash), newest first. Reports are never deleted.
+      parameters:
+        - { name: hash, in: query, required: true, schema: { type: string } }
+        - { name: url, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Report summaries.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string }
+                    startedAt: { type: string, format: date-time }
+                    code: { type: string }
+                    category: { type: string, enum: [NETWORK, INVALID_CONTENT, SCHEMA_INVALID] }
+                    message: { type: string }
+      tags:
+        - Metadata
+
+  /api/metadata/reports/{id}:
+    get:
+      summary: Read one fetch report
+      description: |
+        DNS answers, each address tried and its outcome, redirects, the
+        response, the body up to 2 MB, and content issues with source ranges.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: The report.
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '404':
+          description: No such report.
+      tags:
+        - Metadata
+
+  /data/{filename}:
+    put:
+      summary: Save or update a file
+      description: Saves or updates a file with the given filename. The file content must not exceed 4 MB.
+      operationId: saveFile
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The name of the file to be saved or updated.
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              format: byte
+              description: The content of the file to be saved.
+      responses:
+        '201':
+          description: File saved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '400':
+          description: File size exceeds 4 MB limit.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "File size exceeds 4 MB limit"
+        '500':
+          description: Failed to save file.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to save file"
+
+    get:
+      summary: Retrieve a file
+      description: Retrieves a file by its filename.
+      operationId: getFile
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The name of the file to be retrieved.
+      responses:
+        '200':
+          description: Successfully retrieved file content.
+          content:
+            application/json:
+              schema:
+                type: string
+                description: The content of the retrieved file.
+        '404':
+          description: File not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "File not found"
+        '500':
+          description: Failed to retrieve file.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to retrieve file"
+
+    delete:
+      summary: Delete a file
+      description: Deletes a file with the specified filename.
+      operationId: deleteFile
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The name of the file to be deleted.
+      responses:
+        '200':
+          description: File deleted successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "File deleted successfully"
+        '404':
+          description: File not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "File not found"
+        '500':
+          description: Failed to delete file.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to delete file"
+
+  /api/health:
+      get:
+        summary: Health Check
+        description: Returns the health status of the application.
+        responses:
+          '200':
+            description: The application is healthy.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isHealthy:
+                      type: boolean
+                      description: Indicates whether the application is healthy.
+                  example:
+                    isHealthy: true
+          '500':
+            description: The application is unhealthy or the health check failed.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isHealthy:
+                      type: boolean
+                      description: Indicates whether the application is healthy.
+                    message:
+                      type: string
+                      description: Error details if the health check fails.
+                  example:
+                    isHealthy: false
+                    message: "Database connection failed"
+components:
+  schemas:
+    MetadataFailure:
+      type: object
+      properties:
+        code:
+          type: string
+          enum: [FETCH_ERROR, EXCEEDS_LIMIT, JSON_PARSE_ERROR, HASH_MISMATCH, SCHEMA_INVALID]
+        category:
+          type: string
+          enum: [NETWORK, INVALID_CONTENT, SCHEMA_INVALID]
+        reportId:
+          type: string
+          description: The fetch report behind this failure. Read it at /api/metadata/reports/{id}.
+        message:
+          type: string
+        url:
+          type: string
+        fetchedAt:
+          type: string
+          format: date-time
+        expectedHash:
+          type: string
+          description: Present on HASH_MISMATCH. The hash that was requested.
+        servedHash:
+          type: string
+          description: Present on HASH_MISMATCH. The hash of what the url served.

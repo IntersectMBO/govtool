@@ -1,9 +1,10 @@
 import environments from "@constants/environments";
 import { faker } from "@faker-js/faker";
-import { formatWithThousandSeparator } from "@helpers/adaFormat";
+import { adaAmountText, formatWithThousandSeparator } from "@helpers/adaFormat";
 import { extractProposalIdFromUrl, generateParagraph } from "@helpers/string";
 import { invalid, valid } from "@mock/index";
 import { Locator, Page, expect } from "@playwright/test";
+import { setUsernameIfPrompted } from "./pdfUsername";
 import {
   AdministrationAndAuditingProps,
   BudgetCostingProps,
@@ -253,6 +254,7 @@ export default class BudgetDiscussionSubmissionPage {
     await this.page.goto(`${environments.frontendUrl}/budget_discussion`);
 
     await this.verifyIdentityBtn.click();
+    await setUsernameIfPrompted(this.page);
     await this.createBudgetProposalBtn.click();
 
     await this.continueBtn.click();
@@ -761,7 +763,9 @@ export default class BudgetDiscussionSubmissionPage {
 
     // costing
     await expect(this.adaAmountContent).toHaveText(
-      `₳ ${formatWithThousandSeparator(proposalInformations.costing.adaAmount)}`
+      adaAmountText(
+        formatWithThousandSeparator(proposalInformations.costing.adaAmount)
+      )
     );
     await expect(this.usdToAdaConversionRateContent).toHaveText(
       proposalInformations.costing.usdToAdaConversionRate.toString()

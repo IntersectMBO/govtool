@@ -1,5 +1,4 @@
 import environments from "@constants/environments";
-import { createTempUserAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { createNewPageWithWallet, logWalletDetails } from "@helpers/page";
@@ -7,70 +6,55 @@ import { waitForTxConfirmation } from "@helpers/transaction";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import ProposalSubmissionPage from "@pages/proposalSubmissionPage";
 import { expect } from "@playwright/test";
-import {
-  skipIfMainnet,
-  skipIfScheduledWorkflow,
-  skipIfTemporyWalletIsNotAvailable,
-} from "@helpers/cardano";
-import { ProposalType } from "@types";
-import walletManager from "lib/walletManager";
+import { skipIfMainnet, skipIfScheduledWorkflow } from "@helpers/cardano";
 import { valid as mockValid, invalid as mockInvalid } from "@mock/index";
-import { rewardAddressBech32 } from "@helpers/shellyWallet";
-import { getProposalType, getWalletConfigForFaucet } from "@helpers/index";
+import { getProposalType } from "@helpers/index";
 import { faker } from "@faker-js/faker";
-import { proposalSubmissionAuthFile } from "@constants/auth";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
-import { createKeyFromPrivateKeyHex } from "@helpers/crypto";
+import kuberService from "@services/kuberService";
+import { TestWallet } from "lib/wallet/testWallets";
+import { stakeRegisteredWallet } from "lib/wallet/transactions";
 
 test.beforeEach(async () => {
   await setAllureEpic("7. Proposal submission");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("proposalSubmissionWallets.json");
 });
+
+/**
+ * The named wallet, funded with the governance action deposit and fees. Its
+ * stake key, the deposit return account, is registered, as the faucet stake
+ * key the old proposal wallets used was.
+ */
+async function proposalSubmissionWallet(name: string): Promise<TestWallet> {
+  const { govActionDeposit } = await kuberService.queryProtocolParams();
+  return stakeRegisteredWallet(name, govActionDeposit / 1_000_000 + 22);
+}
 
 getProposalType().forEach((proposalType, index) => {
   test(`7H_${index + 1}. Should submit a ${proposalType.toLocaleLowerCase()} proposal as governance action`, async ({
-    page,
     browser,
   }, testInfo) => {
     await skipIfScheduledWorkflow();
-    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+    test.setTimeout(testInfo.timeout + 2 * environments.txTimeOut);
 
-    const wallet = await walletManager.popWallet("proposalSubmission");
+    const wallet = await proposalSubmissionWallet(`7H_${index + 1}:proposer`);
 
     await logWalletDetails(wallet.address);
 
-    const tempUserAuth = await createTempUserAuth(page, wallet);
-
-    const userPage = await createNewPageWithWallet(browser, {
-      storageState: tempUserAuth,
-      wallet: wallet,
-    });
+    const userPage = await createNewPageWithWallet(browser, { wallet });
 
     const proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();
-    await proposalDiscussionPage.verifyIdentityBtn.click();
-
-    try {
-      await expect(userPage.getByTestId("username-input")).toBeVisible({
-        timeout: 10_000,
-      });
-      await proposalDiscussionPage.setUsername(mockValid.username());
-    } catch (error) {
-      // Ignore error if username is already set
-      console.log("Username is already set");
-    }
+    await proposalDiscussionPage.verifyIdentity();
 
     const proposalSubmissionPage = new ProposalSubmissionPage(userPage);
     await proposalSubmissionPage.proposalCreateBtn.click();
     await proposalDiscussionPage.continueBtn.click();
 
-    const rewardAddress = rewardAddressBech32(
-      environments.networkId,
-      wallet.stake.pkh
+    await proposalSubmissionPage.createProposal(
+      wallet.stakeAddress,
+      proposalType
     );
-
-    await proposalSubmissionPage.createProposal(rewardAddress, proposalType);
 
     await userPage.getByTestId("submit-as-GA-button").click();
 
@@ -92,31 +76,31 @@ getProposalType().forEach((proposalType, index) => {
 
 test.describe("Proposed as a governance action", async () => {
   let proposalSubmissionPage: ProposalSubmissionPage;
-  let proposalDiscussionDetailPage: ProposalDiscussionDetailsPage;
-  let proposalId: number;
+  let proposalDiscussionDetailPage: ProposalDiscussionDetailsPage | undefined;
+  let proposalId: number | undefined;
 
-  test.beforeEach(async ({ browser }) => {
-    const proposalSubmissionWallet =
-      await walletManager.getFirstWalletByPurpose("proposalSubmissionCopy");
-    await logWalletDetails(proposalSubmissionWallet.address);
+  test.beforeEach(async ({ browser }, testInfo) => {
+    test.setTimeout(testInfo.timeout + environments.txTimeOut);
+    // Left unset if this hook fails early, so afterEach has nothing to delete
+    // rather than the previous test's proposal.
+    proposalDiscussionDetailPage = undefined;
+    proposalId = undefined;
 
-    const page = await createNewPageWithWallet(browser, {
-      storageState: proposalSubmissionAuthFile,
-      wallet: proposalSubmissionWallet,
-    });
+    const wallet = await proposalSubmissionWallet("7:gaProposer");
+    await logWalletDetails(wallet.address);
+
+    const page = await createNewPageWithWallet(browser, { wallet });
 
     proposalSubmissionPage = new ProposalSubmissionPage(page);
     await proposalSubmissionPage.goto();
 
-    proposalDiscussionDetailPage = new ProposalDiscussionDetailsPage(page);
+    const detailsPage = new ProposalDiscussionDetailsPage(page);
+    proposalDiscussionDetailPage = detailsPage;
 
-    const rewardAddress = rewardAddressBech32(
-      environments.networkId,
-      getWalletConfigForFaucet().address
+    proposalId = await proposalSubmissionPage.createProposal(
+      wallet.stakeAddress
     );
-
-    proposalId = await proposalSubmissionPage.createProposal(rewardAddress);
-    await proposalDiscussionDetailPage.submitAsGABtn.click();
+    await detailsPage.submitAsGABtn.click();
     await proposalSubmissionPage.currentPage
       .getByTestId("agree-checkbox")
       .click();
@@ -125,17 +109,22 @@ test.describe("Proposed as a governance action", async () => {
 
   test.afterEach(async () => {
     await skipIfMainnet();
-    // cleanup
-    await proposalDiscussionDetailPage.goto(proposalId);
+    // cleanup: nothing to delete when beforeEach failed before creating it
+    if (!proposalDiscussionDetailPage || proposalId === undefined) return;
+    const detailsPage = proposalDiscussionDetailPage;
+    await detailsPage.goto(proposalId);
 
-    const isVerifyIdentityBtnVisible =
-      await proposalDiscussionDetailPage.verifyIdentityBtn.isVisible();
-
-    if (isVerifyIdentityBtnVisible) {
-      await proposalDiscussionDetailPage.verifyIdentityBtn.click();
+    // After the reload pdf-ui shows either the sign-in link or, once signed
+    // in, the owner's menu; the link takes a few seconds to appear, so wait
+    // for one of them rather than checking right away.
+    await expect(
+      detailsPage.verifyIdentityBtn.or(detailsPage.menuBtn).first()
+    ).toBeVisible({ timeout: 60_000 });
+    if (await detailsPage.verifyIdentityBtn.isVisible()) {
+      await detailsPage.verifyIdentity();
     }
 
-    await proposalDiscussionDetailPage.deleteProposal();
+    await detailsPage.deleteProposal();
   });
 
   test.describe("Metadata anchor validation", () => {

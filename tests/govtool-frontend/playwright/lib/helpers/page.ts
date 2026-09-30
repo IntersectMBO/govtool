@@ -1,39 +1,17 @@
-import { importWallet } from "@fixtures/importWallet";
-import loadDemosExtension from "@fixtures/loadExtension";
 import { Browser, ConsoleMessage, Page } from "@playwright/test";
-import { StaticWallet } from "@types";
+import { connectTestWallet, PageWalletOptions } from "lib/wallet/pageWallet";
+import { adaBalance, TestWallet } from "lib/wallet/testWallets";
 import { Logger } from "./logger";
-import kuberService from "@services/kuberService";
 
-interface NewPageConfig {
-  storageState?: string;
-  wallet: StaticWallet;
-  enableStakeSigning?: boolean;
-  enableDRepSigning?: boolean;
-  supportedExtensions?: Record<string, number>[];
-}
-
+/** A page in a new browser context, with the test wallet connected. */
 export async function createNewPageWithWallet(
   browser: Browser,
-  newPageConfig: NewPageConfig
+  { wallet, ...pageWallet }: { wallet: TestWallet } & PageWalletOptions
 ): Promise<Page> {
-  const { storageState, wallet, ...extensionConfig } = newPageConfig;
-
-  const context = await browser.newContext({
-    storageState,
-  });
+  const context = await browser.newContext();
   const newPage = await context.newPage();
-
-  await loadDemosExtension(
-    newPage,
-    extensionConfig.enableStakeSigning,
-    extensionConfig.enableDRepSigning,
-    extensionConfig.supportedExtensions
-  );
-  await importWallet(newPage, wallet);
-
+  await connectTestWallet(newPage, wallet, pageWallet);
   injectLogger(newPage);
-
   return newPage;
 }
 
@@ -52,7 +30,7 @@ export function injectLogger(page: Page) {
 
 export async function logWalletDetails(address: string) {
   try {
-    const balance = await kuberService.getBalance(address);
+    const balance = await adaBalance(address);
     console.log("wallet balance", balance);
   } catch (error) {
     console.log("failed to get balance", error);

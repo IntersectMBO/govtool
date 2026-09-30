@@ -4,11 +4,11 @@ import { Download } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
 const blake = require("blakejs");
 
+import { randomBytes } from "crypto";
 import * as fs from "fs";
-import { ShelleyWallet } from "./crypto";
+import { randomAddress } from "lib/wallet/testWallets";
 import { calculateImageSHA256 } from "./dRep";
 import { imageObject } from "@types";
-import environments from "@constants/environments";
 
 export async function downloadMetadata(download: Download): Promise<{
   name: string;
@@ -29,9 +29,7 @@ export function calculateHash(data: string) {
 
 async function calculateMetadataHash() {
   try {
-    const paymentAddress = (await ShelleyWallet.generate()).addressBech32(
-      environments.networkId
-    );
+    const paymentAddress = await randomAddress();
     const imageUrl = faker.image.avatarGitHub();
     const imageSHA256 = (await calculateImageSHA256(imageUrl)) || "";
     const imageObject: imageObject = {
@@ -61,7 +59,12 @@ export async function uploadMetadataAndGetJsonHash() {
     jsonData,
     givenName,
   } = await calculateMetadataHash();
-  const url = await metadataBucketService.uploadMetadata(givenName, jsonData);
+  // Given names repeat; a unique file name keeps a later upload from replacing
+  // an earlier DRep's metadata, which would then no longer match its hash.
+  const url = await metadataBucketService.uploadMetadata(
+    `${givenName}-${randomBytes(4).toString("hex")}`,
+    jsonData
+  );
   return { dataHash, url, givenName };
 }
 

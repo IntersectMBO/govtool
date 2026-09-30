@@ -1,0 +1,16 @@
+# Local test runs only (Playwright 7H_3 and the like), never a deployment:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build --no-deps backend
+#
+# Lets POST /api/proxy (SPEC §9.2) fetch the test bucket the browser knows
+# as http://127.0.0.1:3001. Inside this container 127.0.0.1 is the container
+# itself, so that host:port is connected through host.docker.internal while
+# the URL and its Host header stay as the browser sent them.
+services:
+  backend:
+    environment:
+      # The GovTool backend on the host (preview network) as the test stack runs it.
+      GOVTOOL_API_BASE_URL: ${GOVTOOL_API_BASE_URL:-http://host.docker.internal:9999}
+      CARDANO_NETWORK_ID: ${CARDANO_NETWORK_ID:-0}
+      PDF_ALLOW_PRIVATE_URLS: "true"
+      PDF_PROXY_HOST_REWRITES: ${PDF_PROXY_HOST_REWRITES:-127.0.0.1:3001=host.docker.internal:3001,localhost:3001=host.docker.internal:3001}

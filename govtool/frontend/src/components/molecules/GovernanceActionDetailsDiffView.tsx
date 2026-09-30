@@ -30,6 +30,7 @@ export const GovernanceActionDetailsDiffView = ({
   return (
     <Box>
       <Box
+        data-testid="parameter-changes-labels"
         sx={{
           display: "flex",
           flexDirection: "row",
@@ -58,7 +59,12 @@ export const GovernanceActionDetailsDiffView = ({
           {t("govActions.protocolParamsDetails.proposed")}
         </Typography>
       </Box>
-      <Diff viewType="split" diffType={diff.type} hunks={diff.hunks || []}>
+      <Diff
+        data-testid="parameters-diff-value"
+        viewType="split"
+        diffType={diff.type}
+        hunks={diff.hunks || []}
+      >
         {(hunks) =>
           hunks.map((hunk) => (
             // Hunk component does not allow to pass children as a prop

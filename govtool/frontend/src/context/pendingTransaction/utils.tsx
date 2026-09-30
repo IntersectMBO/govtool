@@ -83,7 +83,15 @@ export const refetchData = async (
     return data?.dRepHash;
   }
 
-  const data = await queryClient.getQueryData(queryKey);
+  // Voter info is also keyed by the DRep ID after this prefix, so match by
+  // prefix; only the wallet that sent this transaction has entries under it.
+  const data =
+    queryKey[0] === QUERY_KEYS.useGetDRepInfoKey
+      ? queryClient
+          .getQueriesData<VoterInfo>({ queryKey })
+          .map(([, value]) => value)
+          .find((value) => value !== undefined)
+      : await queryClient.getQueryData(queryKey);
 
   if (type === "registerAsDrep" || type === "retireAsDrep")
     return (data as VoterInfo)?.isRegisteredAsDRep;

@@ -1,11 +1,13 @@
 import { forwardRef } from "react";
-import { Button, Link, Typography } from "@mui/material";
+import { Box, Button, Link, Typography } from "@mui/material";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { ICONS, IMAGES } from "@consts";
 import { useModal, useChatwoot } from "@context";
 import { openInNewTab } from "@utils";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { MetadataFailureDetails } from "@molecules";
+import type { MetadataAnchor } from "@models";
 
 export interface StatusModalState {
   buttonText?: string;
@@ -21,6 +23,11 @@ export interface StatusModalState {
   onFeedback?: () => void;
   title: string;
   dataTestId: string;
+  /**
+   * The (url, hash) whose validation failed. When the backend has a fetch
+   * report for it, the modal offers it so the author can see why (D117).
+   */
+  metadataAnchor?: MetadataAnchor;
 }
 
 export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
@@ -78,6 +85,11 @@ export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
             </Link>
           )}
         </Typography>
+        {state?.metadataAnchor && (
+          <Box sx={{ mt: 2, textAlign: "left" }}>
+            <MetadataFailureDetails anchor={state.metadataAnchor} />
+          </Box>
+        )}
       </ModalContents>
       <Button
         data-testid="confirm-modal-button"

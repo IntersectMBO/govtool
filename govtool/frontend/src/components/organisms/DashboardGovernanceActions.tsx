@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router";
 
 import {
   GOVERNANCE_ACTIONS_FILTERS,
-  GOVERNANCE_ACTIONS_SORTING,
   PATHS,
   PDF_PATHS,
 } from "@consts";
@@ -69,7 +68,8 @@ export const DashboardGovernanceActions = () => {
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { isEnableLoading } = useCardano();
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled, governanceActionsSort } =
+    useFeatureFlag();
   const navigate = useNavigate();
   const { state } = useLocation();
 
@@ -106,7 +106,8 @@ export const DashboardGovernanceActions = () => {
           {...dataActionsBarProps}
           filterOptions={GOVERNANCE_ACTIONS_FILTERS}
           filtersTitle={t("govActions.filterTitle")}
-          sortOptions={GOVERNANCE_ACTIONS_SORTING}
+          sortOptions={governanceActionsSort.options}
+          isSorting={governanceActionsSort.isAvailable}
         />
         {!voter || isEnableLoading ? (
           <Box

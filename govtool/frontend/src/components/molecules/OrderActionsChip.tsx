@@ -15,6 +15,12 @@ type Props = {
   setSortOpen: Dispatch<SetStateAction<boolean>>;
   children?: React.ReactNode;
   isFiltering?: boolean;
+  /**
+   * False hides the sort chip entirely. Mirrors `isFiltering`; used when the
+   * active data provider can order the list by nothing at all, where an empty
+   * sort menu would be worse than no sort control.
+   */
+  isSorting?: boolean;
 };
 
 export const OrderActionsChip = (props: Props) => {
@@ -33,6 +39,7 @@ export const OrderActionsChip = (props: Props) => {
     sortOpen,
     setSortOpen,
     isFiltering = true,
+    isSorting = true,
     children,
   } = props;
 
@@ -120,56 +127,58 @@ export const OrderActionsChip = (props: Props) => {
           )}
         </Box>
       )}
-      <Box
-        sx={{
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          ...(!isMobile && {
-            background: sortOpen ? secondary.main : "transparent",
-            borderRadius: "99px",
-            padding: "12px 14px",
-          }),
-        }}
-        onClick={() => {
-          if (isFiltering) {
-            setFiltersOpen(false);
-          }
-          setSortOpen(!sortOpen);
-        }}
-        data-testid="sort-button"
-      >
-        <img
-          alt="sort"
-          src={sortOpen ? ICONS.sortWhiteIcon : ICONS.sortIcon}
-          style={{
-            borderRadius: "100%",
-            marginRight: "8px",
-            height: 20,
-            width: 20,
-            objectFit: "contain",
-            ...(isMobile && {
+      {isSorting && (
+        <Box
+          sx={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            ...(!isMobile && {
               background: sortOpen ? secondary.main : "transparent",
-              padding: "14px",
-              marginRight: "0",
+              borderRadius: "99px",
+              padding: "12px 14px",
             }),
           }}
-        />
-        {!isMobile && (
-          <Typography
-            variant="body1"
-            sx={{
-              color: sortOpen ? "white" : "primaryBlue",
-              fontWeight: 500,
-              whiteSpace: "nowrap",
+          onClick={() => {
+            if (isFiltering) {
+              setFiltersOpen(false);
+            }
+            setSortOpen(!sortOpen);
+          }}
+          data-testid="sort-button"
+        >
+          <img
+            alt="sort"
+            src={sortOpen ? ICONS.sortWhiteIcon : ICONS.sortIcon}
+            style={{
+              borderRadius: "100%",
+              marginRight: "8px",
+              height: 20,
+              width: 20,
+              objectFit: "contain",
+              ...(isMobile && {
+                background: sortOpen ? secondary.main : "transparent",
+                padding: "14px",
+                marginRight: "0",
+              }),
             }}
-          >
-            {chosenSorting ? `${t("sortBy")}: ${chosenSorting}` : t("sort")}
-          </Typography>
-        )}
-      </Box>
+          />
+          {!isMobile && (
+            <Typography
+              variant="body1"
+              sx={{
+                color: sortOpen ? "white" : "primaryBlue",
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {chosenSorting ? `${t("sortBy")}: ${chosenSorting}` : t("sort")}
+            </Typography>
+          )}
+        </Box>
+      )}
       {children}
     </Box>
   );

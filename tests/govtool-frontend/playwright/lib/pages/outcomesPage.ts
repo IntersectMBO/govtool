@@ -8,9 +8,7 @@ import OutcomeDetailsPage from "./outcomeDetailsPage";
 import { isMobile } from "@helpers/mobile";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { createNewPageWithWallet, injectLogger } from "@helpers/page";
-import { createTempUserAuth } from "@datafactory/createAuth";
-import { user01Wallet } from "@constants/staticWallets";
-import { user01AuthFile } from "@constants/auth";
+import { testWallet } from "lib/wallet/testWallets";
 
 const status = ["Expired", "Ratified", "Enacted", "Live"];
 
@@ -20,6 +18,11 @@ enum SortOption {
   OldestFirst = "Oldest first",
   HighestAmountYesVote = "Highest amount of yes votes",
 }
+
+// Card reads run inside retry loops: a filter or sort change can replace
+// the cards between counting and reading them, and an unbounded read then
+// waits for a card that is gone until the test times out.
+const CARD_READ_TIMEOUT = 10_000;
 
 export default class OutComesPage {
   // Buttons
@@ -37,12 +40,17 @@ export default class OutComesPage {
 
   constructor(private readonly page: Page) {}
 
-  async goto(params: { filter?: string; sort?: string } = {}): Promise<void> {
-    const { filter, sort = "newestFirst" } = params;
+  async goto(
+    params: { filter?: string; sort?: string; status?: string } = {}
+  ): Promise<void> {
+    const { filter, sort = "newestFirst", status } = params;
     const url = new URL(`${environments.frontendUrl}/outcomes`);
     url.searchParams.append("sort", sort);
     if (filter) {
       url.searchParams.append("type", filter);
+    }
+    if (status) {
+      url.searchParams.append("status", status);
     }
     await this.page.goto(url.toString());
   }
@@ -54,7 +62,7 @@ export default class OutComesPage {
     for (const dRep of dRepCards) {
       const dRepIdTextContent = await dRep
         .locator('[data-testid$="-CIP-105-id"]')
-        .textContent();
+        .textContent({ timeout: CARD_READ_TIMEOUT });
       dRepIds.push(dRepIdTextContent.replace(/^.*ID/, ""));
     }
 
@@ -128,7 +136,7 @@ export default class OutComesPage {
           if (await proposalCard.isVisible()) {
             const type = await proposalCard
               .locator('[data-testid$="-type"]')
-              .textContent();
+              .textContent({ timeout: CARD_READ_TIMEOUT });
             const outcomeType = type.replace(/^.*Type/, "");
             const hasFilter = await validateFunction(proposalCard, filters);
             if (!hasFilter) {
@@ -201,12 +209,12 @@ export default class OutComesPage {
           const outcomeProposalFromAPI = outcomeProposalList[index];
           const proposalTypeFromUI = await outcomeCard
             .locator('[data-testid$="-type"]')
-            .textContent();
+            .textContent({ timeout: CARD_READ_TIMEOUT });
           const proposalTypeFromApi = outcomeType[outcomeProposalFromAPI.type];
 
           const cip105IdFromUI = await outcomeCard
             .locator('[data-testid$="-CIP-105-id"]')
-            .textContent();
+            .textContent({ timeout: CARD_READ_TIMEOUT });
           const cip105IdFromApi = `${outcomeProposalFromAPI.tx_hash}#${outcomeProposalFromAPI.index}`;
 
           expect(proposalTypeFromUI.replace(/^.*Type/, "")).toContain(
@@ -230,7 +238,7 @@ export default class OutComesPage {
   ): Promise<boolean> {
     const type = await proposalCard
       .locator('[data-testid$="-type"]')
-      .textContent();
+      .textContent({ timeout: CARD_READ_TIMEOUT });
     const outcomeType = type.replace(/^.*Type/, "");
     return filters.includes(outcomeType);
   }
@@ -241,7 +249,7 @@ export default class OutComesPage {
   ): Promise<boolean> {
     const status = await proposalCard
       .locator('[data-testid$="-status"]')
-      .textContent();
+      .textContent({ timeout: CARD_READ_TIMEOUT });
     const outcomeStatus = outcomeStatusType.filter((statusType) => {
       if (statusType === "Live") {
         return "In Progress";
@@ -325,17 +333,25 @@ export default class OutComesPage {
     );
   }
 
+  // Cards show the date that ended the action (Enacted, Not Ratified,
+  // Expired) or, while live, its expiry, so only the expired filter can
+  // promise an "Expired" date on every card.
   async verifyAllOutcomesAreExpired() {
+    await this.goto({ status: "expired" });
     const proposalCards = await this.getAllOutcomes();
 
     for (const proposalCard of proposalCards) {
       const expiryDateEl = proposalCard.locator(
         '[data-testid$="-Expired-date"]'
       );
-      const expiryDateTxt = await expiryDateEl.innerText();
-      const expiryDate = extractExpiryDateFromText(expiryDateTxt);
-      const today = new Date();
-      expect(today >= expiryDate).toBeTruthy();
+      await expect(expiryDateEl).toBeVisible();
+      // e.g. "Expired: Thu Oct 01, 2026 (Epoch 2883)"
+      const match = (await expiryDateEl.innerText()).match(
+        /(\w{3}) (\d{1,2}), (\d{4})/
+      );
+      expect(match, "expired date is not readable").not.toBeNull();
+      const expiryDate = new Date(`${match[1]} ${match[2]}, ${match[3]}`);
+      expect(new Date() >= expiryDate).toBeTruthy();
     }
   }
 
@@ -482,7 +498,7 @@ export default class OutComesPage {
         for (const outcomeCard of idSearchOutcomeCards) {
           const id = await outcomeCard
             .locator('[data-testid$="-CIP-105-id"]')
-            .textContent();
+            .textContent({ timeout: CARD_READ_TIMEOUT });
           expect(id.replace(/^.*ID/, "")).toContain(governanceActionId);
         }
       },
@@ -512,7 +528,7 @@ export default class OutComesPage {
         for (const outcomeCard of titleSearchOutcomeCards) {
           const title = await outcomeCard
             .locator('[data-testid$="-card-title"]')
-            .textContent();
+            .textContent({ timeout: CARD_READ_TIMEOUT });
           expect(title.toLowerCase()).toContain(
             governanceActionTitle.toLowerCase()
           );
@@ -548,8 +564,7 @@ export default class OutComesPage {
       page = await browser.newPage();
     } else {
       page = await createNewPageWithWallet(browser, {
-        storageState: user01AuthFile,
-        wallet: user01Wallet,
+        wallet: await testWallet("user01"),
       });
     }
     injectLogger(page);

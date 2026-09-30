@@ -10,12 +10,14 @@ type GovernanceActionCardHeaderProps = {
   title?: string;
   isDataMissing?: MetadataValidationStatus;
   isValidating?: boolean;
+  dataTestId?: string;
 };
 
 export const GovernanceActionCardHeader = ({
   title,
   isDataMissing,
   isValidating,
+  dataTestId = "governance-action-card-header",
 }: GovernanceActionCardHeaderProps) => {
   const { t } = useTranslation();
 
@@ -27,7 +29,7 @@ export const GovernanceActionCardHeader = ({
         mb: "20px",
         overflow: "hidden",
       }}
-      data-testid="governance-action-card-header"
+      data-testid={dataTestId}
     >
       {isValidating ? (
         <Skeleton height="24px" width="100px" variant="rounded" />

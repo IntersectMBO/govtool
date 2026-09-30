@@ -23,9 +23,11 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
     MetadataValidationStatus | undefined
   >();
   const { validateMetadata } = useValidateMutation();
-  const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
-    props as ProposalData,
-  );
+  // Only the resolved metadata is kept here. The rest comes from the current
+  // props on every render, so a change such as `inProgress` clearing shows up.
+  const [resolvedMetadata, setResolvedMetadata] = useState<
+    Partial<Pick<ProposalData, "title" | "abstract" | "motivation" | "rationale">>
+  >({});
 
   useEffect(() => {
     if (!props?.url) return;
@@ -40,15 +42,11 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
       });
 
       if (metadata) {
-        setExtendedProposal(
-          (prevProposal) =>
-            ({
-              ...(prevProposal || {}),
-              ...(metadata as Pick<
-                ProposalData,
-                "title" | "abstract" | "motivation" | "rationale"
-              >),
-            } as ProposalData),
+        setResolvedMetadata(
+          metadata as Pick<
+            ProposalData,
+            "title" | "abstract" | "motivation" | "rationale"
+          >,
         );
       }
 
@@ -60,7 +58,8 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
 
   return (
     <GovernanceActionCard
-      {...extendedProposal}
+      {...props}
+      {...resolvedMetadata}
       isValidating={isValidating}
       metadataStatus={metadataStatus}
     />

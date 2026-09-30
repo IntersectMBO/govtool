@@ -1,5 +1,3 @@
-import { budgetProposal01AuthFile } from "@constants/auth";
-import { budgetProposal01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -13,17 +11,14 @@ test.beforeEach(async () => {
 });
 
 test.describe("Budget proposal logged in state", () => {
-  test.use({
-    storageState: budgetProposal01AuthFile,
-    wallet: budgetProposal01Wallet,
-  });
+  test.use({ walletName: "budgetProposal01", walletFundsAda: 0 });
 
   let budgetDiscussionDetailsPage: BudgetDiscussionDetailsPage;
 
   test.beforeEach(async ({ page }) => {
     const budgetDiscussionPage = new BudgetDiscussionPage(page);
     await budgetDiscussionPage.goto();
-    await budgetDiscussionPage.verifyUserLink.click();
+    await budgetDiscussionPage.verifyIdentity();
     budgetDiscussionDetailsPage =
       await budgetDiscussionPage.viewFirstProposal();
   });

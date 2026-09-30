@@ -11,7 +11,7 @@ govtool/frontend/*
 *.css                                                                       
 
 # Backend
-govtool/backend/*                                                           
+govtool/govtool-*/*                                                         
 
 # DevOps
 .github/workflows/*

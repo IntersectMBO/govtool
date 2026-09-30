@@ -15,8 +15,10 @@ export const useGetVoterInfo = (options?: { enabled?: boolean }) => {
         pendingTransaction?.retireAsDrep ||
         pendingTransaction?.retireAsDirectVoter
       )?.transactionHash,
+      // Last, so a pending transaction's key [key, hash] still prefixes it.
+      dRepID,
     ],
-    enabled: !!dRepID && options?.enabled,
+    enabled: !!dRepID && (options?.enabled ?? true),
     queryFn: () => getVoterInfo(dRepID),
   });
 

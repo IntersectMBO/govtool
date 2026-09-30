@@ -35,7 +35,9 @@ export async function functionWaitedAssert(
       return true;
     } catch (error) {
       if (Date.now() - startTime >= timeout) {
-        const errorMessage = options.message || error.message;
+        // Callers throw strings as well as Errors; keep either's text.
+        const errorMessage =
+          options.message || (error instanceof Error ? error.message : String(error));
         console.log(errorMessage);
         expect(false, { message: errorMessage }).toBe(true);
       }

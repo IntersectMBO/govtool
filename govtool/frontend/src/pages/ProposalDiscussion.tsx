@@ -1,6 +1,6 @@
 import React, { ComponentProps, Suspense } from "react";
 import { Box, CircularProgress } from "@mui/material";
-import "@intersect.mbo/pdf-ui/style";
+import { useLocation } from "react-router";
 import {
   useAppContext,
   useCardano,
@@ -10,14 +10,22 @@ import {
 } from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
+import { Background } from "@/components/atoms";
 import { Footer, TopNav } from "@/components/organisms";
 import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
-import { getAdaHolderVotingPower, getAccount } from "@/services";
+import {
+  getAdaHolderVotingPower,
+  getAccount,
+  getEnactedProposalDetails,
+} from "@/services";
 import { env } from "@/config/env";
+import { getPdfWalletStatus } from "@/utils/getPdfWalletStatus";
 
-const ProposalDiscussion = React.lazy(
-  () => import("@intersect.mbo/pdf-ui/cjs"),
-);
+const ProposalDiscussion = React.lazy(() => import("@/pdf-ui/App"));
+
+// Local and test runs serve metadata from host:port URLs, which pdf-ui
+// rejects unless its URL validation is told to accept a port.
+const isTestMode = ["development", "test"].includes(env.VITE_APP_ENV ?? "");
 
 export const ProposalDiscussionPillar = () => {
   const { epochParams } = useAppContext();
@@ -29,8 +37,11 @@ export const ProposalDiscussionPillar = () => {
   const { fetchDRepVotingPowerList } = useGetDRepVotingPowerList();
   const { username, setUsername } = useProposalDiscussion();
   const snackbarContext = useSnackbar();
+  const { pathname } = useLocation();
+  // Computed on every render: it also reads the saved wallet name.
+  const walletStatus = getPdfWalletStatus(context);
 
-  return (
+  const content = (
     <Box
       sx={{
         display: "flex",
@@ -42,7 +53,9 @@ export const ProposalDiscussionPillar = () => {
       {!context.isEnabled && <TopNav />}
       <Box
         sx={{
-          px: context.isEnabled ? { xs: 2, sm: 5 } : pagePadding,
+          // Connected: the dashboard's PagePaddingBox values. Public: the
+          // pagePadding every public GovTool page uses.
+          px: context.isEnabled ? { xxs: 2, md: 5 } : pagePadding,
           py: 3,
           display: "flex",
           flex: 1,
@@ -71,7 +84,8 @@ export const ProposalDiscussionPillar = () => {
               createHash,
               voter,
             }}
-            pathname={window.location.pathname}
+            walletStatus={walletStatus}
+            pathname={pathname}
             validateMetadata={
               validateMetadata as ComponentProps<
                 typeof ProposalDiscussion
@@ -81,8 +95,10 @@ export const ProposalDiscussionPillar = () => {
             username={username}
             setUsername={setUsername}
             epochParams={epochParams}
+            allowUrlPorts={isTestMode}
             getAdaHolderVotingPower={getAdaHolderVotingPower}
             getAccount={getAccount}
+            getEnactedProposalDetails={getEnactedProposalDetails}
             {...snackbarContext}
           />
         </Suspense>
@@ -90,4 +106,8 @@ export const ProposalDiscussionPillar = () => {
       {!context.isEnabled && <Footer />}
     </Box>
   );
+
+  // Public GovTool pages sit on the orange and blue background; the
+  // dashboard layout draws its own.
+  return context.isEnabled ? content : <Background>{content}</Background>;
 };

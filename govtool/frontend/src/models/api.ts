@@ -7,6 +7,8 @@ export type EpochParams = {
   committee_max_term_length: number | null;
   committee_min_size: number | null;
   cost_model_id: number | null;
+  /** The joined cost-model row; `costs` feeds the script data hash. */
+  cost_model: { costs: Record<string, number[]> } | null;
   decentralisation: number | null;
   drep_activity: number | null;
   drep_deposit: number | null;
@@ -282,4 +284,17 @@ export type Account = {
   view: string;
   isRegistered: boolean;
   isScriptBased: boolean;
+};
+
+/**
+ * `GET /proposal/enacted-details`: the last enacted action of a type's
+ * lineage, which a new action of that lineage must name as its previous
+ * action. Null when nothing of the lineage has been enacted.
+ */
+export type EnactedProposalDetails = {
+  id: number | null;
+  txId: number | null;
+  index: number;
+  description: unknown;
+  hash: string;
 };

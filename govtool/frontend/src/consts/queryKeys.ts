@@ -9,13 +9,25 @@ export const QUERY_KEYS = {
   useGetNetworkMetricsKey: "useGetNetworkMetricsKey",
   useGetNetworkTotalStakeKey: "useGetNetworkTotalStakeKey",
   useGetNetworkInfoKey: "useGetNetworkInfoKey",
+  useGetSystemFeaturesKey: "useGetSystemFeaturesKey",
   useGetProposalKey: "useGetProposalKey",
   useGetProposalsInfiniteKey: "useGetProposalsInfiniteKey",
   useGetProposalsKey: "useGetProposalsKey",
   useGetVoteContextFromFile: "useGetVoteContextFromFile",
   useGetDRepVotingPowerListKey: "useGetDRepVotingPowerListKey",
+  useGetMetadataResolveKey: "useGetMetadataResolveKey",
+  useGetMetadataReportKey: "useGetMetadataReportKey",
+  useGetMetadataReportsKey: "useGetMetadataReportsKey",
+  useGetOutcomeEpochParamsKey: "useGetOutcomeEpochParamsKey",
+  useGetOutcomeGovActionMetadataKey: "useGetOutcomeGovActionMetadataKey",
+  useGetOutcomeGovernanceActionKey: "useGetOutcomeGovernanceActionKey",
+  useGetOutcomeGovernanceActionsKey: "useGetOutcomeGovernanceActionsKey",
+  useGetOutcomeNetworkMetricsKey: "useGetOutcomeNetworkMetricsKey",
+  useGetOutcomeProposalDiscussionKey: "useGetOutcomeProposalDiscussionKey",
+  useOutcomeVerifySignatureKey: "useOutcomeVerifySignatureKey",
 };
 
 export const MUTATION_KEYS = {
   postValidateKey: "postValidateKey",
+  postMetadataRetryKey: "postMetadataRetryKey",
 };

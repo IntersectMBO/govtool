@@ -8,6 +8,7 @@ import {
 import environments from "lib/constants/environments";
 import ProposalDiscussionDetailsPage from "./proposalDiscussionDetailsPage";
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
+import { setPdfUsername, setUsernameIfPrompted } from "./pdfUsername";
 
 export default class ProposalDiscussionPage {
   // Buttons
@@ -62,13 +63,13 @@ export default class ProposalDiscussionPage {
   }
 
   async setUsername(name: string) {
-    await this.page.getByTestId("username-input").fill(name);
+    await setPdfUsername(this.page, name);
+  }
 
-    const proceedBtn = this.page.getByTestId("proceed-button");
-    await proceedBtn.click();
-    await proceedBtn.click();
-
-    await this.page.getByTestId("close-button").click();
+  /** Signs in to pdf and sets a username if pdf-ui asks for one. */
+  async verifyIdentity() {
+    await this.verifyIdentityBtn.click();
+    await setUsernameIfPrompted(this.page);
   }
 
   private async fillForm(data: ProposalCreateRequest) {

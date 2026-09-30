@@ -1,0 +1,36 @@
+services:
+  govtool-backend:
+    build:
+      # The backend depends on its sibling packages by path, so the build
+      # context is the parent directory.
+      context: ..
+      dockerfile: govtool-backend/Dockerfile
+    ports:
+      - "${GOVTOOL_PORT:-9999}:9999"
+    environment:
+      NODE_ENV: production
+      GOVTOOL_HOST: 0.0.0.0
+      GOVTOOL_PORT: 9999
+      GOVTOOL_DBSYNC_HOST: ${GOVTOOL_DBSYNC_HOST:-host.docker.internal}
+      GOVTOOL_DBSYNC_PORT: ${GOVTOOL_DBSYNC_PORT:-5432}
+      GOVTOOL_DBSYNC_DATABASE: ${GOVTOOL_DBSYNC_DATABASE:-cexplorer}
+      GOVTOOL_DBSYNC_USER: ${GOVTOOL_DBSYNC_USER:-postgres}
+      GOVTOOL_DBSYNC_PASSWORD: ${GOVTOOL_DBSYNC_PASSWORD:-postgres}
+      GOVTOOL_CACHE_DURATION_SECONDS: ${GOVTOOL_CACHE_DURATION_SECONDS:-20}
+      GOVTOOL_DREP_LIST_CACHE_DURATION_SECONDS: ${GOVTOOL_DREP_LIST_CACHE_DURATION_SECONDS:-600}
+      GOVTOOL_PINATA_API_JWT: ${GOVTOOL_PINATA_API_JWT:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const port = process.env.GOVTOOL_PORT || 9999; fetch('http://127.0.0.1:' + port + '/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1));",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped

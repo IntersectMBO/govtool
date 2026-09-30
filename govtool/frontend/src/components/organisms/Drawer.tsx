@@ -51,7 +51,11 @@ export const Drawer = () => {
         px={3}
         rowGap={2}
       >
-        {CONNECTED_NAV_ITEMS.map((navItem) => (
+        {CONNECTED_NAV_ITEMS.filter(
+          (navItem) =>
+            isProposalDiscussionForumEnabled ||
+            navItem.dataTestId !== "budget-discussion-link",
+        ).map((navItem) => (
           <Grid item key={navItem.label}>
             <DrawerLink
               {...navItem}

@@ -68,6 +68,8 @@ export const DashboardGovernanceActionDetails = () => {
   const vote = (data ?? state)?.vote;
 
   const { validateMetadata } = useValidateMutation();
+  // Bumped when a retry resolves the metadata, to validate it again.
+  const [validationRevision, setValidationRevision] = useState(0);
 
   useEffect(() => {
     if (!extendedProposal?.url) return;
@@ -96,7 +98,11 @@ export const DashboardGovernanceActionDetails = () => {
       setIsMetadataValid(valid);
     };
     validate();
-  }, [extendedProposal?.url, extendedProposal?.metadataHash]);
+  }, [
+    extendedProposal?.url,
+    extendedProposal?.metadataHash,
+    validationRevision,
+  ]);
 
   useEffect(() => {
     const isProposalNotFound =
@@ -181,6 +187,9 @@ export const DashboardGovernanceActionDetails = () => {
             }
             isDashboard
             isValidating={isValidating}
+            onMetadataRecovered={() =>
+              setValidationRevision((value) => value + 1)
+            }
           />
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">

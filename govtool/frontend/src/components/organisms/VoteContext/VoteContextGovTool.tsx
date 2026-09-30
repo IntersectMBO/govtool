@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { VoteContextWrapper } from "@organisms";
 import { postIpfs } from "@services";
-import { downloadTextFile, openInNewTab } from "@utils";
+import { downloadTextFile, ipfsGatewayUrl, openInNewTab } from "@utils";
 import { NodeObject } from "jsonld";
 import { UseFormSetValue } from "react-hook-form";
 import { VoteContextFormValues, useTranslation } from "@hooks";
@@ -121,12 +121,13 @@ export const VoteContextGovTool = ({
             >
               {apiResponse.ipfsCid ? (
                 <a
-                  href={`https://ipfs.io/ipfs/${apiResponse.ipfsCid}`}
+                  href={ipfsGatewayUrl(apiResponse.ipfsCid)}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ textDecoration: "none", color: primaryBlue.c500, cursor: "pointer" }}
                 >
-                  <span style={{ fontWeight: 500 }}>IPFS URI:</span> {`https://ipfs.io/ipfs/${apiResponse.ipfsCid}`}
+                  <span style={{ fontWeight: 500 }}>IPFS URI:</span>{" "}
+                  {ipfsGatewayUrl(apiResponse.ipfsCid)}
                 </a>
             ) : (
               "[URI]"

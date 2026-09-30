@@ -1,9 +1,8 @@
-import { budgetProposal01AuthFile } from "@constants/auth";
-import { budgetProposal01Wallet } from "@constants/staticWallets";
 import { test as base } from "@fixtures/walletExtension";
 import { createNewPageWithWallet } from "@helpers/page";
 import BudgetDiscussionDetailsPage from "@pages/budgetDiscussionDetailsPage";
 import BudgetDiscussionSubmissionPage from "@pages/budgetDiscussionSubmissionPage";
+import { testWallet } from "lib/wallet/testWallets";
 
 type TestOptions = {
   proposalId: number;
@@ -13,8 +12,7 @@ export const test = base.extend<TestOptions>({
   proposalId: async ({ browser }, use) => {
     // setup
     const budgetProposalPage = await createNewPageWithWallet(browser, {
-      storageState: budgetProposal01AuthFile,
-      wallet: budgetProposal01Wallet,
+      wallet: await testWallet("budgetProposal01"),
     });
 
     const budgetProposalCreationPage = new BudgetDiscussionSubmissionPage(

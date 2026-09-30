@@ -1,18 +1,13 @@
-import { user01Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
-import { user01AuthFile } from "@constants/auth";
 import EditDRepPage from "@pages/editDRepPage";
 import { generateInvalidDRepInfo, generateValidDRepInfo } from "@helpers/dRep";
 
-test.use({
-  storageState: user01AuthFile,
-  wallet: user01Wallet,
-});
+test.use({ walletName: "user01", walletFundsAda: 0 });
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");

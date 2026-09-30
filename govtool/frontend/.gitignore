@@ -6,6 +6,7 @@
 /.lighthouseci
 /yarn-error.log
 .env
+.env.local
 coverage
 
 # Tool version management file (e.g., asdf version manager)

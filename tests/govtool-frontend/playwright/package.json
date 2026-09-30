@@ -21,7 +21,6 @@
   },
   "scripts": {
     "test:cip179": "playwright test --config playwright.cip179.config.ts",
-    "package-wallet": "tsc ./lib/_mock/cardano-test-wallet/types.ts --outDir dist/@types/cardano-test-wallet --declaration && npx webpack",
     "allure:generate": "npx allure generate ./allure-results --clean",
     "allure:open": "npx allure open ./allure-report",
     "allure:serve": "npx allure serve",
@@ -46,11 +45,10 @@
     "test:headless:chatwoot": "npx playwright test chatwoot.spec.ts",
     "test:headless:misc": "npx playwright test miscellaneous",
     "format": "prettier . --write",
-    "generate-wallets": "ts-node ./generate_wallets.ts 25",
-    "generate-faucet-wallet": "ts-node ./generate_faucet_wallet.ts"
+    "generate-faucet-wallet": "ts-node ./generate_faucet_wallet.ts",
+    "generate-test-mnemonic": "ts-node ./generate_test_mnemonic.ts"
   },
   "dependencies": {
-    "@cardanoapi/cardano-test-wallet": "^3.3.2",
     "@faker-js/faker": "^10.5.0",
     "@noble/curves": "^1.3.0",
     "@noble/ed25519": "^2.0.0",
@@ -61,6 +59,9 @@
     "cbor-x": "^1.5.8",
     "dotenv": "^16.4.4",
     "fast-check": "^3.17.2",
+    "kuber-client": "^4.0.3",
+    "libcardano": "^3.0.6",
+    "libcardano-wallet": "^3.0.3",
     "lockfile": "^1.0.4",
     "node-fetch": "v2",
     "path": "^0.12.7",

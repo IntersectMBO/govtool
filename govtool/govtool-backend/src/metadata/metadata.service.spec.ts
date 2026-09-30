@@ -1,0 +1,274 @@
+import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
+import * as blake from 'blakejs';
+import { MetadataService } from './metadata.service';
+import { ConfigService } from '../config/config.service';
+import { MetadataValidationStatus } from './metadata-status.enum';
+import { MetadataStandard } from './metadata.type';
+import { fetchMetadataText, MetadataFetchError } from './safe-metadata-fetch';
+jest.mock('./safe-metadata-fetch', () => ({
+  ...jest.requireActual<typeof import('./safe-metadata-fetch')>(
+    './safe-metadata-fetch',
+  ),
+  fetchMetadataText: jest.fn(),
+}));
+
+describe('metadata IPFS configuration', () => {
+  it('uses the configured gateway and sends credentials only for IPFS URLs', async () => {
+    const service = new MetadataService(
+      {
+        get: () => ({
+          ipfsGateway: 'https://example.org/ipfs/',
+          ipfsProjectId: 'test-project',
+          metadataAllowPrivateUrls: false,
+        }),
+      } as ConfigService,
+      null,
+    );
+    const raw = '{"body":{"givenName":"Example"},"standard":"CIP-119"}';
+    jest.mocked(fetchMetadataText).mockResolvedValue(raw);
+    const hash = blake.blake2bHex(raw, undefined, 32);
+    await service.validateMetadata({ url: 'ipfs://cid', hash });
+    expect(fetchMetadataText).toHaveBeenLastCalledWith(
+      'https://example.org/ipfs/cid',
+      expect.objectContaining({ project_id: 'test-project' }),
+      { allowPrivateAddresses: false },
+    );
+    await service.validateMetadata({ url: 'https://example.net/data', hash });
+    expect(jest.mocked(fetchMetadataText).mock.lastCall![1]).not.toHaveProperty(
+      'project_id',
+    );
+  });
+});
+
+describe('CIP100 vote rationale', () => {
+  it('returns the comment the frontend shows for a vote rationale', async () => {
+    const service = new MetadataService(
+      {
+        get: () => ({
+          ipfsGateway: '',
+          ipfsProjectId: '',
+          metadataAllowPrivateUrls: false,
+        }),
+      } as ConfigService,
+      null,
+    );
+    const raw = JSON.stringify({
+      body: { comment: { '@value': 'Voting yes because...' } },
+    });
+    jest.mocked(fetchMetadataText).mockResolvedValue(raw);
+
+    await expect(
+      service.validateMetadata({
+        url: 'https://example.org/rationale.jsonld',
+        hash: blake.blake2bHex(raw, undefined, 32),
+        standard: MetadataStandard.CIP100,
+      }),
+    ).resolves.toMatchObject({
+      valid: true,
+      metadata: { comment: 'Voting yes because...' },
+    });
+  });
+});
+
+describe('metadata size limit', () => {
+  it('reports an oversize document as EXCEEDS_LIMIT, not URL_NOT_FOUND', async () => {
+    const service = new MetadataService(
+      {
+        get: () => ({ ipfsGateway: '', ipfsProjectId: '' }),
+      } as ConfigService,
+      null,
+    );
+    jest
+      .mocked(fetchMetadataText)
+      .mockRejectedValue(
+        new MetadataFetchError(MetadataValidationStatus.EXCEEDS_LIMIT),
+      );
+    await expect(
+      service.validateMetadata({
+        url: 'https://example.org/big.jsonld',
+        hash: 'a'.repeat(64),
+      }),
+    ).resolves.toEqual({
+      status: MetadataValidationStatus.EXCEEDS_LIMIT,
+      valid: false,
+      metadata: undefined,
+    });
+  });
+});
+
+describe('validation through the metadata service', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  const config = {
+    get: () => ({ ipfsGateway: '', ipfsProjectId: '' }),
+  } as ConfigService;
+  const doc = {
+    '@context': {
+      CIP119:
+        'https://github.com/cardano-foundation/CIPs/blob/master/CIP-0119/README.md#',
+    },
+    body: { givenName: { '@value': 'HOSKY' } },
+  };
+  const stub = (
+    getMetadata: MetadataServiceV1['getMetadata'],
+  ): MetadataServiceV1 => ({
+    getMetadata,
+    getCipMetadata: () => Promise.reject(new Error('unused')),
+    refresh: () => Promise.reject(new Error('unused')),
+    getReport: () => Promise.resolve(null),
+    listReports: () => Promise.resolve([]),
+  });
+  const input = {
+    url: 'https://ipfs.io/ipfs/QmaAAqY6zwaLRSoqDdQBAMRoYKjydxJfEkpwtSiCWKJCdi',
+    hash: 'AB'.repeat(32),
+  };
+
+  it('uses the service result and does not fetch locally', async () => {
+    const getMetadata = jest.fn<
+      ReturnType<MetadataServiceV1['getMetadata']>,
+      Parameters<MetadataServiceV1['getMetadata']>
+    >(() =>
+      Promise.resolve({
+        ok: true,
+        hash: 'ab'.repeat(32),
+        body: doc,
+        fetchedAt: '2026-09-24T00:00:00Z',
+      }),
+    );
+    const service = new MetadataService(config, stub(getMetadata));
+    const result = await service.validateMetadata(input);
+    expect(getMetadata).toHaveBeenCalledWith('ab'.repeat(32), input.url);
+    expect(result).toEqual({
+      status: undefined,
+      valid: true,
+      metadata: { givenName: 'HOSKY' },
+    });
+    expect(fetchMetadataText).not.toHaveBeenCalled();
+  });
+
+  it('adds the document authors only when asked', async () => {
+    const authors = [{ name: 'A', witness: { witnessAlgorithm: 'ed25519' } }];
+    const service = new MetadataService(
+      config,
+      stub(() =>
+        Promise.resolve({
+          ok: true,
+          hash: 'ab'.repeat(32),
+          body: { ...doc, authors },
+          fetchedAt: '2026-09-24T00:00:00Z',
+        }),
+      ),
+    );
+    await expect(
+      service.validateMetadata(input, { includeAuthors: true }),
+    ).resolves.toMatchObject({ metadata: { givenName: 'HOSKY', authors } });
+    await expect(service.validateMetadata(input)).resolves.toMatchObject({
+      metadata: { givenName: 'HOSKY' },
+    });
+    const plain = await service.validateMetadata(input);
+    expect(plain.metadata).not.toHaveProperty('authors');
+  });
+
+  it.each([
+    ['FETCH_ERROR', 'No IPFS gateway served the content', 'URL_NOT_FOUND'],
+    [
+      'FETCH_ERROR',
+      'Refused: host resolves only to non-public addresses',
+      'URL_BLOCKED',
+    ],
+    ['HASH_MISMATCH', 'Hash of fetched data does not match', 'INVALID_HASH'],
+    ['EXCEEDS_LIMIT', 'too large', 'EXCEEDS_LIMIT'],
+    ['JSON_PARSE_ERROR', 'Unable to parse data into JSON', 'INCORRECT_FORMAT'],
+  ] as const)('maps %s (%s) to %s', async (code, message, status) => {
+    const service = new MetadataService(
+      config,
+      stub(() =>
+        Promise.resolve({
+          ok: false,
+          code,
+          category: 'NETWORK',
+          message,
+          checkedAt: '2026-09-24T00:00:00Z',
+        }),
+      ),
+    );
+    await expect(service.validateMetadata(input)).resolves.toMatchObject({
+      status,
+      valid: false,
+    });
+  });
+
+  it('falls back to the local fetch when the service is unreachable', async () => {
+    (fetchMetadataText as jest.Mock).mockResolvedValueOnce(JSON.stringify(doc));
+    const service = new MetadataService(
+      config,
+      stub(() => Promise.reject(new Error('connect ECONNREFUSED'))),
+    );
+    await service.validateMetadata(input);
+    expect(fetchMetadataText).toHaveBeenCalled();
+  });
+});
+
+describe('CIP-108 title and abstract validation', () => {
+  const service = new MetadataService(
+    {
+      get: () => ({
+        ipfsGateway: '',
+        ipfsProjectId: '',
+        metadataAllowPrivateUrls: false,
+      }),
+    } as ConfigService,
+    null,
+  );
+
+  const validate = async (body: Record<string, unknown>) => {
+    const raw = JSON.stringify({
+      hashAlgorithm: 'blake2b-256',
+      body: {
+        motivation: 'Motivation',
+        rationale: 'Rationale',
+        ...body,
+      },
+      '@context': {
+        CIP108:
+          'https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#',
+      },
+    });
+    jest.mocked(fetchMetadataText).mockResolvedValue(raw);
+    const hash = blake.blake2bHex(raw, undefined, 32);
+    return service.validateMetadata({ url: 'https://example.net/meta', hash });
+  };
+
+  it('accepts non-blank title and abstract', async () => {
+    const result = await validate({ title: 'Title', abstract: 'Abstract' });
+    expect(result).toMatchObject({ valid: true, status: undefined });
+  });
+
+  it('accepts title and abstract at the length limits', async () => {
+    const result = await validate({
+      title: 'a'.repeat(80),
+      abstract: 'b'.repeat(2500),
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it.each([
+    ['empty title', { title: '', abstract: 'Abstract' }],
+    ['whitespace-only title', { title: '  \n\t ', abstract: 'Abstract' }],
+    ['empty abstract', { title: 'Title', abstract: '' }],
+    ['whitespace-only abstract', { title: 'Title', abstract: '   ' }],
+    ['non-string title', { title: 42, abstract: 'Abstract' }],
+    ['missing abstract', { title: 'Title' }],
+    ['title over 80 chars', { title: 'a'.repeat(81), abstract: 'Abstract' }],
+    [
+      'abstract over 2500 chars',
+      { title: 'Title', abstract: 'b'.repeat(2501) },
+    ],
+  ])('rejects %s', async (_case, body) => {
+    const result = await validate(body);
+    expect(result).toMatchObject({
+      valid: false,
+      status: MetadataValidationStatus.INCORRECT_FORMAT,
+    });
+  });
+});

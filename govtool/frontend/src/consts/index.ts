@@ -7,6 +7,7 @@ export * from "./governanceAction";
 export * from "./icons";
 export * from "./images";
 export * from "./navItems";
+export * from "./outcomes";
 export * from "./paths";
 export * from "./placeholders";
 export * from "./queryKeys";

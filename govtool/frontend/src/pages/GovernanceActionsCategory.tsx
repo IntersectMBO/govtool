@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
-import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
+import { ICONS, PATHS } from "@consts";
+import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
@@ -28,6 +28,7 @@ import {
 export const GovernanceActionsCategory = () => {
   const { category } = useParams();
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { governanceActionsSort } = useFeatureFlag();
   const { chosenSorting } = dataActionsBarProps;
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { isEnabled } = useCardano();
@@ -111,7 +112,8 @@ export const GovernanceActionsCategory = () => {
             <DataActionsBar
               {...dataActionsBarProps}
               isFiltering={false}
-              sortOptions={GOVERNANCE_ACTIONS_SORTING}
+              sortOptions={governanceActionsSort.options}
+              isSorting={governanceActionsSort.isAvailable}
             />
             <Typography
               variant="title2"

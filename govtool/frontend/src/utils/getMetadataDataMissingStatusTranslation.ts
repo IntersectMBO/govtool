@@ -14,6 +14,7 @@ export const getMetadataDataMissingStatusTranslation = (
     [MetadataValidationStatus.URL_NOT_FOUND]: "dataMissing",
     [MetadataValidationStatus.INVALID_JSONLD]: "incorrectFormat",
     [MetadataValidationStatus.INCORRECT_FORMAT]: "incorrectFormat",
+    [MetadataValidationStatus.EXCEEDS_LIMIT]: "incorrectFormat",
     [MetadataValidationStatus.INVALID_HASH]: "notVerifiable",
   }[status] as "dataMissing" | "incorrectFormat" | "notVerifiable";
   return i18n.t(`dataMissingErrors.${errorKey || "dataMissing"}`);

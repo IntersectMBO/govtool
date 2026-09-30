@@ -1,5 +1,10 @@
 import i18n from "@/i18n";
-import { isValidURLFormat, isValidHashFormat, isRewardAddress } from "..";
+import {
+  isValidURLFormat,
+  isValidHashFormat,
+  isRewardAddress,
+  isReceivingAddress,
+} from "..";
 
 describe("isValidURLFormat", () => {
   it("returns true for valid HTTP URLs", () => {
@@ -89,5 +94,26 @@ describe("isRewardAddress", () => {
     const invalid = "drep1l8uyy66sm8u82h82gc8hkcy2xu24dl8ffsh58aa0v7d37yp48u8";
     const result = await isRewardAddress(invalid);
     expect(result).toBe(i18n.t("forms.errors.mustBeStakeAddress"));
+  });
+});
+
+// The handle service is never initialised here, as on a network without a
+// handle API: the lookup finds no handle and bech32 validation decides.
+describe("isReceivingAddress", () => {
+  it("returns true for a payment address", async () => {
+    const valid =
+      "addr_test1vzd07hfqzfa929str90plw6utly3lx4778xxplcc0ceq7zqfl4hg9";
+    const result = await isReceivingAddress(valid);
+    expect(result).toBe(true);
+  });
+
+  it("returns true for an empty value", async () => {
+    const result = await isReceivingAddress("");
+    expect(result).toBe(true);
+  });
+
+  it("returns error for a string that is neither handle nor address", async () => {
+    const result = await isReceivingAddress("$not-an-address");
+    expect(result).toBe(i18n.t("forms.errors.mustBeReceivingAddress"));
   });
 });

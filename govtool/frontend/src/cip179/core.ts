@@ -10,6 +10,8 @@ import {
 } from "cip-179";
 import { parseCip179Link } from "cip-179/domain";
 
+import { ipfsGatewayUrl } from "@/utils/ipfsGateway";
+
 import { metadatumCodec } from "./csl";
 
 export type SurveyLink = { txId: string; index: number };
@@ -160,10 +162,13 @@ const validatePresentationQuestion = (
 };
 
 const fetchContentAnchor = async (anchor: ContentAnchor): Promise<unknown> => {
-  const uri = anchor.uri.startsWith("ipfs://")
-    ? `https://ipfs.io/ipfs/${anchor.uri.slice(7)}`
-    : anchor.uri;
-  if (!uri.startsWith("https://")) throw new Error("Unsupported anchor URI");
+  // An ipfs:// anchor goes through the configured gateway, which an isolated
+  // test environment serves over plain http; any other anchor must be https.
+  const viaGateway = anchor.uri.startsWith("ipfs://");
+  const uri = viaGateway ? ipfsGatewayUrl(anchor.uri.slice(7)) : anchor.uri;
+  if (!viaGateway && !uri.startsWith("https://")) {
+    throw new Error("Unsupported anchor URI");
+  }
   const controller = new AbortController();
   const timeout = globalThis.setTimeout(() => controller.abort(), 10_000);
   try {

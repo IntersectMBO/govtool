@@ -37,7 +37,7 @@ govtool-pinning-test: the pinning contract over tests/test-metadata-api, for
 isolated test runs (GOVTOOL_PINNING_PROVIDER=test).
 govtool-metadata-http: the metadata contract as a client of
 govtool-metadata-service, which is private to the backend.
-govtool-backend: backend-ts forked onto the contract; same routes and bodies
+govtool-backend: the backend (D151), on the contract; the legacy routes and bodies
 plus /system/capabilities, /system/features, four metadata routes and the
 outcomes UI's routes under /outcomes (D143). The outcomes UI itself is frontend
 source, on GovTool's components (D149).
@@ -55,14 +55,14 @@ frontend/src/models/featureSet.ts because CI builds it from frontend/ alone, so
 it cannot take a file: dependency on a sibling package. Anything else it needs
 from the contract arrives published or vendored.
 
-## Three backends, one ships
+## One backend
 
-govtool/backend is the Haskell service the deployment compose runs; compatibility
-is measured against it. govtool/backend-ts is its TypeScript port, actively
-developed, not deployed. govtool-backend is the fork of backend-ts on the
-contract. So: a backend-ts bug may already be fixed on develop, and the fork
-drifts, so reconcile it against backend-ts before proposing either replaces the
-other.
+govtool-backend is the only backend (D151): CI builds, checks and publishes it
+as the backend image, and the deployment compose runs it.
+The Haskell backend and backend-ts it replaced are removed; compatibility is
+still measured against the Haskell backend's responses, which the frontend was
+written against. The image takes the db-sync connection from GOVTOOL_DBSYNC_*
+only, never from config.json.
 
 ## Build order
 

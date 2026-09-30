@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Follow the steps of setting up the [GovTool Frontend](../govtool/frontend/README.md).
-- Provide any backend that provides the Epoch params (for the wallet connection), can be the current [GovTool Backend](../govtool/backend/README.md).
+- Provide any backend that provides the Epoch params (for the wallet connection), can be the current [GovTool Backend](../govtool/govtool-backend/README.md).
 - Have a wallet with the 50k of ADA to pay for the transaction and fee.
 
 ## Development guide

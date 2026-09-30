@@ -42,9 +42,6 @@ Chain Data API, [#4224](https://github.com/IntersectMBO/govtool/issues/4224) /
   interface. As built, a provider must be a TypeScript module; the Koios and
   Blockfrost providers are thin adapters over remote HTTP, so a remote source
   works today, but a provider in another language would need a shim.
-- Whether `govtool-backend` replaces `backend-ts`, or the provider layer is
-  folded into `backend-ts` as a change on top of it. The second is likely less
-  disruptive while `backend-ts` is under active development.
 - Whether the provider packages move under `govtool-backend/`. They are
   siblings today, and moving them would break every `file:` path and the
   Docker build context.

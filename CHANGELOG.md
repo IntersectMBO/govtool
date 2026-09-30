@@ -12,11 +12,23 @@ changes.
 
 ### Added
 
+- Rate limits on anonymous IPFS uploads, per client and per instance ([#4171](https://github.com/IntersectMBO/govtool/issues/4171))
+
 ### Fixed
+
+- IPFS upload accepts only a CIP-100 JSON-LD document and no longer returns Pinata error details ([#4171](https://github.com/IntersectMBO/govtool/issues/4171))
+- Server errors are logged and reported to Sentry ([#2776](https://github.com/IntersectMBO/govtool/issues/2776))
+- A DRep's own vote is returned on a proposal, and voted-on actions are left out of its proposal list
+- Blank CIP-108 titles and abstracts are rejected
 
 ### Changed
 
+- `govtool-backend` is the backend: CI, the Docker image and the deployment compose use it. The image reads its db-sync connection from `GOVTOOL_DBSYNC_*` environment variables
+- The outcomes API is served by the backend under `/outcomes`; the separate outcomes service is no longer deployed
+
 ### Removed
+
+- The Haskell backend (`govtool/backend`) and the TypeScript port (`govtool/backend-ts`)
 
 ## [v2.1.0-alpha.1](https://github.com/IntersectMBO/govtool/compare/v2.0.36...v2.1.0-alpha.1) 2026-09-18
 

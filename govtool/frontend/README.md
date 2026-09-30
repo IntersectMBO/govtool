@@ -53,7 +53,7 @@ The following integrations are optional and may remain blank:
 - `VITE_SENTRY_DSN`: Sentry error reporting. `VITE_APP_ENV` labels the Sentry environment when a DSN is configured.
 - `VITE_CHATWOOT_URL` and `VITE_CHATWOOT_WEBSITE_TOKEN`: Chatwoot feedback widget.
 - `VITE_PDF_API_URL`: Proposal discussion service API.
-- `VITE_OUTCOMES_API_URL`: Governance outcomes service API.
+- `VITE_OUTCOMES_API_URL`: Governance outcomes API, served by the backend under `/outcomes` (for example `http://127.0.0.1:9999/outcomes`).
 - `VITE_IPFS_PROJECT_ID`: Project identifier for gateways that require it.
 
 The two feature flags can remain `false` when their companion services are not running:
@@ -61,7 +61,7 @@ The two feature flags can remain `false` when their companion services are not r
 - `VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED`
 - `VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED`
 
-For backend setup, see the [backend README](../backend/README.md). To run the complete service stack, see the [Docker Compose instructions](../../docker/README.md).
+For backend setup, see the [backend README](../govtool-backend/README.md). To run the complete service stack, see the [Docker Compose instructions](../../docker/README.md).
 
 ## Troubleshooting
 
@@ -83,7 +83,7 @@ Vite will normally choose another available port automatically. To choose one ex
 
 ### Backend or API is not running
 
-The page can start without the APIs, but data requests will fail. Start the required services using the [backend instructions](../backend/README.md) or the [Docker Compose stack](../../docker/README.md), then confirm that the URLs in `.env` match those services.
+The page can start without the APIs, but data requests will fail. Start the required services using the [backend instructions](../govtool-backend/README.md) or the [Docker Compose stack](../../docker/README.md), then confirm that the URLs in `.env` match those services.
 
 ## Contributing
 

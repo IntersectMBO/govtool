@@ -5341,3 +5341,20 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
   first) is dropped with the local copy of it; it missed e.g. `txFeePerByte` and `govActionDeposit`.
 - The live action page (`VotesSubmitted`) now shows the SPO threshold on such actions too.
 - DRep keys are unchanged (the first group that matches, not the highest of the groups touched).
+
+## D151 — govtool-backend is the only backend
+
+**Date:** 2026-09-30
+**Amends:** the open question of whether govtool-backend replaces backend-ts or folds into it.
+
+- govtool-backend replaces both the Haskell backend and backend-ts, which are removed. It is what CI builds,
+  checks and publishes under the existing backend image name, and what the deployment compose runs. The
+  swarm test stack still builds the removed Haskell backend and is switched separately.
+- The fixes made to backend-ts after the fork are carried over rather than lost with it: CIP-100-only,
+  rate-limited anonymous uploads with no Pinata detail in errors; a DRep's vote on a proposal and the
+  voted-on actions left out of its proposal list; blank CIP-108 titles and abstracts rejected; every 5xx
+  logged and sent to Sentry; a clean stop on SIGTERM; one cache bound per namespace; and a failed voting
+  power lookup that still answers 0 but is no longer cached.
+- The image differs from the Haskell one in one way a deployment sees: the db-sync connection and network
+  come only from environment variables, never from the config file.
+- The outcomes API is served by this backend, so no deployment runs the separate outcomes service.

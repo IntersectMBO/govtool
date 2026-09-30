@@ -13,9 +13,6 @@ From the repo root
 cd docker
 cp .env.example .env
 ```
-> [!NOTE]
-> Update the backend config file used by the `govtool-backend` service in [`example-config.json`](../govtool/backend/example-config.json) before starting the stack.
-
 Also create the frontend and metadata-validation environment files:
 
 ```bash
@@ -27,16 +24,18 @@ Docker Compose loads the frontend container's runtime configuration from `govtoo
 
 Fill in the db-sync details and required service URLs in `docker/.env`.
 
-Note: The `.env.example` in this folder is for the outcomes service only.
-
-Edit `docker/.env` with real values:
+The `govtool-backend` service reads `docker/.env`; the compose file maps its values onto the backend's `GOVTOOL_*` settings. Edit it with real values:
 - DBSYNC_POSTGRES_HOST
 - DBSYNC_POSTGRES_PORT
 - DBSYNC_DATABASE
 - DBSYNC_POSTGRES_USER
 - DBSYNC_POSTGRES_PASSWORD
+- DBSYNC_NETWORK: mainnet, preprod, preview or devnet. It must match the database, or every route answers 500.
 - IPFS_GATEWAY
 - PDF_API_URL
+- PINATA_API_JWT (optional; without it `/ipfs/upload` answers 503)
+
+Every backend setting, with its default, is listed in [`govtool-backend/.env.example`](../govtool/govtool-backend/.env.example).
 
 Validate the resolved Compose configuration before starting services:
 
@@ -59,6 +58,5 @@ docker compose up -d --no-build
 
 ## Service endpoints
 - Frontend: http://localhost
-- Backend API: http://localhost:9999
+- Backend API: http://localhost:9999, including the outcomes API under `/outcomes`
 - Metadata validation: http://localhost:3000
-- Outcomes API: http://localhost:3001

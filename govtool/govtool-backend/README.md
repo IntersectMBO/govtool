@@ -1,8 +1,11 @@
 # govtool-backend
 
-The GovTool HTTP API on the data-layer contract. Same routes, error shapes and
-response bodies as `backend-ts`, except where noted under
-[Known limitations](#known-limitations), and no database handle of its own.
+The GovTool backend: the HTTP API on the data-layer contract. It replaced the
+Haskell backend (`govtool/backend`) and its TypeScript port
+(`govtool/backend-ts`), both since removed, and keeps their routes, error
+shapes and response bodies except where noted under
+[Known limitations](#known-limitations). It holds no database handle of its
+own.
 
 Every chain read goes through the chain-data contract
 ([`@govtool/data-providers`](../govtool-data-providers)), satisfied by
@@ -32,7 +35,7 @@ name in `src/config/config.types.ts` and `src/config/config.service.ts`, and a
 ## What this package owns
 
 The HTTP surface, the response shapes the frontend reads, and the cache.
-Controllers and DTOs match `backend-ts`. The services map contract types to
+Controllers and DTOs keep the legacy API's. The services map contract types to
 those shapes; [src/common/legacy.ts](src/common/legacy.ts) holds the
 narrowings, [src/common/legacy-ids.ts](src/common/legacy-ids.ts) the
 identifier translation, [src/common/legacy-network.ts](src/common/legacy-network.ts)
@@ -40,7 +43,7 @@ the epoch-to-time schedule, and [src/common/errors.ts](src/common/errors.ts)
 the single place a `ChainDataError`, `PinningError` or metadata fault becomes
 HTTP.
 
-Beyond the `backend-ts` routes it serves `GET /system/capabilities` (the
+Beyond the legacy routes it serves `GET /system/capabilities` (the
 provider's own declaration), `GET /system/features` (this backend's feature
 set, which the frontend reads at boot to decide which controls to render; see
 [src/system/capabilities.ts](src/system/capabilities.ts)) and the four
@@ -54,7 +57,7 @@ before this package typechecks or runs:
 ```bash
 for p in govtool-data-providers govtool-provider-fixture govtool-provider-dbsync \
          govtool-provider-koios govtool-provider-blockfrost govtool-pinning-pinata \
-         govtool-metadata-http; do
+         govtool-pinning-test govtool-metadata-http; do
   (cd "../$p" && npm install && npm run build)
 done
 npm install
@@ -65,6 +68,29 @@ Configuration is `config.json` plus `GOVTOOL_`-prefixed environment variables;
 [.env.example](.env.example) lists them and
 [src/config/config.service.ts](src/config/config.service.ts) is the source of
 truth.
+
+## Upload
+
+`POST /ipfs/upload` is anonymous, so it accepts only what GovTool pins:
+
+- a `text/plain` body (anything else is `415`) holding a CIP-100 JSON-LD
+  document, with `@context`, `hashAlgorithm: blake2b-256` and a `body` object
+  (anything else is `400`, before the pinning service is contacted);
+- at most `GOVTOOL_IPFS_UPLOAD_PER_CLIENT_LIMIT` uploads per client IP and
+  `GOVTOOL_IPFS_UPLOAD_GLOBAL_LIMIT` in all per
+  `GOVTOOL_IPFS_UPLOAD_WINDOW_SECONDS`, then `429` with `retryAfterSeconds`.
+  The client IP is resolved through `GOVTOOL_TRUST_PROXY` (Express "trust
+  proxy"), which defaults to private-network proxies only.
+
+The bytes are pinned exactly as received, since the on-chain hash is over
+them. A pinning failure never passes Pinata's response or connection details
+to the client.
+
+## Errors
+
+Every `5xx` is logged with its method, path and body, and reported to Sentry
+when `GOVTOOL_SENTRY_DSN` is set. The backend closes its db-sync pool and
+timers on `SIGTERM`, so a container stops cleanly.
 
 ## Metadata
 
@@ -105,20 +131,37 @@ docker build -f govtool-backend/Dockerfile ..
 ```
 
 `../docker-compose.fixture.yml` and `../docker-compose.koios.yml` already set
-the context; see `../AGENTS.md`.
+the context; see `../AGENTS.md`. CI publishes the image as
+`ghcr.io/intersectmbo/govtool-backend`.
+
+The image runs `node dist/main.js` on port 9999. Unlike the Haskell image, it
+takes the db-sync connection only from the environment, never from
+`config.json`, so a deployment sets at least:
+
+| Variable | |
+| --- | --- |
+| `GOVTOOL_DBSYNC_HOST`, `_PORT`, `_DATABASE`, `_USER`, `_PASSWORD` | the db-sync connection |
+| `GOVTOOL_DBSYNC_NETWORK` | `mainnet`, `preprod`, `preview` or `devnet`; must match the database, or every route answers 500 |
+
+`GOVTOOL_PINATA_API_JWT`, `GOVTOOL_METADATA_SERVICE_URL` and
+`GOVTOOL_PDF_API_URL` are optional; without them the upload, metadata and
+discussion-link routes answer `503`. `-c <file>` points it at a `config.json`
+for port, host, cache durations and Sentry, which the environment overrides.
+[`docker/docker-compose.yaml`](../../docker/docker-compose.yaml) is a working
+example.
 
 ## Compatibility
 
-Compatibility is measured against the **Haskell** backend, since that is what
-is deployed and what the frontend was written against.
+Compatibility is measured against the **Haskell** backend this replaced,
+since that is what the frontend was written against.
 
-- All 22 `backend-ts` routes are present, at the same paths, with the same
+- All 22 legacy routes are present, at the same paths, with the same
   methods.
 - Response bodies are asserted key-for-key in
   [test/legacy-shape.spec.ts](test/legacy-shape.spec.ts), driven by a stubbed
   provider. Those tests use `toEqual`, so an added or dropped key fails.
 
-Deliberate differences from `backend-ts`, both cases where `backend-ts`
+Deliberate differences from the removed `backend-ts`, both cases where it
 diverged from Haskell:
 
 1. **`GET /drep/getVotes/:drepId` answers.** `backend-ts` reads four unaliased
@@ -144,12 +187,12 @@ underneath:
   a key credential, then as a script credential.
 - `GET /ada-holder/get-voting-power/:stakeKey` still answers `0` on failure,
   including a provider outage. The frontend renders this number directly and
-  has no error path for it. The provider itself distinguishes "no rows" from
-  "unavailable" for callers that want the difference.
-- `GET /proposal/enacted-details` still substitutes `HardForkInitiation` for
-  any type other than itself and `ParameterChange`. The provider refuses an
-  unanswerable type; the substitution happens in
-  [proposal.service.ts](src/proposal/proposal.service.ts).
+  has no error path for it. A failure is logged and never cached, so the next
+  request asks again.
+- With a `drepId`, `GET /proposal/list` leaves out the actions that DRep has
+  voted on and `GET /proposal/get` returns its vote. A `drepId` that names no
+  DRep, such as the text `undefined` a disconnected frontend sends, is
+  ignored.
 - `GET /network/metrics` still answers its thirteen counters. The contract has
   no metrics resource, so [network.service.ts](src/network/network.service.ts)
   assembles them from the committee, the DRep counts, the proposal total and
@@ -189,7 +232,7 @@ transaction metadata and no provider serves them.
 ## Tests
 
 ```bash
-npm run verify    # lint, typecheck, unit tests, build
+npm run verify    # format check, lint, typecheck, unit tests, build; never fixes
 npm run test:e2e  # the two routes that need no data layer
 ```
 

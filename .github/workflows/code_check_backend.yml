@@ -4,77 +4,45 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - govtool/backend/**
+      - govtool/govtool-backend/**
+      - govtool/govtool-data-providers/**
+      - govtool/govtool-provider-*/**
+      - govtool/govtool-pinning-*/**
+      - govtool/govtool-metadata-http/**
+
+permissions:
+  contents: read
 
 jobs:
-  lint:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Use Haskell
-        uses: haskell-actions/setup@v2
-        with:
-          ghc-version: '9.2.8'
-          cabal-version: '3.8.1.0'
-          cabal-update: false
-
-      - name: Use Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-
-      - name: Install Pre-commit
-        run: pip install pre-commit
-
-      - name: Install HLint
-        run: |
-          rm -rf ~/.cabal ~/.ghcup
-          mkdir -p ~/.cabal
-          cat <<EOF > ~/.cabal/config
-          repository hackage.haskell.org
-            url: http://hackage.haskell.org/
-            secure: False
-          EOF
-          cabal update
-          cabal install hlint
-
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run hlint
-        run: pre-commit run --all-files hlint
-
-  check-format:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Use Haskell
-        uses: haskell-actions/setup@v2
+      - name: Use Node
+        uses: actions/setup-node@v4
         with:
-          ghc-version: '9.2.8'
-          cabal-version: '3.8.1.0'
-          cabal-update: false
+          node-version: 22
 
-      - name: Use Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-
-      - name: Install Pre-commit
-        run: pip install pre-commit
-
-      - name: Install HLint
+      # file: dependencies resolve to built dist, so each is built before the backend.
+      - name: Build dependencies
+        working-directory: govtool
         run: |
-          rm -rf ~/.cabal ~/.ghcup
-          mkdir -p ~/.cabal
-          cat <<EOF > ~/.cabal/config
-          repository hackage.haskell.org
-            url: http://hackage.haskell.org/
-            secure: False
-          EOF
-          cabal update
-          cabal install stylish-haskell
+          for p in govtool-data-providers govtool-provider-fixture govtool-provider-dbsync \
+                   govtool-provider-koios govtool-provider-blockfrost govtool-pinning-pinata \
+                   govtool-pinning-test govtool-metadata-http; do
+            (cd "$p" && npm ci && npm run build)
+          done
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Install backend
+        working-directory: govtool/govtool-backend
+        run: npm ci
 
-      - name: Run hlint
-        run: pre-commit run --all-files stylish-haskell
+      - name: Check format
+        working-directory: govtool/govtool-backend
+        run: npx prettier --check "src/**/*.ts" "test/**/*.ts"
+
+      - name: Lint, typecheck, test and build
+        working-directory: govtool/govtool-backend
+        run: npm run verify

@@ -17,9 +17,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - workdir: ./govtool/backend
+          - workdir: ./govtool/govtool-backend
+            context: ./govtool
             name: govtool-backend
-            dockerfile: ./govtool/backend/Dockerfile
+            dockerfile: ./govtool/govtool-backend/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-backend
            
           - workdir: ./govtool/frontend
@@ -102,7 +103,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.workdir }}
+          context: ${{ matrix.context || matrix.workdir }}
           file: ${{ matrix.dockerfile }}
           tags: ${{ steps.image_lowercase.outputs.lowercase }}
           load: false

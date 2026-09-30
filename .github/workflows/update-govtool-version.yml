@@ -35,16 +35,11 @@ jobs:
           cd govtool/frontend && npm install && cd ../..
           cd govtool/metadata-validation && npm install && cd ../..
 
-      - name: Update vva-be.cabal version (Preserve Spacing)
+      - name: Update govtool-backend version
         run: |
-          sed -i -E "s/^(version:[[:space:]]+)[0-9]+\.[0-9]+\.[0-9]+/\1$VERSION/" govtool/backend/vva-be.cabal
-          echo "✅ Updated version in vva-be.cabal while preserving spacing."
-
-      - name: Update Dockerfile Versions
-        run: |
-          sed -i -E "s/vva-be-[0-9]+\.[0-9]+\.[0-9]+/vva-be-$VERSION/g" govtool/backend/Dockerfile
-          sed -i -E "s/vva-be-[0-9]+\.[0-9]+\.[0-9]+/vva-be-$VERSION/g" govtool/backend/Dockerfile.qovery
-          echo "✅ Updated vva-be version in Dockerfiles."
+          jq --arg v "$VERSION" '.version = $v' govtool/govtool-backend/package.json > temp.json && mv temp.json govtool/govtool-backend/package.json
+          cd govtool/govtool-backend && npm install --package-lock-only
+          echo "✅ Updated govtool-backend version."
 
       - name: Update Metadata Validation API Version
         run: |

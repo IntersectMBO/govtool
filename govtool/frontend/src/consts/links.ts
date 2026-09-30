@@ -1,4 +1,5 @@
 export const LINKS = {
+  NEWSLETTER_SIGNUP: "https://newsletter.gov.tools/#/portal/signup",
   USING_GOVTOOL: "https://docs.gov.tools/cardano-govtool/using-govtool",
   COMPATIBLE_WALLETS:
     "https://docs.gov.tools/cardano-govtool/using-govtool/getting-started/compatible-wallets",

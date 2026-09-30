@@ -383,7 +383,8 @@
   "footer": {
     "copyright": "© {{year}} GovTool",
     "privacyPolicy": "Privacy policy",
-    "termOfService": "Terms of Use"
+    "termOfService": "Terms of Use",
+    "subscribe": "Subscribe to updates"
   },
   "forms": {
     "link": "Link",

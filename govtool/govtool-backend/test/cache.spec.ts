@@ -12,9 +12,12 @@ function configWith(maxEntries: number): ConfigService {
   } as unknown as ConfigService;
 }
 
-/** Reaches the private Map, which is the only way to observe eviction. */
+/** Reaches the private partitions, which is the only way to observe eviction. */
 function size(cache: CacheService): number {
-  return (cache as unknown as { cache: Map<string, unknown> }).cache.size;
+  const { caches } = cache as unknown as {
+    caches: Map<string, Map<string, unknown>>;
+  };
+  return [...caches.values()].reduce((sum, part) => sum + part.size, 0);
 }
 
 describe('CacheService eviction', () => {
@@ -45,6 +48,19 @@ describe('CacheService eviction', () => {
     await expect(
       cache.getOrSet('drepInfo', 'middle', () => Promise.resolve(-1)),
     ).resolves.toBe(-1);
+  });
+
+  it('keeps one namespace from evicting another', async () => {
+    const cache = new CacheService(configWith(2));
+
+    cache.set('proposal', 'kept', 1);
+    for (let i = 0; i < 10; i += 1) {
+      cache.set('drepInfo', `drep-${i}`, i);
+    }
+
+    await expect(
+      cache.getOrSet('proposal', 'kept', () => Promise.resolve(-1)),
+    ).resolves.toBe(1);
   });
 
   it('bounds the snapshot path too, not just set', async () => {

@@ -1,4 +1,10 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import type {
   ChainDataApiV1,
   Delegation,
@@ -18,8 +24,16 @@ const PREDEFINED_VIEW = {
   alwaysNoConfidence: 'drep_always_no_confidence',
 } as const;
 
+/**
+ * A lookup that failed rather than found nothing; never cached. An
+ * HttpException, so `asHttp` passes it through unchanged.
+ */
+class VotingPowerUnavailableError extends InternalServerErrorException {}
+
 @Injectable()
 export class AdaHolderService {
+  private readonly logger = new Logger(AdaHolderService.name);
+
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
     private readonly cacheService: CacheService,
@@ -62,37 +76,58 @@ export class AdaHolderService {
    * "no rows" from "unavailable" for consumers that want the difference.
    */
   async getVotingPower(stakeKey: string): Promise<ApiInteger> {
-    return this.cacheService.getOrSet('adaHolderVotingPower', stakeKey, () =>
-      asHttp(async () => {
-        // A malformed key is still a 400, as it was when the legacy route
-        // parsed it as hex. Failing to learn the served network (needed only
-        // for a bare key hash) is a failure like any other: 0.
-        let stakeAddress: string;
-        try {
-          stakeAddress = await this.network.stakeAddress(stakeKey);
-        } catch (error) {
-          if (error instanceof BadRequestException) {
-            throw error;
-          }
-          return 0;
-        }
-        try {
-          const accounts = withMethod(
-            this.chain.accounts,
-            'getVotingPower',
-            'accounts.getVotingPower',
-          );
-          const { data } = await accounts.getVotingPower(stakeAddress);
-          if (data === null) {
-            return 0;
-          }
-          const amount = Number(data.amount);
-          return Number.isFinite(amount) ? Math.floor(amount) : 0;
-        } catch {
-          return 0;
-        }
-      }),
+    try {
+      return await this.cacheService.getOrSet(
+        'adaHolderVotingPower',
+        stakeKey,
+        () =>
+          asHttp(async () => {
+            // A malformed key is still a 400, as it was when the legacy route
+            // parsed it as hex. Failing to learn the served network (needed
+            // only for a bare key hash) is a failure like any other.
+            let stakeAddress: string;
+            try {
+              stakeAddress = await this.network.stakeAddress(stakeKey);
+            } catch (error) {
+              if (error instanceof BadRequestException) {
+                throw error;
+              }
+              throw this.unavailable(stakeKey, error);
+            }
+            let data: { amount: string | number } | null;
+            try {
+              const accounts = withMethod(
+                this.chain.accounts,
+                'getVotingPower',
+                'accounts.getVotingPower',
+              );
+              ({ data } = await accounts.getVotingPower(stakeAddress));
+            } catch (error) {
+              throw this.unavailable(stakeKey, error);
+            }
+            if (data === null) {
+              return 0;
+            }
+            const amount = Number(data.amount);
+            return Number.isFinite(amount) ? Math.floor(amount) : 0;
+          }),
+      );
+    } catch (error) {
+      // Rejecting inside the cache keeps the fallback 0 out of it.
+      if (error instanceof VotingPowerUnavailableError) return 0;
+      throw error;
+    }
+  }
+
+  private unavailable(
+    stakeKey: string,
+    error: unknown,
+  ): VotingPowerUnavailableError {
+    this.logger.error(
+      `Couldn't fetch voting power for stake key: ${stakeKey}`,
+      error instanceof Error ? error.stack : String(error),
     );
+    return new VotingPowerUnavailableError();
   }
 
   private toLegacyDelegation(delegation: Delegation): DelegationResponse {

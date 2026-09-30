@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/only-throw-error, @typescript-eslint/no-base-to-string --
+/* eslint-disable @typescript-eslint/only-throw-error --
  * This service throws `MetadataValidationStatus` enum values as its control
  * flow and stringifies untyped JSON-LD field values. Both are the legacy
  * behaviour, and the thrown status is what reaches the response body, so it
@@ -265,15 +265,26 @@ export class MetadataService {
     const motivation = this.getFieldValue(body, 'motivation');
     const rationale = this.getFieldValue(body, 'rationale');
 
-    if (!title || !abstract || !motivation || !rationale) {
+    if (
+      !this.isNonBlankString(title) ||
+      !this.isNonBlankString(abstract) ||
+      !motivation ||
+      !rationale
+    ) {
       throw MetadataValidationStatus.INCORRECT_FORMAT;
     }
 
-    if (String(title).length > 80 || String(abstract).length > 2500) {
+    if (title.length > 80 || abstract.length > 2500) {
       throw MetadataValidationStatus.INCORRECT_FORMAT;
     }
 
     return true;
+  }
+
+  // CIP-108 requires `title` and `abstract` as strings (max 80 / 2500 chars).
+  // Empty or whitespace-only values carry no content, so they are rejected.
+  private isNonBlankString(value: unknown): value is string {
+    return typeof value === 'string' && value.trim().length > 0;
   }
 
   private parseMetadata(

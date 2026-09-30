@@ -31,6 +31,7 @@ import type {
   Ratio,
   VotingPower,
 } from '@govtool/data-providers/chain-data';
+import { Logger } from '@nestjs/common';
 import { ChainDataError } from '@govtool/data-providers/chain-data';
 
 import { AccountService } from '../src/account/account.service';
@@ -245,6 +246,28 @@ describe('GET /ada-holder/get-voting-power/:stakeKey', () => {
         Promise.reject(new ChainDataError('PROVIDER_UNAVAILABLE', 'down')),
       ).getVotingPower(STAKE_KEY),
     ).resolves.toBe(0);
+  });
+
+  it('does not cache the 0 from a provider failure', async () => {
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    const getVotingPower = jest
+      .fn()
+      .mockRejectedValueOnce(new ChainDataError('PROVIDER_UNAVAILABLE', 'down'))
+      .mockResolvedValue(env({ amount: '900000000', basis: 'live' as const }));
+    const service = new AdaHolderService(
+      chain({ accounts: { getVotingPower } }),
+      new CacheService({
+        get: () => ({
+          cacheMaxEntries: 10,
+          cacheDurationSeconds: 60,
+          drepListCacheDurationSeconds: 60,
+        }),
+      } as unknown as ConfigService),
+    );
+
+    await expect(service.getVotingPower(STAKE_KEY)).resolves.toBe(0);
+    await expect(service.getVotingPower(STAKE_KEY)).resolves.toBe(900000000);
+    jest.restoreAllMocks();
   });
 });
 

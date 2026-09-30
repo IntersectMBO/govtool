@@ -1,4 +1,5 @@
 import type { LegacyParamProposal } from 'src/epoch/epoch.type';
+import type { VoteParams } from '../drep/drep.type';
 import type { ApiInteger } from 'src/common/integer';
 
 /**
@@ -69,7 +70,7 @@ export type ListProposalsResponse = {
 };
 
 export type GetProposalResponse = {
-  vote: unknown;
+  vote: VoteParams | null;
   proposal: ProposalResponse;
 };
 

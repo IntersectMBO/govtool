@@ -1,4 +1,10 @@
-import { Global, Module, type Provider } from '@nestjs/common';
+import {
+  Global,
+  Inject,
+  Module,
+  type OnApplicationShutdown,
+  type Provider,
+} from '@nestjs/common';
 import { createDbSyncProvider } from '@govtool/provider-dbsync';
 import { createKoiosProvider } from '@govtool/provider-koios';
 import { createFixtureProvider } from '@govtool/provider-fixture';
@@ -20,6 +26,13 @@ import { ConfigService } from '../config/config.service';
 export const CHAIN_DATA = 'CHAIN_DATA';
 export const PINNING = 'PINNING';
 export const METADATA = 'METADATA';
+/** The chain data plus whatever it holds open (the db-sync pool). */
+const CHAIN_DATA_HANDLE = 'CHAIN_DATA_HANDLE';
+
+type ChainDataHandle = {
+  chainData: ChainDataApiV1;
+  close?: () => Promise<void>;
+};
 
 /**
  * Builds whichever implementation GOVTOOL_CHAIN_DATA_PROVIDER names.
@@ -32,12 +45,12 @@ export const METADATA = 'METADATA';
  * one and 200 under another. That is reported per route by the provider's
  * capability document rather than being a surprise at the call site.
  */
-function createChainData(configService: ConfigService): ChainDataApiV1 {
+function createChainData(configService: ConfigService): ChainDataHandle {
   const config = configService.get();
 
   switch (config.chainDataProvider) {
     case 'fixture':
-      return createFixtureProvider().chainData;
+      return createFixtureProvider();
 
     case 'dbsync': {
       // config.service guarantees dbSync is set when the provider is dbsync.
@@ -55,7 +68,7 @@ function createChainData(configService: ConfigService): ChainDataApiV1 {
           user: db.user,
           password: db.password,
         },
-      }).chainData;
+      });
     }
 
     case 'blockfrost': {
@@ -65,7 +78,7 @@ function createChainData(configService: ConfigService): ChainDataApiV1 {
         network: bf.network,
         ...(bf.baseUrl ? { baseUrl: bf.baseUrl } : {}),
         ...(bf.projectId ? { projectId: bf.projectId } : {}),
-      }).chainData;
+      });
     }
 
     case 'koios': {
@@ -76,7 +89,7 @@ function createChainData(configService: ConfigService): ChainDataApiV1 {
         network: k.network,
         ...(k.baseUrl ? { baseUrl: k.baseUrl } : {}),
         ...(k.token ? { token: k.token } : {}),
-      }).chainData;
+      });
     }
 
     default:
@@ -86,10 +99,16 @@ function createChainData(configService: ConfigService): ChainDataApiV1 {
   }
 }
 
-const chainDataProvider: Provider = {
-  provide: CHAIN_DATA,
+const chainDataHandleProvider: Provider = {
+  provide: CHAIN_DATA_HANDLE,
   inject: [ConfigService],
   useFactory: createChainData,
+};
+
+const chainDataProvider: Provider = {
+  provide: CHAIN_DATA,
+  inject: [CHAIN_DATA_HANDLE],
+  useFactory: (handle: ChainDataHandle) => handle.chainData,
 };
 
 /**
@@ -131,12 +150,21 @@ const metadataProvider: Provider = {
 @Module({
   providers: [
     ConfigService,
+    chainDataHandleProvider,
     chainDataProvider,
     pinningProvider,
     metadataProvider,
   ],
   exports: [ConfigService, CHAIN_DATA, PINNING, METADATA],
 })
-export class ProvidersModule {}
+export class ProvidersModule implements OnApplicationShutdown {
+  constructor(
+    @Inject(CHAIN_DATA_HANDLE) private readonly chainData: ChainDataHandle,
+  ) {}
+
+  async onApplicationShutdown(): Promise<void> {
+    await this.chainData.close?.();
+  }
+}
 
 export type { ChainDataApiV1, MetadataServiceV1, PinningServiceV1 };

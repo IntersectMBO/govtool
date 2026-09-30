@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UnsupportedMediaTypeException,
+} from '@nestjs/common';
+import type { Request } from 'express';
 
 import { IpfsService } from './ipfs.service';
 import { UploadResponse } from './ipfs.type';
@@ -7,11 +14,19 @@ import { UploadResponse } from './ipfs.type';
 export class IpfsController {
   constructor(private readonly ipfsService: IpfsService) {}
 
+  // `fileName` is still accepted in the query and ignored: the contract pins
+  // bytes, not a named file.
   @Post('upload')
   upload(
-    @Query('fileName') fileName: string | undefined,
-    @Body() fileContent: string,
+    @Req() request: Request,
+    @Body() fileContent: unknown,
   ): Promise<UploadResponse> {
-    return this.ipfsService.upload(fileName ?? 'data.txt', fileContent);
+    if (!request.is('text/plain') || typeof fileContent !== 'string') {
+      throw new UnsupportedMediaTypeException('Expected a text/plain body');
+    }
+    return this.ipfsService.upload(
+      fileContent,
+      request.ip ?? request.socket.remoteAddress ?? 'unknown',
+    );
   }
 }

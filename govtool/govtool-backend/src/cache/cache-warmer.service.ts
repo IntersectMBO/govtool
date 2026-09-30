@@ -48,20 +48,22 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
       return;
     }
 
-    const latestBlockNo = await this.getLatestBlockNo();
-
-    if (
-      !force &&
-      latestBlockNo !== null &&
-      latestBlockNo === this.lastBlockNo
-    ) {
-      return;
-    }
-
+    // Set before the first await, so a tick that lands while the tip is
+    // being read cannot start a second refresh.
     this.refreshing = true;
     const startedAt = Date.now();
 
     try {
+      const latestBlockNo = await this.getLatestBlockNo();
+
+      if (
+        !force &&
+        latestBlockNo !== null &&
+        latestBlockNo === this.lastBlockNo
+      ) {
+        return;
+      }
+
       // allSettled, not all: `all` rejects on the first failure while the
       // other warm is still running, and clearing `refreshing` then lets the
       // next tick start a second copy of it. Against a slow provider that

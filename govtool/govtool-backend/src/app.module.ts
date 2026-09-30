@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { SentryModule } from '@sentry/nestjs/setup';
 
 import { IntegerJsonInterceptor } from './common/integer-json.interceptor';
+import { LoggingExceptionFilter } from './common/logging-exception.filter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -44,7 +46,7 @@ import { OutcomesService } from './outcomes/outcomes.service';
  * surface, the legacy response shapes and the cache — nothing else.
  */
 @Module({
-  imports: [ProvidersModule, MetadataModule],
+  imports: [SentryModule.forRoot(), ProvidersModule, MetadataModule],
   controllers: [
     AppController,
     HealthController,
@@ -65,6 +67,9 @@ import { OutcomesService } from './outcomes/outcomes.service';
     // Writes bigint response fields as unquoted JSON numbers, so a lovelace
     // value above the safe range reaches the wire exactly.
     { provide: APP_INTERCEPTOR, useClass: IntegerJsonInterceptor },
+    // Logs every 5xx and reports it to Sentry, which treats an HttpException
+    // as expected and would otherwise drop it.
+    { provide: APP_FILTER, useClass: LoggingExceptionFilter },
     AppService,
     LegacyNetwork,
     NetworkService,

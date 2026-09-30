@@ -116,6 +116,8 @@ export class ProposalService {
     pageSize: number;
     drepId?: string;
     search?: string;
+    /** `txHash#index` ids left out before paging: the DRep's voted actions. */
+    excludedIds?: ReadonlySet<string>;
   }): Promise<ListProposalsResponse> {
     return this.cacheService.getOrSet(
       'proposalList',
@@ -137,7 +139,11 @@ export class ProposalService {
           // the list once it is ratified, enacted, expired or dropped.
           const proposals = (await this.getProposalSnapshot(''))
             .filter(({ status }) => status === 'live')
-            .map(({ proposal }) => proposal);
+            .map(({ proposal }) => proposal)
+            .filter(
+              ({ txHash, index }) =>
+                !params.excludedIds?.has(`${txHash.toLowerCase()}#${index}`),
+            );
 
           let filtered = this.filterByType(proposals, params.type);
           filtered = this.filterBySearch(filtered, params.search);
@@ -166,8 +172,8 @@ export class ProposalService {
     // the CIP-129 id, the only form it takes.
     const { txHash, index, id } = legacyGovActionId(proposalId);
 
-    // Only charset-checked: it selects nothing yet (`vote` is always null),
-    // and a disconnected frontend sends the literal text "undefined".
+    // Only charset-checked here: the controller adds the DRep's vote, and a
+    // disconnected frontend sends the literal text "undefined".
     if (drepId) {
       assertIdentifier(drepId);
     }

@@ -33,6 +33,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.4.2",
+    "@sentry/nestjs": "^10.75.3",
     "bech32": "^2.0.0",
     "blakejs": "^1.2.1",
     "class-transformer": "^0.5.1",

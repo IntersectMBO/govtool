@@ -66,6 +66,13 @@ export type BackendConfigFile = {
   sentryenv: string;
 };
 
+/** Fixed-window budgets for the anonymous `/ipfs/upload` route. */
+export type IpfsUploadConfig = {
+  perClientLimit: number;
+  globalLimit: number;
+  windowSeconds: number;
+};
+
 export type BackendConfig = {
   chainDataProvider: ChainDataProviderName;
   /**
@@ -86,6 +93,12 @@ export type BackendConfig = {
    * `testPinningUrl`, for isolated test environments only.
    */
   pinningProvider: PinningProviderName;
+  ipfsUpload: IpfsUploadConfig;
+  /**
+   * Express "trust proxy" setting, which resolves the client IP the upload
+   * rate limit counts against. Defaults to private-network proxies only.
+   */
+  trustProxy: string;
   /** Root url of tests/test-metadata-api; required when `pinningProvider` is `test`. */
   testPinningUrl: string | null;
   /**

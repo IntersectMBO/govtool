@@ -80,6 +80,24 @@ export class ConfigService {
           rawConfig.pinataapijwt ?? '',
         ) || null,
       ...this.pinningConfig(),
+      ipfsUpload: {
+        perClientLimit: this.positiveInteger(
+          'GOVTOOL_IPFS_UPLOAD_PER_CLIENT_LIMIT',
+          10,
+        ),
+        globalLimit: this.positiveInteger(
+          'GOVTOOL_IPFS_UPLOAD_GLOBAL_LIMIT',
+          300,
+        ),
+        windowSeconds: this.positiveInteger(
+          'GOVTOOL_IPFS_UPLOAD_WINDOW_SECONDS',
+          3600,
+        ),
+      },
+      trustProxy: this.envString(
+        'GOVTOOL_TRUST_PROXY',
+        'loopback, linklocal, uniquelocal',
+      ),
       metadataServiceUrl:
         this.envString('GOVTOOL_METADATA_SERVICE_URL', '').trim() || null,
       metadataAllowPrivateUrls:

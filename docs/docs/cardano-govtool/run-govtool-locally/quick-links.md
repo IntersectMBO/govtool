@@ -4,11 +4,12 @@
 
 * [Core Govtool](https://github.com/IntersectMBO/govtool/blob/develop/.github/workflows/build-docker-images.yml)
 * [Proposal Pillar](https://github.com/IntersectMBO/govtool-proposal-pillar/blob/main/.github/workflows/merge.yaml)
-* [Outcomes Pillar](https://github.com/IntersectMBO/govtool-outcomes-pillar/blob/main/.github/workflows/build-backend-image.yaml)
 
 ### Local development
 
 * [Docker Compose setup for Core GovTool](https://github.com/IntersectMBO/govtool/blob/develop/docker/README.md)
+* [Whole stack on frozen mainnet data](https://github.com/IntersectMBO/govtool/blob/develop/govtool/docker-compose.fixture.yml) and [on Koios](https://github.com/IntersectMBO/govtool/blob/develop/govtool/docker-compose.koios.yml)
+* [Backend configuration (`GOVTOOL_*` variables)](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-backend/.env.example)
 * [Helm / Argo CD deployment configuration](https://github.com/IntersectMBO/govtool-argo)
 
 ### Docker Desktop Installation

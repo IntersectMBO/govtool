@@ -2,24 +2,29 @@
 
 ## [Core GovTool](https://github.com/IntersectMBO/govtool)
 
-Core Govtool is comprised of the frontend, backend and metadata services which will allow you to view
+Core GovTool is comprised of the frontend, backend and metadata services which will allow you to view
 
 * Home,
 * Governance Actions Live Voting,
 * Drep Directory,
 * Guides
 * FAQs
+* Governance Actions Outcomes (served by the backend under `/outcomes`)
 
 with or without a wallet connected
 
 :::note
-"Backend" on these pages refers to the Haskell service in `govtool/backend` (image `ghcr.io/intersectmbo/govtool-backend`), which is the one built and deployed today. A NestJS (TypeScript) replacement exists in `govtool/backend-ts`, but it is not yet used by the published images.
+"Backend" on these pages refers to the NestJS (TypeScript) service in `govtool/govtool-backend` (image `ghcr.io/intersectmbo/govtool-backend`). It replaced the Haskell backend (`govtool/backend`), which has been removed. It is configured through `GOVTOOL_*` environment variables, listed in [`govtool-backend/.env.example`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-backend/.env.example), not through a `config.json` file.
 :::
 
 ## Prerequisites
 
-To run Core GovTool you will need access to a **DB-Sync Instance**, this can be run locally or via a third party e.g. Demeter.\
-This is a dependency of the backend service which will query the information stored in DB-Sync to retrieve and populate the respective pages with information checking for any issues using the Metadata Validation service
+To run Core GovTool against live data you will need access to a **DB-Sync Instance**, this can be run locally or via a third party e.g. Demeter.\
+This is a dependency of the backend service (with `GOVTOOL_CHAIN_DATA_PROVIDER=dbsync`, the default), which will query the information stored in DB-Sync to retrieve and populate the respective pages with information checking for any issues using the Metadata Validation service.
+
+Set `GOVTOOL_DBSYNC_NETWORK` to the network your DB-Sync follows (`mainnet`, `preprod`, `preview` or `devnet`). If it does not match the database, every backend route answers `500`.
+
+To try GovTool without DB-Sync, use the frozen mainnet data (`fixture`) or Koios setups described in [Run GovTool Locally](./README.md).
 
 ## Notice
 
@@ -37,7 +42,7 @@ previous versions
 
 ## Setting up Core GovTool
 
-1. Review the frontend -> fe-env-vars.yaml and the backend -> config.json files and add your custom env vars
+1. Review the frontend -> fe-env-vars.yaml file and add your custom env vars. For the backend, set the `GOVTOOL_*` environment variables from [`govtool-backend/.env.example`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-backend/.env.example), at least the `GOVTOOL_DBSYNC_*` connection group
 2. Review [frontend.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml), [backend.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/backend/backend.yaml) and [metadata.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/metadata/metadata.yaml) ensuring to update the Deployment Containers Image Spec ([example](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml#L34)) with the associated image for the service (these can be custom or the images referenced in the current deployments) and metadata -> namespace ([example](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml#L5)) if not using the default govtool namespace
-3. Create the Kubernetes Secrets which will house the env vars using `kubectl apply` and `kubectl create secret` (this will be used with the [config.json](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/backend/config.json)) in your chosen namespace
+3. Create the Kubernetes Secrets which will house the env vars using `kubectl apply` and `kubectl create secret` in your chosen namespace. The community example still mounts a [config.json](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/backend/config.json) for the removed Haskell backend; replace it with the `GOVTOOL_DBSYNC_*` variables
 4. Use `kubectl apply` to launch the frontend backend and metadata services in the same namespace as your secrets -- ([kubectl links](./quick-links.md))

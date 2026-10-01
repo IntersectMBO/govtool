@@ -35,15 +35,17 @@ The maintainers have shared the direction they want to take GovTool in. The plan
 
 ### Easier to run and contribute to
 
-* **One repository for everything.** Some parts of GovTool, such as the Proposal and Outcomes pillars, still live in separate repositories. They will be brought into the main GovTool repository, so the project is easier to follow and to contribute to. Moving this documentation into the GovTool repository is part of that work.
-* **A simple local setup.** Running the full GovTool stack on your own machine should be a short, documented process. See [Run GovTool Locally](../cardano-govtool/run-govtool-locally/README.md) for the current setup.
-* **A TypeScript backend.** The Haskell backend is being replaced with a TypeScript (NestJS) backend, so that more people can work across the whole codebase. The new backend is already in the repository (`govtool/backend-ts`).
+* **One repository for everything.** Some parts of GovTool, such as the Proposal and Outcomes pillars, lived in separate repositories. They are being brought into the main GovTool repository, so the project is easier to follow and to contribute to. The Outcomes pillar is already part of GovTool (its UI is in the frontend and its API is served by the backend), the Proposal Discussion UI is in the frontend source, and a new Proposal Discussion backend is in the repository. Moving this documentation into the GovTool repository is part of the same work.
+* **A simple local setup.** Running the full GovTool stack on your own machine should be a short, documented process. The whole stack can now run on frozen mainnet data with a single Docker Compose command, with no db-sync or Cardano node. See [Run GovTool Locally](../cardano-govtool/run-govtool-locally/README.md).
+* **A TypeScript backend.** The Haskell backend has been replaced with a TypeScript (NestJS) backend (`govtool/govtool-backend`), so that more people can work across the whole codebase. The Haskell backend has been removed from the repository ([#4246](https://github.com/IntersectMBO/govtool/pull/4246)).
 * **Smoother contributions.** Clearer setup instructions, better documentation and faster reviews.
 * **A cleaner issue backlog.** Outdated or already-resolved issues will be closed, so that the open issues reflect the work that is actually left to do.
 
 ### Lighter infrastructure
 
-Today, running GovTool means running your own Cardano node and cardano-db-sync instance. That is a lot to ask of a contributor, and a lot to operate. Where mature community-run projects and providers already offer this data reliably, GovTool will build on them and work with their teams instead of duplicating the effort.
+Running GovTool has meant running your own Cardano node and cardano-db-sync instance. That is a lot to ask of a contributor, and a lot to operate. Where mature community-run projects and providers already offer this data reliably, GovTool will build on them and work with their teams instead of duplicating the effort.
+
+The first step is in the repository: the backend now reads chain data through a provider layer, with db-sync, Koios and Blockfrost providers. db-sync remains the default; the Koios and Blockfrost providers are a trial and are not used by the hosted deployments.
 
 ### Better connected to the ecosystem
 

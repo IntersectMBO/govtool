@@ -11,6 +11,10 @@ It contains:
 - **Developer documentation** (`docs/developers/`): architecture, governance action submission,
   handling new governance action types, and the React / CSS style guides that previously lived in this folder.
 
+Two parts of this folder are not published on the site: `api/` (the backend API surface, the metadata
+service and Proposal Discussion API specs, and the data-layer design decisions) and `known-issues.md`.
+`api/` is linked from the site's developer pages.
+
 ## Local development
 
 Requires Node.js >= 22.22.0.
@@ -80,6 +84,7 @@ The container is published on `127.0.0.1` only. The host reverse proxy terminate
 | --- | --- |
 | `docs/` | Markdown pages (URL = file path, `README.md` = section index) |
 | `docs/developers/` | Developer documentation (hand-written, not touched by the migration script) |
+| `api/`, `known-issues.md` | API and data-layer reference, read on GitHub (not part of the site) |
 | `Dockerfile`, `nginx.conf.template`, `deploy/` | Docker image and server deployment files |
 | `sidebars.js` | Sidebar tree: GitBook sections + developer documentation |
 | `sidebars.gitbook.js` | GitBook part of the sidebar (originally generated from `SUMMARY.md`) |

@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 
 import { GovernanceActionCard } from "@molecules";
 import { useValidateMutation } from "@/hooks/mutations";
-import { MetadataStandard, ProposalData } from "@/models";
+import {
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+} from "@/models";
 
 type ActionTypeProps = Omit<
   ProposalData,
@@ -22,6 +27,7 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
   const [metadataStatus, setMetadataStatus] = useState<
     MetadataValidationStatus | undefined
   >();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const { validateMetadata } = useValidateMutation();
   // Only the resolved metadata is kept here. The rest comes from the current
   // props on every render, so a change such as `inProgress` clearing shows up.
@@ -35,7 +41,7 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
     const validate = async () => {
       setIsValidating(true);
 
-      const { status, metadata } = await validateMetadata({
+      const { status, metadata, issues } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: props?.url,
         hash: props?.metadataHash ?? "",
@@ -51,6 +57,7 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
       }
 
       setMetadataStatus(status);
+      setMetadataIssues(issues);
       setIsValidating(false);
     };
     validate();
@@ -62,6 +69,7 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
       {...resolvedMetadata}
       isValidating={isValidating}
       metadataStatus={metadataStatus}
+      metadataIssues={metadataIssues}
     />
   );
 };

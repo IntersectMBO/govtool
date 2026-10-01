@@ -85,11 +85,6 @@ jobs:
             dockerfile: ./govtool/frontend/Dockerfile
             image: ghcr.io/${{ github.repository }}-frontend
 
-          - name: govtool-metadata-validation
-            workdir: ./govtool/metadata-validation
-            dockerfile: ./govtool/metadata-validation/Dockerfile
-            image: ghcr.io/${{ github.repository }}-metadata-validation
-
     steps:
       - name: Checkout PR code
         uses: actions/checkout@v4

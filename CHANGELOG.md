@@ -13,6 +13,8 @@ changes.
 ### Added
 
 - Rate limits on anonymous IPFS uploads, per client and per instance ([#4171](https://github.com/IntersectMBO/govtool/issues/4171))
+- Metadata validation names the fields a document gets wrong (`issues`); cards and details pages say which field is missing or too long
+- Own messages for blocked metadata URLs, documents over 2 MB and failed checks, on cards, details pages and form modals
 
 ### Fixed
 
@@ -20,15 +22,21 @@ changes.
 - Server errors are logged and reported to Sentry ([#2776](https://github.com/IntersectMBO/govtool/issues/2776))
 - A DRep's own vote is returned on a proposal, and voted-on actions are left out of its proposal list
 - Blank CIP-108 titles and abstracts are rejected
+- A format failure in a submission form no longer says the data does not match the original file
 
 ### Changed
 
 - `govtool-backend` is the backend: CI, the Docker image and the deployment compose use it. The image reads its db-sync connection from `GOVTOOL_DBSYNC_*` environment variables
 - The outcomes API is served by the backend under `/outcomes`; the separate outcomes service is no longer deployed
+- Metadata validation is served by the backend under `/metadata`; the frontend calls it on `VITE_BASE_URL`
+- The deployment compose (`docker/docker-compose.yaml`) and the Koios compose run the metadata service and its Postgres, and point the backend at it; the deployment one needs `METADATA_DB_PASSWORD`
+- A CIP-108 title over 80 characters or abstract over 2500 is shown with a warning instead of being rejected
 
 ### Removed
 
 - The Haskell backend (`govtool/backend`) and the TypeScript port (`govtool/backend-ts`)
+- The standalone metadata validation service (`govtool/metadata-validation`) and its image
+- The `VITE_METADATA_API_URL` frontend variable
 
 ## [v2.1.0-alpha.1](https://github.com/IntersectMBO/govtool/compare/v2.0.36...v2.1.0-alpha.1) 2026-09-18
 

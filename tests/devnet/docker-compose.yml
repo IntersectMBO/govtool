@@ -234,7 +234,6 @@ services:
     environment:
       # Read by the browser, so host addresses, not service names.
       VITE_BASE_URL: ${PUBLIC_BACKEND_URL:-http://127.0.0.1:9999}
-      VITE_METADATA_API_URL: ${PUBLIC_BACKEND_URL:-http://127.0.0.1:9999}/metadata
       VITE_NETWORK_FLAG: "0"
       # `test` makes pdf-ui accept anchor URLs with a port (the bucket's).
       VITE_APP_ENV: test

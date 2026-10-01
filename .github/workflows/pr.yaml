@@ -27,12 +27,6 @@ jobs:
             name: govtool-frontend
             dockerfile: ./govtool/frontend/Dockerfile
             image: ghcr.io/${{ github.repository }}-govtool-frontend
-           
-          - workdir: ./govtool/metadata-validation
-            name: govtool-metadata-validation
-            dockerfile: ./govtool/metadata-validation/Dockerfile
-            image: ghcr.io/${{ github.repository }}-govtool-metadata-validation
-            
 
     runs-on: ubuntu-latest
     steps:

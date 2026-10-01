@@ -14,8 +14,6 @@ export default defineConfig({
   testDir: "./tests",
   // Picks this run's HD account base for the test wallets.
   globalSetup: "./lib/wallet/hdRunSetup.ts",
-  // Run these deterministic local tests with npm run test:cip179.
-  testIgnore: ["**/cip179/**"],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /**TODO: Remove this timeout *
@@ -103,6 +101,19 @@ export default defineConfig({
       name: "wallet",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.wallet.spec.ts",
+    },
+    {
+      // Mocks every request and the wallet, so it runs against any frontend,
+      // the devnet's included. npm run test:cip179 runs it on a local Vite
+      // server instead.
+      name: "cip179 (desktop)",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: "**/cip179/**/*.spec.ts",
+    },
+    {
+      name: "cip179 (mobile)",
+      use: { ...devices["Pixel 5"] },
+      testMatch: "**/cip179/**/*.spec.ts",
     },
     {
       name: "independent (desktop)",

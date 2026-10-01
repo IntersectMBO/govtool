@@ -44,6 +44,8 @@
     "test:headless:wallet-connect": "npx playwright test walletConnect",
     "test:headless:chatwoot": "npx playwright test chatwoot.spec.ts",
     "test:headless:misc": "npx playwright test miscellaneous",
+    "test:headless:cip179": "npx playwright test cip179/",
+    "test:headless:no-cip179": "npx playwright test \"^(?!.*cip179/).*\"",
     "format": "prettier . --write",
     "generate-faucet-wallet": "ts-node ./generate_faucet_wallet.ts",
     "generate-test-mnemonic": "ts-node ./generate_test_mnemonic.ts"

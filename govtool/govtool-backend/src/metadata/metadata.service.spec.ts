@@ -259,16 +259,81 @@ describe('CIP-108 title and abstract validation', () => {
     ['whitespace-only abstract', { title: 'Title', abstract: '   ' }],
     ['non-string title', { title: 42, abstract: 'Abstract' }],
     ['missing abstract', { title: 'Title' }],
-    ['title over 80 chars', { title: 'a'.repeat(81), abstract: 'Abstract' }],
-    [
-      'abstract over 2500 chars',
-      { title: 'Title', abstract: 'b'.repeat(2501) },
-    ],
   ])('rejects %s', async (_case, body) => {
     const result = await validate(body);
     expect(result).toMatchObject({
       valid: false,
       status: MetadataValidationStatus.INCORRECT_FORMAT,
+    });
+    expect(result.metadata).toBeUndefined();
+  });
+
+  it('names every missing field', async () => {
+    const result = await validate({ title: 'Title', rationale: undefined });
+    expect(result.issues).toEqual([
+      { field: 'abstract', rule: 'required', severity: 'error' },
+      { field: 'rationale', rule: 'required', severity: 'error' },
+    ]);
+  });
+
+  it('accepts an over-long title and abstract with warnings and the content', async () => {
+    const result = await validate({
+      title: 'a'.repeat(84),
+      abstract: 'b'.repeat(3000),
+    });
+    expect(result).toMatchObject({
+      valid: true,
+      status: undefined,
+      metadata: { title: 'a'.repeat(84) },
+    });
+    expect(result.issues).toEqual([
+      {
+        field: 'title',
+        rule: 'maxLength',
+        severity: 'warning',
+        limit: 80,
+        actual: 84,
+      },
+      {
+        field: 'abstract',
+        rule: 'maxLength',
+        severity: 'warning',
+        limit: 2500,
+        actual: 3000,
+      },
+    ]);
+  });
+
+  it('returns no issues for a document within the limits', async () => {
+    const result = await validate({ title: 'Title', abstract: 'Abstract' });
+    expect(result).not.toHaveProperty('issues');
+  });
+});
+
+describe('CIP-119 validation', () => {
+  it('names a missing givenName', async () => {
+    const service = new MetadataService(
+      {
+        get: () => ({
+          ipfsGateway: '',
+          ipfsProjectId: '',
+          metadataAllowPrivateUrls: false,
+        }),
+      } as ConfigService,
+      null,
+    );
+    const raw = JSON.stringify({ body: { objectives: 'x' } });
+    jest.mocked(fetchMetadataText).mockResolvedValue(raw);
+    const hash = blake.blake2bHex(raw, undefined, 32);
+    const result = await service.validateMetadata({
+      url: 'https://example.net/drep',
+      hash,
+      standard: MetadataStandard.CIP119,
+    });
+    expect(result).toMatchObject({
+      valid: false,
+      status: MetadataValidationStatus.INCORRECT_FORMAT,
+      issues: [{ field: 'givenName', rule: 'required', severity: 'error' }],
     });
   });
 });

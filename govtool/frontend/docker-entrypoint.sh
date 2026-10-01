@@ -154,7 +154,6 @@ window.__ENV__ = {
   VITE_IS_DEV: $(json_escape "${VITE_IS_DEV:-}"),
   VITE_APP_ENV: $(json_escape "${VITE_APP_ENV:-}"),
   VITE_BASE_URL: $(json_escape "${VITE_BASE_URL:-}"),
-  VITE_METADATA_API_URL: $(json_escape "${VITE_METADATA_API_URL:-}"),
   VITE_NETWORK_FLAG: $(json_escape "${VITE_NETWORK_FLAG:-}"),
   VITE_SENTRY_DSN: $(json_escape "${VITE_SENTRY_DSN:-}"),
   VITE_CHATWOOT_URL: $(json_escape "${VITE_CHATWOOT_URL:-}"),

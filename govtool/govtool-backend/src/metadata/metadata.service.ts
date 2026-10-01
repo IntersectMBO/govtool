@@ -16,8 +16,16 @@ import { METADATA } from '../providers/providers.module';
 
 import { ValidateMetadataDto } from './dto/validate-metadata.dto';
 import { MetadataValidationStatus } from './metadata-status.enum';
-import { MetadataStandard, ValidateMetadataResult } from './metadata.type';
+import {
+  MetadataIssue,
+  MetadataStandard,
+  ValidateMetadataResult,
+} from './metadata.type';
 import { fetchMetadataText, MetadataFetchError } from './safe-metadata-fetch';
+
+/** CIP-108 length limits, per the CIP text (F43). */
+const CIP108_TITLE_MAX_LENGTH = 80;
+const CIP108_ABSTRACT_MAX_LENGTH = 2500;
 
 @Injectable()
 export class MetadataService {
@@ -100,6 +108,7 @@ export class MetadataService {
   ): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus | undefined;
     let metadata: Record<string, unknown> | undefined;
+    let issues: MetadataIssue[] = [];
     let standard = paramStandard;
 
     try {
@@ -135,10 +144,13 @@ export class MetadataService {
       }
 
       if (standard) {
-        this.validateMetadataStandard(
+        issues = this.validateMetadataStandard(
           parsedData.body as Record<string, unknown>,
           standard,
         );
+        if (issues.some((issue) => issue.severity === 'error')) {
+          throw MetadataValidationStatus.INCORRECT_FORMAT;
+        }
 
         metadata = this.parseMetadata(
           parsedData.body as Record<string, unknown>,
@@ -173,10 +185,17 @@ export class MetadataService {
       }
     }
 
+    // Issues explain a format failure or warn about a valid document; beside
+    // any other failure they would describe a document nobody can see.
+    const showIssues =
+      issues.length > 0 &&
+      (!status || status === MetadataValidationStatus.INCORRECT_FORMAT);
+
     return {
       status,
       valid: !status,
       metadata,
+      ...(showIssues && { issues }),
     };
   }
 
@@ -236,52 +255,67 @@ export class MetadataService {
     return undefined;
   }
 
+  /** Every rule `body` breaks; empty when it meets the standard. */
   private validateMetadataStandard(
     body: Record<string, unknown>,
     standard: MetadataStandard,
-  ): true {
+  ): MetadataIssue[] {
     switch (standard) {
-      case MetadataStandard.CIP119: {
-        const givenName = this.getFieldValue(body, 'givenName');
-
-        if (!givenName) {
-          throw MetadataValidationStatus.INCORRECT_FORMAT;
-        }
-
-        return true;
-      }
+      case MetadataStandard.CIP119:
+        return this.getFieldValue(body, 'givenName')
+          ? []
+          : [{ field: 'givenName', rule: 'required', severity: 'error' }];
 
       case MetadataStandard.CIP108:
         return this.validateCip108Body(body);
 
       default:
-        return true;
+        return [];
     }
   }
 
-  private validateCip108Body(body: Record<string, unknown>): true {
+  /**
+   * A missing field is an error. An over-long title or abstract is only a
+   * warning: the document is still readable, and the old validator accepted
+   * up to 84 / 3000 characters, so rejecting them would hide existing actions.
+   */
+  private validateCip108Body(body: Record<string, unknown>): MetadataIssue[] {
+    const issues: MetadataIssue[] = [];
     const title = this.getFieldValue(body, 'title');
     const abstract = this.getFieldValue(body, 'abstract');
-    const motivation = this.getFieldValue(body, 'motivation');
-    const rationale = this.getFieldValue(body, 'rationale');
 
-    if (
-      !this.isNonBlankString(title) ||
-      !this.isNonBlankString(abstract) ||
-      !motivation ||
-      !rationale
-    ) {
-      throw MetadataValidationStatus.INCORRECT_FORMAT;
+    if (!this.isNonBlankString(title)) {
+      issues.push({ field: 'title', rule: 'required', severity: 'error' });
+    }
+    if (!this.isNonBlankString(abstract)) {
+      issues.push({ field: 'abstract', rule: 'required', severity: 'error' });
+    }
+    for (const field of ['motivation', 'rationale']) {
+      if (!this.getFieldValue(body, field)) {
+        issues.push({ field, rule: 'required', severity: 'error' });
+      }
     }
 
-    if (title.length > 80 || abstract.length > 2500) {
-      throw MetadataValidationStatus.INCORRECT_FORMAT;
+    const limits: [string, unknown, number][] = [
+      ['title', title, CIP108_TITLE_MAX_LENGTH],
+      ['abstract', abstract, CIP108_ABSTRACT_MAX_LENGTH],
+    ];
+    for (const [field, value, limit] of limits) {
+      if (typeof value === 'string' && value.length > limit) {
+        issues.push({
+          field,
+          rule: 'maxLength',
+          severity: 'warning',
+          limit,
+          actual: value.length,
+        });
+      }
     }
 
-    return true;
+    return issues;
   }
 
-  // CIP-108 requires `title` and `abstract` as strings (max 80 / 2500 chars).
+  // CIP-108 requires `title` and `abstract` as strings.
   // Empty or whitespace-only values carry no content, so they are rejected.
   private isNonBlankString(value: unknown): value is string {
     return typeof value === 'string' && value.trim().length > 0;

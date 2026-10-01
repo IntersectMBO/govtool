@@ -11,6 +11,8 @@ import { useAppContext } from '../../../context/context';
 import {
     CheckingDataModal,
     ExternalDataNotMatchModal,
+    MetadataErrorModal,
+    hasMetadataErrorModal,
     UrlErrorModal,
     CancelRegistrationModal,
     GovernanceActionSubmittedModal,
@@ -43,6 +45,8 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
     const [showExternalDataNotMatchModal, setShowExternalDataNotMatchModal] =
         useState(false);
     const [showUrlErrorModal, setShowUrlErrorModal] = useState(false);
+    // The status shown by MetadataErrorModal, or null while it is closed.
+    const [metadataErrorStatus, setMetadataErrorStatus] = useState(null);
     const [showCancelRegistrationModal, setShowCancelRegistrationModal] =
         useState(false);
     const [
@@ -134,10 +138,14 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
             if (fileURL.startsWith('ipfs://')) {
                 url = `https://ipfs.io/ipfs/${fileURL.replace('ipfs://', '')}`;
             }
+            // A request that fails outright is GovTool's error, not the data's.
             const response = await validateMetadata({
                 url: url,
                 hash: hashData,
                 standard: 'CIP108',
+            }).catch((error) => {
+                console.error(error);
+                return { valid: false, status: 'INTERNAL_ERROR' };
             });
 
             if (response?.valid) {
@@ -232,6 +240,8 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                 console.error(response);
                 if (response?.status === 'URL_NOT_FOUND') {
                     setShowUrlErrorModal(true);
+                } else if (hasMetadataErrorModal(response?.status)) {
+                    setMetadataErrorStatus(response.status);
                 } else {
                     setShowExternalDataNotMatchModal(true);
                 }
@@ -437,6 +447,16 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                 buttonOneClick={handleCloseSubmissionDialog}
                 buttonTwoClick={() => {
                     setShowExternalDataNotMatchModal(false);
+                    setShowCancelRegistrationModal(true);
+                }}
+            />
+            <MetadataErrorModal
+                status={metadataErrorStatus}
+                open={metadataErrorStatus !== null}
+                onClose={() => setMetadataErrorStatus(null)}
+                buttonOneClick={handleCloseSubmissionDialog}
+                buttonTwoClick={() => {
+                    setMetadataErrorStatus(null);
                     setShowCancelRegistrationModal(true);
                 }}
             />

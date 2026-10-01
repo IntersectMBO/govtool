@@ -63,7 +63,7 @@ export const useVoteContextForm = (
     async (data: VoteContextFormValues) => {
       try {
         if (!hash) {
-          throw new Error(MetadataValidationStatus.INVALID_HASH);
+          throw MetadataValidationStatus.INVALID_HASH;
         }
 
         const result = await validateMetadata({

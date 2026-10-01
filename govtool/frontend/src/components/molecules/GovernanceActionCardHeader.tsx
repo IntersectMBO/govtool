@@ -1,14 +1,22 @@
 import { Box, Skeleton } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
 import { Tooltip, Typography } from "@atoms";
 import { useTranslation } from "@hooks";
-import { getMetadataDataMissingStatusTranslation } from "@/utils";
-import { MetadataValidationStatus } from "@/models";
+import {
+  getMetadataDataMissingStatusTranslation,
+  getMetadataErrors,
+  getMetadataIssueMessage,
+  getMetadataWarnings,
+} from "@/utils";
+import { MetadataIssue, MetadataValidationStatus } from "@/models";
 
 type GovernanceActionCardHeaderProps = {
   title?: string;
   isDataMissing?: MetadataValidationStatus;
+  /** Errors explain a failure in the tooltip; warnings alone get an icon. */
+  metadataIssues?: MetadataIssue[];
   isValidating?: boolean;
   dataTestId?: string;
 };
@@ -16,10 +24,13 @@ type GovernanceActionCardHeaderProps = {
 export const GovernanceActionCardHeader = ({
   title,
   isDataMissing,
+  metadataIssues,
   isValidating,
   dataTestId = "governance-action-card-header",
 }: GovernanceActionCardHeaderProps) => {
   const { t } = useTranslation();
+  const errors = getMetadataErrors(metadataIssues);
+  const warnings = getMetadataWarnings(metadataIssues);
 
   return (
     <Box
@@ -58,7 +69,16 @@ export const GovernanceActionCardHeader = ({
           heading={getMetadataDataMissingStatusTranslation(
             isDataMissing as MetadataValidationStatus,
           )}
-          paragraphOne={t("govActions.dataMissingTooltipExplanation")}
+          paragraphOne={
+            errors.length > 0
+              ? errors.map(getMetadataIssueMessage).join(" ")
+              : t("govActions.dataMissingTooltipExplanation")
+          }
+          paragraphTwo={
+            errors.length > 0
+              ? t("govActions.dataMissingTooltipExplanation")
+              : undefined
+          }
           placement="bottom-end"
           arrow
         >
@@ -67,6 +87,20 @@ export const GovernanceActionCardHeader = ({
               color: "#ADAEAD",
             }}
             sx={{ ml: 0.7 }}
+            fontSize="small"
+          />
+        </Tooltip>
+      )}
+      {!isDataMissing && !isValidating && warnings.length > 0 && (
+        <Tooltip
+          heading={t("metadataIssues.warningTitle")}
+          paragraphOne={warnings.map(getMetadataIssueMessage).join(" ")}
+          placement="bottom-end"
+          arrow
+        >
+          <WarningAmberRoundedIcon
+            data-testid="metadata-warning-icon"
+            sx={{ ml: 0.7, color: "orangeDark" }}
             fontSize="small"
           />
         </Tooltip>

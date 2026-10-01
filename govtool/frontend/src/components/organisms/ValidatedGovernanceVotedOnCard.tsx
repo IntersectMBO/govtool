@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 
 import { useValidateMutation } from "@/hooks/mutations";
-import { MetadataStandard, ProposalData, VotedProposal } from "@/models";
+import {
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+  VotedProposal,
+} from "@/models";
 import { GovernanceVotedOnCard } from "../molecules";
 
 type Props = {
@@ -16,6 +22,7 @@ export const ValidatedGovernanceVotedOnCard = ({
   const [metadataStatus, setMetadataStatus] = useState<
     MetadataValidationStatus | undefined
   >();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const { validateMetadata } = useValidateMutation();
   // Only the resolved metadata is kept here. The vote and the rest come from
   // the current props on every render, so a changed vote shows up.
@@ -29,7 +36,7 @@ export const ValidatedGovernanceVotedOnCard = ({
     const validate = async () => {
       setIsValidating(true);
 
-      const { status, metadata } = await validateMetadata({
+      const { status, metadata, issues } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: votedProposal.proposal.url,
         hash: votedProposal.proposal.metadataHash,
@@ -44,6 +51,7 @@ export const ValidatedGovernanceVotedOnCard = ({
         );
       }
       setMetadataStatus(status);
+      setMetadataIssues(issues);
       setIsValidating(false);
     };
     validate();
@@ -58,6 +66,7 @@ export const ValidatedGovernanceVotedOnCard = ({
       inProgress={inProgress}
       isValidating={isValidating}
       metadataStatus={metadataStatus}
+      metadataIssues={metadataIssues}
     />
   );
 };

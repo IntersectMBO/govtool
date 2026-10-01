@@ -20,7 +20,6 @@ const runtimeEnv = window['__ENV__'] || {};
 export const env = {
   VITE_APP_ENV: getEnv("VITE_APP_ENV"),
   VITE_BASE_URL: getEnv("VITE_BASE_URL"),
-  VITE_METADATA_API_URL: getEnv("VITE_METADATA_API_URL"),
   VITE_PDF_API_URL: getEnv("VITE_PDF_API_URL"),
   VITE_OUTCOMES_API_URL: getEnv("VITE_OUTCOMES_API_URL"),
   VITE_IPFS_GATEWAY: getEnv("VITE_IPFS_GATEWAY"),

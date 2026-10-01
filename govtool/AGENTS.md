@@ -104,10 +104,10 @@ Seeing a change run, cheapest first:
    then curl localhost:9999/drep/list, /proposal/list, /network/metrics and
    so on. Nothing else needs to be running.
 2. Frontend against that backend: in frontend/, put
-   VITE_BASE_URL=http://127.0.0.1:9999 and
-   VITE_METADATA_API_URL=http://127.0.0.1:9999/metadata in .env.local, which
-   is gitignored and overrides .env (leave .env alone; it points at preview),
-   then npm run dev. Vite hot-reloads frontend edits.
+   VITE_BASE_URL=http://127.0.0.1:9999 in .env.local, which is gitignored and
+   overrides .env (leave .env alone; it points at preview), then npm run dev.
+   Metadata validation goes to the same backend under /metadata. Vite
+   hot-reloads frontend edits.
 3. The whole stack in Docker, including the metadata service and its
    Postgres: docker compose -f docker-compose.fixture.yml up -d --build, then
    http://localhost:8080. The frontend there is the Vite dev server over

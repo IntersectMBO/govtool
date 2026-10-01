@@ -29,22 +29,15 @@ jobs:
       - name: Update package.json files and install dependencies
         run: |
           jq --arg v "$VERSION" '.version = $v' govtool/frontend/package.json > temp.json && mv temp.json govtool/frontend/package.json
-          jq --arg v "$VERSION" '.version = $v' govtool/metadata-validation/package.json > temp.json && mv temp.json govtool/metadata-validation/package.json
 
           echo "Running npm install to update lock files..."
           cd govtool/frontend && npm install && cd ../..
-          cd govtool/metadata-validation && npm install && cd ../..
 
       - name: Update govtool-backend version
         run: |
           jq --arg v "$VERSION" '.version = $v' govtool/govtool-backend/package.json > temp.json && mv temp.json govtool/govtool-backend/package.json
           cd govtool/govtool-backend && npm install --package-lock-only
           echo "✅ Updated govtool-backend version."
-
-      - name: Update Metadata Validation API Version
-        run: |
-          sed -i -E "s/(\.setVersion\()[\"'][0-9]+\.[0-9]+\.[0-9]+[\"']/\1\"$VERSION\"/" govtool/metadata-validation/src/main.ts
-          echo "✅ Updated API version in main.ts"
 
       - name: Update CHANGELOG.md
         run: |

@@ -5,8 +5,8 @@
 #   ./run-tests.sh playwright [playwright args]
 #
 # Playwright runs the projects listed below and skips the specs listed in
-# README.md ("Excluded"). DEVNET_PLAYWRIGHT_PROJECTS, DEVNET_PLAYWRIGHT_FILES
-# and DEVNET_PLAYWRIGHT_GREP_INVERT change that. To re-run only failures,
+# README.md ("Excluded"). DEVNET_PLAYWRIGHT_PROJECTS, DEVNET_PLAYWRIGHT_FILES,
+# DEVNET_PLAYWRIGHT_GREP_INVERT and DEVNET_PLAYWRIGHT_CIP179=0 change that. To re-run only failures,
 # pass --last-failed. TEST_WALLET_MNEMONIC comes from .state/playwright.env
 # (one per devnet).
 set -euo pipefail
@@ -27,13 +27,25 @@ case "$suite" in
   playwright)
     [ -f "$DEVNET_STATE_DIR/playwright.env" ] || die "run ./up.sh first"
     set -a; . "$DEVNET_STATE_DIR/playwright.env"; set +a
+    # DEVNET_PLAYWRIGHT_CIP179=0 leaves the cip179 specs out. They load the
+    # frontend's codecs from its node_modules, so a run with them needs it.
+    cip179="${DEVNET_PLAYWRIGHT_CIP179:-1}"
+    case "${DEVNET_PLAYWRIGHT_PROJECTS:-cip179}" in
+      *cip179*) ;;
+      *) cip179=0 ;;
+    esac
+    if [ "$cip179" = 1 ] && [ ! -d "$REPO_ROOT/govtool/frontend/node_modules" ]; then
+      die "cip179 needs the frontend's dependencies: (cd govtool/frontend && npm ci --ignore-scripts), or set DEVNET_PLAYWRIGHT_CIP179=0"
+    fi
     cd "$REPO_ROOT/tests/govtool-frontend/playwright"
-    # Every project runs by default, forum and mobile included; only
+    # Every project runs by default, forum, mobile and cip179 included; only
     # chatwoot.spec.ts is left out (Chatwoot is disabled on the devnet).
     # DEVNET_PLAYWRIGHT_PROJECTS (comma-separated) narrows the projects.
     # Playwright ORs file filters, so a targeted run replaces this one:
     # DEVNET_PLAYWRIGHT_FILES=walletConnect.loggedin.spec.ts:10
-    file_filter="${DEVNET_PLAYWRIGHT_FILES:-^(?!.*chatwoot\.spec\.ts).*}"
+    skip='chatwoot\.spec\.ts'
+    [ "$cip179" = 1 ] || skip="$skip|cip179/"
+    file_filter="${DEVNET_PLAYWRIGHT_FILES:-^(?!.*($skip)).*}"
     grep_invert="${DEVNET_PLAYWRIGHT_GREP_INVERT:-}"
     args=()
     if [ -n "${DEVNET_PLAYWRIGHT_PROJECTS:-}" ]; then

@@ -12,9 +12,10 @@ changes.
 
 ## [v2.1.0-alpha.2](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.1...v2.1.0-alpha.2) 2026-10-02
 
-Pre-release. `govtool-backend` is the only backend, and it reads chain data
-through a provider layer: db-sync stays the default, and Koios can be
-selected instead.
+Pre-release. The Haskell backend and the older TypeScript backend
+(`backend-ts`) are removed. The new `govtool-backend` replaces both: it serves
+the full GovTool API and reads chain data through a provider layer, with
+db-sync as the default and Koios as a supported alternative.
 
 ### Added
 

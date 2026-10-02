@@ -10,8 +10,21 @@ changes.
 
 ## [Unreleased]
 
+## [v2.1.0-alpha.2](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.1...v2.1.0-alpha.2) 2026-10-02
+
+Pre-release. `govtool-backend` is the only backend, and it reads chain data
+through a provider layer: db-sync stays the default, and Koios can be
+selected instead.
+
 ### Added
 
+- **Provider layer** — the backend depends on a provider-agnostic contract (`govtool-data-providers`) instead of querying db-sync directly, with one package per data source ([#4246](https://github.com/IntersectMBO/govtool/pull/4246))
+  - db-sync provider (default)
+  - Koios provider: set `GOVTOOL_CHAIN_DATA_PROVIDER=koios` and `GOVTOOL_KOIOS_NETWORK`; `GOVTOOL_KOIOS_TOKEN` raises the rate limit and `GOVTOOL_KOIOS_BASE_URL` points at a self-hosted instance. No db-sync database is needed. What it serves and omits is listed in `govtool/govtool-provider-koios/README.md`
+  - Blockfrost provider (experimental)
+  - Fixture provider over a committed mainnet capture, for development and tests without a network or database
+  - `/system/capabilities` and `/system/features`, so the frontend hides what the selected provider cannot serve
+- Newsletter signup button in the footer ([#4249](https://github.com/IntersectMBO/govtool/pull/4249))
 - Rate limits on anonymous IPFS uploads, per client and per instance ([#4171](https://github.com/IntersectMBO/govtool/issues/4171))
 - Metadata validation names the fields a document gets wrong (`issues`); cards and details pages say which field is missing or too long
 - Own messages for blocked metadata URLs, documents over 2 MB and failed checks, on cards, details pages and form modals

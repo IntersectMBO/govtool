@@ -121,7 +121,7 @@ export type GovernanceActionSignatureVerificationResult = {
   error?: string;
 };
 
-/** The pdf API's proposal item, as `/governance-actions/proposal/:txHash` forwards it. */
+/** The pdf API's proposal item, from `/api/proposals`. */
 export type GovernanceActionProposalDiscussion = {
   id: number | string;
   attributes?: {

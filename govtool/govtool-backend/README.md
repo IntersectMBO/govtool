@@ -143,9 +143,8 @@ takes the db-sync connection only from the environment, never from
 | `GOVTOOL_DBSYNC_HOST`, `_PORT`, `_DATABASE`, `_USER`, `_PASSWORD` | the db-sync connection |
 | `GOVTOOL_DBSYNC_NETWORK` | `mainnet`, `preprod`, `preview` or `devnet`; must match the database, or every route answers 500 |
 
-`GOVTOOL_PINATA_API_JWT`, `GOVTOOL_METADATA_SERVICE_URL` and
-`GOVTOOL_PDF_API_URL` are optional; without them the upload, metadata and
-discussion-link routes answer `503`. `-c <file>` points it at a `config.json`
+`GOVTOOL_PINATA_API_JWT` and `GOVTOOL_METADATA_SERVICE_URL` are optional;
+without them the upload and metadata routes answer `503`. `-c <file>` points it at a `config.json`
 for port, host, cache durations and Sentry, which the environment overrides.
 [`docker/docker-compose.yaml`](../../docker/docker-compose.yaml) is a working
 example.

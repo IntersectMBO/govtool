@@ -59,7 +59,6 @@ services:
             # Must match the database, or every route answers 500.
             GOVTOOL_DBSYNC_NETWORK: ${DBSYNC_NETWORK:-mainnet}
             GOVTOOL_PINATA_API_JWT: ${PINATA_API_JWT:-}
-            GOVTOOL_PDF_API_URL: ${PDF_API_URL:-}
             IPFS_GATEWAY: ${IPFS_GATEWAY:-}
             GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
         ports:

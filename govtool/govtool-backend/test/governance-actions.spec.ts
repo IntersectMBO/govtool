@@ -195,7 +195,6 @@ function service(
   stub: StubApi,
   options: {
     optionalArguments?: OptionalArgument[];
-    pdfApiUrl?: string | null;
     metadata?: Partial<MetadataService>;
     documents?: MetadataServiceV1;
   } = {},
@@ -222,9 +221,6 @@ function service(
         optionalArguments: options.optionalArguments ?? [],
       } as unknown as ProviderCapabilities),
   } as unknown as SystemService;
-  const config = {
-    get: () => ({ pdfApiUrl: options.pdfApiUrl ?? null }),
-  } as unknown as ConfigService;
   return new GovernanceActionsService(
     api,
     options.documents ?? null,
@@ -233,7 +229,6 @@ function service(
     new LegacyNetwork(api),
     (options.metadata ?? {}) as MetadataService,
     system,
-    config,
   );
 }
 
@@ -866,54 +861,6 @@ describe('GET /misc/*', () => {
     const row = await svc.getEpochParams(500);
     expect(row).toMatchObject({ epoch_no: 500, protocol_major: 10 });
     expect(getProtocolParams).toHaveBeenCalledWith({ epoch: 500 });
-  });
-});
-
-describe('GET /governance-actions/proposal/:hash', () => {
-  const realFetch = global.fetch;
-  afterEach(() => {
-    global.fetch = realFetch;
-  });
-
-  it('asks the pdf API by submission tx hash and answers its first item', async () => {
-    const fetchMock = jest.fn(() =>
-      Promise.resolve(
-        new Response(
-          JSON.stringify({ data: [{ id: 7, attributes: {} }], meta: {} }),
-          {
-            status: 200,
-          },
-        ),
-      ),
-    );
-    global.fetch = fetchMock;
-    const svc = service({}, { pdfApiUrl: 'http://pdf:1337/api' });
-    await expect(svc.getProposal(TX.toUpperCase())).resolves.toEqual({
-      data: { id: 7, attributes: {} },
-    });
-    const url = new URL((fetchMock.mock.calls[0] as unknown as [string])[0]);
-    expect(url.origin + url.pathname).toBe('http://pdf:1337/api/proposals');
-    expect(url.searchParams.get('filters[prop_submission_tx_hash][$eq]')).toBe(
-      TX,
-    );
-  });
-
-  it('answers { data: null } when no proposal was discussed', async () => {
-    global.fetch = () =>
-      Promise.resolve(new Response('{"data":[]}', { status: 200 }));
-    await expect(
-      service({}, { pdfApiUrl: 'http://pdf:1337/api' }).getProposal(TX),
-    ).resolves.toEqual({ data: null });
-  });
-
-  it('refuses a non-hash before any request, and is a 503 when unconfigured', () => {
-    global.fetch = jest.fn();
-    const svc = service({}, { pdfApiUrl: 'http://pdf:1337/api' });
-    expect(() => svc.getProposal('../users/me')).toThrow(HttpException);
-    expect(global.fetch).not.toHaveBeenCalled();
-    expect(() => service({}).getProposal(TX)).toThrow(
-      expect.objectContaining({ status: 503 }),
-    );
   });
 });
 

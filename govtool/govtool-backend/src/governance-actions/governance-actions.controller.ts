@@ -101,11 +101,6 @@ export class GovernanceActionsController {
     );
   }
 
-  @Get('proposal/:hash')
-  proposal(@Param('hash') hash: string): Promise<{ data: unknown }> {
-    return this.governanceActions.getProposal(hash);
-  }
-
   @Get(':id')
   get(
     @Param('id') id: string,

@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 
 import { Typography } from "@atoms";
+import { useFeatureFlag } from "@context";
 import { GOV_ACTION_HISTORY_PATHS, GOV_ACTION_HISTORY_TYPE_FILTERS, primaryBlue } from "@consts";
 import {
   useGetGovernanceActionMetadata,
@@ -104,6 +105,7 @@ const GovernanceActionHistoryDetailsContent = ({
   governanceAction,
 }: GovernanceActionHistoryDetailsContentProps) => {
   const { isMobile } = useScreenDimension();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -430,10 +432,12 @@ const GovernanceActionHistoryDetailsContent = ({
               </Box>
             )}
 
-            <GovernanceActionProposalDiscussion
-              proposal={proposal?.data}
-              isLoading={isProposalLoading}
-            />
+            {isProposalDiscussionForumEnabled && (
+              <GovernanceActionProposalDiscussion
+                proposal={proposal}
+                isLoading={isProposalLoading}
+              />
+            )}
           </Box>
         </Box>
 

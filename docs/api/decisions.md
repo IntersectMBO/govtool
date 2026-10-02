@@ -5613,3 +5613,19 @@ Source: [Conway committee tally](https://github.com/IntersectMBO/cardano-ledger/
 - The minimum-size veto counts eligible cold members, rather than distinct hot credentials.
   db-sync already counts cold members and needs no change. Historical Koios committee
   aggregates remain unavailable because current authorisations cannot reconstruct them.
+
+## D164 — The frontend looks up an action's forum proposal itself
+
+**Date:** 2026-10-02
+**Amends:** D143 (the `…/proposal/:txHash` route) and D162 (governance action requests
+use `VITE_BASE_URL`).
+
+- `GET /governance-actions/proposal/:txHash` and `GOVTOOL_PDF_API_URL` are removed. The
+  backend no longer calls the proposal discussion API.
+- The governance action history page asks the pdf API directly, on `VITE_PDF_API_URL`,
+  for `/api/proposals` filtered by `prop_submission_tx_hash`, and shows the first item.
+  The forum pages already call that API from the browser, so it already allows the
+  frontend's origin and needs no login to list proposals.
+- With the forum disabled, the page makes no request and shows no discussion card.
+- One pdf URL setting remains, the API root, so deployments cannot give the frontend and
+  the backend differently shaped URLs.

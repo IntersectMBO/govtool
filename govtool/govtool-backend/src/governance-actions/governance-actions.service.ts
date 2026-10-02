@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  Inject,
-  Injectable,
-  NotFoundException,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
   ChainDataError,
   type ChainDataApiV1,
@@ -15,7 +9,6 @@ import {
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 
 import { CacheService } from 'src/cache/cache.service';
-import { ConfigService } from 'src/config/config.service';
 import { asHttp } from 'src/common/errors';
 import { legacyGovActionId } from 'src/common/legacy-ids';
 import { LegacyNetwork } from 'src/common/legacy-network';
@@ -52,8 +45,6 @@ import type {
 import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { verifyAuthorWitness, type AuthorWitnessInput } from './signature';
 
-const PDF_TIMEOUT_MS = 10_000;
-const PDF_MAX_BYTES = 1024 * 1024;
 const DOCUMENT_MAX_BYTES = 1024 * 1024;
 
 const bodyOf = (
@@ -88,7 +79,6 @@ export class GovernanceActionsService {
     private readonly network: LegacyNetwork,
     private readonly metadataValidation: MetadataService,
     private readonly system: SystemService,
-    private readonly config: ConfigService,
   ) {}
 
   /* ----------------------------------------------------------------------- */
@@ -191,48 +181,6 @@ export class GovernanceActionsService {
       metadataValid: result.valid,
       data: result.metadata,
     };
-  }
-
-  /**
-   * The discussion-forum proposal submitted in `txHash`, as `{ data }` with
-   * the forum's own item shape, or `{ data: null }` when there is none.
-   */
-  getProposal(txHash: string): Promise<{ data: unknown }> {
-    const base = this.config.get().pdfApiUrl;
-    if (base === null) {
-      throw new ServiceUnavailableException({
-        errorType: 'ServiceUnavailableError',
-        message: 'GOVTOOL_PDF_API_URL is not configured',
-      });
-    }
-    const hash = txHash.toLowerCase();
-    if (!/^[0-9a-f]{64}$/.test(hash)) {
-      throw new HttpException(
-        {
-          errorType: 'ValidationError',
-          message: 'hash must be a 64-hex transaction hash',
-        },
-        400,
-      );
-    }
-    return this.cache.getOrSet(
-      'governanceActionsPdfProposal',
-      hash,
-      async () => {
-        const query = new URLSearchParams({
-          'filters[prop_submission_tx_hash][$eq]': hash,
-          'pagination[page]': '1',
-          'pagination[pageSize]': '1',
-        });
-        const body = await this.fetchPdf(
-          `${base}/proposals?${query.toString()}`,
-        );
-        const items = (body as { data?: unknown }).data;
-        const first: unknown =
-          Array.isArray(items) && items.length > 0 ? items[0] : null;
-        return { data: first };
-      },
-    );
   }
 
   /* ----------------------------------------------------------------------- */
@@ -497,52 +445,5 @@ export class GovernanceActionsService {
       out.set(a.id, { ...(fields ?? NO_TEXT), document });
     });
     return out;
-  }
-
-  /** GET against the operator-configured pdf API: bounded, no redirects. */
-  private async fetchPdf(url: string): Promise<unknown> {
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': 'GovTool/Backend',
-        },
-        redirect: 'error',
-        signal: AbortSignal.timeout(PDF_TIMEOUT_MS),
-      });
-    } catch {
-      throw new ServiceUnavailableException({
-        errorType: 'ServiceUnavailableError',
-        message: 'The proposal discussion API cannot be reached',
-      });
-    }
-    if (!response.ok) {
-      throw new HttpException(
-        {
-          errorType: 'UpstreamError',
-          message: `The proposal discussion API answered ${response.status}`,
-        },
-        response.status >= 500 ? 502 : response.status,
-      );
-    }
-    const text = await response.text();
-    if (Buffer.byteLength(text) > PDF_MAX_BYTES) {
-      throw new HttpException(
-        { errorType: 'UpstreamError', message: 'Proposal response too large' },
-        502,
-      );
-    }
-    try {
-      return JSON.parse(text) as unknown;
-    } catch {
-      throw new HttpException(
-        {
-          errorType: 'UpstreamError',
-          message: 'Proposal response is not JSON',
-        },
-        502,
-      );
-    }
   }
 }

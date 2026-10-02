@@ -31,7 +31,6 @@ The `govtool-backend` service reads `docker/.env`; the compose file maps its val
 - DBSYNC_POSTGRES_PASSWORD
 - DBSYNC_NETWORK: mainnet, preprod, preview or devnet. It must match the database, or every route answers 500.
 - IPFS_GATEWAY
-- PDF_API_URL
 - PINATA_API_JWT (optional; without it `/ipfs/upload` answers 503)
 
 Every backend setting, with its default, is listed in [`govtool-backend/.env.example`](../govtool/govtool-backend/.env.example).

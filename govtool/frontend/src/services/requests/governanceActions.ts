@@ -1,3 +1,6 @@
+import axios from "axios";
+
+import { env } from "@/config/env";
 import {
   EpochParams,
   GovernanceActionMetadata,
@@ -9,7 +12,8 @@ import {
 
 import { GovernanceActionsAPI } from "../GovernanceActionsAPI";
 
-// Governance action reads and author verification on the GovTool backend.
+// Governance action reads and author verification on the GovTool backend; the
+// forum proposal lookup goes to the pdf API.
 
 export const getGovernanceActionHistory = async (
   search: string,
@@ -54,11 +58,23 @@ export const getGovernanceActionMetadata = async (
   return data;
 };
 
+/**
+ * The discussion forum proposal submitted in `txHash`, or null when there is
+ * none. Asks the pdf API directly, as the forum pages do.
+ */
 export const getGovernanceActionProposalDiscussion = async (txHash: string) => {
-  const { data } = await GovernanceActionsAPI.get<{
-    data: GovernanceActionProposalDiscussion | null;
-  }>(`/governance-actions/proposal/${txHash}`);
-  return data;
+  const { data } = await axios.get<{
+    data?: GovernanceActionProposalDiscussion[];
+  }>("/api/proposals", {
+    baseURL: String(env.VITE_PDF_API_URL ?? "").replace(/\/+$/, ""),
+    params: {
+      "filters[prop_submission_tx_hash][$eq]": txHash.toLowerCase(),
+      "pagination[page]": 1,
+      "pagination[pageSize]": 1,
+    },
+    timeout: 30_000,
+  });
+  return data.data?.[0] ?? null;
 };
 
 export const getGovernanceActionEpochParams = async (epoch?: number) => {

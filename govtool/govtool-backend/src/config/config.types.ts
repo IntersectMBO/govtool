@@ -113,12 +113,6 @@ export type BackendConfig = {
    * unless GOVTOOL_METADATA_ALLOW_PRIVATE_URLS is exactly "true".
    */
   metadataAllowPrivateUrls: boolean;
-  /**
-   * Base url of the proposal discussion (pdf) API, such as
-   * http://pdf-backend:1337/api. The governance action route that links an action to
-   * its discussion answers 503 without it.
-   */
-  pdfApiUrl: string | null;
   port: number;
   host: string;
   cacheDurationSeconds: number;

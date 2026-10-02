@@ -104,7 +104,6 @@ export class ConfigService {
         this.envString('GOVTOOL_METADATA_ALLOW_PRIVATE_URLS', 'false')
           .trim()
           .toLowerCase() === 'true',
-      pdfApiUrl: this.httpUrl('GOVTOOL_PDF_API_URL'),
       port: this.envNumber('GOVTOOL_PORT', rawConfig.port),
       host: this.envString('GOVTOOL_HOST', rawConfig.host),
       cacheDurationSeconds: this.envNumber(
@@ -118,22 +117,6 @@ export class ConfigService {
       sentryDsn: this.envString('GOVTOOL_SENTRY_DSN', rawConfig.sentrydsn),
       sentryEnv: this.envString('GOVTOOL_SENTRY_ENV', rawConfig.sentryenv),
     };
-  }
-
-  /** An optional http(s) base url, trailing slashes dropped; null when unset. */
-  private httpUrl(name: string): string | null {
-    const raw = this.envString(name, '').trim();
-    if (raw === '') return null;
-    let url: URL;
-    try {
-      url = new URL(raw);
-    } catch {
-      throw new Error(`${name} must be an http(s) url`);
-    }
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-      throw new Error(`${name} must be an http(s) url`);
-    }
-    return raw.replace(/\/+$/, '');
   }
 
   private positiveInteger(name: string, fallback: number): number {

@@ -155,7 +155,6 @@ services:
       # Pins go to the bucket, never to Pinata.
       GOVTOOL_PINNING_PROVIDER: test
       GOVTOOL_TEST_PINNING_URL: ${METADATA_BUCKET_URL}
-      GOVTOOL_PDF_API_URL: http://pdf:1337/api
       # config.json caches the DRep list for 600 s, sized for day-long
       # epochs; with 60 s epochs that hides new DReps and voting power.
       GOVTOOL_DREP_LIST_CACHE_DURATION_SECONDS: "20"

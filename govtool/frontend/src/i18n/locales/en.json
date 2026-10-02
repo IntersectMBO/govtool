@@ -444,8 +444,8 @@
       "invalidValueType": "Invalid value type"
     }
   },
-  "outcome": {
-    "label": "Outcome",
+  "actionRecord": {
+    "label": "Governance action",
     "abstract": "Abstract",
     "motivation": "Motivation",
     "rationale": "Rationale",
@@ -552,7 +552,7 @@
       "ratificationThreshold": "Ratification Threshold Stake"
     },
     "ratifiedStatus": {
-      "title": "Outcome",
+      "title": "Voting result",
       "valueRatified": "Ratified",
       "valueNotRatified": "Not Ratified"
     },
@@ -581,8 +581,8 @@
       "proposedOn": "Proposed on:"
     }
   },
-  "outcomesList": {
-    "title": "Outcomes",
+  "governanceActionHistoryList": {
+    "title": "Governance action history",
     "noResults": {
       "title": "No governance actions found",
       "description": "Governance actions are searchable by their ID both CIP-105 (legacy) and CIP-129 formats, title and abstract contents."
@@ -788,9 +788,9 @@
       "title": "Live Voting",
       "label": "Live Voting"
     },
-    "outcomes": {
-      "title": "Outcomes",
-      "label": "Outcomes"
+    "history": {
+      "title": "Governance action history",
+      "label": "Governance action history"
     },
     "votedByMe": {
       "title": "Voted by me",

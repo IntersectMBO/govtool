@@ -18,8 +18,8 @@ changes.
 
 ### Fixed
 
-- Committee outcome indicators respect the ledger's minimum committee size outside bootstrap
-- Outcomes displays each provider's action-specific vote tally independently, preserves exact threshold comparisons, and identifies unavailable historical voting data
+- Committee vote indicators respect the ledger's minimum committee size outside bootstrap
+- Governance action history displays each provider's action-specific vote tally independently, preserves exact threshold comparisons, and identifies unavailable historical voting data
 - db-sync no longer counts a DRep vote invalidated by retirement, including after re-registration
 - db-sync proposal rankings use the same retirement validity rule as the displayed vote tallies
 - SPO voting results and thresholds are shown for parameter changes that only update block execution steps
@@ -30,7 +30,7 @@ changes.
 - A format failure in a submission form no longer says the data does not match the original file
 - Submission forms check that the entered URL serves the document, instead of accepting a cached copy of its hash, and a failed check shows its full fetch report
 - Metadata validation answers within the frontend's timeout when the metadata service is slow, and a failed check no longer leaves a card loading
-- The outcomes page no longer counts automatic DRep no-confidence votes and passive pool votes twice ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
+- Governance action history no longer counts automatic DRep no-confidence votes and passive pool votes twice ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
 - Live-action DRep percentages divide by active DRep stake plus always-no-confidence stake again, as before the backend change ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
 - Vote totals a data source cannot give for an action are shown as unavailable instead of as zero votes ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
 - Governance action details show again: treasury withdrawal rows, the hard fork version, committee members, removals and threshold, and the constitution's guardrails script ([#4261](https://github.com/IntersectMBO/govtool/issues/4261))
@@ -39,17 +39,17 @@ changes.
 
 ### Changed
 
-- Outcomes is always available and defaults to the configured GovTool backend under `/outcomes`
+- Governance action history is always available and uses the configured GovTool backend
 - DRep activity sorting is offered only when the provider supplies directory activity
 - `govtool-backend` is the backend: CI, the Docker image and the deployment compose use it. The image reads its db-sync connection from `GOVTOOL_DBSYNC_*` environment variables
-- The outcomes API is served by the backend under `/outcomes`; the separate outcomes service is no longer deployed
+- Governance action records are served by `govtool-backend` under `/governance-actions`
 - Metadata validation is served by the backend under `/metadata`; the frontend calls it on `VITE_BASE_URL`
 - The deployment compose (`docker/docker-compose.yaml`) and the Koios compose run the metadata service and its Postgres, and point the backend at it; the deployment one needs `METADATA_DB_PASSWORD`
 - A CIP-108 title over 80 characters or abstract over 2500 is shown with a warning instead of being rejected
 
 ### Removed
 
-- The obsolete `votesLastYear` DRep directory response field and the `VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED` frontend variable
+- The obsolete `votesLastYear` DRep directory response field and the separate action-history API URL and enablement variables
 - The Haskell backend (`govtool/backend`) and the TypeScript port (`govtool/backend-ts`)
 - The standalone metadata validation service (`govtool/metadata-validation`) and its image
 - The `VITE_METADATA_API_URL` frontend variable

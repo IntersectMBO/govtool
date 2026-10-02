@@ -161,7 +161,6 @@ window.__ENV__ = {
   VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: $(json_escape "${VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED:-}"),
   VITE_IS_CIP179_ENABLED: $(json_escape "${VITE_IS_CIP179_ENABLED:-true}"),
   VITE_PDF_API_URL: $(json_escape "${VITE_PDF_API_URL:-}"),
-  VITE_OUTCOMES_API_URL: $(json_escape "${VITE_OUTCOMES_API_URL:-}"),
   VITE_IPFS_GATEWAY: $(json_escape "${VITE_IPFS_GATEWAY:-}"),
   VITE_IPFS_PROJECT_ID: $(json_escape "${VITE_IPFS_PROJECT_ID:-}")
 };

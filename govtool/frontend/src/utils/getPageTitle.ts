@@ -2,7 +2,7 @@ import { matchPath } from "react-router";
 
 import {
   BUDGET_DISCUSSION_PATHS,
-  OUTCOMES_PATHS,
+  GOV_ACTION_HISTORY_PATHS,
   PATHS,
   PDF_PATHS,
   USER_PATHS,
@@ -70,8 +70,8 @@ const PAGE_TITLES = [
     title: "Budget Discussion",
   },
   {
-    path: `${OUTCOMES_PATHS.governanceActionsOutcomes}/*`,
-    title: "Governance Action Outcomes",
+    path: `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`,
+    title: "Governance action history",
   },
   {
     path: USER_PATHS.governanceActionsVotedByMe,

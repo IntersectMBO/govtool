@@ -5575,3 +5575,26 @@ Source: [Conway governance rule](https://github.com/IntersectMBO/cardano-ledger/
   Bootstrap bypasses this size gate, and InfoAction still has no pass/fail indicator.
 - The Outcomes frontend already honours provider decisions. No additional protocol-parameter
   request or network-wide metric is needed to display the veto.
+
+
+## D162 — Governance actions use the GovTool backend and action history naming
+
+**Date:** 2026-10-02
+
+**Amends:** D143 and D156 (separate action-history API namespace and optional URL override),
+D149 and D158 (the legacy Outcomes terminology in frontend source and browser checks).
+
+- There is one GovTool backend. Governance action records are served at
+  `/governance-actions`, with supporting epoch, network and author-verification routes
+  under `/misc`. They are not a separate service or a separately enabled feature.
+- The frontend uses `VITE_BASE_URL` for these requests. The separate API URL override
+  and the `/outcomes` backend prefix are removed; no compatibility alias is retained.
+  Existing response fields and exact per-role aggregates are unchanged.
+- The view of completed actions is called Governance action history, under
+  `/governance_actions/history`; detail links append the action's `txHash#index`.
+  The existing lifecycle filters, including live actions, remain available.
+- Backend classes, frontend source, browser helpers and test commands use governance
+  action names. Historical decision records and source attribution retain their original names.
+- Governance-action browser regression checks share the existing frontend browser CI
+  job with CIP-179, including dependency and Chromium installation. Browser-only edits
+  do not run frontend unit tests, lint or type checking; frontend source changes do.

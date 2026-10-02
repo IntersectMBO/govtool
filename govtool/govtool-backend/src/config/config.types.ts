@@ -115,7 +115,7 @@ export type BackendConfig = {
   metadataAllowPrivateUrls: boolean;
   /**
    * Base url of the proposal discussion (pdf) API, such as
-   * http://pdf-backend:1337/api. The outcomes route that links an action to
+   * http://pdf-backend:1337/api. The governance action route that links an action to
    * its discussion answers 503 without it.
    */
   pdfApiUrl: string | null;

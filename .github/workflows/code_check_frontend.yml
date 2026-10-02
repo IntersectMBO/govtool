@@ -12,7 +12,33 @@ defaults:
     working-directory: govtool/frontend
 
 jobs:
-  outcomes:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.paths.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Identify frontend source changes
+        id: paths
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        working-directory: .
+        shell: bash
+        run: |
+          if [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            changed_files="$(git diff --name-only "$BEFORE_SHA" "$GITHUB_SHA" -- govtool/frontend .github/workflows/code_check_frontend.yml)"
+            if [[ -n "$changed_files" ]]; then
+              echo "frontend=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "frontend=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+  browser_checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,44 +47,33 @@ jobs:
           node-version-file: "./govtool/frontend/.nvmrc"
           registry-url: "https://registry.npmjs.org/"
           scope: "@intersect.mbo"
+          cache: npm
+          cache-dependency-path: |
+            govtool/frontend/package-lock.json
+            tests/govtool-frontend/playwright/package-lock.json
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
       - run: npm ci --ignore-scripts
         working-directory: tests/govtool-frontend/playwright
       - run: npx playwright install --with-deps chromium
         working-directory: tests/govtool-frontend/playwright
-      - run: npm run test:outcomes-aggregates
+      - name: CIP-179 browser checks
+        run: npm run test:cip179
+        working-directory: tests/govtool-frontend/playwright
+      - name: Governance action browser checks
+        if: ${{ !cancelled() }}
+        run: npm run test:governance-action-aggregates
         working-directory: tests/govtool-frontend/playwright
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: outcomes-playwright-results
-          path: tests/govtool-frontend/playwright/test-results/outcomes-aggregates
-  cip179:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: "./govtool/frontend/.nvmrc"
-          registry-url: "https://registry.npmjs.org/"
-          scope: "@intersect.mbo"
-      - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
-      - run: npm ci --ignore-scripts
-        working-directory: tests/govtool-frontend/playwright
-      - run: npx playwright install --with-deps chromium
-        working-directory: tests/govtool-frontend/playwright
-      - run: npm run test:cip179
-        working-directory: tests/govtool-frontend/playwright
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: cip179-playwright-results
-          path: tests/govtool-frontend/playwright/test-results/cip179
+          name: frontend-playwright-results
+          path: |
+            tests/govtool-frontend/playwright/test-results/cip179
+            tests/govtool-frontend/playwright/test-results/governance-actions-aggregates
+
   test:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -77,14 +92,14 @@ jobs:
           node-version-file: "./govtool/frontend/.nvmrc"
           scope: "@intersect.mbo"
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 🧪 Test
         run: |
           npm run test
 
   lint:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -103,14 +118,14 @@ jobs:
           node-version-file: "./govtool/frontend/.nvmrc"
           scope: "@intersect.mbo"
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 👕 Lint
         run: |
           npm run lint
 
   type_check:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -129,8 +144,6 @@ jobs:
           node-version-file: "./govtool/frontend/.nvmrc"
           scope: "@intersect.mbo"
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
 
       - name: 🔍 Type Check
         run: |

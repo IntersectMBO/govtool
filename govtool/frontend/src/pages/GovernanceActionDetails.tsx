@@ -9,7 +9,7 @@ import { Box, CircularProgress, Link } from "@mui/material";
 import { AxiosError } from "axios";
 
 import { Background, Typography } from "@atoms";
-import { ICONS, OUTCOMES_PATHS, PATHS } from "@consts";
+import { ICONS, GOV_ACTION_HISTORY_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
@@ -107,7 +107,7 @@ export const GovernanceActionDetails = () => {
       error.response?.data.message.match(/Proposal with id: .* not found/);
     if (isProposalNotFound && fullProposalId) {
       navigate(
-        OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),
+        GOV_ACTION_HISTORY_PATHS.governanceActionHistoryDetail.replace(":id", fullProposalId),
       );
     } else if (
       isEnabled &&

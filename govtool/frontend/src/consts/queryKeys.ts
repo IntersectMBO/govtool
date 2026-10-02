@@ -18,12 +18,12 @@ export const QUERY_KEYS = {
   useGetMetadataResolveKey: "useGetMetadataResolveKey",
   useGetMetadataReportKey: "useGetMetadataReportKey",
   useGetMetadataReportsKey: "useGetMetadataReportsKey",
-  useGetOutcomeEpochParamsKey: "useGetOutcomeEpochParamsKey",
-  useGetOutcomeGovActionMetadataKey: "useGetOutcomeGovActionMetadataKey",
-  useGetOutcomeGovernanceActionKey: "useGetOutcomeGovernanceActionKey",
-  useGetOutcomeGovernanceActionsKey: "useGetOutcomeGovernanceActionsKey",
-  useGetOutcomeProposalDiscussionKey: "useGetOutcomeProposalDiscussionKey",
-  useOutcomeVerifySignatureKey: "useOutcomeVerifySignatureKey",
+  useGetGovernanceActionEpochParamsKey: "useGetGovernanceActionEpochParamsKey",
+  useGetGovernanceActionMetadataKey: "useGetGovernanceActionMetadataKey",
+  useGetGovernanceActionRecordKey: "useGetGovernanceActionRecordKey",
+  useGetGovernanceActionHistoryKey: "useGetGovernanceActionHistoryKey",
+  useGetGovernanceActionProposalDiscussionKey: "useGetGovernanceActionProposalDiscussionKey",
+  useGovernanceActionVerifySignatureKey: "useGovernanceActionVerifySignatureKey",
 };
 
 export const MUTATION_KEYS = {

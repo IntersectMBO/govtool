@@ -52,12 +52,11 @@ The following integrations are optional and may remain blank:
 - `VITE_SENTRY_DSN`: Sentry error reporting. `VITE_APP_ENV` labels the Sentry environment when a DSN is configured.
 - `VITE_CHATWOOT_URL` and `VITE_CHATWOOT_WEBSITE_TOKEN`: Chatwoot feedback widget.
 - `VITE_PDF_API_URL`: Proposal discussion service API.
-- `VITE_OUTCOMES_API_URL`: Optional override for the governance outcomes API. Defaults to `VITE_BASE_URL` with `/outcomes` appended (for example `http://127.0.0.1:9999/outcomes`).
 - `VITE_IPFS_PROJECT_ID`: Project identifier for gateways that require it.
 
 `VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` can remain `false` when the proposal discussion service is not running.
 
-Outcomes is part of GovTool and is always enabled. Its pages and navigation do not depend on an environment flag. The voting panel consumes the action's `vote_aggregates`, displaying each supported voter group independently without requesting network metrics. An unsupported applicable group has a direct provider-support message and no pass/fail indicator.
+Governance action history uses the GovTool backend configured by `VITE_BASE_URL`. Its pages and navigation do not depend on an environment flag. The voting panel consumes the action's `vote_aggregates`, displaying each supported voter group independently without requesting network metrics. An unsupported applicable group has a direct provider-support message and no pass/fail indicator.
 
 For backend setup, see the [backend README](../govtool-backend/README.md). To run the complete service stack, see the [Docker Compose instructions](../../docker/README.md).
 

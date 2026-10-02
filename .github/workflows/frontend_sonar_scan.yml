@@ -30,8 +30,6 @@ jobs:
           scope: "@intersect.mbo"
       - name: 🧪 Test
         working-directory: govtool/frontend
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMRC_TOKEN }}
         run: |
           npm ci
           npm run test:coverage

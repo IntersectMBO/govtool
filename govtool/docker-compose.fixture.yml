@@ -159,8 +159,7 @@ services:
       VITE_NETWORK_FLAG: "1"
       VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "true"
       VITE_PDF_API_URL: ${PUBLIC_PDF_URL:-http://localhost:1337}/
-      # Outcomes is built in; unsupported voting metrics are handled in the UI.
-      VITE_OUTCOMES_API_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}/outcomes
+      # Governance action history is built in; unsupported voting metrics are handled in the UI.
       NODE_OPTIONS: --max-old-space-size=4096
     ports:
       - "${FRONTEND_PORT:-8080}:8080"

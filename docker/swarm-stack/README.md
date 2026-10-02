@@ -13,6 +13,13 @@ The backend also serves the outcomes API (`/api/outcomes`) and metadata
 validation (`/api/metadata`), so the separate metadata-validation and outcomes
 services are no longer needed.
 
+Deployment is done with
+[docker-stack](https://github.com/mesudip/docker-stack)
+(`pip install docker-stack`), which resolves the stack's secrets from the
+deploying shell's environment and versions them: changed values roll out as
+new secret versions, and `versions`/`checkout` inspect and restore earlier
+ones.
+
 It assumes what is already on the server:
 
 - an nginx-proxy gateway (`mesudip/nginx-proxy`, as in
@@ -25,14 +32,14 @@ It assumes what is already on the server:
 
 ## Files
 
-- `docker-stack.yml`: the stack.
-- `.env.example`: every setting; copy to `.env` (gitignored).
-- `deploy.sh`: loads `.env` and wraps the swarm commands. `docker stack deploy`
-  does not read `.env`, so deploy through the script.
+- `docker-stack.yml`: the stack, deployed with `docker-stack deploy`.
+- `.env.example`: every non-secret setting; copy to `.env` (gitignored) and
+  export it before deploying. Secrets are exported separately and never
+  stored in the file.
 
 ## First deploy
 
-On a manager node, from this folder:
+On a manager node with `docker-stack` installed, from this folder:
 
 ```bash
 cp .env.example .env
@@ -52,32 +59,54 @@ docker node update --label-add govtool=true <node>
 
 On a single-node swarm `<node>` is the id from `docker node ls -q`.
 
+Export the settings and the required db-sync password (prompted without
+echo, so it never lands in a file; the deploy fails before creating
+anything if it is unset or empty):
+
 ```bash
-./deploy.sh secrets
+set -a; . ./.env; set +a
+read -r -s -p "db-sync Postgres password: " DBSYNC_PASSWORD; echo
+export DBSYNC_PASSWORD
 ```
 
-Asks for the db-sync password and the Pinata JWT (leave the JWT empty to run
-without `/ipfs/upload`), and stores them as swarm secrets.
+The Pinata JWT is optional: export `PINATA_API_JWT` the same way, or leave
+it unset to run without `/ipfs/upload`.
+
+Create the `metadata` role and database once on the proposal stack's
+Postgres, with a generated password. Run this on the node where that
+Postgres runs:
 
 ```bash
-./deploy.sh init-metadata-db
+export METADATA_DB_PASSWORD="$(openssl rand -hex 32)"
+container=$(docker ps -q \
+  --filter "label=com.docker.swarm.service.name=${METADATA_DB_SERVICE:-preview-proposal_postgres}" | head -n 1)
+docker exec -i "$container" psql -v ON_ERROR_STOP=1 -q \
+  -U "${METADATA_DB_SUPERUSER:-postgres}" -d postgres <<SQL
+\set pw '$METADATA_DB_PASSWORD'
+SELECT 'CREATE ROLE metadata LOGIN'
+  WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'metadata') \gexec
+ALTER ROLE metadata LOGIN PASSWORD :'pw';
+SELECT 'CREATE DATABASE metadata OWNER metadata'
+  WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'metadata') \gexec
+SQL
 ```
 
-Creates the `metadata` role and database on the proposal stack's Postgres with
-a random password, and stores the connection url as a secret. Run it on the
-node where that Postgres runs. The metadata service applies its migrations on
-start.
+Hex keeps the password URL-safe inside the connection string the stack
+assembles. Keep this shell: the exported password is reused by the deploy
+below. The metadata service applies its migrations on start.
+
+Deploy:
 
 ```bash
-./deploy.sh deploy
+docker-stack deploy "$STACK_NAME" docker-stack.yml
 ```
 
-Checks the settings, node label, networks and secrets, then deploys and waits
-for the services to converge. The backend reads a full DRep and proposal
-snapshot before it listens, so its first start takes a few minutes.
+The backend reads a full DRep and proposal snapshot before it listens, so
+its first start takes a few minutes. Check convergence with:
 
 ```bash
-./deploy.sh status
+docker stack services "$STACK_NAME"
+docker stack ps "$STACK_NAME" --no-trunc --filter desired-state=running
 ```
 
 ## Replacing the old preview-govtool stack
@@ -87,7 +116,7 @@ The old stack ran the Haskell backend from `config.json`, plus
 drop the services this file no longer defines:
 
 ```bash
-./deploy.sh deploy --prune
+docker-stack deploy --prune "$STACK_NAME" docker-stack.yml
 ```
 
 Then check the frontend's outcomes pages and remove the old outcomes stack:
@@ -99,10 +128,14 @@ docker stack rm preview-outcome
 ## Updating
 
 Set `GOVTOOL_TAG` in `.env` (`dev`, `test`, `latest`, a `vX.Y.Z` tag or a
-commit sha) and run `./deploy.sh deploy` again. Updates start the new task
-before stopping the old one and roll back when a task fails within 60 s.
-Pinning a sha or version keeps redeploys reproducible; `dev` moves with every
-merge to develop.
+commit sha), export it, and run `docker-stack deploy` again. Updates start
+the new task before stopping the old one and roll back when a task fails
+within 60 s. Pinning a sha or version keeps redeploys reproducible; `dev`
+moves with every merge to develop.
+
+Changing a secret value (a password, the JWT) and redeploying creates a new
+secret version and repoints the services at it; nothing has to be removed by
+hand. `docker-stack versions "$STACK_NAME"` lists the history.
 
 ## Secrets
 
@@ -118,14 +151,3 @@ to the file at `<NAME>_FILE`, defaulting to the Swarm mount
 that default path, so no `*_FILE` variable is needed and no secret value
 appears in the service definition: `docker service inspect` shows only
 non-sensitive config.
-
-Swarm secrets are immutable, so `secrets` and `init-metadata-db` never change
-an existing one, and a secret in use cannot be removed. To rotate one, stop
-the stack first (a short outage):
-
-```bash
-./deploy.sh rm
-docker secret rm preview-govtool_dbsync_password
-./deploy.sh secrets
-./deploy.sh deploy
-```

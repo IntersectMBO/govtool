@@ -1,8 +1,10 @@
 # GovTool on Docker Swarm: govtool-backend, govtool-frontend and the private
 # govtool-metadata-service, behind an nginx-proxy gateway (VIRTUAL_HOST).
 #
-# Deploy with ./deploy.sh, not `docker stack deploy` directly: stack deploy does
-# not read .env, and the script also checks the secrets and networks exist.
+# Deploy with docker-stack (https://github.com/mesudip/docker-stack), not
+# vanilla `docker stack deploy`: it resolves the secrets below from the
+# deploying shell's environment and versions them, so changed values roll
+# out as new secret versions without hand-written _v2 names.
 #
 #   https://${BASE_DOMAIN}/            frontend
 #   https://${BASE_DOMAIN}/api/        backend (prefix stripped), including
@@ -15,8 +17,7 @@
 # file (`<NAME>_FILE` overrides the path), so no secret value appears in
 # `environment:` or in the service definition. Only true secrets live here;
 # hostnames, db names, users and urls stay in `environment:` where they help
-# debugging. A whitespace-only secret counts as unset, so an optional one can
-# be created as " ".
+# debugging. A whitespace-only secret counts as unset.
 
 x-deploy: &deploy
   replicas: 1
@@ -54,15 +55,19 @@ networks:
     driver: overlay
 
 secrets:
+  # Required: export DBSYNC_PASSWORD in the deploying shell. The deploy
+  # fails before creating anything if it is unset or empty.
   dbsync_password:
-    external: true
-    name: ${STACK_NAME}_dbsync_password
+    environment: DBSYNC_PASSWORD
+  # Optional: export PINATA_API_JWT, or leave it unset to run without
+  # /ipfs/upload (the single space counts as unset for the app).
   pinata_api_jwt:
-    external: true
-    name: ${STACK_NAME}_pinata_api_jwt
+    x-template: "${PINATA_API_JWT:- }"
+  # Assembled from the metadata db password; the role and database
+  # themselves are created once by hand, see README. Unset or empty
+  # METADATA_DB_PASSWORD fails the deploy before creating anything.
   metadata_database_url:
-    external: true
-    name: ${STACK_NAME}_metadata_database_url
+    x-template: "postgresql://metadata:${METADATA_DB_PASSWORD}@${METADATA_DB_HOST:-postgres}:5432/metadata"
 
 services:
   backend:

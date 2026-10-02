@@ -30,6 +30,7 @@ changes.
 - Vote totals a data source cannot give for an action are shown as unavailable instead of as zero votes ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
 - Governance action details show again: treasury withdrawal rows, the hard fork version, committee members, removals and threshold, and the constitution's guardrails script ([#4261](https://github.com/IntersectMBO/govtool/issues/4261))
 - A governance action's authors and their signatures are shown and verified again ([#4261](https://github.com/IntersectMBO/govtool/issues/4261))
+- Searching the DRep directory by name and governance actions by title, abstract, motivation or rationale finds results again ([#4262](https://github.com/IntersectMBO/govtool/issues/4262))
 
 ### Changed
 

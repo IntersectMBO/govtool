@@ -29,9 +29,12 @@ import {
   ENRICH_CONCURRENCY,
   mapLimit,
   proposalDocumentFields,
+  proposalFields,
+  resolveBody,
   resolveDocument,
 } from 'src/metadata/enrich';
 import { toLegacyDescription } from 'src/common/legacy-description';
+import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import { readAll } from 'src/common/snapshot';
 import {
@@ -82,9 +85,34 @@ type ProposalSnapshotEntry = {
   action: GovAction;
 };
 
+/**
+ * The longest a text search waits for document text it has not cached. The
+ * rest is matched from what the cache already holds; the fetches carry on and
+ * fill it for the next search. Well inside the frontend's 30 s timeout, and
+ * independent of how many actions are searched (a DRep's whole vote history).
+ */
+const SEARCH_TEXT_WAIT_MS = 5_000;
+
+/**
+ * A term that can only be an action id, or a prefix of one: a CIP-129
+ * `gov_action1…` id, or a transaction hash (eight or more hex digits) with
+ * an optional `#index`. Matched against ids alone, with no metadata wait.
+ */
+const ACTION_ID_TERM = /^(gov_action1[0-9a-z]*|[0-9a-f]{8,}(#\d*)?)$/i;
+
+/** The CIP-108 strings a search matches, as the Haskell backend's did. */
+type ProposalSearchText = Pick<
+  ProposalResponse,
+  'title' | 'abstract' | 'motivation' | 'rationale'
+>;
+
 @Injectable()
 export class ProposalService {
   private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
+  /** Search text by (hash, url); see `DocumentSummaryCache`. */
+  private readonly searchTextCache =
+    new DocumentSummaryCache<ProposalSearchText>();
+  private warming = false;
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
@@ -147,7 +175,7 @@ export class ProposalService {
             );
 
           let filtered = this.filterByType(proposals, params.type);
-          filtered = this.filterBySearch(filtered, params.search);
+          filtered = await this.filterBySearch(filtered, params.search);
           filtered = this.sortProposals(filtered, params.sort);
 
           const total = filtered.length;
@@ -453,31 +481,108 @@ export class ProposalService {
     );
   }
 
-  filterBySearch(
+  /**
+   * The action id in either form, or the title, abstract, motivation or
+   * rationale, as the Haskell backend searched them. The four strings are
+   * document text, which the snapshot does not carry, so every candidate's
+   * is read through the search text cache before filtering and paging.
+   */
+  async filterBySearch(
     proposals: ProposalResponse[],
     search?: string,
-  ): ProposalResponse[] {
+  ): Promise<ProposalResponse[]> {
     if (!search) {
       return proposals;
     }
 
     const searchLower = search.toLowerCase();
+    const texts = ACTION_ID_TERM.test(search.trim())
+      ? new Map<string, ProposalSearchText>()
+      : await this.searchTexts(proposals, { waitMs: SEARCH_TEXT_WAIT_MS });
 
     return proposals.filter((proposal) => {
       const govActionId = `${proposal.txHash}#${proposal.index}`;
+      const text = texts.get(proposal.id) ?? proposal;
       const values = [
         govActionId,
         // The CIP-129 action id, which is what `id` carries now and what a
         // provider's own `exactId` search matches.
         proposal.id,
-        proposal.title,
-        proposal.abstract,
-        proposal.motivation,
-        proposal.rationale,
+        text.title,
+        text.abstract,
+        text.motivation,
+        text.rationale,
       ].filter((value): value is string => value !== null);
 
       return values.some((value) => value.toLowerCase().includes(searchLower));
     });
+  }
+
+  /**
+   * Resolves every live action's search text into the cache, so the first
+   * search after a start or a new block does not wait on the documents. One
+   * run at a time; failures only leave entries unresolved.
+   */
+  async warmSearchText(): Promise<void> {
+    if (this.metadata === null || this.warming) return;
+    this.warming = true;
+    try {
+      const live = (await this.getProposalSnapshot(''))
+        .filter(({ status }) => status === 'live')
+        .map(({ proposal }) => proposal);
+      await this.searchTexts(live, { awaitRefresh: true });
+    } finally {
+      this.warming = false;
+    }
+  }
+
+  /**
+   * Each action's search text through the cache. With `waitMs`, waits at most
+   * that long in all and then takes whatever the cache holds, so a search
+   * does not slow down with the number of uncached documents; the warmer
+   * passes `awaitRefresh` and waits for every document instead.
+   */
+  private async searchTexts(
+    proposals: ProposalResponse[],
+    options: { awaitRefresh?: boolean; waitMs?: number } = {},
+  ): Promise<Map<string, ProposalSearchText>> {
+    const out = new Map<string, ProposalSearchText>();
+    const metadata = this.metadata;
+    if (metadata === null) return out;
+    // Never rejects: the cache treats a failed resolution as unresolved.
+    const all = mapLimit(proposals, ENRICH_CONCURRENCY, (p) => {
+      const { url, metadataHash: hash } = p;
+      if (!url || !hash) return Promise.resolve(undefined);
+      return this.searchTextCache.get(
+        hash,
+        url,
+        async () => proposalFields(await resolveBody(metadata, { url, hash })),
+        { awaitRefresh: options.awaitRefresh },
+      );
+    });
+    let texts: (ProposalSearchText | undefined)[];
+    if (options.waitMs === undefined) {
+      texts = await all;
+    } else {
+      let timer: NodeJS.Timeout | undefined;
+      const timeout = new Promise<undefined>((resolve) => {
+        timer = setTimeout(() => resolve(undefined), options.waitMs);
+      });
+      texts =
+        (await Promise.race([all, timeout]).finally(() =>
+          clearTimeout(timer),
+        )) ??
+        proposals.map(({ url, metadataHash }) =>
+          url && metadataHash
+            ? this.searchTextCache.peek(metadataHash, url)
+            : undefined,
+        );
+    }
+    proposals.forEach((p, i) => {
+      const text = texts[i];
+      if (text !== undefined) out.set(p.id, text);
+    });
+    return out;
   }
 
   sortProposals(

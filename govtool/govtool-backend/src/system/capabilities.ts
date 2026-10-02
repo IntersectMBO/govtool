@@ -162,7 +162,8 @@ function notExposed(what: string): Unavailable {
  * provider's restriction does not reach the browser.
  *
  * `DRepService.sortDReps` and `ProposalService` sort, filter and page the
- * whole cached collection, and `filterBySearch` matches action ids across it.
+ * whole cached collection. Search matches ids across it and, with a metadata
+ * service, DRep names and action text from the anchored documents.
  * Omitting a control from this list means the provider's answer stands.
  */
 const SUPPLIED_BY_BACKEND: readonly ControlId[] = [

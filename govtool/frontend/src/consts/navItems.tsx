@@ -7,9 +7,8 @@ import { LINKS } from "./links";
 import {
   PATHS,
   PDF_PATHS,
-  OUTCOMES_PATHS,
+  GOV_ACTION_HISTORY_PATHS,
   BUDGET_DISCUSSION_PATHS,
-  // TODO: This will be uncommented when the page has been bootstrapped in the outcomes Pillar
   // USER_PATHS
 } from "./paths";
 
@@ -60,9 +59,9 @@ export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
         newTabLink: null,
       },
       {
-        dataTestId: "governance-actions-outcomes-link",
-        label: i18n.t("govActions.outcomes.title"),
-        navTo: OUTCOMES_PATHS.governanceActionsOutcomes,
+        dataTestId: "governance-actions-governance-actions-link",
+        label: i18n.t("govActions.history.title"),
+        navTo: GOV_ACTION_HISTORY_PATHS.governanceActionHistory,
         newTabLink: null,
       },
     ],
@@ -145,14 +144,13 @@ export const CONNECTED_NAV_ITEMS = [
         newTabLink: null,
       },
       {
-        dataTestId: "governance-actions-outcomes-link",
-        label: i18n.t("govActions.outcomes.title"),
-        navTo: OUTCOMES_PATHS.governanceActionsOutcomes,
+        dataTestId: "governance-actions-governance-actions-link",
+        label: i18n.t("govActions.history.title"),
+        navTo: GOV_ACTION_HISTORY_PATHS.governanceActionHistory,
         activeIcon: ICONS.governanceActionsActiveIcon,
         icon: ICONS.governanceActionsIcon,
         newTabLink: null,
       },
-      // TODO: This will be uncommented when the page has been bootstrapped in the outcomes Pillar
       // {
       //   dataTestId: "governance-actions-voted-by-me-link",
       //   label: i18n.t("govActions.votedByMe.title"),

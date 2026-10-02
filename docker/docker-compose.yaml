@@ -1,4 +1,47 @@
 services:
+    # The metadata service's store: fetched documents, kept by hash, and fetch
+    # reports. Not published: only the metadata service connects to it.
+    metadata-db:
+        image: postgres:16-alpine
+        environment:
+            POSTGRES_USER: metadata
+            POSTGRES_PASSWORD: ${METADATA_DB_PASSWORD:?set METADATA_DB_PASSWORD in docker/.env}
+            POSTGRES_DB: metadata
+        volumes:
+            - metadata-db:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U metadata -d metadata"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+        restart: unless-stopped
+
+    # Resolves anchors for the backend: caches by hash, fails over across IPFS
+    # gateways and refuses private addresses. Not published: only the backend
+    # talks to it (D119).
+    metadata:
+        image: ghcr.io/intersectmbo/govtool-metadata-service:dev
+        build:
+            context: ../govtool/govtool-metadata-service
+            dockerfile: Dockerfile
+        environment:
+            NODE_ENV: production
+            PORT: 3000
+            # The image runs `prisma migrate deploy` before starting.
+            DATABASE_URL: postgresql://metadata:${METADATA_DB_PASSWORD}@metadata-db:5432/metadata
+            # Optional: your own IPFS gateway, tried before the public ones.
+            IPFS_PRIMARY_GATEWAY: ${IPFS_PRIMARY_GATEWAY:-}
+        depends_on:
+            metadata-db:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1));"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 20s
+        restart: unless-stopped
+
     govtool-backend:
         image: ghcr.io/intersectmbo/govtool-backend:dev
         build:
@@ -18,21 +61,12 @@ services:
             GOVTOOL_PINATA_API_JWT: ${PINATA_API_JWT:-}
             GOVTOOL_PDF_API_URL: ${PDF_API_URL:-}
             IPFS_GATEWAY: ${IPFS_GATEWAY:-}
+            GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
         ports:
          - "9999:9999"
-
-    metadata-validation:
-        image: ghcr.io/intersectmbo/govtool-metadata-validation:dev
-        build: 
-            context: ../govtool/metadata-validation
-            dockerfile: Dockerfile
-        environment:
-            - PORT=3000
-        env_file:
-            - ../govtool/metadata-validation/.env
-        
-        ports:
-            - "3000:3000"
+        depends_on:
+            metadata:
+                condition: service_healthy
 
     govtool-frontend:
         image: ghcr.io/intersectmbo/govtool-frontend:dev
@@ -47,9 +81,10 @@ services:
             UMAMI_SSL_VERIFY: ${UMAMI_SSL_VERIFY:-true}
             TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-}
             REAL_IP_HEADER: ${REAL_IP_HEADER:-X-Forwarded-For}
-            VITE_OUTCOMES_API_URL: ${VITE_OUTCOMES_API_URL:-http://localhost:9999/outcomes}
         ports:
             - "80:80"
         depends_on:
             - govtool-backend
-            - metadata-validation
+
+volumes:
+    metadata-db:

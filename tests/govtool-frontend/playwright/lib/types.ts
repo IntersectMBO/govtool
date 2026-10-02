@@ -94,7 +94,7 @@ export enum GovernanceActionType {
   UpdatetotheConstitution = "NewConstitution",
 }
 
-export enum outcomeType {
+export enum actionRecordType {
   NewConstitution = "New Constitution",
   NewCommittee = "Update Committee",
   HardForkInitiation = "Hard-Fork Initiation",
@@ -296,7 +296,7 @@ export interface imageObject {
   sha256: string;
 }
 
-export interface outcomeProposal {
+export interface actionRecordProposal {
   id: string;
   tx_hash: string;
   index: string;
@@ -324,13 +324,13 @@ export interface outcomeProposal {
   proposal_params: EpochParams | null;
 }
 
-export interface outcomeMetadata {
+export interface actionRecordMetadata {
   metadataStatus: string;
   metadataValid: boolean;
-  data: outcomeMetadataBody;
+  data: actionRecordMetadataBody;
 }
 
-interface outcomeMetadataBody {
+interface actionRecordMetadataBody {
   abstract: string;
   motivation: "string";
   rationale: string;

@@ -135,10 +135,7 @@ const MenuNavItem: FC<{
   navItem: NavMenuItem;
   closeDrawer: () => void;
 }> = ({ closeDrawer, navItem }) => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
 
   const filterChildNavItems = () => {
     if (navItem.dataTestId === "governance-actions") {
@@ -146,11 +143,6 @@ const MenuNavItem: FC<{
         if (
           !isProposalDiscussionForumEnabled &&
           item.dataTestId === "proposed-governance-actions-link"
-        )
-          return false;
-        if (
-          !isGovernanceOutcomesPillarEnabled &&
-          item.dataTestId === "governance-actions-outcomes-link"
         )
           return false;
         return true;

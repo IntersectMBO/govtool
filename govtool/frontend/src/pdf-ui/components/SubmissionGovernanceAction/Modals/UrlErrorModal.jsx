@@ -3,7 +3,13 @@ import React from 'react';
 import { openInNewTab } from '../../../lib/utils';
 import { PdfStatusModal } from '../../PdfModal';
 
-const UrlErrorModal = ({ open, onClose, buttonOneClick, buttonTwoClick }) => {
+const UrlErrorModal = ({
+    open,
+    onClose,
+    buttonOneClick,
+    buttonTwoClick,
+    children,
+}) => {
     const openLink = () =>
         openInNewTab(
             'https://docs.gov.tools/using-govtool/govtool-functions/storing-information-offline'
@@ -49,6 +55,7 @@ const UrlErrorModal = ({ open, onClose, buttonOneClick, buttonTwoClick }) => {
             >
                 Learn More about self-hosting
             </Link>
+            {children}
         </PdfStatusModal>
     );
 };

@@ -51,7 +51,7 @@ This directory contains all automated test cases, organized by feature area:
 8. **`8-proposal-discussion/`**  
    Tests related to proposal discussions adjacent to the submission form.
 
-9. **`9-outcomes/`**  
+9. **`9-governance-action-history/`**  
    Tests related to proposal outcome visibility and validations.
 
 10. **`10-feedback/`**  
@@ -141,17 +141,17 @@ Tracks creation, display, and participation in budget-related proposals.
 
 ---
 
-### 4. Outcomes Pillars
+### 4. Governance action history
 
-Tests centered around outcomes from various actions.
+Tests of governance action history and lifecycle status.
 
-![Outcomes Pillars](./docs/outcomes-pillars.png)
+![Governance action history](./docs/governance-action-history.png)
 
 ---
 
 ### 5. Logged-In State
 
-Covers all test cases that require the user to be authenticated, and are not included in the delegation, voting, proposal, or outcomes pillars
+Covers all test cases that require the user to be authenticated, and are not included in the delegation, voting, proposal, or action history
 
 ![Logged-In State](./docs/loggedin.png)
 

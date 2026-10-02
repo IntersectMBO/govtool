@@ -6,6 +6,8 @@ import { toRatio, continuedFraction } from '../dist/governance/proposals/ratio.j
 import { decodeBody, paramGroups } from '../dist/governance/proposals/body.js';
 import { deriveStatus, toGovAction, toLifecycle } from '../dist/governance/proposals/rows.js';
 import {
+  DREP_SQL,
+  PARAMS_SQL,
   assembleAggregates,
   ccFigures,
   drepFigures,
@@ -23,6 +25,14 @@ import {
 
 const H = (n) => n.toString(16).padStart(2, '0').repeat(28);
 const TX = (n) => n.toString(16).padStart(2, '0').repeat(32);
+
+test('DRep tallies invalidate a vote on retirement after the vote but not after the tally epoch', () => {
+  assert.match(DREP_SQL, /vp\.vote::text AS vote, vp\.tx_id/);
+  assert.match(DREP_SQL, /WHERE NOT EXISTS\s*\(\s*SELECT 1 FROM drep_registration retired/);
+  assert.match(DREP_SQL, /retired\.drep_hash_id = v\.voter AND retired\.deposit < 0/);
+  assert.match(DREP_SQL, /retired\.tx_id > v\.tx_id AND retired\.tx_id <= bound\.max_tx/);
+  assert.match(DREP_SQL, /JOIN bound ON bound\.e = p\.e/);
+});
 
 function fakeDb(routes) {
   const calls = [];
@@ -245,7 +255,7 @@ test('committee figures count eligible members only', () => {
 /* -- thresholds ----------------------------------------------------------------- */
 
 const params = {
-  e: 10, protocol_major: 10,
+  e: 10, protocol_major: 10, committee_min_size: 3,
   dvt_motion_no_confidence: 0.67, dvt_committee_normal: 0.67, dvt_committee_no_confidence: 0.6, dvt_update_to_constitution: 0.75,
   dvt_hard_fork_initiation: 0.6, dvt_p_p_network_group: 0.67, dvt_p_p_economic_group: 0.67, dvt_p_p_technical_group: 0.67,
   dvt_p_p_gov_group: 0.75, dvt_treasury_withdrawal: 0.67,
@@ -288,6 +298,19 @@ test('assembled aggregates balance, and the committee is left out when none is i
   const none = assembleAggregates(targets, { drep: [drepRow], spo: [], cc: [{ ...cc, has_committee: false }], params: [params] }).get('1');
   assert.deepEqual(none.map((a) => a.role), ['drep']);
   assert.throws(() => assembleAggregates(targets, { drep: [drepRow], spo: [], cc: [cc], params: [] }), { code: 'STALE_DATA' });
+});
+
+test('an undersized committee cannot approve a ratifiable action, even with all yes votes or zero quorum', () => {
+  assert.match(PARAMS_SQL, /protocol_major, committee_min_size/);
+  const cc = { id: '1', e: 10, has_committee: true, quorum_numerator: '0', quorum_denominator: '1', eligible: '2', yes: '2', no: '0', abstain: '0' };
+  const read = (p) => assembleAggregates([target('TreasuryWithdrawals')], { drep: [drepRow], spo: [], cc: [cc], params: [p] }).get('1').find((a) => a.role === 'cc');
+  assert.equal(read(params).passing, false);
+  assert.equal(read({ ...params, committee_min_size: '3' }).passing, false, 'pg returns int8 columns as strings');
+  assert.equal(read(params).totalEligible, '2', 'the breakdown remains available');
+  assert.equal(read({ ...params, committee_min_size: 2 }).passing, undefined, 'meeting the minimum leaves the quorum comparison to the consumer');
+  assert.equal(read({ ...params, protocol_major: 9 }).passing, undefined, 'bootstrap bypasses the minimum-size gate');
+  assert.throws(() => read({ ...params, committee_min_size: null }), { code: 'STALE_DATA' });
+  assert.throws(() => read({ ...params, committee_min_size: 'bad' }), { code: 'INTERNAL' });
 });
 
 /* -- votes ---------------------------------------------------------------------- */
@@ -369,6 +392,20 @@ test('filter and search values are bound, never interpolated', async () => {
   assert.ok(main.params.includes(TX(5)));
   assert.match(main.sql, /ORDER BY g\.expiration ASC NULLS LAST, g\.id ASC/);
 });
+
+for (const sort of ['mostYesVotes', 'highestParticipation']) {
+  test(`${sort} applies the same retirement cutoff as the displayed DRep tally`, async () => {
+    const { api, db } = provider([['count(*) AS n', [{ n: '0' }]], ['total_count', []]]);
+    await api.list({ page: 1, size: 5, sort });
+    const { sql } = db.calls[0];
+    assert.match(sql, /eps AS \(SELECT DISTINCT e FROM f\)/);
+    assert.match(sql, /bound AS MATERIALIZED/);
+    assert.match(sql, /vp\.vote::text AS vote, vp\.tx_id/);
+    assert.match(sql, /retired\.drep_hash_id = dv\.voter AND retired\.deposit < 0/);
+    assert.match(sql, /retired\.tx_id > dv\.tx_id AND retired\.tx_id <= bound\.max_tx/);
+    assert.match(sql, /JOIN bound ON bound\.e = f\.e/);
+  });
+}
 
 test('getEnacted is keyed by lineage: committee covers UpdateCommittee AND NoConfidence', async () => {
   const { api, db } = provider([['enacted_epoch IS NOT NULL', (params) => (params[0].includes('NoConfidence') ? [{ tx_hash: TX(4), index: 1 }] : [])]]);

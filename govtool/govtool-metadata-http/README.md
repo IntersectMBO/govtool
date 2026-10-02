@@ -37,6 +37,7 @@ Zero HTTP dependencies: it uses the global `fetch` Node 20 ships. A custom
 |                  |                                          | a §2.4 failure status with `{code, …}` becomes a `MetadataFailure`               |
 | `getCipMetadata` | `GET /api/metadata?hash=&url=&cip=`      | `501` throws: the service does not validate CIPs yet                             |
 | `refresh`        | `POST /api/metadata/{hash}/refresh?url=` | `200 MetadataRefreshOutcome`, passed through                                     |
+| `verify`         | `POST /api/metadata/{hash}/verify?url=`  | `200 MetadataResult`: always a real fetch, a failure with its `reportId` (D152)  |
 | `getReport`      | `GET /api/metadata/reports/{id}`         | `200 MetadataReport`, or `null` on `404`                                         |
 | `listReports`    | `GET /api/metadata/reports?hash=&url=`   | `200 MetadataReportSummary[]`                                                    |
 

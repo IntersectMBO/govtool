@@ -5358,3 +5358,258 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
 - The image differs from the Haskell one in one way a deployment sees: the db-sync connection and network
   come only from environment variables, never from the config file.
 - The outcomes API is served by this backend, so no deployment runs the separate outcomes service.
+
+## D152 — Submission checks the url, with the full diagnosis; reads take the hash cache
+
+**Date:** 2026-10-02
+**Amends:** D112 (the url is a hint) for `POST /metadata/validate` at submission time.
+
+- D112 is right for reads: content under a hash is authoritative, whatever url asked for it. At
+  submission the url itself goes on chain, so a cached hash says nothing about whether the url serves
+  it. Through the service, a url that serves nothing passed as `valid: true` once the hash was known.
+  The removed metadata-validation service always fetched the url, so this only surfaced once the
+  frontend validated through the backend.
+- `POST /metadata/validate` takes an optional `verifyUrl: true`. The frontend sets it on every
+  submission: DRep registration and edit, vote rationale, governance action creation, and the proposal
+  discussion's submission step. Cards and details pages leave it unset and keep the cache.
+- A submission failure gets the same full diagnosis as a read (D113–D117), not just a status. The
+  metadata service gains `verify(hash, url)`, `POST /api/metadata/{hash}/verify?url=`: one real fetch
+  whatever the cache holds, through the same guards and IPFS gateways, content cached on success and a
+  fetch report kept on failure. The validate response carries that `reportId`, read or submission, and
+  the submission error modals show the report itself (hops, addresses, response, body, served hash)
+  rather than looking the anchor up, whose cached answer can disagree with what the url just served.
+- `verify` is not windowed like `refresh` (D125): the person submitting needs this fetch, now. The
+  backend limits it instead, per client and per instance; over the limit, or without a service that
+  verifies, the backend fetches the url itself under the same guards (no private addresses, no
+  redirects, size cap, 10 s) and checks the hash, with a status but no report.
+- Validation waits at most 15 s for the metadata service, then falls back to the local fetch (10 s), so
+  the whole request answers inside the frontend's 30 s timeout. The service is not cancelled; it
+  finishes and records for the next read.
+- A request that fails outright (timeout, network, 5xx) reaches the frontend as `INTERNAL_ERROR` with
+  the request's own error text, shown in the same place as a report, so no card is left validating
+  forever and the author still sees why.
+
+## D153 — One convention for automatic votes; an unknown tally is null
+
+**Date:** 2026-10-02
+**Amends:** the outcomes UI's own arithmetic (D149) and the legacy `/proposal` and outcomes vote fields.
+**Issue:** [#4260](https://github.com/IntersectMBO/govtool/issues/4260)
+
+- Every provider reports an action's vote aggregates with the automatic votes already in them: the
+  always-no-confidence DRep stake as yes on a NoConfidence action and as no on every other, and each
+  pool's passive always-no-confidence and always-abstain stake the same way (pools not after a hard
+  fork, and every silent pool as abstain before protocol 10). The DRep always-abstain stake is the one
+  automatic figure left out of the action's abstain, because it sits outside the DRep denominator.
+- The consumer adds nothing else. The outcomes page added the always-no-confidence stake to the DRep
+  yes or no and the pools' passive stake to their yes, no and abstain a second time, so a 50% result
+  read as 66.7% or 83.3% and the pass indicator could flip. It now adds only the DRep always-abstain
+  stake to the DRep abstain.
+- `/network/total-stake`'s `totalStakeControlledByDReps` is active DRep stake plus the
+  always-no-confidence stake again, as the Haskell backend reported it: the live-action page divides
+  DRep yes and no, which include that stake, by it. The contract's field of the same name stays the
+  active stake; the backend adds the two at its edge. The outcomes route already did.
+  The page's DRep "not voted" figure is that total less the abstain, yes and no figures as given; it
+  no longer takes the always-no-confidence stake back out of yes or no first, which counted it as
+  not voted.
+- A tally figure the data source does not have is `null` on both the legacy `/proposal` routes and the
+  outcomes routes, never 0, which reads as "nobody voted": the provider serves no aggregates for the
+  action (Blockfrost on a concluded one), or a role's aggregate is a `percent`. A role left out of
+  aggregates the provider does serve does not vote on the action and stays 0, as the Haskell backend's
+  cast-vote counts were. Sorting by yes votes puts unknown totals last.
+- The frontend shows a group whose figures are null as unavailable, with no pass or fail indicator.
+- Not changed here: the Koios provider leaves the committee aggregate out of a concluded action rather
+  than guess its denominator, which this rule reads as "does not vote" and so reports as 0.
+
+## D154 — `/proposal` details and authors take the Haskell shapes again
+
+**Date:** 2026-10-02
+**Amends:** the legacy `/proposal` mapping, which sent the contract's typed body as `details` and left
+`json` and `authors` empty.
+**Issue:** [#4261](https://github.com/IntersectMBO/govtool/issues/4261)
+
+- `details` is db-sync's `description` reshaped by type, as the Haskell backend's `list-proposals.sql`
+  did and the frontend's detail tabs read it: a treasury withdrawal as `[{receivingAddress, amount}]`, a
+  hard fork as `{major, minor}`, a committee change as `{tag, members, membersToBeRemoved, threshold}`
+  with each added member's current term from the committee in force, a constitution as
+  `{anchor, script}`, and `{data: …}` for the rest. The outcomes route already built these for its
+  `description`; the one function now serves both.
+- The current committee is read once per proposal snapshot, and only when an UpdateCommittee needs it.
+  If it cannot be read, a member's current term is null, as for a member not yet on the committee.
+- `json` and `authors` come from the anchored document, resolved through the metadata service with the
+  four CIP-108 strings: `json` is the whole document, and `authors` lists each CIP-100 author as
+  `{name, publicKey, signature, witnessAlgorithm}`, as the Haskell backend read them from
+  `off_chain_vote_data`. The frontend shows the authors and verifies their signatures from these.
+- The same enrichment applies to every route that sends a proposal: `/proposal/list`, `/proposal/get`
+  and a DRep's vote history (`/drep/getVotes`), whose rows the details page opens as they are, without
+  reading the proposal again.
+- Unchanged: `/proposal/enacted-details` still sends the typed body as `description`. The Haskell
+  backend sent db-sync's raw column there, and nothing reads it.
+
+## D155 — Search matches DRep names and action text again, from the metadata service
+
+**Date:** 2026-10-02
+**Amends:** the `/drep/list` and `/proposal/list` search, which matched ids only once document text left
+chain data (D40, D45, D87 left free text to an index provider; none was wired).
+**Issue:** [#4262](https://github.com/IntersectMBO/govtool/issues/4262)
+
+- The Haskell backend searched DReps by exact id or `given_name ILIKE`, and actions by id or by title,
+  abstract, motivation and rationale `ILIKE`. The new backend matched ids only on every provider: a name
+  went to the provider's `exactId` search, and action text was filtered while it was still null, before
+  the page's documents were resolved.
+- No provider indexes document text, so the backend matches it itself, over its whole snapshot, with
+  the text read through the metadata service and kept per (hash, url) in the same stale-while-revalidate
+  cache the outcomes search uses, now in `src/metadata/text-cache.ts`.
+- Actions: a search reads every candidate's four strings before filtering and paging. It waits at most
+  5 s in all for text it has not cached, then matches what the cache holds; the fetches carry on and fill
+  it for the next search. So a search's time does not grow with the number of documents, which matters
+  for a DRep's whole vote history. The warmer fills the cache for live actions after each refresh.
+- A term that can only be an action id (a `gov_action1…` id, or eight or more hex digits with an
+  optional `#index`) is matched against ids alone and reads no document.
+- DReps: a term that is not a DRep id is a name, matched case-insensitively as a substring over the whole
+  directory. A directory holds thousands of DReps, more than a search can resolve on demand, so it
+  matches the names already cached and never fetches. The cache warmer resolves every DRep's name after
+  each snapshot refresh; until its first run completes after a start, a DRep whose name is not cached
+  yet is not found. The DRep vote history's action search gets the same action text match.
+- Without a metadata service there is no document text, and search matches ids only, as before. The
+  declared `drepDirectory.search` options are unchanged: the backend already claimed free text, and now
+  honours it.
+
+## D156 — Outcomes is always enabled as part of GovTool
+
+**Date:** 2026-10-02
+**Said:** "So it should always be enabled."
+**Amends:** D143 (provider limitations prevented the whole Outcomes section from being enabled).
+
+- Outcomes is GovTool's own frontend and backend. Its public and wallet-connected routes, navigation,
+  and links from submitted proposals are always available; there is no environment enable/disable flag.
+- Outcomes requests default to the configured GovTool backend with `/outcomes` appended. An explicit
+  API URL override remains supported; an unset override never selects an external Outcomes service.
+- Provider limitations belong to the affected data and calculations within Outcomes. They do not
+  disable the entire section. When required voting metrics or protocol parameters cannot be loaded,
+  the page retains the action's recorded status and shows an unavailable-data message instead of
+  computing pass/fail indicators from missing values.
+
+## D157 — Remove the obsolete votesLastYear field and retain optional activity sorting
+
+**Date:** 2026-10-02
+**Said:** "Remove the obsolete field; keep capability-aware activity sorting".
+
+- DRep directory responses no longer include `votesLastYear`. Its name implied a trailing year, while
+  the underlying participation count covers governance actions voted on since registration.
+- The backend retains the provider's activity data internally for Voting Activity sorting. It never
+  serializes that internal count under the obsolete name or replaces it with another response field.
+- Activity sorting is offered only when the configured provider declares directory activity support.
+  A direct request for unsupported activity sorting, or a supported declaration with missing directory
+  activity data, is refused explicitly instead of treating unknown counts as zero or ranking all rows
+  equally. The frontend selects an available fallback when its persisted Activity choice is unsupported.
+
+## D158 — Outcomes displays action-specific aggregates independently per voter group
+
+**Date:** 2026-10-02
+**Said:** "lets do that" — consume the available proposal aggregates, display each supported group
+independently, and validate live and concluded actions against Koios and db-sync.
+**Amends:** D143 (Outcomes recalculated votes from a complete network-metrics response) and D156
+(a missing metric prevented all voting calculations from rendering).
+
+- The Outcomes detail response includes `vote_aggregates`, containing only the contract's per-role
+  representation, yes/no/abstain/not-voted figures, eligible total, threshold ratio and optional passing
+  decision. Strings preserve exact quantities; provider extensions are not serialized.
+- The voting panel consumes those aggregates directly. It never recomputes automatic votes from
+  network totals or substitutes present-day stake or committee membership into a historical tally.
+- Each applicable voter group renders independently. An absent aggregate means the provider does not
+  support that group's complete breakdown; the UI says so directly and displays no invented totals or
+  pass/fail result. Groups that do not vote on the action have a separate inapplicability message.
+- The supported table displays only the breakdown the aggregate actually supplies. Automatic and
+  explicit vote subcategories are not separately reported when the contract does not supply them.
+- Passing uses the provider decision when supplied, otherwise exact cross-multiplication against its
+  threshold, with no majority fallback for a zero threshold. A zero non-abstaining denominator is a
+  zero ratio, as in the ledger: it passes only a zero threshold. InfoAction never receives a pass/fail
+  indicator.
+- The recorded lifecycle status remains visible regardless of which voting groups are supported.
+  Other detail tabs request protocol parameters independently; no voting panel or detail tab requires
+  the complete network-metrics endpoint.
+
+## D159 — Koios omits historical SPO default-vote aggregates it cannot reproduce
+
+**Date:** 2026-10-02
+**Evidence:** A live comparison on preview at epoch 1438 found identical DRep tallies for an enacted
+committee update ratified in epoch 1369, but different SPO no/abstain/not-voted values. Eligible SPO
+stake and explicit yes stake matched. Koios's proposal summary resolves pool reward accounts through
+its current pool-info cache, whereas the db-sync tally uses registrations effective at the tally epoch.
+
+- Until historical pool reward-account registrations can be reproduced, the Koios adapter omits SPO
+  aggregates for past protocol-10 tallies that use reward-account default votes. It retains supported
+  DRep aggregates and the Outcomes UI identifies the absent SPO breakdown explicitly (D158).
+- Historical hard-fork tallies remain supported because silent pools count as not-voted regardless of
+  reward delegation. Historical bootstrap tallies remain supported because silent pools abstain.
+- Current-epoch SPO tallies remain supported. This restriction does not imply that Koios lacks all pool
+  voting data; it prevents current registration state from being substituted into historical defaults.
+
+## D160 — DRep retirement invalidates a prior vote, even after re-registration
+
+**Date:** 2026-10-02
+**Evidence:** The preview live comparison at epoch 1438 found a 4,994,351,707-lovelace DRep Yes vote
+counted by db-sync and excluded by Koios. The DRep retired after that vote and later re-registered.
+The latest registration alone therefore cannot establish that its old vote is still valid.
+
+- The db-sync aggregate excludes a DRep vote when a retirement certificate follows it and precedes
+  the tally epoch's transaction cutoff. A later registration does not reinstate that earlier vote.
+- Retirement after the tally cutoff does not rewrite a historical result. A fresh vote after
+  re-registration remains eligible under the existing activity and stake rules.
+- This aligns the db-sync aggregate with Koios's retirement rule without changing the eligible total
+  or silently converting a supported vote into an unavailable aggregate.
+
+## D161 — Committee aggregates carry the minimum-size approval veto
+
+**Date:** 2026-10-02
+**Evidence:** The ledger's `votingCommitteeThresholdInternal` refuses committee approval when
+active membership is below `committeeMinSize`, except during bootstrap. A quorum ratio alone
+cannot reproduce that decision, even with unanimous yes votes or a zero quorum.
+Source: [Conway governance rule](https://github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/src/Cardano/Ledger/Conway/Governance/Internal.hs#L441-L459).
+**Amends:** D158 (deriving passing from an aggregate's ratio alone).
+
+- db-sync and current-epoch Koios committee aggregates retain their complete vote breakdown and
+  quorum, and supply the existing optional `passing: false` when eligible membership is below
+  the tally epoch's minimum size outside bootstrap.
+- Meeting the minimum does not itself mean passing; the existing exact quorum comparison applies.
+  Bootstrap bypasses this size gate, and InfoAction still has no pass/fail indicator.
+- The Outcomes frontend already honours provider decisions. No additional protocol-parameter
+  request or network-wide metric is needed to display the veto.
+
+
+## D162 — Governance actions use the GovTool backend and action history naming
+
+**Date:** 2026-10-02
+
+**Amends:** D143 and D156 (separate action-history API namespace and optional URL override),
+D149 and D158 (the legacy Outcomes terminology in frontend source and browser checks).
+
+- There is one GovTool backend. Governance action records are served at
+  `/governance-actions`, with supporting epoch, network and author-verification routes
+  under `/misc`. They are not a separate service or a separately enabled feature.
+- The frontend uses `VITE_BASE_URL` for these requests. The separate API URL override
+  and the `/outcomes` backend prefix are removed; no compatibility alias is retained.
+  Existing response fields and exact per-role aggregates are unchanged.
+- The view of completed actions is called Governance action history, under
+  `/governance_actions/history`; detail links append the action's `txHash#index`.
+  The existing lifecycle filters, including live actions, remain available.
+- Backend classes, frontend source, browser helpers and test commands use governance
+  action names. Historical decision records and source attribution retain their original names.
+- Governance-action browser regression checks share the existing frontend browser CI
+  job with CIP-179, including dependency and Chromium installation. Browser-only edits
+  do not run frontend unit tests, lint or type checking; frontend source changes do.
+
+## D163 — Committee hot credentials do not identify seats
+
+**Date:** 2026-10-02
+**Amends:** D161 (minimum-size calculation in the Koios implementation).
+**Evidence:** The ledger walks cold committee credentials and looks up each member's authorised
+hot credential when tallying. Multiple cold members can therefore use the same hot vote.
+Source: [Conway committee tally](https://github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/src/Cardano/Ledger/Conway/Rules/Ratify.hs#L131-L158).
+
+- Koios current-epoch committee aggregates retain the eligible cold-to-hot mapping. Each
+  cold member contributes one seat and receives its hot credential's latest vote, including
+  abstentions; a member whose hot credential has not voted contributes to not-voted.
+- The minimum-size veto counts eligible cold members, rather than distinct hot credentials.
+  db-sync already counts cold members and needs no change. Historical Koios committee
+  aggregates remain unavailable because current authorisations cannot reconstruct them.

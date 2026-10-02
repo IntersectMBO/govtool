@@ -73,6 +73,8 @@ Declared (`system.getCapabilities()`, `capabilities()`):
   count, with `notVoted` filled so that `yes + no + abstain + notVoted` is the
   eligible total, and the threshold from the parameters by type and group. A
   pool with no recorded voting power is refused rather than counted as zero.
+  Outside bootstrap, a committee below `committeeMinSize` retains its tally
+  but supplies `passing: false`, even when its yes ratio meets quorum.
 - **DRep fields** are omitted rather than zeroed when the ledger's
   distribution has no row for the DRep (SPEC.md §3.2).
 - **Unknown but well-formed addresses** get an explicit empty answer

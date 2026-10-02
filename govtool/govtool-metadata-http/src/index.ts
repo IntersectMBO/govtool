@@ -273,6 +273,15 @@ export function createHttpMetadataService(
       return outcome;
     },
 
+    async verify(hash, url): Promise<MetadataResult> {
+      const path = `/api/metadata/${encodeURIComponent(hash)}/verify`;
+      const route = 'POST /api/metadata/{hash}/verify';
+      const { status, body } = await call('POST', path, { url });
+      const result = status === 200 ? toResult(body) : undefined;
+      if (!result) unexpected(status, route, body);
+      return result;
+    },
+
     async getReport(reportId): Promise<MetadataReport | null> {
       const path = `/api/metadata/reports/${encodeURIComponent(reportId)}`;
       const route = 'GET /api/metadata/reports/{id}';

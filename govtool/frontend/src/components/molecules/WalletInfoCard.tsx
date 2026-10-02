@@ -5,7 +5,7 @@ import {
   PDF_PATHS,
   PATHS,
   gray,
-  OUTCOMES_PATHS,
+  GOV_ACTION_HISTORY_PATHS,
   BUDGET_DISCUSSION_PATHS,
 } from "@consts";
 import { useCardano } from "@context";
@@ -29,13 +29,13 @@ export const WalletInfoCard = () => {
       PDF_PATHS.proposalDiscussion.replace("/", ""),
     );
 
-    const isGovernanceOutcomesPillar = window.location.pathname.includes(
-      OUTCOMES_PATHS.governanceActionsOutcomes.replace("/", ""),
+    const isGovernanceGovernanceActionHistoryPillar = window.location.pathname.includes(
+      GOV_ACTION_HISTORY_PATHS.governanceActionHistory.replace("/", ""),
     );
     if (
       !isBudgetDiscussion &&
       !isProposalDiscussionForum &&
-      !isGovernanceOutcomesPillar
+      !isGovernanceGovernanceActionHistoryPillar
     ) {
       navigate(
         pathname.includes("/connected")

@@ -63,6 +63,7 @@ jobs:
           cache-dependency-path: |
             tests/govtool-frontend/playwright/package-lock.json
             tests/devnet/blockfrost-shim/package-lock.json
+            govtool/frontend/package-lock.json
 
       - uses: actions/setup-python@v5
         with:
@@ -110,6 +111,12 @@ jobs:
       - name: Install Playwright dependencies
         working-directory: tests/govtool-frontend/playwright
         run: npm ci --no-audit --no-fund
+
+      # The cip179 project encodes its fixtures with the frontend's own
+      # codecs, imported from its source and node_modules.
+      - name: Install frontend dependencies for the cip179 tests
+        working-directory: govtool/frontend
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4

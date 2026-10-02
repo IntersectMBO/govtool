@@ -31,6 +31,7 @@ import {
   mapLimit,
   resolveBody,
 } from 'src/metadata/enrich';
+import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { readAll } from 'src/common/snapshot';
 import { ProposalService } from 'src/proposal/proposal.service';
 import {
@@ -104,9 +105,20 @@ const SNAPSHOT_DREP_SORTS: readonly DRepSort[] = [
   'activity',
 ];
 
+/**
+ * Room for every DRep's name on mainnet several times over; a value is one
+ * short string.
+ */
+const NAME_CACHE_MAX_ENTRIES = 50_000;
+
 @Injectable()
 export class DRepService {
   private readonly drepListSnapshotNamespace = 'drepListSnapshot';
+  /** Each DRep's CIP-119 `givenName` by (hash, url), for name search. */
+  private readonly nameCache = new DocumentSummaryCache<{
+    givenName: string | null;
+  }>(NAME_CACHE_MAX_ENTRIES);
+  private warmingNames = false;
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
@@ -299,14 +311,32 @@ export class DRepService {
     const sort = params.sort ?? 'Random';
     const seed = params.seed ?? '';
 
-    let dreps = [...(await this.getDRepListSnapShot(search))];
+    // A term that is not a DRep id is a name, as in the Haskell backend's
+    // `given_name ILIKE`. No provider indexes names, so it is matched over the
+    // whole directory against the names the warmer has resolved.
+    const isName =
+      search !== '' && tryLegacyDRepCandidates(search) === undefined;
+    const snapshot = await this.getDRepListSnapShot(isName ? '' : search);
+    const activityVotes = new Map(
+      snapshot.flatMap((drep) =>
+        drep.activity === undefined
+          ? []
+          : [[drepIdToHex(drep.id), drep.activity.voted] as const],
+      ),
+    );
+    let dreps = snapshot.map((drep) => this.toLegacyListItem(drep));
+    if (isName) {
+      dreps = this.filterByName(dreps, search);
+    }
 
     if (params.status.length > 0) {
       dreps = dreps.filter((drep) => params.status.includes(drep.status));
     }
 
     dreps = this.filterDRepsBySearchRule(dreps, search);
-    dreps = this.sortDReps(dreps, sort, seed);
+    dreps = await asHttp(() =>
+      this.sortDReps(dreps, sort, seed, activityVotes),
+    );
 
     const total = dreps.length;
     const offset = page * pageSize;
@@ -402,17 +432,78 @@ export class DRepService {
             proposals,
             selectedTypes,
           );
-          proposals = this.proposalService.filterBySearch(proposals, search);
+          proposals = await this.proposalService.filterBySearch(
+            proposals,
+            search,
+          );
           proposals = this.proposalService.sortProposals(proposals, sort);
 
-          return proposals.flatMap((proposal) => {
+          const ordered = proposals.flatMap((proposal) => {
             const pair = byGovActionId.get(
               `${proposal.txHash}#${proposal.index}`,
             );
             return pair === undefined ? [] : [{ ...pair, proposal }];
           });
+          // The details page opens a row as it is, without reading the
+          // proposal again, so each carries its document and authors.
+          return mapLimit(ordered, ENRICH_CONCURRENCY, async (pair) => ({
+            ...pair,
+            proposal: await this.proposalService.withDocument(pair.proposal),
+          }));
         }),
     );
+  }
+
+  /**
+   * Resolves every DRep's name into the name cache, so a name search finds
+   * them: a directory holds thousands of DReps, more than a search could
+   * resolve on demand. One run at a time; failures only leave a name
+   * unresolved, and the metadata service keeps each document once fetched,
+   * so later runs are quick.
+   */
+  async warmSearchNames(): Promise<void> {
+    const metadata = this.metadata;
+    if (metadata === null || this.warmingNames) return;
+    this.warmingNames = true;
+    try {
+      const dreps = (await this.getDRepListSnapShot('')).map((drep) =>
+        this.toLegacyListItem(drep),
+      );
+      await mapLimit(
+        dreps,
+        ENRICH_CONCURRENCY,
+        ({ url, metadataHash: hash }) =>
+          !url || !hash
+            ? Promise.resolve(undefined)
+            : this.nameCache.get(
+                hash,
+                url,
+                async () => {
+                  const fields = drepFields(
+                    await resolveBody(metadata, { url, hash }),
+                  );
+                  return fields ? { givenName: fields.givenName } : undefined;
+                },
+                { awaitRefresh: true },
+              ),
+      );
+    } finally {
+      this.warmingNames = false;
+    }
+  }
+
+  /**
+   * DReps whose resolved name contains `search`, ignoring case. Reads only
+   * names already cached: one not resolved yet does not match, and is
+   * picked up once the warmer reaches it.
+   */
+  private filterByName(dreps: DRepListItem[], search: string): DRepListItem[] {
+    const needle = search.toLowerCase();
+    return dreps.filter(({ url, metadataHash }) => {
+      if (!url || !metadataHash) return false;
+      const name = this.nameCache.peek(metadataHash, url)?.givenName;
+      return !!name && name.toLowerCase().includes(needle);
+    });
   }
 
   async warmDefaultListSnapshot(): Promise<void> {
@@ -443,7 +534,7 @@ export class DRepService {
     }
   }
 
-  private getDRepListSnapShot(search: string): Promise<DRepListItem[]> {
+  private getDRepListSnapShot(search: string): Promise<DRep[]> {
     return this.cacheService.getOrSetStaleWhileRevalidate(
       this.drepListSnapshotNamespace,
       search,
@@ -462,7 +553,7 @@ export class DRepService {
    * rather than reshuffling, so asking for the default would cap the snapshot
    * at one page.
    */
-  private async fetchDRepListSnapshot(search: string): Promise<DRepListItem[]> {
+  private async fetchDRepListSnapshot(search: string): Promise<DRep[]> {
     return asHttp(async () => {
       const sort = await this.snapshotSort();
       const read = (term: string) =>
@@ -499,7 +590,7 @@ export class DRepService {
           .filter((drep) => decodeCip129DRepId(drep.id) !== undefined)
           .map((drep) => [drep.id, drep]),
       );
-      return [...unique.values()].map((drep) => this.toLegacyListItem(drep));
+      return [...unique.values()];
     });
   }
 
@@ -552,9 +643,6 @@ export class DRepService {
       qualifications: null,
       imageUrl: null,
       imageHash: null,
-      // Participation is "voted out of votable since registration" now, not a
-      // trailing year — the legacy field name outlived the window.
-      votesLastYear: drep.activity?.voted ?? null,
       // `list-dreps.sql` COALESCEs both reference arrays to `[]`, so the
       // legacy field is an array even for a DRep with no metadata anchor.
       // Never `null`.
@@ -656,11 +744,12 @@ export class DRepService {
     });
   }
 
-  private sortDReps(
+  private async sortDReps(
     dreps: DRepListItem[],
     sort?: DRepListSort,
     seed?: string,
-  ): DRepListItem[] {
+    activityVotes: ReadonlyMap<string, number> = new Map(),
+  ): Promise<DRepListItem[]> {
     const copied = [...dreps];
 
     switch (sort) {
@@ -672,10 +761,26 @@ export class DRepService {
           compareIntegers(b.votingPower ?? -1, a.votingPower ?? -1),
         );
 
-      case 'Activity':
-        return copied.sort(
-          (a, b) => (b.votesLastYear ?? -1) - (a.votesLastYear ?? -1),
-        );
+      case 'Activity': {
+        const { data } = await this.chain.system.getCapabilities();
+        if (!data.sorts.dreps.includes('activity')) {
+          throw new ChainDataError(
+            'CAPABILITY_UNSUPPORTED',
+            'The configured chain-data provider does not support directory activity sorting',
+          );
+        }
+        const ranked = copied.map((item) => {
+          const count = activityVotes.get(item.drepId);
+          if (count === undefined) {
+            throw new ChainDataError(
+              'CAPABILITY_UNSUPPORTED',
+              'The configured chain-data provider does not supply directory activity for every DRep',
+            );
+          }
+          return { item, count };
+        });
+        return ranked.sort((a, b) => b.count - a.count).map(({ item }) => item);
+      }
 
       case 'RegistrationDate':
         return copied.sort(

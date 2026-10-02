@@ -13,6 +13,7 @@ import {
   DataMissingHeader,
   GovernanceActionsDatesBox,
   MetadataFailureDetails,
+  MetadataWarningInfoBox,
   GovernanceActionDetailsDiffView,
   GovernanceActionNewCommitteeDetailsTabContent,
   GovernanceActionCardTreasuryWithdrawalElement,
@@ -29,7 +30,7 @@ import {
   encodeCIP129Identifier,
   validateSignature,
 } from "@utils";
-import { MetadataValidationStatus, ProposalData } from "@models";
+import { MetadataIssue, MetadataValidationStatus, ProposalData } from "@models";
 import { Trans } from "react-i18next";
 import { errorRed, successGreen } from "@/consts";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -68,6 +69,8 @@ const StyledTab = styled(({ isMobile, ...props }: StyledTabProps) => (
 type GovernanceActionDetailsCardDataProps = {
   isDashboard?: boolean;
   isDataMissing?: MetadataValidationStatus;
+  /** Errors are listed with the failure; warnings alone get their own box. */
+  metadataIssues?: MetadataIssue[];
   isInProgress?: boolean;
   isOneColumn: boolean;
   isSubmitted?: boolean;
@@ -80,6 +83,7 @@ type GovernanceActionDetailsCardDataProps = {
 export const GovernanceActionDetailsCardData = ({
   isDashboard,
   isDataMissing,
+  metadataIssues,
   isInProgress,
   isOneColumn,
   isSubmitted,
@@ -272,7 +276,11 @@ export const GovernanceActionDetailsCardData = ({
         isValidating={isValidating}
         isInProgress={isInProgress}
         isSubmitted={isSubmitted}
+        issues={metadataIssues}
       />
+      {!isDataMissing && !isValidating && (
+        <MetadataWarningInfoBox issues={metadataIssues} />
+      )}
       {isDataMissing &&
         !isValidating &&
         !isSubmitted &&

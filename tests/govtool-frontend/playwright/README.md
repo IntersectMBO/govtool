@@ -1,6 +1,6 @@
 # 🚀 GovTool Integration Test Guide
 
-For CIP-179 user stories and deterministic tests without funded wallets or API keys, see [CIP-179 linked surveys](docs/cip179-user-stories.md). Run them with `npm run test:cip179` after installing frontend and test dependencies.
+For CIP-179 user stories and deterministic tests without funded wallets or API keys, see [CIP-179 linked surveys](docs/cip179-user-stories.md). They run in every default run as the `cip179 (desktop)` and `cip179 (mobile)` projects, against the run's frontend; to run only them or skip them, see [CIP-179 Linked Surveys](#10-cip-179-linked-surveys) below.
 
 ## ✅ Prerequisites
 
@@ -205,19 +205,29 @@ npm run test:headless:voting-pillar
 
 ---
 
-#### 3. **Outcomes**
+#### 3. **Governance action history**
 
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:outcomes
+npm run test:governance-action-history
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:outcomes
+npm run test:headless:governance-action-history
 ```
+
+For offline desktop/mobile aggregate replays, run:
+
+```bash
+npm run test:governance-action-aggregates
+```
+
+This starts a local Vite server and mocks HTTP; it needs no backend or wallet.
+The deployment suite excludes these fixtures. To replay a captured provider
+comparison, set `GOVTOOL_AGGREGATES_REPORT=/path/to/report.json` for the same command.
 
 ---
 
@@ -322,6 +332,42 @@ npm run test:misc
 ```bash
 npm run test:headless:misc
 ```
+
+---
+
+#### 10. **CIP-179 Linked Surveys**
+
+- **Pre-requisite**: the frontend's dependencies, which the tests load to encode their fixtures: `npm ci --ignore-scripts` in `govtool/frontend`. No funded wallet or API key: every request and the wallet are mocked.
+
+These run in every default run (`cip179 (desktop)` and `cip179 (mobile)`). User stories: [docs/cip179-user-stories.md](docs/cip179-user-stories.md).
+
+#### 🖥️ UI Mode
+
+```bash
+npx playwright test cip179/ --ui
+```
+
+#### 🧪 Headless Mode (No UI)
+
+Against the `HOST_URL` frontend:
+
+```bash
+npm run test:headless:cip179
+```
+
+On a local Vite dev server the config starts itself, with no `HOST_URL` or backend:
+
+```bash
+npm run test:cip179
+```
+
+#### ⏭️ Skip Them
+
+```bash
+npm run test:headless:no-cip179
+```
+
+This filters by path, so the cip179 files are never loaded and the frontend's dependencies are not needed. `--grep-invert` would load them first.
 
 ---
 

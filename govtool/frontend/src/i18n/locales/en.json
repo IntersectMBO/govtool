@@ -358,24 +358,36 @@
       "description": {
         "notVerifiable": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
         "dataMissing": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
-        "incorrectFormat": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec."
+        "incorrectFormat": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec.",
+        "urlBlocked": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. GovTool only fetches data from public internet addresses, and this URL points to a private, local or otherwise blocked address.",
+        "exceedsLimit": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the file at the URL is larger than the 2 MB GovTool accepts.",
+        "internalError": "Something went wrong on GovTool's side while checking this DRep's data. This is not a problem with the DRep's data. Please try again later."
       },
       "message": {
         "notVerifiable": "The data that was originally used when this DRep was created has changed.",
         "dataMissing": "The data that was originally used when this DRep was created has not been found.",
-        "incorrectFormat": "The data that was originally used when this DRep was created has been formatted incorrectly."
+        "incorrectFormat": "The data that was originally used when this DRep was created has been formatted incorrectly.",
+        "urlBlocked": "The URL this DRep registered points to an address GovTool does not fetch from.",
+        "exceedsLimit": "The data that was originally used when this DRep was created is too large to load.",
+        "internalError": "GovTool could not check the data for this DRep."
       }
     },
     "gAMetadata": {
       "description": {
         "notVerifiable": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data when the Governance Action was originally posted.",
         "dataMissing": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that GovTool cannot locate the data on the URL specified when the Governance Action was originally posted.",
-        "incorrectFormat": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data format as defined by the Cardano community."
+        "incorrectFormat": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data format as defined by the Cardano community.",
+        "urlBlocked": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. GovTool only fetches data from public internet addresses, and this URL points to a private, local or otherwise blocked address.",
+        "exceedsLimit": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the file at the URL is larger than the 2 MB GovTool accepts.",
+        "internalError": "Something went wrong on GovTool's side while checking this Governance Action's data. This is not a problem with the proposer's data. Please try again later."
       },
       "message": {
         "notVerifiable": "The data that was originally used when this Governance Action was created has changed.",
         "dataMissing": "The data that was originally used when this Governance Action was created has not been found.",
-        "incorrectFormat": "The data that was originally used when this Governance Action was created has been formatted incorrectly."
+        "incorrectFormat": "The data that was originally used when this Governance Action was created has been formatted incorrectly.",
+        "urlBlocked": "The URL this Governance Action was posted with points to an address GovTool does not fetch from.",
+        "exceedsLimit": "The data that was originally used when this Governance Action was created is too large to load.",
+        "internalError": "GovTool could not check the data for this Governance Action."
       },
       "title": {}
     }
@@ -432,8 +444,8 @@
       "invalidValueType": "Invalid value type"
     }
   },
-  "outcome": {
-    "label": "Outcome",
+  "actionRecord": {
+    "label": "Governance action",
     "abstract": "Abstract",
     "motivation": "Motivation",
     "rationale": "Rationale",
@@ -511,6 +523,12 @@
     },
     "votes": {
       "title": "Votes Submitted for this Governance Action:",
+      "dataUnavailable": "The configured data provider does not support this voting breakdown.",
+      "dataInconsistent": "The data provider returned an inconsistent voting breakdown, so it is not displayed.",
+      "totalEligible": "Total Eligible Voting Power",
+      "eligibleMembers": "Eligible Committee Members",
+      "ratificationDenominator": "Eligible Non-Abstaining Votes",
+      "noEligibleVotes": "There are no eligible non-abstaining votes for this tally.",
       "dReps": "DReps",
       "sPos": "SPOs",
       "cCommitteeFull": "Constitutional Committee",
@@ -522,6 +540,7 @@
       "abstainVotes": "Abstain Votes",
       "votingNotAvailable": "do not vote",
       "onThisTypeOfAction": "on this type of action",
+      "totalsUnavailable": "Vote totals for this group are not available for this action from the configured data source.",
       "totalStake": "Total Votes",
       "numberOfCCs": "Number of Active CCs",
       "metric": "Metric",
@@ -533,7 +552,7 @@
       "ratificationThreshold": "Ratification Threshold Stake"
     },
     "ratifiedStatus": {
-      "title": "Outcome",
+      "title": "Voting result",
       "valueRatified": "Ratified",
       "valueNotRatified": "Not Ratified"
     },
@@ -562,8 +581,8 @@
       "proposedOn": "Proposed on:"
     }
   },
-  "outcomesList": {
-    "title": "Outcomes",
+  "governanceActionHistoryList": {
+    "title": "Governance action history",
     "noResults": {
       "title": "No governance actions found",
       "description": "Governance actions are searchable by their ID both CIP-105 (legacy) and CIP-129 formats, title and abstract contents."
@@ -715,6 +734,7 @@
     "votedOnByMe": "Voted on by me",
     "voteOnGovActions": "Vote on Governance Action",
     "voteSubmitted": "Votes submitted",
+    "voteTotalsUnavailable": "Vote totals are not available for this action from the configured data source.",
     "voteTransaction": "Vote transaction",
     "votes": "Votes:",
     "votesSubmitted": "DRep votes submitted",
@@ -768,9 +788,9 @@
       "title": "Live Voting",
       "label": "Live Voting"
     },
-    "outcomes": {
-      "title": "Outcomes",
-      "label": "Outcomes"
+    "history": {
+      "title": "Governance action history",
+      "label": "Governance action history"
     },
     "votedByMe": {
       "title": "Voted by me",
@@ -939,6 +959,20 @@
       "message": "GovTool checks the URL you entered to see if the JSON file that you self-host matches the one that was generated in GovTool. To complete registration, this match must be exact.\n\nIn this case, there is a mismatch. You can go back to the data edit screen and try the process again.",
       "title": "Your External Data Does Not Match the Original File."
     },
+    "externalDataIncorrectFormat": {
+      "buttonText": "Go to Data Edit Screen",
+      "cancelRegistrationText": "Cancel Registration",
+      "feedbackText": "Feedback",
+      "message": "GovTool checked the file at the URL you entered, and it does not follow the metadata standard for this kind of data. Make sure the URL serves the exact JSON file generated in GovTool, then try again.",
+      "title": "Your External Data Is Not in the Expected Format"
+    },
+    "externalDataTooLarge": {
+      "buttonText": "Go to Data Edit Screen",
+      "cancelRegistrationText": "Cancel Registration",
+      "feedbackText": "Feedback",
+      "message": "The file at the URL you entered is larger than the 2 MB GovTool accepts. Make sure the URL serves the JSON file generated in GovTool, then try again.",
+      "title": "Your External Data Is Too Large"
+    },
     "externalLink": {
       "beCareful": "Be Careful!",
       "continueTo": "Continue to external link",
@@ -962,6 +996,20 @@
       "linkText": "Learn More about self-hosting",
       "message": "GovTool cannot find the URL that you entered. Please check it and re-enter.",
       "title": "The URL You Entered Cannot Be Found"
+    },
+    "urlBlocked": {
+      "buttonText": "Go to Data Edit Screen",
+      "cancelRegistrationText": "Cancel Registration",
+      "feedbackText": "Feedback",
+      "message": "The URL you entered points to a private or local network address. GovTool only fetches data from public internet addresses, so host the file somewhere public and enter that URL.",
+      "title": "The URL You Entered Cannot Be Used"
+    },
+    "metadataCheckFailed": {
+      "buttonText": "Go to Data Edit Screen",
+      "cancelRegistrationText": "Cancel Registration",
+      "feedbackText": "Feedback",
+      "message": "Something went wrong on GovTool's side while checking the file at your URL. This is not a problem with your data. Please try again in a moment.",
+      "title": "GovTool Could Not Check Your Data"
     },
     "votingPower": {
       "govActionsVotes": "Governance Action votes",
@@ -1126,7 +1174,23 @@
   "dataMissingErrors": {
     "dataMissing": "Data Missing",
     "notVerifiable": "Data Not Verifiable",
-    "incorrectFormat": "Data Formatted Incorrectly"
+    "incorrectFormat": "Data Formatted Incorrectly",
+    "urlBlocked": "Data URL Blocked",
+    "exceedsLimit": "Data Too Large",
+    "internalError": "Data Not Checked"
+  },
+  "metadataIssues": {
+    "fields": {
+      "abstract": "Abstract",
+      "givenName": "Name",
+      "motivation": "Motivation",
+      "rationale": "Rationale",
+      "title": "Title"
+    },
+    "maxLength": "{{field}} is {{actual}} characters long; the standard allows {{limit}}.",
+    "required": "{{field}} is missing or empty.",
+    "warningDescription": "It is shown as published, but other tools may cut these fields short or reject the data.",
+    "warningTitle": "This data does not fully follow its metadata standard"
   },
   "votes": {
     "abstain": "Abstain",

@@ -2,8 +2,13 @@ import { Box, Link, Skeleton, SxProps } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
-import { MetadataValidationStatus } from "@models";
-import { openInNewTab } from "@utils";
+import { MetadataIssue, MetadataValidationStatus } from "@models";
+import {
+  getMetadataErrors,
+  getMetadataIssueMessage,
+  getMetadataStatusErrorKey,
+  openInNewTab,
+} from "@utils";
 import { LINKS } from "@/consts/links";
 
 export const DataMissingInfoBox = ({
@@ -12,6 +17,7 @@ export const DataMissingInfoBox = ({
   isValidating,
   isSubmitted,
   isDrep = false,
+  issues,
   sx,
 }: {
   isDataMissing?: MetadataValidationStatus;
@@ -19,45 +25,18 @@ export const DataMissingInfoBox = ({
   isValidating?: boolean;
   isSubmitted?: boolean;
   isDrep?: boolean;
+  /** The rules the document breaks, listed under the description. */
+  issues?: MetadataIssue[];
   sx?: SxProps;
 }) => {
   const { t } = useTranslation();
 
-  const gaMetadataErrorMessage = {
-    [MetadataValidationStatus.URL_NOT_FOUND]: isDrep
-      ? t("errors.dRep.message.dataMissing")
-      : t("errors.gAMetadata.message.dataMissing"),
-    [MetadataValidationStatus.INVALID_JSONLD]: isDrep
-      ? t("errors.dRep.message.incorrectFormat")
-      : t("errors.gAMetadata.message.incorrectFormat"),
-    [MetadataValidationStatus.INVALID_HASH]: isDrep
-      ? t("errors.dRep.message.notVerifiable")
-      : t("errors.gAMetadata.message.notVerifiable"),
-    [MetadataValidationStatus.INCORRECT_FORMAT]: isDrep
-      ? t("errors.dRep.message.incorrectFormat")
-      : t("errors.gAMetadata.message.incorrectFormat"),
-    [MetadataValidationStatus.EXCEEDS_LIMIT]: isDrep
-      ? t("errors.dRep.message.incorrectFormat")
-      : t("errors.gAMetadata.message.incorrectFormat"),
-  }[isDataMissing as MetadataValidationStatus];
-
-  const gaMetadataErrorDescription = {
-    [MetadataValidationStatus.URL_NOT_FOUND]: isDrep
-      ? t("errors.dRep.description.dataMissing")
-      : t("errors.gAMetadata.description.dataMissing"),
-    [MetadataValidationStatus.INVALID_JSONLD]: isDrep
-      ? t("errors.dRep.description.incorrectFormat")
-      : t("errors.gAMetadata.description.incorrectFormat"),
-    [MetadataValidationStatus.INVALID_HASH]: isDrep
-      ? t("errors.dRep.description.notVerifiable")
-      : t("errors.gAMetadata.description.notVerifiable"),
-    [MetadataValidationStatus.INCORRECT_FORMAT]: isDrep
-      ? t("errors.dRep.description.incorrectFormat")
-      : t("errors.gAMetadata.description.incorrectFormat"),
-    [MetadataValidationStatus.EXCEEDS_LIMIT]: isDrep
-      ? t("errors.dRep.description.incorrectFormat")
-      : t("errors.gAMetadata.description.incorrectFormat"),
-  }[isDataMissing as MetadataValidationStatus];
+  const errorKey = isDataMissing && getMetadataStatusErrorKey(isDataMissing);
+  const scope = isDrep ? "errors.dRep" : "errors.gAMetadata";
+  const gaMetadataErrorMessage = errorKey && t(`${scope}.message.${errorKey}`);
+  const gaMetadataErrorDescription =
+    errorKey && t(`${scope}.description.${errorKey}`);
+  const errors = getMetadataErrors(issues);
 
   return isDataMissing && !isSubmitted && !isInProgress ? (
     <Box
@@ -109,6 +88,23 @@ export const DataMissingInfoBox = ({
         >
           {gaMetadataErrorDescription}
         </Typography>
+      )}
+      {!isValidating && errors.length > 0 && (
+        <Box
+          component="ul"
+          data-testid="metadata-error-issues"
+          sx={{ color: "errorRed", mt: 0, mb: 0.5, pl: 3 }}
+        >
+          {errors.map((issue) => (
+            <Typography
+              component="li"
+              key={`${issue.field}-${issue.rule}`}
+              sx={{ color: "errorRed", fontWeight: 400 }}
+            >
+              {getMetadataIssueMessage(issue)}
+            </Typography>
+          ))}
+        </Box>
       )}
       {isValidating ? (
         <Skeleton width="128px" height="24px" variant="text" />

@@ -26,6 +26,7 @@ import type {
   ProviderCapabilities,
 } from '@govtool/data-providers/chain-data';
 import { ChainDataError } from '@govtool/data-providers/chain-data';
+import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 
 import { AdaHolderService } from '../src/ada-holder/ada-holder.service';
 import { CacheService } from '../src/cache/cache.service';
@@ -173,11 +174,11 @@ function govAction(overrides: Partial<GovAction> = {}): GovAction {
   };
 }
 
-function drepService(dreps: DRep[]): DRepService {
+function drepService(dreps: DRep[], capabilities = PROVIDER): DRepService {
   const cache = passthroughCache();
   const api = chain({
     governance: { dreps: { list: () => Promise.resolve(page(dreps)) } },
-    system: { getCapabilities: () => Promise.resolve(env(PROVIDER)) },
+    system: { getCapabilities: () => Promise.resolve(env(capabilities)) },
   });
   return new DRepService(
     api,
@@ -282,6 +283,26 @@ describe('RAISE: sortDReps handles all five DRepSort keys', () => {
 
   it('orders by activity, descending', async () => {
     await expect(order('Activity')).resolves.toEqual(['a', 'c', 'b']);
+  });
+
+  it('refuses undeclared activity sorting even when rows contain activity', async () => {
+    const capabilities = providerCapabilities({
+      sorts: { dreps: ['registrationDate'], proposals: ['newest', 'oldest'] },
+    });
+    await expect(
+      drepService(dreps, capabilities).list({ status: [], sort: 'Activity' }),
+    ).rejects.toMatchObject({ status: 501 });
+  });
+
+  it('refuses activity sorting when a directory row lacks activity', async () => {
+    const { activity, ...withoutActivity } = dreps[0];
+    expect(activity).toBeDefined();
+    await expect(
+      drepService([withoutActivity, ...dreps.slice(1)]).list({
+        status: [],
+        sort: 'Activity',
+      }),
+    ).rejects.toMatchObject({ status: 501 });
   });
 
   it('orders by registration date, newest first', async () => {
@@ -411,10 +432,9 @@ describe('RAISE: the proposal list is filtered and sorted in memory', () => {
 
   /**
    * The provider declares `exactId` search only, and the backend still matches
-   * a substring — of the action id, which is what it has. The four CIP-108
-   * strings the legacy search also matched are metadata, and chain data no
-   * longer resolves any, so free text over a title is gone until a metadata
-   * service is wired in.
+   * a substring of the action id. The four CIP-108 strings come from the
+   * anchored documents, through the metadata service; see the search tests
+   * below.
    */
   it('searches over the whole snapshot, not by exact id alone', async () => {
     const body = await proposalService(actions).list({
@@ -514,6 +534,190 @@ describe('LOWER: laundering an absence into a number', () => {
   });
 });
 
+/** Serves each anchor url's document; any other url fails to resolve. */
+function metadataService(
+  documents: Record<string, Record<string, unknown>>,
+): MetadataServiceV1 {
+  return {
+    getMetadata: (hash, url) =>
+      url !== undefined && url in documents
+        ? Promise.resolve({
+            ok: true,
+            hash,
+            body: documents[url],
+            fetchedAt: '2026-10-02T00:00:00Z',
+          })
+        : Promise.reject(new Error('not served')),
+    getCipMetadata: () => Promise.reject(new Error('unused')),
+    refresh: () => Promise.reject(new Error('unused')),
+    getReport: () => Promise.resolve(null),
+    listReports: () => Promise.resolve([]),
+  };
+}
+
+describe('RAISE: search reaches names and titles, which no provider indexes', () => {
+  const anchor = (url: string) => ({ url, dataHash: 'e'.repeat(64) });
+
+  it('finds an action by a word of its title, abstract, motivation or rationale', async () => {
+    const actions = [
+      govAction({ anchor: anchor('https://x/bridge.jsonld') }),
+      govAction({
+        id: actionId(TX, 1),
+        index: 1,
+        anchor: anchor('https://x/other.jsonld'),
+      }),
+    ];
+    const service = new ProposalService(
+      chain({
+        governance: {
+          proposals: { list: () => Promise.resolve(page(actions)) },
+        },
+      }),
+      passthroughCache(),
+      metadataService({
+        'https://x/bridge.jsonld': {
+          body: { title: 'Fund the Bridge', rationale: 'Because' },
+        },
+        'https://x/other.jsonld': { body: { title: 'Something else' } },
+      }),
+    );
+    const search = (term: string) =>
+      service.list({ type: [], page: 0, pageSize: 10, search: term });
+
+    expect((await search('bridge')).elements.map((e) => e.index)).toEqual([0]);
+    expect((await search('BECAUSE')).total).toBe(1);
+    expect((await search('nowhere')).total).toBe(0);
+  });
+
+  it('matches an action id without reading any other document', async () => {
+    const getMetadata = jest.fn<
+      ReturnType<MetadataServiceV1['getMetadata']>,
+      Parameters<MetadataServiceV1['getMetadata']>
+    >(() => Promise.reject(new Error('down')));
+    const actions = [0, 1].map((index) =>
+      govAction({
+        id: actionId(TX, index),
+        index,
+        anchor: anchor(`https://x/${index}.jsonld`),
+      }),
+    );
+    const service = new ProposalService(
+      chain({
+        governance: {
+          proposals: { list: () => Promise.resolve(page(actions)) },
+        },
+      }),
+      passthroughCache(),
+      { ...metadataService({}), getMetadata },
+    );
+
+    for (const term of [actionId(TX, 1), `${TX}#1`]) {
+      const body = await service.list({
+        type: [],
+        page: 0,
+        pageSize: 10,
+        search: term,
+      });
+      expect(body.elements.map((e) => e.index)).toEqual([1]);
+    }
+    // Only the matched row's own document, to fill the page: the search
+    // itself never asked for one.
+    expect(getMetadata.mock.calls.map(([, url]) => url)).toEqual([
+      'https://x/1.jsonld',
+      'https://x/1.jsonld',
+    ]);
+  });
+
+  it('answers a text search within its wait, however many documents are slow', async () => {
+    jest.useFakeTimers();
+    try {
+      // Forty documents that never resolve: on demand, eight at a time and
+      // four seconds each, they would take twenty seconds.
+      const actions = Array.from({ length: 40 }, (_, index) =>
+        govAction({
+          id: actionId(TX, index),
+          index,
+          anchor: anchor(`https://x/${index}.jsonld`),
+        }),
+      );
+      const service = new ProposalService(
+        chain({
+          governance: {
+            proposals: { list: () => Promise.resolve(page(actions)) },
+          },
+        }),
+        passthroughCache(),
+        { ...metadataService({}), getMetadata: () => new Promise(() => {}) },
+      );
+      let answered = false;
+      const pending = service
+        .list({ type: [], page: 0, pageSize: 10, search: 'bridge' })
+        .then((body) => {
+          answered = true;
+          return body;
+        });
+
+      await jest.advanceTimersByTimeAsync(5_000);
+      expect(answered).toBe(true);
+      expect((await pending).total).toBe(0);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('finds a DRep by its name once the warmer has resolved it', async () => {
+    const alice = drep({ anchor: anchor('https://x/alice.jsonld') });
+    const bob = drep({
+      id: drepId('b'),
+      anchor: anchor('https://x/bob.jsonld'),
+      activity: { voted: 3, votable: 3 },
+    });
+    const cache = passthroughCache();
+    const api = chain({
+      governance: {
+        dreps: { list: () => Promise.resolve(page([alice, bob])) },
+      },
+      system: { getCapabilities: () => Promise.resolve(env(PROVIDER)) },
+    });
+    const service = new DRepService(
+      api,
+      new ProposalService(api, cache, null),
+      cache,
+      metadataService({
+        'https://x/alice.jsonld': { body: { givenName: 'Alice Example' } },
+        'https://x/bob.jsonld': { body: { givenName: 'Bob Alice' } },
+      }),
+    );
+    const search = (term: string) =>
+      service.list({ status: [], page: 0, pageSize: 10, search: term });
+
+    // Names are document text: none is known before the warmer runs.
+    expect((await search('alice')).total).toBe(0);
+
+    await service.warmSearchNames();
+
+    const found = await search('ALICE ex');
+    expect(found.total).toBe(1);
+    expect(found.elements[0].givenName).toBe('Alice Example');
+    expect((await search('carol')).total).toBe(0);
+
+    const sorted = await service.list({
+      status: [],
+      search: 'alice',
+      sort: 'Activity',
+      page: 0,
+      pageSize: 10,
+    });
+    expect(sorted.elements.map(({ givenName }) => givenName)).toEqual([
+      'Bob Alice',
+      'Alice Example',
+    ]);
+    expect(sorted.elements.every((row) => !('votesLastYear' in row))).toBe(
+      true,
+    );
+  });
+});
+
 describe('RAISE: a DRep vote history is read whole, not one provider page', () => {
   it('pages the listing to the end and asks for voted rows only', async () => {
     const calls: (PageRequest & DRepVoteListQuery)[] = [];
@@ -575,7 +779,7 @@ describe('the composed feature set', () => {
 
   it('RAISES the controls it applies to its own snapshot', () => {
     // The point is that the backend removes the restriction entirely, so a
-    // provider that refuses every key still gets a full menu.
+    // provider that refuses every key still gets the data-independent controls.
     const raised = backendFeatures(
       providerCapabilities({
         sorts: { dreps: [], proposals: ['newest'] },
@@ -585,9 +789,10 @@ describe('the composed feature set', () => {
       'mainnet',
     );
     const universe = ['votingPower', 'activity', 'status'];
-    expect(allowedOptions(raised, 'drepDirectory.sort', universe)).toEqual(
-      universe,
-    );
+    expect(allowedOptions(raised, 'drepDirectory.sort', universe)).toEqual([
+      'votingPower',
+      'status',
+    ]);
     expect(allowedOptions(raised, 'govActionList.sort', ['newest'])).toEqual([
       'newest',
     ]);
@@ -597,6 +802,19 @@ describe('the composed feature set', () => {
     expect(allowedOptions(raised, 'govActionList.status', ['live'])).toEqual([
       'live',
     ]);
+  });
+
+  it('retains activity sorting when the provider declares it', () => {
+    const universe = [
+      'votingPower',
+      'registrationDate',
+      'activity',
+      'status',
+      'random',
+    ];
+    expect(allowedOptions(COMPOSED, 'drepDirectory.sort', universe)).toEqual(
+      universe,
+    );
   });
 
   it('LOWERS a feature whose route it does not expose', () => {

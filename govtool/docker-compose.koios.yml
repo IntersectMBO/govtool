@@ -22,13 +22,56 @@
 # own network id, and a mismatch is reported as a rejected wallet rather than
 # as a misconfiguration. 1 is mainnet, 0 is every testnet.
 #
-# Every route the frontend calls is served on Koios. Without a metadata
-# service configured, document-derived fields (DRep names, action titles) are
-# null.
+# Every route the frontend calls is served on Koios. Document-derived fields
+# (DRep names, action titles) come from the metadata service below, which
+# fetches the anchors from the internet, IPFS included.
 
 name: govtool-koios
 
 services:
+  metadata-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: metadata
+      POSTGRES_PASSWORD: metadata
+      POSTGRES_DB: metadata
+    volumes:
+      - metadata-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metadata -d metadata"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  metadata:
+    build:
+      context: ./govtool-metadata-service
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # The image runs `prisma migrate deploy` before starting.
+      DATABASE_URL: postgresql://metadata:metadata@metadata-db:5432/metadata
+      # Optional: your own IPFS gateway, tried before the public ones.
+      IPFS_PRIMARY_GATEWAY: ${IPFS_PRIMARY_GATEWAY:-}
+    # No published port: only the backend talks to it (D119).
+    depends_on:
+      metadata-db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
   backend:
     build:
       # The parent directory: the backend depends on its sibling packages by
@@ -56,8 +99,12 @@ services:
       GOVTOOL_DREP_LIST_CACHE_DURATION_SECONDS: ${DREP_CACHE_SECONDS:-600}
       # Optional: without it /ipfs/upload answers 503 and reads are unaffected.
       GOVTOOL_PINATA_API_JWT: ${PINATA_API_JWT:-}
+      GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
     ports:
       - "${BACKEND_PORT:-9999}:9999"
+    depends_on:
+      metadata:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -90,16 +137,15 @@ services:
       VITE_IS_DEV: "true"
       # Must agree with GOVTOOL_KOIOS_NETWORK above: 1 for mainnet, 0 otherwise.
       VITE_NETWORK_FLAG: ${VITE_NETWORK_FLAG:-1}
-      VITE_METADATA_API_URL: ${METADATA_API_URL:-}
       VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-https://ipfs.io/ipfs}
       VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false"
-      # Off because the Koios provider cannot serve
-      # /outcomes/misc/network/metrics (501, D143); the URL is ready for it.
-      VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "false"
-      VITE_OUTCOMES_API_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}/outcomes
+      # Governance action history is built in; unsupported voting groups are identified in the UI.
     ports:
       - "${FRONTEND_PORT:-8080}:80"
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  metadata-db:

@@ -27,7 +27,7 @@ Global `fetch`, no HTTP library, no cache (SPEC.md §3.6).
 | network      | `getNetworkInfo`, `getProtocolParams` (+ past epochs), `getStakeDistribution`, `getTreasury`, `getGenesisParams` | `totalLiveStake`: Koios has no un-snapshotted network total                                                                                             |
 | accounts     | `get`, `getDelegation`, `getPoolDelegation`, `getVotingPower`                            | `balance`: withdrawals are not split into `rewards` / `rewardsRest`, and the contract forbids `total` alone. `listDelegationHistory`: `/account_updates` dates each certificate but does not say what it delegated to |
 | dreps        | `list`, `get`, `listVotes`, `listUpdateHistory`, `getCounts`                             | `listDelegators`: `/drep_delegators` reports each account's live balance, not the active snapshot the row requires. `liveVotingPower`: no live per-DRep figure. `activity` on list rows: served on `get` only |
-| proposals    | `list`, `get` (+ `voterId`), `getEnacted`, `listVotes`, `listActivity`, aggregates      |                                                                                                                                                        |
+| proposals    | `list`, `get` (+ `voterId`), `getEnacted`, `listVotes`, `listActivity`, aggregates      | Past committee aggregates lack eligible membership history. Past protocol-10 SPO default-vote aggregates use current pool registrations in Koios and cannot reproduce historical totals; hard forks and bootstrap SPO tallies remain supported. |
 | pools        | `list`, `get`, `listVotes`                                                               |                                                                                                                                                        |
 | committee    | `getCommittee`, `getMember`, `getConstitution`                                           |                                                                                                                                                        |
 | transactions | `get`                                                                                    |                                                                                                                                                        |
@@ -63,6 +63,10 @@ Declared (`system.getCapabilities()`, `capabilities()`):
 - **Committee voters** are resolved from hot to cold credential through the
   committee. A cold-id voter lookup that cannot be resolved is refused rather
   than answered "not voted".
+  A current-epoch committee aggregate below `committeeMinSize` supplies
+  `passing: false` outside bootstrap, while retaining the vote breakdown.
+  Tallies and minimum size count cold members: members sharing an authorised
+  hot credential each receive that credential's vote.
 - **Pages** are capped at 1,000 rows, which is also PostgREST's cap on a
   response; a larger request is refused, never silently shortened.
 - **Request bodies** over roughly five kilobytes are rejected by Koios, which

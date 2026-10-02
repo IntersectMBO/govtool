@@ -17,13 +17,18 @@ import {
   GovernanceActionCardStatePill,
   GovernanceActionsDatesBox,
 } from "@molecules";
-import { VotedProposal } from "@/models";
+import {
+  MetadataIssue,
+  MetadataValidationStatus,
+  VotedProposal,
+} from "@/models";
 
 type Props = {
   votedProposal: VotedProposal;
   inProgress?: boolean;
   isValidating?: boolean;
   metadataStatus?: MetadataValidationStatus;
+  metadataIssues?: MetadataIssue[];
 };
 
 export const GovernanceVotedOnCard = ({
@@ -31,6 +36,7 @@ export const GovernanceVotedOnCard = ({
   inProgress,
   isValidating,
   metadataStatus,
+  metadataIssues,
 }: Props) => {
   const navigate = useNavigate();
   const { proposal, vote } = votedProposal;
@@ -94,6 +100,7 @@ export const GovernanceVotedOnCard = ({
         <GovernanceActionCardHeader
           title={title}
           isDataMissing={metadataStatus}
+          metadataIssues={metadataIssues}
           isValidating={isValidating}
         />
         <GovernanceActionCardElement

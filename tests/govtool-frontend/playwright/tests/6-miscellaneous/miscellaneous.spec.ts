@@ -37,8 +37,8 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
       isDropdownContent: true,
     },
     {
-      testId: "governance-actions-outcomes-link",
-      urlPattern: /\/outcomes/,
+      testId: "governance-actions-governance-actions-link",
+      urlPattern: /\/governance_actions\/history/,
       isDropdownContent: true,
     },
   ];

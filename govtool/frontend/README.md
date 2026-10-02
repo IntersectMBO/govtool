@@ -43,7 +43,6 @@ Vite prints the local URL when it starts, normally `http://localhost:5173`.
 The values copied from `.env.example` are suitable for a local frontend connected to the standard local services:
 
 - `VITE_BASE_URL`: GovTool backend API URL. The local Docker setup uses `http://localhost:9999`.
-- `VITE_METADATA_API_URL`: Metadata validation service URL. The local Docker setup uses `http://localhost:3000`.
 - `VITE_NETWORK_FLAG`: Cardano network selector; use `0` for a test network and `1` for mainnet.
 - `VITE_IS_DEV`: Keep this `true` locally to enable development behavior and skip the production maintenance check.
 - `VITE_IPFS_GATEWAY`: Gateway used to load `ipfs://` content.
@@ -53,13 +52,11 @@ The following integrations are optional and may remain blank:
 - `VITE_SENTRY_DSN`: Sentry error reporting. `VITE_APP_ENV` labels the Sentry environment when a DSN is configured.
 - `VITE_CHATWOOT_URL` and `VITE_CHATWOOT_WEBSITE_TOKEN`: Chatwoot feedback widget.
 - `VITE_PDF_API_URL`: Proposal discussion service API.
-- `VITE_OUTCOMES_API_URL`: Governance outcomes API, served by the backend under `/outcomes` (for example `http://127.0.0.1:9999/outcomes`).
 - `VITE_IPFS_PROJECT_ID`: Project identifier for gateways that require it.
 
-The two feature flags can remain `false` when their companion services are not running:
+`VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` can remain `false` when the proposal discussion service is not running.
 
-- `VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED`
-- `VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED`
+Governance action history uses the GovTool backend configured by `VITE_BASE_URL`. Its pages and navigation do not depend on an environment flag. The voting panel consumes the action's `vote_aggregates`, displaying each supported voter group independently without requesting network metrics. An unsupported applicable group has a direct provider-support message and no pass/fail indicator.
 
 For backend setup, see the [backend README](../govtool-backend/README.md). To run the complete service stack, see the [Docker Compose instructions](../../docker/README.md).
 

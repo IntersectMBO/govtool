@@ -7,11 +7,17 @@ import {
   GovernanceActionDetailsCardVotes,
 } from "@molecules";
 import { GovernanceActionDetailsCardData } from "@organisms";
-import { MetadataValidationStatus, ProposalData, ProposalVote } from "@models";
+import {
+  MetadataIssue,
+  MetadataValidationStatus,
+  ProposalData,
+  ProposalVote,
+} from "@models";
 
 type GovernanceActionDetailsCardProps = {
   isDashboard?: boolean;
   isDataMissing?: MetadataValidationStatus;
+  metadataIssues?: MetadataIssue[];
   isInProgress?: boolean;
   isValidating?: boolean;
   isVoter?: boolean;
@@ -23,6 +29,7 @@ type GovernanceActionDetailsCardProps = {
 export const GovernanceActionDetailsCard = ({
   isDashboard,
   isDataMissing,
+  metadataIssues,
   isInProgress,
   isVoter,
   isValidating,
@@ -63,6 +70,7 @@ export const GovernanceActionDetailsCard = ({
       <GovernanceActionDetailsCardData
         isDashboard={isDashboard}
         isDataMissing={isDataMissing}
+        metadataIssues={metadataIssues}
         isInProgress={isInProgress}
         isOneColumn={isOneColumn}
         isSubmitted={isVoteSubmitted}

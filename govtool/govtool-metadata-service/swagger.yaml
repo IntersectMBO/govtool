@@ -130,6 +130,28 @@ paths:
       tags:
         - Metadata
 
+  /api/metadata/{hash}/verify:
+    post:
+      summary: Verify a url for submission
+      description: |
+        Fetches the url now, whatever the cache holds, and checks it against the
+        hash. For submission, where the url itself goes on chain. A failure
+        carries a reportId like any other. Not windowed; the backend rate-limits
+        it.
+      parameters:
+        - { name: hash, in: path, required: true, schema: { type: string } }
+        - { name: url, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Always 200, with a MetadataResult.
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '400':
+          description: Invalid hash, or url missing.
+      tags:
+        - Metadata
+
   /api/metadata/reports:
     get:
       summary: List fetch reports for an anchor

@@ -46,7 +46,7 @@ export const USER_PATHS = {
   governanceActionsVotedByMe: "/my/votes_and_favorites",
 };
 
-export const OUTCOMES_PATHS = {
-  governanceActionsOutcomes: "/outcomes",
-  governanceActionOutcomes: "/outcomes/governance_actions/:id",
+export const GOV_ACTION_HISTORY_PATHS = {
+  governanceActionHistory: "/governance_actions/history",
+  governanceActionHistoryDetail: "/governance_actions/history/:id",
 };

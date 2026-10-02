@@ -23,11 +23,12 @@ describe("getMetadataDataMissingStatusTranslation", () => {
     expect(translation).toBe("Data Not Verifiable");
   });
 
-  it("should map EXCEEDS_LIMIT to the incorrect format translation", () => {
-    const translation = getMetadataDataMissingStatusTranslation(
-      MetadataValidationStatus.EXCEEDS_LIMIT,
-    );
-    expect(translation).toBe("Data Formatted Incorrectly");
+  it.each([
+    [MetadataValidationStatus.EXCEEDS_LIMIT, "Data Too Large"],
+    [MetadataValidationStatus.URL_BLOCKED, "Data URL Blocked"],
+    [MetadataValidationStatus.INTERNAL_ERROR, "Data Not Checked"],
+  ])("should return its own translation for %s", (status, expected) => {
+    expect(getMetadataDataMissingStatusTranslation(status)).toBe(expected);
   });
 
   it("should return the default translation for unknown status", () => {

@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import type {
   ChainDataApiV1,
+  Committee,
   GovActionLineage,
   GovAction,
   GovActionStatus,
-  VoteAggregate,
 } from '@govtool/data-providers/chain-data';
 
 import { CacheService } from 'src/cache/cache.service';
@@ -21,20 +21,20 @@ import {
   epochStartTime,
   type EpochSchedule,
 } from 'src/common/legacy-network';
-import {
-  compareIntegers,
-  dbInteger,
-  type ApiInteger,
-} from 'src/common/integer';
+import { compareFiguresDescending, voteFigure } from 'src/common/vote-figures';
 import { toLegacyNullableNumber } from 'src/common/legacy';
 import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 import {
   ENRICH_CONCURRENCY,
   mapLimit,
+  proposalDocumentFields,
   proposalFields,
   resolveBody,
+  resolveDocument,
 } from 'src/metadata/enrich';
+import { toLegacyDescription } from 'src/common/legacy-description';
+import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import { readAll } from 'src/common/snapshot';
 import {
@@ -81,13 +81,38 @@ const LINEAGE_OF: Partial<Record<GovernanceActionType, GovActionLineage>> = {
 type ProposalSnapshotEntry = {
   proposal: ProposalResponse;
   status: GovActionStatus;
-  /** The contract entity the row was mapped from, for the outcomes routes. */
+  /** The contract entity the row was mapped from, for the governanceActions routes. */
   action: GovAction;
 };
+
+/**
+ * The longest a text search waits for document text it has not cached. The
+ * rest is matched from what the cache already holds; the fetches carry on and
+ * fill it for the next search. Well inside the frontend's 30 s timeout, and
+ * independent of how many actions are searched (a DRep's whole vote history).
+ */
+const SEARCH_TEXT_WAIT_MS = 5_000;
+
+/**
+ * A term that can only be an action id, or a prefix of one: a CIP-129
+ * `gov_action1…` id, or a transaction hash (eight or more hex digits) with
+ * an optional `#index`. Matched against ids alone, with no metadata wait.
+ */
+const ACTION_ID_TERM = /^(gov_action1[0-9a-z]*|[0-9a-f]{8,}(#\d*)?)$/i;
+
+/** The CIP-108 strings a search matches, as the Haskell backend's did. */
+type ProposalSearchText = Pick<
+  ProposalResponse,
+  'title' | 'abstract' | 'motivation' | 'rationale'
+>;
 
 @Injectable()
 export class ProposalService {
   private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
+  /** Search text by (hash, url); see `DocumentSummaryCache`. */
+  private readonly searchTextCache =
+    new DocumentSummaryCache<ProposalSearchText>();
+  private warming = false;
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
@@ -96,17 +121,21 @@ export class ProposalService {
     private readonly network: LegacyNetwork = new LegacyNetwork(chain),
   ) {}
 
-  /** A proposal with its CIP-108 text filled from the anchored document. */
-  private async withText(
-    proposal: ProposalResponse,
-  ): Promise<ProposalResponse> {
-    const text = proposalFields(
-      await resolveBody(this.metadata, {
+  /**
+   * A proposal with what the anchored document gives filled in: its CIP-108
+   * text, the document itself as `json` and its authors, as the Haskell
+   * backend read them from `off_chain_vote_data`. Every route that sends a
+   * proposal to the frontend applies it: the list, the detail and a DRep's
+   * vote history, whose rows the details page opens without asking again.
+   */
+  async withDocument(proposal: ProposalResponse): Promise<ProposalResponse> {
+    const fields = proposalDocumentFields(
+      await resolveDocument(this.metadata, {
         url: proposal.url,
         hash: proposal.metadataHash,
       }),
     );
-    return text ? { ...proposal, ...text } : proposal;
+    return fields ? { ...proposal, ...fields } : proposal;
   }
 
   async list(params: {
@@ -146,7 +175,7 @@ export class ProposalService {
             );
 
           let filtered = this.filterByType(proposals, params.type);
-          filtered = this.filterBySearch(filtered, params.search);
+          filtered = await this.filterBySearch(filtered, params.search);
           filtered = this.sortProposals(filtered, params.sort);
 
           const total = filtered.length;
@@ -159,7 +188,7 @@ export class ProposalService {
             elements: await mapLimit(
               filtered.slice(start, start + params.pageSize),
               ENRICH_CONCURRENCY,
-              (proposal) => this.withText(proposal),
+              (proposal) => this.withDocument(proposal),
             ),
           };
         }),
@@ -195,7 +224,7 @@ export class ProposalService {
     }
 
     return {
-      proposal: await this.withText(proposals[0]),
+      proposal: await this.withDocument(proposals[0]),
       vote: null,
     };
   }
@@ -255,7 +284,7 @@ export class ProposalService {
   /**
    * The contract entities behind the snapshot: every action, whatever its
    * status, or with `search` (a CIP-129 id) the one it names. Shares the
-   * cached snapshot, so the outcomes routes cost no extra provider read.
+   * cached snapshot, so the governance action routes cost no extra provider read.
    */
   async getActions(search = ''): Promise<GovAction[]> {
     return (await this.getProposalSnapshot(search)).map(({ action }) => action);
@@ -300,13 +329,29 @@ export class ProposalService {
           submitted.time === undefined ||
           (expires !== null && expires.time === undefined),
       );
-      const schedule = undated ? await this.network.epochSchedule() : null;
+      const [schedule, committee] = await Promise.all([
+        undated ? this.network.epochSchedule() : null,
+        this.committeeFor(elements),
+      ]);
       return elements.map((action) => ({
-        proposal: this.toLegacyProposal(action, schedule),
+        proposal: this.toLegacyProposal(action, schedule, committee),
         status: action.lifecycle.status,
         action,
       }));
     });
+  }
+
+  /**
+   * The current committee, read only when an UpdateCommittee needs it for
+   * each added member's current term. Best effort: only that column needs it.
+   */
+  private async committeeFor(actions: GovAction[]): Promise<Committee | null> {
+    if (!actions.some((a) => a.body.type === 'UpdateCommittee')) return null;
+    try {
+      return (await this.chain.governance.committee.getCommittee()).data;
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -346,17 +391,9 @@ export class ProposalService {
   toLegacyProposal(
     action: GovAction,
     schedule: EpochSchedule | null = null,
+    committee: Committee | null = null,
   ): ProposalResponse {
     const { submitted, expires } = action.lifecycle;
-    const aggregates = new Map(
-      (action.voteAggregates ?? []).map((aggregate) => [
-        aggregate.role,
-        aggregate,
-      ]),
-    );
-    const drep = aggregates.get('drep');
-    const spo = aggregates.get('spo');
-    const cc = aggregates.get('cc');
 
     return {
       // The legacy `id` was db-sync's internal row id. No provider carries one
@@ -366,9 +403,9 @@ export class ProposalService {
       txHash: action.txHash,
       index: action.index,
       type: LEGACY_TYPE[action.type],
-      // Was db-sync's raw `description` column. The typed body is what the
-      // action proposes, and there is no untyped fallback any more.
-      details: action.body,
+      // db-sync's `description` reshaped by type, as the Haskell backend sent
+      // it and the frontend's detail tabs read it.
+      details: toLegacyDescription(action, committee),
       expiryDate:
         expires === null
           ? null
@@ -388,21 +425,21 @@ export class ProposalService {
           ? toLegacyParamProposal(action.body.changes)
           : null,
       // The four CIP-108 strings, `json` and `authors` come from the anchored
-      // document. Chain data emits the anchor and never resolves it, and this
-      // backend has no metadata service wired, so they are absent.
+      // document, which chain data never resolves: they are null here and
+      // filled through the metadata service when a page is served.
       title: null,
       abstract: null,
       motivation: null,
       rationale: null,
-      dRepYesVotes: this.aggregateValue(drep, 'yes'),
-      dRepNoVotes: this.aggregateValue(drep, 'no'),
-      dRepAbstainVotes: this.aggregateValue(drep, 'abstain'),
-      poolYesVotes: this.aggregateValue(spo, 'yes'),
-      poolNoVotes: this.aggregateValue(spo, 'no'),
-      poolAbstainVotes: this.aggregateValue(spo, 'abstain'),
-      ccYesVotes: this.aggregateValue(cc, 'yes'),
-      ccNoVotes: this.aggregateValue(cc, 'no'),
-      ccAbstainVotes: this.aggregateValue(cc, 'abstain'),
+      dRepYesVotes: voteFigure(action, 'drep', 'yes'),
+      dRepNoVotes: voteFigure(action, 'drep', 'no'),
+      dRepAbstainVotes: voteFigure(action, 'drep', 'abstain'),
+      poolYesVotes: voteFigure(action, 'spo', 'yes'),
+      poolNoVotes: voteFigure(action, 'spo', 'no'),
+      poolAbstainVotes: voteFigure(action, 'spo', 'abstain'),
+      ccYesVotes: voteFigure(action, 'cc', 'yes'),
+      ccNoVotes: voteFigure(action, 'cc', 'no'),
+      ccAbstainVotes: voteFigure(action, 'cc', 'abstain'),
       prevGovActionIndex: toLegacyNullableNumber(
         action.previousAction?.index ?? null,
       ),
@@ -432,24 +469,6 @@ export class ProposalService {
     return schedule === null ? null : epochStartTime(schedule, epoch);
   }
 
-  /**
-   * One choice off a vote aggregate, as the legacy integer field.
-   *
-   * The legacy fields are whole numbers — lovelace for the DRep and pool rows,
-   * a head count for the committee — so a `percent` aggregate has nothing to
-   * put in them. Reporting the fraction rounded to 0 would read as "no votes",
-   * so it is refused instead.
-   */
-  private aggregateValue(
-    aggregate: VoteAggregate | undefined,
-    choice: 'yes' | 'no' | 'abstain',
-  ): ApiInteger {
-    if (aggregate === undefined || aggregate.representation === 'percent') {
-      return 0;
-    }
-    return dbInteger(aggregate[choice]);
-  }
-
   filterByType(
     proposals: ProposalResponse[],
     selectedTypes: GovernanceActionType[],
@@ -462,31 +481,108 @@ export class ProposalService {
     );
   }
 
-  filterBySearch(
+  /**
+   * The action id in either form, or the title, abstract, motivation or
+   * rationale, as the Haskell backend searched them. The four strings are
+   * document text, which the snapshot does not carry, so every candidate's
+   * is read through the search text cache before filtering and paging.
+   */
+  async filterBySearch(
     proposals: ProposalResponse[],
     search?: string,
-  ): ProposalResponse[] {
+  ): Promise<ProposalResponse[]> {
     if (!search) {
       return proposals;
     }
 
     const searchLower = search.toLowerCase();
+    const texts = ACTION_ID_TERM.test(search.trim())
+      ? new Map<string, ProposalSearchText>()
+      : await this.searchTexts(proposals, { waitMs: SEARCH_TEXT_WAIT_MS });
 
     return proposals.filter((proposal) => {
       const govActionId = `${proposal.txHash}#${proposal.index}`;
+      const text = texts.get(proposal.id) ?? proposal;
       const values = [
         govActionId,
         // The CIP-129 action id, which is what `id` carries now and what a
         // provider's own `exactId` search matches.
         proposal.id,
-        proposal.title,
-        proposal.abstract,
-        proposal.motivation,
-        proposal.rationale,
+        text.title,
+        text.abstract,
+        text.motivation,
+        text.rationale,
       ].filter((value): value is string => value !== null);
 
       return values.some((value) => value.toLowerCase().includes(searchLower));
     });
+  }
+
+  /**
+   * Resolves every live action's search text into the cache, so the first
+   * search after a start or a new block does not wait on the documents. One
+   * run at a time; failures only leave entries unresolved.
+   */
+  async warmSearchText(): Promise<void> {
+    if (this.metadata === null || this.warming) return;
+    this.warming = true;
+    try {
+      const live = (await this.getProposalSnapshot(''))
+        .filter(({ status }) => status === 'live')
+        .map(({ proposal }) => proposal);
+      await this.searchTexts(live, { awaitRefresh: true });
+    } finally {
+      this.warming = false;
+    }
+  }
+
+  /**
+   * Each action's search text through the cache. With `waitMs`, waits at most
+   * that long in all and then takes whatever the cache holds, so a search
+   * does not slow down with the number of uncached documents; the warmer
+   * passes `awaitRefresh` and waits for every document instead.
+   */
+  private async searchTexts(
+    proposals: ProposalResponse[],
+    options: { awaitRefresh?: boolean; waitMs?: number } = {},
+  ): Promise<Map<string, ProposalSearchText>> {
+    const out = new Map<string, ProposalSearchText>();
+    const metadata = this.metadata;
+    if (metadata === null) return out;
+    // Never rejects: the cache treats a failed resolution as unresolved.
+    const all = mapLimit(proposals, ENRICH_CONCURRENCY, (p) => {
+      const { url, metadataHash: hash } = p;
+      if (!url || !hash) return Promise.resolve(undefined);
+      return this.searchTextCache.get(
+        hash,
+        url,
+        async () => proposalFields(await resolveBody(metadata, { url, hash })),
+        { awaitRefresh: options.awaitRefresh },
+      );
+    });
+    let texts: (ProposalSearchText | undefined)[];
+    if (options.waitMs === undefined) {
+      texts = await all;
+    } else {
+      let timer: NodeJS.Timeout | undefined;
+      const timeout = new Promise<undefined>((resolve) => {
+        timer = setTimeout(() => resolve(undefined), options.waitMs);
+      });
+      texts =
+        (await Promise.race([all, timeout]).finally(() =>
+          clearTimeout(timer),
+        )) ??
+        proposals.map(({ url, metadataHash }) =>
+          url && metadataHash
+            ? this.searchTextCache.peek(metadataHash, url)
+            : undefined,
+        );
+    }
+    proposals.forEach((p, i) => {
+      const text = texts[i];
+      if (text !== undefined) out.set(p.id, text);
+    });
+    return out;
   }
 
   sortProposals(
@@ -510,7 +606,10 @@ export class ProposalService {
 
       case 'MostYesVotes':
         return copied.sort((a, b) =>
-          compareIntegers(this.totalYesVotes(b), this.totalYesVotes(a)),
+          compareFiguresDescending(
+            this.totalYesVotes(a),
+            this.totalYesVotes(b),
+          ),
         );
 
       default:
@@ -524,12 +623,12 @@ export class ProposalService {
    * comparator on values that large returns 0 for totals that differ, which
    * silently scrambles the sort.
    */
-  private totalYesVotes(proposal: ProposalResponse): bigint {
-    return (
-      BigInt(proposal.dRepYesVotes) +
-      BigInt(proposal.poolYesVotes) +
-      BigInt(proposal.ccYesVotes)
-    );
+  private totalYesVotes(proposal: ProposalResponse): bigint | null {
+    const { dRepYesVotes, poolYesVotes, ccYesVotes } = proposal;
+    if (dRepYesVotes === null || poolYesVotes === null || ccYesVotes === null) {
+      return null;
+    }
+    return BigInt(dRepYesVotes) + BigInt(poolYesVotes) + BigInt(ccYesVotes);
   }
 
   private nullableDateSortValue(value: string | null): number {

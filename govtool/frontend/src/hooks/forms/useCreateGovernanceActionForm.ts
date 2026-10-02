@@ -25,7 +25,7 @@ import {
   generateMetadataBody,
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
-import { MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus, ValidateMetadataResult } from "@models";
 import { API } from "@services";
 import {
   decodeDefinition,
@@ -358,18 +358,21 @@ export const useCreateGovernanceActionForm = (
 
   const onSubmit = useCallback(
     async (data: CreateGovernanceActionValues) => {
+      let validation: ValidateMetadataResult<unknown> | undefined;
+
       try {
         setIsLoading(true);
         showLoadingModal();
         await validateSurveyLink(data.surveyTxId);
         if (!hash) throw MetadataValidationStatus.INVALID_HASH;
-        const { status } = await validateMetadata({
+        validation = await validateMetadata({
           url: data.storingURL,
           hash,
+          verifyUrl: true,
         });
 
-        if (status) {
-          throw status;
+        if (validation.status) {
+          throw validation.status;
         }
 
         const govActionBuilder = await buildTransaction(data);
@@ -397,6 +400,8 @@ export const useCreateGovernanceActionForm = (
                 error as MetadataValidationStatus
               ],
               metadataAnchor: { url: data.storingURL, hash: hash ?? "" },
+              metadataReportId: validation?.reportId,
+              metadataError: validation?.error,
               onSubmit: backToForm,
               onCancel: backToDashboard,
             },

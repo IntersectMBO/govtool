@@ -182,18 +182,20 @@ test.describe("Proposed as a governance action", async () => {
     );
     await proposalSubmissionPage.submitBtn.click();
 
-    await expect(
-      proposalSubmissionPage.currentPage.getByTestId("data-not-match-modal")
-    ).toBeVisible();
-    await expect(
-      proposalSubmissionPage.currentPage.getByTestId(
-        "data-not-match-modal-go-to-data-button"
-      )
-    ).toBeVisible();
-
-    await proposalSubmissionPage.currentPage
+    // An HTML page is a hash mismatch through the metadata service and a
+    // format error through the backend's own fetch; both offer the edit screen.
+    const page = proposalSubmissionPage.currentPage;
+    const goToDataButton = page
       .getByTestId("data-not-match-modal-go-to-data-button")
-      .click();
+      .or(page.getByTestId("metadata-error-modal-go-to-data-button"));
+    await expect(
+      page
+        .getByTestId("data-not-match-modal")
+        .or(page.getByTestId("metadata-error-modal"))
+    ).toBeVisible();
+    await expect(goToDataButton).toBeVisible();
+
+    await goToDataButton.click();
 
     await expect(
       proposalSubmissionPage.currentPage.getByTestId("governance-action-type")

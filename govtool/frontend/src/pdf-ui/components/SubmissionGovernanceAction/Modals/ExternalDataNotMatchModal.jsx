@@ -7,6 +7,7 @@ const ExternalDataNotMatchModal = ({
     onClose,
     buttonOneClick,
     buttonTwoClick,
+    children,
 }) => {
     return (
         <PdfStatusModal
@@ -49,6 +50,7 @@ const ExternalDataNotMatchModal = ({
                 In this case, there is a mismatch. You can go back to the data
                 edit screen and try the process again.
             </Typography>
+            {children}
         </PdfStatusModal>
     );
 };

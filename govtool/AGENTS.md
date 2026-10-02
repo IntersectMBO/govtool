@@ -39,7 +39,7 @@ govtool-metadata-http: the metadata contract as a client of
 govtool-metadata-service, which is private to the backend.
 govtool-backend: the backend (D151), on the contract; the legacy routes and bodies
 plus /system/capabilities, /system/features, four metadata routes and the
-outcomes UI's routes under /outcomes (D143). The outcomes UI itself is frontend
+governance action records under /governance-actions (D162). The action history view is frontend
 source, on GovTool's components (D149).
 govtool-pdf-backend: the proposal discussion forum (pdf) backend, NestJS +
 Prisma + its own Postgres, wire-compatible with the Strapi v4 surface the
@@ -104,10 +104,10 @@ Seeing a change run, cheapest first:
    then curl localhost:9999/drep/list, /proposal/list, /network/metrics and
    so on. Nothing else needs to be running.
 2. Frontend against that backend: in frontend/, put
-   VITE_BASE_URL=http://127.0.0.1:9999 and
-   VITE_METADATA_API_URL=http://127.0.0.1:9999/metadata in .env.local, which
-   is gitignored and overrides .env (leave .env alone; it points at preview),
-   then npm run dev. Vite hot-reloads frontend edits.
+   VITE_BASE_URL=http://127.0.0.1:9999 in .env.local, which is gitignored and
+   overrides .env (leave .env alone; it points at preview), then npm run dev.
+   Metadata validation goes to the same backend under /metadata. Vite
+   hot-reloads frontend edits.
 3. The whole stack in Docker, including the metadata service and its
    Postgres: docker compose -f docker-compose.fixture.yml up -d --build, then
    http://localhost:8080. The frontend there is the Vite dev server over

@@ -6,7 +6,7 @@
 #      demo rows (users, proposals, budget discussions)
 #   2. `cardano devnet smoke` round 1: DReps, delegations, committee hot keys
 #      and one proposal of each DEVNET_SEED_ACTIONS type; DEVNET_SEED_RATIFY
-#      get yes votes and are enacted (outcomes data), the others no votes;
+#      get yes votes and are enacted (action history data), the others no votes;
 #      DEVNET_SEED_EXTRA_TREASURY more treasury withdrawals are enacted too
 #   3. round 2: another proposal of each type, none ratified, so every type
 #      stays live for the whole run (it must follow round 1's enactment,

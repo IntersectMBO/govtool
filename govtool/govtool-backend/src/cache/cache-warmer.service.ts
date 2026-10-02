@@ -9,7 +9,7 @@ import {
 import type { ChainDataApiV1 } from '@govtool/data-providers/chain-data';
 
 import { DRepService } from 'src/drep/drep.service';
-import { OutcomesService } from 'src/outcomes/outcomes.service';
+import { GovernanceActionsService } from 'src/governance-actions/governance-actions.service';
 import { ProposalService } from 'src/proposal/proposal.service';
 import { CHAIN_DATA } from 'src/providers/providers.module';
 
@@ -26,7 +26,7 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
     private readonly drepService: DRepService,
     private readonly proposalService: ProposalService,
-    @Optional() private readonly outcomes?: OutcomesService,
+    @Optional() private readonly governanceActions?: GovernanceActionsService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -93,11 +93,21 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
         );
         // Not awaited: document text comes from the metadata service and
         // must not hold up the next snapshot refresh.
-        void this.outcomes?.warmSearchText().catch((error: unknown) => {
-          this.logger.warn(
-            `Could not warm outcomes search text: ${error instanceof Error ? error.message : String(error)}`,
-          );
-        });
+        const warmText = (what: string, run: () => Promise<void>) =>
+          void run().catch((error: unknown) => {
+            this.logger.warn(
+              `Could not warm ${what}: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          });
+        warmText('governanceActions search text', () =>
+          this.governanceActions
+            ? this.governanceActions.warmSearchText()
+            : Promise.resolve(),
+        );
+        warmText('proposal search text', () =>
+          this.proposalService.warmSearchText(),
+        );
+        warmText('DRep names', () => this.drepService.warmSearchNames());
       }
     } finally {
       this.refreshing = false;

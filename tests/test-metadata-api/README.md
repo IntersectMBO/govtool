@@ -66,7 +66,7 @@ Use it as a gateway base url:
 - metadata service `IPFS_PRIMARY_GATEWAY=http://<host>:3000` (it appends `/ipfs/<cid>`)
   with `METADATA_ALLOW_PRIVATE_ADDRESSES=true`, and `IPFS_GATEWAYS` set to the same
   url to drop the public fallbacks
-- metadata-validation `IPFS_GATEWAY=http://<host>:3000/ipfs`
+- backend `IPFS_GATEWAY=http://<host>:3000/ipfs`, for its local fallback fetch
 - db-sync: `"ipfs_gateway": ["http://<host>:3000/ipfs"]` in its config file
 - backend pinning: `GOVTOOL_PINNING_PROVIDER=test` and
   `GOVTOOL_TEST_PINNING_URL=http://<host>:3000`

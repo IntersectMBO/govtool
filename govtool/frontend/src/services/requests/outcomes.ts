@@ -2,7 +2,6 @@ import {
   EpochParams,
   OutcomeGovActionMetadata,
   OutcomeGovernanceAction,
-  OutcomeNetworkMetrics,
   OutcomeProposalDiscussion,
   OutcomeSignatureVerificationDto,
   OutcomeSignatureVerificationResult,
@@ -61,14 +60,6 @@ export const getOutcomeProposalDiscussion = async (txHash: string) => {
   const { data } = await OutcomesAPI.get<{
     data: OutcomeProposalDiscussion | null;
   }>(`/governance-actions/proposal/${txHash}`);
-  return data;
-};
-
-export const getOutcomeNetworkMetrics = async (epoch?: number) => {
-  const { data } = await OutcomesAPI.get<OutcomeNetworkMetrics>(
-    "/misc/network/metrics",
-    { params: { epoch } },
-  );
   return data;
 };
 

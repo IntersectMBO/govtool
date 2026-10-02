@@ -26,6 +26,9 @@
  *     bootstrap (< 10)    a pool that did not vote abstains; notVoted = 0
  *     otherwise           passive always-no-confidence is Yes on NoConfidence
  *                         and No elsewhere; passive always-abstain abstains
+ *   Historical protocol-10 default votes are omitted: Koios resolves reward
+ *   accounts through the current pool-info cache, which cannot reproduce pool
+ *   registration history. Hard forks and bootstrap do not use that default.
  *
  * CC. `/proposal_voting_summary` counts committee votes but never the number
  *   of members eligible AS OF the tally epoch, and Koios has no history of
@@ -253,7 +256,8 @@ export async function loadAggregates(ctx: Ctx, targets: readonly TallyTarget[], 
     });
     const list: VoteAggregate[] = [];
     if (t.drep) list.push(aggregate('drep', drepFigures(target.row.proposal_type, s), t.drep));
-    if (t.spo) list.push(aggregate('spo', spoFigures(target.row.proposal_type, s, p.protocol_major ?? 0), t.spo));
+    const reliableSpoDefaults = isLive || target.row.proposal_type === 'HardForkInitiation' || (p.protocol_major ?? 0) < 10;
+    if (t.spo && reliableSpoDefaults) list.push(aggregate('spo', spoFigures(target.row.proposal_type, s, p.protocol_major ?? 0), t.spo));
     if (t.cc && cc) {
       const votes = ccVotes.filter((v) => v.proposal_id === target.row.proposal_id && cc.hot.has(v.voter_id));
       const count = (choice: string) => BigInt(votes.filter((v) => v.vote === choice).length);

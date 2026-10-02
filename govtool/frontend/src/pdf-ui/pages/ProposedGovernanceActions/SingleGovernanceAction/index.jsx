@@ -68,7 +68,6 @@ import { PdfModal } from '../../../components/PdfModal';
 import { PdfTextArea } from '../../../components/PdfFields';
 import { cyan, errorRed, gray } from '@/consts/colors';
 import { OUTCOMES_PATHS } from '@/consts/paths';
-import { useFeatureFlag } from '@/context/featureFlag';
 import { useGetOutcomeGovernanceActionQuery } from '@/hooks/queries/useGetOutcomeGovernanceActionQuery';
 import { getOutcomeVoteEnd } from '@/utils/outcomes';
 
@@ -249,12 +248,11 @@ const SingleGovernanceAction = ({ id }) => {
 
     // Once the submitted action is decided, the page reports the vote's end
     // and links to its outcome instead of asking for votes (#3301).
-    const { isGovernanceOutcomesPillarEnabled } = useFeatureFlag();
     const submissionTxHash =
         proposal?.attributes?.content?.attributes?.prop_submission_tx_hash;
     const { governanceAction: submittedAction } =
         useGetOutcomeGovernanceActionQuery(
-            isGovernanceOutcomesPillarEnabled && submissionTxHash
+            submissionTxHash
                 ? `${submissionTxHash}#0`
                 : ''
         );

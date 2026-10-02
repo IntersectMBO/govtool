@@ -28,10 +28,7 @@ export const DashboardDrawerMobile = ({
   isDrawerOpen,
   setIsDrawerOpen,
 }: DashboardDrawerMobileProps) => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
   const { voter } = useGetVoterInfo();
 
@@ -115,15 +112,6 @@ export const DashboardDrawerMobile = ({
                         if (
                           !isProposalDiscussionForumEnabled &&
                           childItem.dataTestId === "proposal-discussion-link"
-                        ) {
-                          return null;
-                        }
-                        if (
-                          !isGovernanceOutcomesPillarEnabled &&
-                          (childItem.dataTestId ===
-                            "governance-actions-voted-by-me-link" ||
-                            childItem.dataTestId ===
-                              "governance-actions-outcomes-link")
                         ) {
                           return null;
                         }

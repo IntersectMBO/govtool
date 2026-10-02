@@ -139,9 +139,7 @@ services:
       VITE_NETWORK_FLAG: ${VITE_NETWORK_FLAG:-1}
       VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-https://ipfs.io/ipfs}
       VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false"
-      # Off because the Koios provider cannot serve
-      # /outcomes/misc/network/metrics (501, D143); the URL is ready for it.
-      VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "false"
+      # Outcomes is built in; unsupported voting groups are identified in the UI.
       VITE_OUTCOMES_API_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}/outcomes
     ports:
       - "${FRONTEND_PORT:-8080}:80"

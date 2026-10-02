@@ -79,7 +79,7 @@ const BOUND = `bound AS MATERIALIZED (
 
 const latestVotes = (column: string) => `
   SELECT DISTINCT ON (vp.gov_action_proposal_id, vp.${column})
-         vp.gov_action_proposal_id AS pid, vp.${column} AS voter, vp.vote::text AS vote
+         vp.gov_action_proposal_id AS pid, vp.${column} AS voter, vp.vote::text AS vote, vp.tx_id
     FROM voting_procedure vp
    WHERE vp.invalid IS NULL AND vp.${column} IS NOT NULL AND vp.gov_action_proposal_id = ANY($1::bigint[])
    ORDER BY vp.gov_action_proposal_id, vp.${column}, vp.tx_id DESC, vp.id DESC`;
@@ -91,6 +91,7 @@ const latestVotes = (column: string) => `
  */
 export const DREP_SQL = `
 WITH ${TARGETS},
+  ${BOUND},
   v AS (${latestVotes('drep_voter')}),
   cast_ AS (
     SELECT p.id,
@@ -100,6 +101,11 @@ WITH ${TARGETS},
       FROM p
       JOIN v ON v.pid = p.id
       JOIN drep_distr dd ON dd.hash_id = v.voter AND dd.epoch_no = p.e AND dd.active_until >= p.e
+     WHERE NOT EXISTS (
+       SELECT 1 FROM drep_registration retired
+       JOIN bound ON bound.e = p.e
+        WHERE retired.drep_hash_id = v.voter AND retired.deposit < 0
+          AND retired.tx_id > v.tx_id AND retired.tx_id <= bound.max_tx)
      GROUP BY p.id),
   tot AS (
     SELECT dd.epoch_no AS e,

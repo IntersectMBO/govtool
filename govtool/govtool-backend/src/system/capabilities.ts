@@ -10,6 +10,8 @@
  *           filtered, searched, sorted and paged in memory. A provider that
  *           honours no sort key at all still gets a working sort menu, and a
  *           provider with no text index still gets free-text search.
+ *           Activity sorting additionally requires the provider to declare
+ *           directory activity support; ordering cannot supply missing data.
  *
  *   LOWERS  a feature whose route this backend does not expose is unreachable
  *           however good the provider is, and a parameter the legacy route
@@ -39,7 +41,7 @@ export const BACKEND_VERSION = '0.0.1';
  * When this was last reviewed against `src/`. A constant rather than
  * `new Date()`, so the digest a consumer compares does not change on restart.
  */
-export const BACKEND_CAPABILITIES_REVIEWED_AT = '2026-09-18T00:00:00Z';
+export const BACKEND_CAPABILITIES_REVIEWED_AT = '2026-10-02T00:00:00Z';
 
 /* ------------------------------------------------------------------------- */
 /* Vocabulary                                                                 */
@@ -279,6 +281,16 @@ export function backendFeatures(
     // Deleting the key is how "every value works" is spelled: an absent
     // control accepts the UI's whole universe.
     delete options[control];
+  }
+
+  // Sorting in memory cannot recover activity omitted from directory rows.
+  if (!provider.sorts.dreps.includes('activity')) {
+    options['drepDirectory.sort'] = [
+      'votingPower',
+      'registrationDate',
+      'status',
+      'random',
+    ];
   }
 
   const unavailable: Partial<Record<FeatureId, Unavailable>> = {};

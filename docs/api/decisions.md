@@ -5473,3 +5473,88 @@ chain data (D40, D45, D87 left free text to an index provider; none was wired).
 - Without a metadata service there is no document text, and search matches ids only, as before. The
   declared `drepDirectory.search` options are unchanged: the backend already claimed free text, and now
   honours it.
+
+## D156 — Outcomes is always enabled as part of GovTool
+
+**Date:** 2026-10-02
+**Said:** "So it should always be enabled."
+**Amends:** D143 (provider limitations prevented the whole Outcomes section from being enabled).
+
+- Outcomes is GovTool's own frontend and backend. Its public and wallet-connected routes, navigation,
+  and links from submitted proposals are always available; there is no environment enable/disable flag.
+- Outcomes requests default to the configured GovTool backend with `/outcomes` appended. An explicit
+  API URL override remains supported; an unset override never selects an external Outcomes service.
+- Provider limitations belong to the affected data and calculations within Outcomes. They do not
+  disable the entire section. When required voting metrics or protocol parameters cannot be loaded,
+  the page retains the action's recorded status and shows an unavailable-data message instead of
+  computing pass/fail indicators from missing values.
+
+## D157 — Remove the obsolete votesLastYear field and retain optional activity sorting
+
+**Date:** 2026-10-02
+**Said:** "Remove the obsolete field; keep capability-aware activity sorting".
+
+- DRep directory responses no longer include `votesLastYear`. Its name implied a trailing year, while
+  the underlying participation count covers governance actions voted on since registration.
+- The backend retains the provider's activity data internally for Voting Activity sorting. It never
+  serializes that internal count under the obsolete name or replaces it with another response field.
+- Activity sorting is offered only when the configured provider declares directory activity support.
+  A direct request for unsupported activity sorting, or a supported declaration with missing directory
+  activity data, is refused explicitly instead of treating unknown counts as zero or ranking all rows
+  equally. The frontend selects an available fallback when its persisted Activity choice is unsupported.
+
+## D158 — Outcomes displays action-specific aggregates independently per voter group
+
+**Date:** 2026-10-02
+**Said:** "lets do that" — consume the available proposal aggregates, display each supported group
+independently, and validate live and concluded actions against Koios and db-sync.
+**Amends:** D143 (Outcomes recalculated votes from a complete network-metrics response) and D156
+(a missing metric prevented all voting calculations from rendering).
+
+- The Outcomes detail response includes `vote_aggregates`, containing only the contract's per-role
+  representation, yes/no/abstain/not-voted figures, eligible total, threshold ratio and optional passing
+  decision. Strings preserve exact quantities; provider extensions are not serialized.
+- The voting panel consumes those aggregates directly. It never recomputes automatic votes from
+  network totals or substitutes present-day stake or committee membership into a historical tally.
+- Each applicable voter group renders independently. An absent aggregate means the provider does not
+  support that group's complete breakdown; the UI says so directly and displays no invented totals or
+  pass/fail result. Groups that do not vote on the action have a separate inapplicability message.
+- The supported table displays only the breakdown the aggregate actually supplies. Automatic and
+  explicit vote subcategories are not separately reported when the contract does not supply them.
+- Passing uses the provider decision when supplied, otherwise exact cross-multiplication against its
+  threshold, with no majority fallback for a zero threshold. A zero non-abstaining denominator is a
+  zero ratio, as in the ledger: it passes only a zero threshold. InfoAction never receives a pass/fail
+  indicator.
+- The recorded lifecycle status remains visible regardless of which voting groups are supported.
+  Other detail tabs request protocol parameters independently; no voting panel or detail tab requires
+  the complete network-metrics endpoint.
+
+## D159 — Koios omits historical SPO default-vote aggregates it cannot reproduce
+
+**Date:** 2026-10-02
+**Evidence:** A live comparison on preview at epoch 1438 found identical DRep tallies for an enacted
+committee update ratified in epoch 1369, but different SPO no/abstain/not-voted values. Eligible SPO
+stake and explicit yes stake matched. Koios's proposal summary resolves pool reward accounts through
+its current pool-info cache, whereas the db-sync tally uses registrations effective at the tally epoch.
+
+- Until historical pool reward-account registrations can be reproduced, the Koios adapter omits SPO
+  aggregates for past protocol-10 tallies that use reward-account default votes. It retains supported
+  DRep aggregates and the Outcomes UI identifies the absent SPO breakdown explicitly (D158).
+- Historical hard-fork tallies remain supported because silent pools count as not-voted regardless of
+  reward delegation. Historical bootstrap tallies remain supported because silent pools abstain.
+- Current-epoch SPO tallies remain supported. This restriction does not imply that Koios lacks all pool
+  voting data; it prevents current registration state from being substituted into historical defaults.
+
+## D160 — DRep retirement invalidates a prior vote, even after re-registration
+
+**Date:** 2026-10-02
+**Evidence:** The preview live comparison at epoch 1438 found a 4,994,351,707-lovelace DRep Yes vote
+counted by db-sync and excluded by Koios. The DRep retired after that vote and later re-registered.
+The latest registration alone therefore cannot establish that its old vote is still valid.
+
+- The db-sync aggregate excludes a DRep vote when a retirement certificate follows it and precedes
+  the tally epoch's transaction cutoff. A later registration does not reinstate that earlier vote.
+- Retirement after the tally cutoff does not rewrite a historical result. A fresh vote after
+  re-registration remains eligible under the existing activity and stake rules.
+- This aligns the db-sync aggregate with Koios's retirement rule without changing the eligible total
+  or silently converting a supported vote into an unavailable aggregate.

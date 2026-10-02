@@ -239,7 +239,6 @@ services:
       VITE_APP_ENV: test
       VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "true"
       VITE_PDF_API_URL: ${PUBLIC_PDF_URL:-http://127.0.0.1:1337}/
-      VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "true"
       # Outcomes are served by govtool-backend under /outcomes.
       VITE_OUTCOMES_API_URL: ${PUBLIC_BACKEND_URL:-http://127.0.0.1:9999}/outcomes
       # Browser-facing: the bucket's /ipfs/<cid>.

@@ -22,7 +22,6 @@ export const QUERY_KEYS = {
   useGetOutcomeGovActionMetadataKey: "useGetOutcomeGovActionMetadataKey",
   useGetOutcomeGovernanceActionKey: "useGetOutcomeGovernanceActionKey",
   useGetOutcomeGovernanceActionsKey: "useGetOutcomeGovernanceActionsKey",
-  useGetOutcomeNetworkMetricsKey: "useGetOutcomeNetworkMetricsKey",
   useGetOutcomeProposalDiscussionKey: "useGetOutcomeProposalDiscussionKey",
   useOutcomeVerifySignatureKey: "useOutcomeVerifySignatureKey",
 };

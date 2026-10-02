@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 
-import { useGetOutcomeNetworkMetrics, useTranslation } from "@hooks";
+import { useGetOutcomeEpochParams, useTranslation } from "@hooks";
 import { OutcomeGovernanceAction } from "@models";
 
 import { GovernanceActionCardElement } from "./GovernanceActionCardElement";
@@ -15,7 +15,7 @@ export const OutcomeHardForkDetails = ({
   action,
   prevGovActionId,
 }: OutcomeHardForkDetailsProps) => {
-  const { epochParams } = useGetOutcomeNetworkMetrics(action);
+  const { epochParams } = useGetOutcomeEpochParams(action);
   const { t } = useTranslation();
 
   return (

@@ -13,7 +13,7 @@ import { OUTCOMES_PATHS, OUTCOMES_TYPE_FILTERS, primaryBlue } from "@consts";
 import {
   useGetOutcomeGovActionMetadata,
   useGetOutcomeGovernanceActionQuery,
-  useGetOutcomeNetworkMetrics,
+  useGetOutcomeEpochParams,
   useGetOutcomeProposalDiscussionQuery,
   useScreenDimension,
   useTranslation,
@@ -112,7 +112,7 @@ const OutcomeDetailsContent = ({
   const { proposal, isProposalLoading } = useGetOutcomeProposalDiscussionQuery(
     governanceAction.tx_hash,
   );
-  const { epochParams } = useGetOutcomeNetworkMetrics(governanceAction);
+  const { epochParams } = useGetOutcomeEpochParams(governanceAction);
 
   const title = governanceAction.title || metadata?.data?.title;
   const abstract = governanceAction.abstract || metadata?.data?.abstract;

@@ -523,6 +523,12 @@
     },
     "votes": {
       "title": "Votes Submitted for this Governance Action:",
+      "dataUnavailable": "The configured data provider does not support this voting breakdown.",
+      "dataInconsistent": "The data provider returned an inconsistent voting breakdown, so it is not displayed.",
+      "totalEligible": "Total Eligible Voting Power",
+      "eligibleMembers": "Eligible Committee Members",
+      "ratificationDenominator": "Eligible Non-Abstaining Votes",
+      "noEligibleVotes": "There are no eligible non-abstaining votes for this tally.",
       "dReps": "DReps",
       "sPos": "SPOs",
       "cCommitteeFull": "Constitutional Committee",

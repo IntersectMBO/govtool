@@ -37,6 +37,7 @@ export const SECURITY_RELEVANT_PARAMS_MAP: Record<string, string> = {
   maxBlockHeaderSize: "max_bh_size",
   maxValueSize: "max_val_size",
   maxBlockExecutionUnits: "max_block_ex_mem",
+  maxBlockExecutionSteps: "max_block_ex_steps",
   txFeePerByte: "min_fee_a",
   txFeeFixed: "min_fee_b",
   utxoCostPerByte: "coins_per_utxo_size",

@@ -83,7 +83,6 @@ const buildGatedControl = (
  */
 type FeatureFlagContextType = {
   isProposalDiscussionForumEnabled: boolean;
-  isGovernanceOutcomesPillarEnabled: boolean;
   isCip179Enabled: boolean;
   /** loading / unavailable / ready — see `CapabilitiesStatus`. */
   capabilitiesStatus: CapabilitiesStatus;
@@ -128,7 +127,6 @@ const UNGATED_GOVERNANCE_ACTIONS_SORT = buildGatedControl(
 
 const FeatureFlagContext = createContext<FeatureFlagContextType>({
   isProposalDiscussionForumEnabled: false,
-  isGovernanceOutcomesPillarEnabled: false,
   isCip179Enabled: false,
   // Capability defaults are open, not closed: a missing provider must not hide
   // UI that works.
@@ -271,10 +269,6 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
         (env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === "true" ||
           env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === true) &&
         !!env.VITE_PDF_API_URL,
-      isGovernanceOutcomesPillarEnabled:
-        env.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED === "true" ||
-        env.VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED === true ||
-        false,
       isCip179Enabled:
         env.VITE_IS_CIP179_ENABLED === "true" ||
         env.VITE_IS_CIP179_ENABLED === true ||

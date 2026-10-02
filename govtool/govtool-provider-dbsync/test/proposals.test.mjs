@@ -6,6 +6,7 @@ import { toRatio, continuedFraction } from '../dist/governance/proposals/ratio.j
 import { decodeBody, paramGroups } from '../dist/governance/proposals/body.js';
 import { deriveStatus, toGovAction, toLifecycle } from '../dist/governance/proposals/rows.js';
 import {
+  DREP_SQL,
   assembleAggregates,
   ccFigures,
   drepFigures,
@@ -23,6 +24,14 @@ import {
 
 const H = (n) => n.toString(16).padStart(2, '0').repeat(28);
 const TX = (n) => n.toString(16).padStart(2, '0').repeat(32);
+
+test('DRep tallies invalidate a vote on retirement after the vote but not after the tally epoch', () => {
+  assert.match(DREP_SQL, /vp\.vote::text AS vote, vp\.tx_id/);
+  assert.match(DREP_SQL, /WHERE NOT EXISTS\s*\(\s*SELECT 1 FROM drep_registration retired/);
+  assert.match(DREP_SQL, /retired\.drep_hash_id = v\.voter AND retired\.deposit < 0/);
+  assert.match(DREP_SQL, /retired\.tx_id > v\.tx_id AND retired\.tx_id <= bound\.max_tx/);
+  assert.match(DREP_SQL, /JOIN bound ON bound\.e = p\.e/);
+});
 
 function fakeDb(routes) {
   const calls = [];

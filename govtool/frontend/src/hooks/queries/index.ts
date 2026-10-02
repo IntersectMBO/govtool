@@ -19,5 +19,5 @@ export * from "./useGetMetadataReports";
 export * from "./useGetOutcomeGovActionMetadata";
 export * from "./useGetOutcomeGovernanceActionQuery";
 export * from "./useGetOutcomeGovernanceActionsQuery";
-export * from "./useGetOutcomeNetworkMetrics";
+export * from "./useGetOutcomeEpochParams";
 export * from "./useGetOutcomeProposalDiscussionQuery";

@@ -242,3 +242,27 @@ npm run test:e2e  # the two routes that need no data layer
 metadata gateway, the whole-collection reader and the cache. The e2e spec
 covers `/` and `/health` only; to exercise the rest, run the server against
 the fixture.
+
+For a read-only Outcomes comparison, build the contract, providers and backend,
+then run from this directory with the db-sync and Koios environment settings
+for the same network (`.env` supplies defaults):
+
+```bash
+OUTCOMES_LIVE_REPORT=/tmp/govtool-outcomes-live.json node scripts/live-outcome-aggregates.mjs
+```
+
+This samples current, enacted and expired actions, compares each supported
+voter group's complete tally and threshold, and checks the Outcomes detail
+projection. Unsupported historical Koios SPO/committee groups are recorded
+separately. Any mismatch or read failure exits nonzero. Chain data changes, so
+the resulting report describes that run rather than a frozen release guarantee.
+
+To check desktop and mobile rendering with those sampled tallies, run from
+`../../tests/govtool-frontend/playwright`:
+
+```bash
+OUTCOMES_LIVE_REPORT=/tmp/govtool-outcomes-live.json npx playwright test --config playwright.outcomes.config.ts
+```
+
+These browser checks replay the captured aggregate data through mocked HTTP
+responses; they do not replace the full release suite against a deployment.

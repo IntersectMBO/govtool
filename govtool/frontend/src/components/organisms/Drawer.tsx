@@ -9,10 +9,7 @@ import { WalletInfoCard, DRepInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
 
 export const Drawer = () => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { voter } = useGetVoterInfo();
 
   return (
@@ -80,16 +77,6 @@ export const Drawer = () => {
                   if (
                     !isProposalDiscussionForumEnabled &&
                     childItem.dataTestId === "proposal-discussion-link"
-                  ) {
-                    return null;
-                  }
-
-                  if (
-                    !isGovernanceOutcomesPillarEnabled &&
-                    (childItem.dataTestId ===
-                      "governance-actions-voted-by-me-link" ||
-                      childItem.dataTestId ===
-                        "governance-actions-outcomes-link")
                   ) {
                     return null;
                   }

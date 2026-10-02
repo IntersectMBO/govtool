@@ -1,14 +1,7 @@
 import environments from "@constants/environments";
-import { formatWithThousandSeparator } from "@helpers/adaFormat";
-import { Browser, expect, Page, Response } from "@playwright/test";
+import { Browser, expect, Page } from "@playwright/test";
 import { outcomeProposal, outcomeType } from "@types";
 import OutComesPage from "./outcomesPage";
-import {
-  areCCVoteTotalsDisplayed,
-  areDRepVoteTotalsDisplayed,
-  areSPOVoteTotalsDisplayed,
-} from "@helpers/featureFlag";
-import { parseVotingPowerAndPercentage } from "@helpers/index";
 
 export default class OutcomeDetailsPage {
   readonly dRepYesVotes = this.page.getByTestId("DReps-yes-votes-submitted");
@@ -54,240 +47,90 @@ export default class OutcomeDetailsPage {
     );
   }
 
-  async getSposAndDRepAbstainNoConfidence(metricsResponses: Response): Promise<{
-    autoAbstain: string;
-    noConfidence: string;
-    sPosAutoAbstain: string;
-    sPosNoConfidence: string;
-  }> {
-    const response = await metricsResponses.json();
-    const LOVELACE = 1000000;
-    let autoAbstain: string = "0";
-    let noConfidence: string = "0";
-    let sPosAutoAbstain: string = "0";
-    let sPosNoConfidence: string = "0";
-    if (response) {
-      autoAbstain = formatWithThousandSeparator(
-        Math.ceil(response.always_abstain_voting_power / LOVELACE)
-      );
-      noConfidence = formatWithThousandSeparator(
-        Math.ceil(response.always_no_confidence_voting_power / LOVELACE)
-      );
-
-      sPosAutoAbstain = formatWithThousandSeparator(
-        Math.ceil(response.spos_abstain_voting_power / LOVELACE)
-      );
-      sPosNoConfidence = formatWithThousandSeparator(
-        Math.ceil(response.spos_no_confidence_voting_power / LOVELACE)
-      );
-    }
-    return {
-      autoAbstain,
-      noConfidence,
-      sPosAutoAbstain,
-      sPosNoConfidence,
-    };
-  }
-
   async shouldDisplayCorrectVotingResults(
     browser: Browser,
     isLoggedIn = false
   ) {
-    await Promise.all(
-      Object.entries(outcomeType).map(async ([filterKey, filterValue]) => {
-        const outcomePage = new OutComesPage(this.page);
-        const {
-          govActionDetailsPage,
-          metricsResponsePromise,
-          outcomeResponsePromise,
-        } = await outcomePage.navigateToFilteredProposalDetail(
+    // Visit serially: every detail page may need a provider read.
+    for (const filterKey of Object.keys(outcomeType)) {
+      const outcomePage = new OutComesPage(this.page);
+      const { govActionDetailsPage, outcomeResponsePromise } =
+        await outcomePage.navigateToFilteredProposalDetail(
           browser,
           filterKey,
           isLoggedIn
         );
-
-        
-        if (!govActionDetailsPage) {
-          return;
-        }
-
-        const outcomeResponse = await outcomeResponsePromise;
-        const proposalToCheck = (await outcomeResponse.json());
-
-        const metricsResponse = await metricsResponsePromise;
-
-        const { autoAbstain, noConfidence, sPosAutoAbstain, sPosNoConfidence } =
-          await govActionDetailsPage.getSposAndDRepAbstainNoConfidence(
-            metricsResponse
+      if (!govActionDetailsPage) continue;
+      const page = govActionDetailsPage.currentPage;
+      try {
+        const response = await outcomeResponsePromise;
+        expect(response.ok()).toBeTruthy();
+        const proposal = await response.json();
+        expect(Array.isArray(proposal.vote_aggregates)).toBeTruthy();
+        for (const [role, prefix, title] of [
+          ["drep", "DReps", "DReps"],
+          ["spo", "SPOs", "SPOs"],
+          ["cc", "CC", "Constitutional Committee"],
+        ]) {
+          const section = page.getByTestId(`${prefix}-voting-results-data`);
+          await expect(section).toBeVisible();
+          const aggregate = proposal.vote_aggregates.find(
+            (a: { role: string }) => a.role === role
           );
-
-        const metricsResponseJson = await metricsResponse.json();
-        const totalStakeControlledByNoConfidence = Number(metricsResponseJson.always_no_confidence_voting_power)
-        const dRepYesVotes = filterValue === outcomeType.NoConfidence ? Number(proposalToCheck.yes_votes) + totalStakeControlledByNoConfidence : Number(proposalToCheck.yes_votes);
-        const dRepNoVotes = filterValue != outcomeType.NoConfidence ? Number(proposalToCheck.no_votes) + totalStakeControlledByNoConfidence : Number(proposalToCheck.no_votes) ;
-
-        const currentPageUrl = govActionDetailsPage.currentPage.url();
-
-        // check dRep votes
-        if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
-          await govActionDetailsPage.dRepExpandButton.click();
-
-          await expect(
-            govActionDetailsPage.dRepResultData.getByRole("row", {
-              name: "Yes",
-            }),
-            {
-              message: `DRep "Yes" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(
-            `Yes${formatWithThousandSeparator(dRepYesVotes, false)}`,
-            {
-              timeout: 60_000,
-            }
-          ); //BUG missing testIds
-
-          await expect(
-            govActionDetailsPage.dRepResultData.getByRole("row", {
-              name: "Auto-Abstain",
-            }),
-            {
-              message: `DRep "Auto-Abstain" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(`Auto-Abstain${autoAbstain}`); //BUG missing testIds
-          await expect(
-            govActionDetailsPage.dRepResultData.getByRole("row", {
-              name: "No Confidence",
-            }),
-            {
-              message: `DRep "No Confidence" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(`No Confidence${noConfidence}`); //BUG missing testIds
-          await expect(
-            govActionDetailsPage.dRepResultData.getByRole("row", {
-              name: "Explicit",
-            }),
-            {
-              message: `DRep "Explicit" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(
-            `Explicit${formatWithThousandSeparator(proposalToCheck.abstain_votes, false)}`
+          if (!aggregate) {
+            // Unsupported and inapplicable roles have distinct explicit messages.
+            await expect(section.getByRole("status")).toBeVisible();
+            await expect(section.getByRole("progressbar")).toHaveCount(0);
+            continue;
+          }
+          const format = (value: string) =>
+            aggregate.representation === "percent"
+              ? `${(Number(value) * 100).toFixed(2)}%`
+              : aggregate.representation === "count"
+                ? BigInt(value).toLocaleString("en-US")
+                : `₳ ${((BigInt(value) + 999999n) / 1000000n).toLocaleString("en-US")}`;
+          // Exact integer arithmetic: mainnet lovelace exceeds Number's safe range.
+          const digits = Math.max(
+            ...[aggregate.yes, aggregate.abstain, aggregate.totalEligible].map(
+              (value: string) => value.split(".")[1]?.length ?? 0
+            )
           );
-
-          await expect(
-            govActionDetailsPage.dRepResultData
-              .getByRole("row", {
-                name: "No",
-              })
-              .first(),
-            {
-              message: `DRep "No" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(
-            `No${formatWithThousandSeparator(dRepNoVotes, false)}`
-          ); //BUG missing testIds
+          const scaled = (value: string) => {
+            const [whole, fraction = ""] = value.split(".");
+            return BigInt(whole + fraction.padEnd(digits, "0"));
+          };
+          const denominator =
+            scaled(aggregate.totalEligible) - scaled(aggregate.abstain);
+          if (denominator > 0n) {
+            // Hundredths of a percent, rounded half up, as the UI rounds.
+            const hundredths =
+              (scaled(aggregate.yes) * 10000n + denominator / 2n) /
+              denominator;
+            const yesPercent = Number(hundredths) / 100;
+            await expect(
+              section.getByTestId(`${title}-yes-votes-submitted`)
+            ).toHaveText(
+              `${format(aggregate.yes)} - ${yesPercent.toFixed(2)}%`
+            );
+          } else {
+            await expect(section.getByRole("progressbar")).toHaveCount(0);
+          }
+          await section.getByTestId(`${title}-expand-button`).click();
+          for (const [field, suffix] of [
+            ["yes", "yes-votes"],
+            ["no", "no-votes"],
+            ["notVoted", "not-voted-votes"],
+            ["abstain", "abstain-votes"],
+          ]) {
+            await expect(section.getByTestId(`${title}-${suffix}`)).toHaveText(
+              format(aggregate[field])
+            );
+          }
         }
-
-        // check sPos votes
-        if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
-          await govActionDetailsPage.sPosExpandButton.click();
-          const totalSposNoVotes =
-            filterKey === "NoConfidence"
-              ? proposalToCheck.pool_no_votes
-              : parseInt(sPosNoConfidence.replace(/,/g, "")) * 1000000 +
-              parseInt(proposalToCheck.pool_no_votes);
-
-          const totalSposYesVotesForNoConfidence =
-            parseInt(sPosNoConfidence.replace(/,/g, "")) * 1000000 +
-            parseInt(proposalToCheck.pool_yes_votes);
-
-          const totalSposYesVotes =
-            filterKey === "NoConfidence"
-              ? totalSposYesVotesForNoConfidence
-              : proposalToCheck.pool_yes_votes;
-          await expect(
-            govActionDetailsPage.sPosResultData.getByRole("row", {
-              name: "Yes",
-            }),
-            {
-              message: `SPos "Yes" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(
-            `Yes${formatWithThousandSeparator(totalSposYesVotes, false)}`,
-            {
-              timeout: 60_000,
-            }
-          ); //BUG missing testIds
-
-          await expect(
-            govActionDetailsPage.sPosResultData.getByRole("row", {
-              name: "Auto-Abstain",
-            }),
-            {
-              message: `SPos "Auto-Abstain" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(`Auto-Abstain${sPosAutoAbstain}`); //BUG missing testIds
-          await expect(
-            govActionDetailsPage.sPosResultData.getByRole("row", {
-              name: "No Confidence",
-            }),
-            {
-              message: `SPos "No Confidence" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(`No Confidence${sPosNoConfidence}`); //BUG missing testIds
-          await expect(
-            govActionDetailsPage.sPosResultData.getByRole("row", {
-              name: "Explicit",
-            }),
-            {
-              message: `SPos "Explicit" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(
-            `Explicit${formatWithThousandSeparator(proposalToCheck.pool_abstain_votes, false)}`
-          ); //BUG missing testIds
-          await expect(
-            govActionDetailsPage.sPosResultData
-              .getByRole("row", {
-                name: "No",
-              })
-              .first(),
-            {
-              message: `SPos "No" voting power checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(
-            `No${formatWithThousandSeparator(totalSposNoVotes, false)}`
-          ); //BUG missing testIds
-        }
-
-        // check ccCommittee votes
-        if (areCCVoteTotalsDisplayed(proposalToCheck)) {
-          const ccYesVoteSubmittedText =
-            await govActionDetailsPage.ccCommitteeYesVotes.textContent();
-
-          const { percentage: yesPercentage } = parseVotingPowerAndPercentage(
-            ccYesVoteSubmittedText
-          );
-
-          await expect(govActionDetailsPage.ccCommitteeYesVotes, {
-            message: `CC "Yes" vote count checked for ${currentPageUrl}`,
-          }).toHaveText(`${proposalToCheck.cc_yes_votes} - ${yesPercentage}`);
-          await expect(
-            govActionDetailsPage.cCResultData.getByRole("row", {
-              name: "Abstain Votes",
-            }),
-            {
-              message: `CC "Abstain" vote count checked for ${currentPageUrl}`,
-            }
-          ).toHaveText(`Abstain Votes${proposalToCheck.cc_abstain_votes}`); //BUG missing testIds
-
-          const noPercentage = 100 - parseFloat(yesPercentage.replace("%", ""));
-          await expect(govActionDetailsPage.ccCommitteeNoVotes, {
-            message: `CC "No" vote count checked for ${currentPageUrl}`,
-          }).toHaveText(
-            `${proposalToCheck.cc_no_votes} - ${noPercentage.toFixed(2)}%`
-          );
-        }
-      })
-    );
+      } finally {
+        await page.close();
+      }
+    }
   }
 
   async verifyInvalidOutcomeMetadata({
@@ -301,13 +144,15 @@ export default class OutcomeDetailsPage {
     url: string;
     hash: string;
   }) {
-    let governanceActionPromise = this.page.route("**/governance-actions/*", async (route) => {
-      if (route.request().url().includes("/governance-actions/metadata")) {
-        await route.continue();
-      } else {
-        await route.fulfill({ body: JSON.stringify(outcomeResponse)});
+    let governanceActionPromise = this.page.route(
+      "**/governance-actions/*",
+      async (route) => {
+        if (route.request().url().includes("/governance-actions/metadata")) {
+          await route.continue();
+        } else {
+          await route.fulfill({ body: JSON.stringify(outcomeResponse) });
+        }
       }
-    }
     );
     const outcomePage = new OutComesPage(this.page);
     await outcomePage.goto();
@@ -318,7 +163,7 @@ export default class OutcomeDetailsPage {
     await expect(
       outcomePage.title,
       outcomeTitle.toLowerCase() !== type.toLowerCase() &&
-      `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
+        `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
     ).toHaveText(type, {
       ignoreCase: true,
       timeout: 60_000,

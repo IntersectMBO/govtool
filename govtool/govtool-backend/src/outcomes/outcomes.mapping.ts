@@ -198,6 +198,21 @@ export function toOutcomeDetailRow(
     cc_yes_votes: tally(action, 'cc', 'yes'),
     cc_no_votes: tally(action, 'cc', 'no'),
     cc_abstain_votes: tally(action, 'cc', 'abstain'),
+    // Copy only contract fields: provider extensions must not escape on the wire.
+    vote_aggregates: (action.voteAggregates ?? []).map((a) => ({
+      role: a.role,
+      representation: a.representation,
+      yes: a.yes,
+      no: a.no,
+      abstain: a.abstain,
+      notVoted: a.notVoted,
+      totalEligible: a.totalEligible,
+      threshold: {
+        numerator: a.threshold.numerator,
+        denominator: a.threshold.denominator,
+      },
+      ...(a.passing === undefined ? {} : { passing: a.passing }),
+    })),
     prev_gov_action_index:
       action.previousAction === null
         ? null

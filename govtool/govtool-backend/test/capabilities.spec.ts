@@ -174,11 +174,11 @@ function govAction(overrides: Partial<GovAction> = {}): GovAction {
   };
 }
 
-function drepService(dreps: DRep[]): DRepService {
+function drepService(dreps: DRep[], capabilities = PROVIDER): DRepService {
   const cache = passthroughCache();
   const api = chain({
     governance: { dreps: { list: () => Promise.resolve(page(dreps)) } },
-    system: { getCapabilities: () => Promise.resolve(env(PROVIDER)) },
+    system: { getCapabilities: () => Promise.resolve(env(capabilities)) },
   });
   return new DRepService(
     api,
@@ -283,6 +283,26 @@ describe('RAISE: sortDReps handles all five DRepSort keys', () => {
 
   it('orders by activity, descending', async () => {
     await expect(order('Activity')).resolves.toEqual(['a', 'c', 'b']);
+  });
+
+  it('refuses undeclared activity sorting even when rows contain activity', async () => {
+    const capabilities = providerCapabilities({
+      sorts: { dreps: ['registrationDate'], proposals: ['newest', 'oldest'] },
+    });
+    await expect(
+      drepService(dreps, capabilities).list({ status: [], sort: 'Activity' }),
+    ).rejects.toMatchObject({ status: 501 });
+  });
+
+  it('refuses activity sorting when a directory row lacks activity', async () => {
+    const { activity, ...withoutActivity } = dreps[0];
+    expect(activity).toBeDefined();
+    await expect(
+      drepService([withoutActivity, ...dreps.slice(1)]).list({
+        status: [],
+        sort: 'Activity',
+      }),
+    ).rejects.toMatchObject({ status: 501 });
   });
 
   it('orders by registration date, newest first', async () => {
@@ -743,7 +763,7 @@ describe('the composed feature set', () => {
 
   it('RAISES the controls it applies to its own snapshot', () => {
     // The point is that the backend removes the restriction entirely, so a
-    // provider that refuses every key still gets a full menu.
+    // provider that refuses every key still gets the data-independent controls.
     const raised = backendFeatures(
       providerCapabilities({
         sorts: { dreps: [], proposals: ['newest'] },
@@ -753,9 +773,10 @@ describe('the composed feature set', () => {
       'mainnet',
     );
     const universe = ['votingPower', 'activity', 'status'];
-    expect(allowedOptions(raised, 'drepDirectory.sort', universe)).toEqual(
-      universe,
-    );
+    expect(allowedOptions(raised, 'drepDirectory.sort', universe)).toEqual([
+      'votingPower',
+      'status',
+    ]);
     expect(allowedOptions(raised, 'govActionList.sort', ['newest'])).toEqual([
       'newest',
     ]);
@@ -765,6 +786,19 @@ describe('the composed feature set', () => {
     expect(allowedOptions(raised, 'govActionList.status', ['live'])).toEqual([
       'live',
     ]);
+  });
+
+  it('retains activity sorting when the provider declares it', () => {
+    const universe = [
+      'votingPower',
+      'registrationDate',
+      'activity',
+      'status',
+      'random',
+    ];
+    expect(allowedOptions(COMPOSED, 'drepDirectory.sort', universe)).toEqual(
+      universe,
+    );
   });
 
   it('LOWERS a feature whose route it does not expose', () => {

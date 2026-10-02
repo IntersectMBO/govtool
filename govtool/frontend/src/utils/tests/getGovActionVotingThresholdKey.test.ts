@@ -79,6 +79,16 @@ describe("getGovActionVotingThresholdKey", () => {
   describe("ParameterChange", () => {
     const govActionType = GovernanceActionType.ParameterChange;
 
+    it("gives SPOs the security threshold for a change to block execution steps alone", () => {
+      expect(
+        getGovActionVotingThresholdKey({
+          govActionType,
+          protocolParams: { max_block_ex_steps: 1000000 },
+          voterType: "sPos",
+        }),
+      ).toBe("pvtpp_security_group");
+    });
+
     it("gives SPOs the security group threshold for a network-group security parameter", () => {
       expect(
         getGovActionVotingThresholdKey({

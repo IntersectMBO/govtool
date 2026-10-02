@@ -1,12 +1,9 @@
 import { OutcomeGovernanceAction, OutcomeStatus } from "@/models";
 
-import { correctAdaFormatWithSuffix } from "./adaFormat";
 import {
   decodeCIP129Identifier,
   encodeCIP129Identifier,
 } from "./cip129identifier";
-
-const LOVELACE = 1000000;
 
 export type OutcomeProposalStatus =
   "Enacted" | "Ratified" | "Expired" | "Not Ratified" | "Live";
@@ -121,22 +118,6 @@ export const encodeOutcomeCommitteeColdId = (
     txID: (hasScript ? "13" : "12") + keyHash,
     bech32Prefix: "cc_cold",
   });
-};
-
-/** `₳ 1.23M` for stake, or the plain count for the committee. */
-export const formatOutcomeVoteValue = (
-  value: number,
-  isCC: boolean,
-  addAdaPrefix = true,
-) => {
-  if (isCC) return value;
-  return `${addAdaPrefix ? "₳" : ""} ${correctAdaFormatWithSuffix(value)}`;
-};
-
-/** Whole ada, rounded up. */
-export const lovelaceToRoundedUpAda = (lovelace: number | undefined) => {
-  if (!lovelace) return 0;
-  return Math.ceil(lovelace / LOVELACE);
 };
 
 /**

@@ -588,14 +588,8 @@ export default class OutComesPage {
       return {
         govActionDetailsPage: null,
         outcomeResponsePromise: null,
-        metricsResponsePromise: null,
       };
     }
-
-    const metricsResponsePromise = page.waitForResponse(
-      (response) => response.url().includes(`/misc/network/metrics?epoch`),
-      { timeout: 120_000 }
-    );
 
     expect(
       proposals.length,
@@ -619,7 +613,6 @@ export default class OutComesPage {
     return {
       govActionDetailsPage,
       outcomeResponsePromise,
-      metricsResponsePromise,
     };
   }
 }

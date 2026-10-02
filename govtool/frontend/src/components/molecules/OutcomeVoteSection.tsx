@@ -4,7 +4,6 @@ import {
   Fade,
   Grid,
   LinearProgress,
-  Skeleton,
   styled,
   Table,
   TableBody,
@@ -20,7 +19,8 @@ import {
 import { Typography } from "@atoms";
 import { primaryBlue, successGreen } from "@consts";
 import { useTranslation } from "@hooks";
-import { formatOutcomeVoteValue, lovelaceToRoundedUpAda } from "@utils";
+import { formatOutcomeAggregateValue, outcomeVoteResult } from "@utils";
+import type { OutcomeVoteAggregate } from "@models";
 
 const THRESHOLD_COLOR = "#45458A";
 const NO_BAR_COLOR = "#D84444";
@@ -86,40 +86,18 @@ const ThresholdIndicator = styled(Box, {
   zIndex: 5,
 }));
 
-const VoteSectionLoader = ({ title }: { title: string }) => (
-  <Box mb={3}>
-    <Typography
-      sx={{ color: "neutralGray", fontWeight: 600, fontSize: 18, mb: 1 }}
-    >
-      {title}
-    </Typography>
-    <Skeleton
-      variant="rectangular"
-      width="100%"
-      height={32}
-      sx={{ borderRadius: 20, mb: 1 }}
-    />
-    <Skeleton
-      variant="rectangular"
-      width="100%"
-      height={105}
-      sx={{ borderRadius: 1 }}
-    />
-  </Box>
-);
-
 type VoteMetricsTableProps = {
   collapsedMetrics: VoteMetric[];
   expandedMetrics: VoteMetric[];
   title: string;
-  isCC: boolean;
+  representation: OutcomeVoteAggregate["representation"];
 };
 
 const VoteMetricsTable = ({
   collapsedMetrics,
   expandedMetrics,
   title,
-  isCC,
+  representation,
 }: VoteMetricsTableProps) => {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -164,7 +142,7 @@ const VoteMetricsTable = ({
                   fontSize: 14,
                 }}
               >
-                {t("outcome.votes.value")} {!isCC && " (₳)"}
+                {t("outcome.votes.value")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -196,11 +174,10 @@ const VoteMetricsTable = ({
                     data-testid={metric.testId}
                     sx={{ color: "textBlack" }}
                   >
-                    {isCC
-                      ? metric.value
-                      : lovelaceToRoundedUpAda(
-                          Number(metric.value),
-                        ).toLocaleString()}
+                    {formatOutcomeAggregateValue(
+                      String(metric.value),
+                      representation,
+                    )}
                   </Box>
                 </TableCell>
               </TableRow>
@@ -209,7 +186,7 @@ const VoteMetricsTable = ({
         </Table>
       </Fade>
 
-      {!isCC && (
+      {expandedMetrics.length > collapsedMetrics.length && (
         <Box
           onClick={toggleExpand}
           data-testid={`${title}-${expanded ? "collapse" : "expand"}-button`}
@@ -240,156 +217,85 @@ const VoteMetricsTable = ({
 
 type OutcomeVoteSectionProps = {
   title: string;
-  yesVotes?: number;
-  noVotes?: number;
-  noTotalVotes?: number;
-  noConfidenceVotes?: number;
-  totalControlled?: number;
-  totalAbstainVotes?: number;
-  autoAbstainVotes?: number;
-  explicitAbstainVotes?: number;
-  notVotedVotes?: number;
-  threshold?: number | null;
-  ratificationThreshold?: number;
-  yesPercentage?: number;
-  noPercentage?: number;
-  isCC?: boolean;
+  aggregate?: OutcomeVoteAggregate;
   isDisplayed: boolean;
-  isUnavailable?: boolean;
-  isDataReady: boolean;
-  dataTestId?: string;
+  dataTestId: string;
 };
 
-/**
- * One voter group's result: the yes/no bar against the ratification
- * threshold, and the stake (or, for the committee, member) breakdown.
- */
+/** A complete action-specific tally, with no network-wide recomputation. */
 export const OutcomeVoteSection = ({
   title,
-  yesVotes = 0,
-  noVotes = 0,
-  noTotalVotes = 0,
-  totalControlled = 0,
-  totalAbstainVotes = 0,
-  autoAbstainVotes = 0,
-  explicitAbstainVotes = 0,
-  noConfidenceVotes = 0,
-  notVotedVotes = 0,
-  threshold = null,
-  yesPercentage = 0,
-  noPercentage = 0,
-  ratificationThreshold = 0,
-  isCC = false,
+  aggregate,
   isDisplayed,
-  isUnavailable = false,
-  isDataReady,
   dataTestId,
 }: OutcomeVoteSectionProps) => {
   const { t } = useTranslation();
+  const result = aggregate && outcomeVoteResult(aggregate);
+  const unavailable = !aggregate ? "dataUnavailable" : "dataInconsistent";
 
-  if (!isDataReady) {
-    return <VoteSectionLoader title={title} />;
+  if (!isDisplayed || !aggregate || !result) {
+    return (
+      <Box data-testid={dataTestId} mb={3}>
+        <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 1.875 }}>
+          {title}
+        </Typography>
+        <Box
+          role="status"
+          data-testid={
+            isDisplayed
+              ? `${dataTestId}-unavailable`
+              : "voting-not-available-label"
+          }
+        >
+          <Typography>
+            {isDisplayed
+              ? t(`outcome.votes.${unavailable}`)
+              : `${title} ${t("outcome.votes.votingNotAvailable")} ${t("outcome.votes.onThisTypeOfAction")}`}
+          </Typography>
+        </Box>
+      </Box>
+    );
   }
 
-  const collapsedMetrics: VoteMetric[] = isCC
-    ? [
-        {
-          label: t("outcome.votes.numberOfCCs"),
-          value: totalControlled,
-          testId: "active-constitutional-committee-count",
-        },
-        {
-          label: t("outcome.votes.abstainVotes"),
-          value: totalAbstainVotes,
-          testId: "constitutional-committee-abstain-votes",
-        },
-        {
-          label: t("outcome.votes.notVoted"),
-          value: notVotedVotes,
-          testId: "constitutional-committee-not-voted-votes",
-        },
-      ]
-    : [
-        {
-          label: t("outcome.votes.totalActiveStake"),
-          value: totalControlled,
-          testId: `${title}-total-controlled-amount`,
-        },
-        {
-          label: t("outcome.votes.totalAbstain"),
-          value: totalAbstainVotes,
-          testId: `${title}-abstain-votes`,
-        },
-        {
-          label: t("outcome.votes.ratificationThreshold"),
-          value: ratificationThreshold,
-          testId: `${title}-ratification-threshold`,
-        },
-      ];
-
-  const expandedMetrics: VoteMetric[] = [
+  const { representation, yes, no, abstain, notVoted, totalEligible } =
+    aggregate;
+  const { yesPercentage, noPercentage } = result;
+  const threshold =
+    aggregate.threshold.numerator / aggregate.threshold.denominator;
+  const collapsedMetrics: VoteMetric[] = [
     {
-      label: t("outcome.votes.totalActiveStake"),
-      value: totalControlled,
-      testId: `${title}-total-controlled-amount`,
-    },
-    {
-      label: t("outcome.votes.ratificationThreshold"),
-      value: ratificationThreshold,
-      testId: `${title}-ratification-threshold`,
-      isHighlighted: true,
-      indentDepth: 1,
-    },
-    {
-      label: t("outcome.votes.yes"),
-      value: yesVotes,
-      testId: `${title}-yes-votes`,
-      indentDepth: 2,
-    },
-    {
-      label: t("outcome.votes.no"),
-      value: noVotes,
-      testId: `${title}-no-votes`,
-      indentDepth: 2,
-    },
-    {
-      label: t("outcome.votes.noConfidence"),
-      value: noConfidenceVotes,
-      testId: `${title}-no-confidence-votes`,
-      indentDepth: 2,
-    },
-    {
-      label: t("outcome.votes.notVoted"),
-      value: notVotedVotes,
-      testId: `${title}-not-voted-votes`,
-      indentDepth: 2,
+      label: t(
+        representation === "count"
+          ? "outcome.votes.eligibleMembers"
+          : "outcome.votes.totalEligible",
+      ),
+      value: totalEligible,
+      testId:
+        representation === "count"
+          ? "active-constitutional-committee-count"
+          : `${title}-total-controlled-amount`,
     },
     {
       label: t("outcome.votes.totalAbstain"),
-      value: totalAbstainVotes,
+      value: abstain,
       testId: `${title}-abstain-votes`,
-      isHighlighted: true,
-      indentDepth: 1,
     },
     {
-      label: t("outcome.votes.autoAbstain"),
-      value: autoAbstainVotes,
-      testId: `${title}-auto-abstain`,
-      indentDepth: 2,
-    },
-    {
-      label: t("outcome.votes.explicit"),
-      value: explicitAbstainVotes,
-      testId: `${title}-explicit-abstain`,
-      indentDepth: 2,
+      label: t("outcome.votes.ratificationDenominator"),
+      value: result.ratification,
+      testId: `${title}-ratification-threshold`,
     },
   ];
-
-  const thresholdValue = threshold
-    ? isCC
-      ? Math.round((totalControlled - totalAbstainVotes) * threshold)
-      : threshold * ratificationThreshold
-    : 0;
+  const expandedMetrics: VoteMetric[] = [
+    ...collapsedMetrics,
+    { label: t("outcome.votes.yes"), value: yes, testId: `${title}-yes-votes` },
+    { label: t("outcome.votes.no"), value: no, testId: `${title}-no-votes` },
+    {
+      label: t("outcome.votes.notVoted"),
+      value: notVoted,
+      testId: `${title}-not-voted-votes`,
+    },
+  ];
 
   return (
     <Box
@@ -405,29 +311,13 @@ export const OutcomeVoteSection = ({
       >
         {title}
       </Typography>
-      {!isDisplayed ? (
-        <Typography
-          data-testid="voting-not-available-label"
-          sx={{ fontWeight: 400, fontSize: 13 }}
-        >
-          {title}{" "}
-          <span>
-            <strong>{t("outcome.votes.votingNotAvailable")}</strong>{" "}
-            {t("outcome.votes.onThisTypeOfAction")}
-          </span>
-        </Typography>
-      ) : isUnavailable ? (
-        <Typography
-          data-testid="vote-totals-unavailable-label"
-          sx={{ fontWeight: 400, fontSize: 13 }}
-        >
-          {t("outcome.votes.totalsUnavailable")}
-        </Typography>
-      ) : (
-        <Grid container spacing={1.875}>
-          <Grid item xs={12}>
-            <Box position="relative" width="100%">
-              {threshold !== null && (
+      <Grid container spacing={1.875}>
+        <Grid item xs={12}>
+          {yesPercentage === undefined ? (
+            <Typography>{t("outcome.votes.noEligibleVotes")}</Typography>
+          ) : (
+            <>
+              <Box position="relative" width="100%">
                 <>
                   <ThresholdIndicator left={threshold * 100}>
                     <Box
@@ -449,8 +339,7 @@ export const OutcomeVoteSection = ({
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {formatOutcomeVoteValue(thresholdValue, isCC)} -{" "}
-                        {(threshold * 100).toFixed(0)}%
+                        {(threshold * 100).toFixed(2)}%
                       </Typography>
                     </Box>
                     <Box
@@ -476,55 +365,55 @@ export const OutcomeVoteSection = ({
                     }}
                   />
                 </>
-              )}
-              <ProgressContainer>
-                <StyledLinearProgress
-                  data-testid={`${title}-percentages-progress-bar`}
-                  variant="determinate"
-                  value={yesPercentage}
-                />
-                <PercentageOverlay>
-                  <PercentageText>{t("outcome.votes.yes")}</PercentageText>
-                  <PercentageText>{t("outcome.votes.no")}</PercentageText>
-                </PercentageOverlay>
-              </ProgressContainer>
-            </Box>
-            <Box
-              sx={{
-                alignItems: "center",
-                display: "flex",
-                fontSize: 14,
-                fontWeight: 600,
-                justifyContent: "space-between",
-                lineHeight: 1.75,
-                mt: 1,
-                width: "100%",
-              }}
-            >
+                <ProgressContainer>
+                  <StyledLinearProgress
+                    data-testid={`${title}-percentages-progress-bar`}
+                    variant="determinate"
+                    value={yesPercentage}
+                  />
+                  <PercentageOverlay>
+                    <PercentageText>{t("outcome.votes.yes")}</PercentageText>
+                    <PercentageText>{t("outcome.votes.no")}</PercentageText>
+                  </PercentageOverlay>
+                </ProgressContainer>
+              </Box>
               <Box
-                data-testid={`${title}-yes-votes-submitted`}
-                component="span"
+                sx={{
+                  alignItems: "center",
+                  display: "flex",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  justifyContent: "space-between",
+                  lineHeight: 1.75,
+                  mt: 1,
+                  width: "100%",
+                }}
               >
-                {`${formatOutcomeVoteValue(yesVotes, isCC)} - ${yesPercentage?.toFixed(2)}%`}
+                <Box
+                  data-testid={`${title}-yes-votes-submitted`}
+                  component="span"
+                >
+                  {`${formatOutcomeAggregateValue(yes, representation)} - ${yesPercentage.toFixed(2)}%`}
+                </Box>
+                <Box
+                  data-testid={`${title}-no-votes-submitted`}
+                  component="span"
+                >
+                  {`${formatOutcomeAggregateValue(result.totalNo, representation)} - ${noPercentage?.toFixed(2)}%`}
+                </Box>
               </Box>
-              <Box data-testid={`${title}-no-votes-submitted`} component="span">
-                {`${formatOutcomeVoteValue(
-                  isCC ? noVotes : noTotalVotes,
-                  isCC,
-                )} - ${noPercentage?.toFixed(2)}%`}
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12}>
-            <VoteMetricsTable
-              collapsedMetrics={collapsedMetrics}
-              expandedMetrics={expandedMetrics}
-              title={title}
-              isCC={isCC}
-            />
-          </Grid>
+            </>
+          )}
         </Grid>
-      )}
+        <Grid item xs={12}>
+          <VoteMetricsTable
+            collapsedMetrics={collapsedMetrics}
+            expandedMetrics={expandedMetrics}
+            title={title}
+            representation={representation}
+          />
+        </Grid>
+      </Grid>
     </Box>
   );
 };

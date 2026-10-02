@@ -9,7 +9,7 @@ import { errorRed, successGreen } from "@consts";
 
 type OutcomeIndicatorProps = {
   title: string;
-  passed: boolean;
+  passed?: boolean;
   isDisplayed: boolean;
   isLoading: boolean;
   dataTestId?: string;
@@ -27,7 +27,7 @@ export const OutcomeIndicator = ({
   dataTestId,
 }: OutcomeIndicatorProps) => {
   const bgcolor =
-    isLoading || !isDisplayed
+    isLoading || !isDisplayed || passed === undefined
       ? "gray"
       : passed
         ? successGreen.c600
@@ -59,7 +59,13 @@ export const OutcomeIndicator = ({
           height={20}
           color="white"
         >
-          {!isDisplayed ? "-" : passed ? <IconThumbUp /> : <IconThumbDown />}
+          {isLoading || !isDisplayed || passed === undefined ? (
+            "-"
+          ) : passed ? (
+            <IconThumbUp />
+          ) : (
+            <IconThumbDown />
+          )}
         </Box>
         <Typography
           data-testid="voter-type-label"

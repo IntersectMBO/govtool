@@ -60,8 +60,22 @@ export type OutcomeGovernanceAction = {
   cc_yes_votes: number | null;
   cc_no_votes: number | null;
   cc_abstain_votes: number | null;
+  vote_aggregates?: OutcomeVoteAggregate[];
   prev_gov_action_index: string | number | null;
   prev_gov_action_tx_hash: string | null;
+};
+
+/** Values use lovelace, member counts, or 0..1 fractions as declared. */
+export type OutcomeVoteAggregate = {
+  role: "drep" | "spo" | "cc";
+  representation: "stake" | "count" | "percent";
+  yes: string;
+  no: string;
+  abstain: string;
+  notVoted: string;
+  totalEligible: string;
+  threshold: { numerator: number; denominator: number };
+  passing?: boolean;
 };
 
 export type OutcomeReference = {
@@ -85,25 +99,6 @@ export type OutcomeGovActionMetadata = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     authors: any[];
   };
-};
-
-export type OutcomeNetworkMetrics = {
-  epoch_no: number;
-  /** Lovelace */
-  total_stake_controlled_by_active_dreps: string;
-  /** Lovelace */
-  total_stake_controlled_by_stake_pools: string;
-  /** Lovelace */
-  always_abstain_voting_power: string;
-  /** Lovelace */
-  spos_abstain_voting_power: string;
-  /** Lovelace */
-  always_no_confidence_voting_power: string;
-  /** Lovelace */
-  spos_no_confidence_voting_power: string;
-  no_of_committee_members: number;
-  quorum_numerator: number;
-  quorum_denominator: number;
 };
 
 export type OutcomeAuthorWitness = {

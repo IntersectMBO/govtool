@@ -638,6 +638,7 @@ describe('GET /outcomes/governance-actions/:id', () => {
       'cc_yes_votes',
       'cc_no_votes',
       'cc_abstain_votes',
+      'vote_aggregates',
       'prev_gov_action_index',
       'prev_gov_action_tx_hash',
       'used_epoch_no',
@@ -667,6 +668,59 @@ describe('GET /outcomes/governance-actions/:id', () => {
       prev_gov_action_tx_hash: TX2,
       used_epoch_no: 507,
     });
+  });
+
+  it('keeps supported historical tallies when another role and network metrics are unavailable', async () => {
+    const action = govAction();
+    const aggregates = action.voteAggregates!.filter((a) => a.role !== 'cc');
+    const networkMetrics = jest.fn(() =>
+      Promise.reject(new Error('unsupported metrics')),
+    );
+    const svc = service({
+      network: { getStakeDistribution: networkMetrics },
+      governance: {
+        proposals: {
+          get: () =>
+            Promise.resolve(env({ ...action, voteAggregates: aggregates })),
+        },
+      },
+    });
+    const row = await svc.get(TX, '0');
+    expect(row.vote_aggregates).toEqual(aggregates);
+    expect(row.used_epoch_no).toBe(507);
+    expect(row.status.expired_epoch).toBe(507);
+    expect(networkMetrics).not.toHaveBeenCalled();
+  });
+
+  it('does not leak provider extensions from aggregates or thresholds', async () => {
+    const aggregate = govAction().voteAggregates![0];
+    const extended = {
+      ...aggregate,
+      privateExtra: 'hidden',
+      threshold: { ...aggregate.threshold, privateExtra: 'hidden' },
+      passing: true,
+    };
+    const row = await service({
+      governance: {
+        proposals: {
+          get: () =>
+            Promise.resolve(env(govAction({ voteAggregates: [extended] }))),
+        },
+      },
+    }).get(TX, '0');
+    expect(row.vote_aggregates).toEqual([{ ...aggregate, passing: true }]);
+  });
+
+  it('leaves absent aggregates absent rather than synthesizing zero tallies', async () => {
+    const row = await service({
+      governance: {
+        proposals: {
+          get: () =>
+            Promise.resolve(env(govAction({ voteAggregates: undefined }))),
+        },
+      },
+    }).get(TX, '0');
+    expect(row.vote_aggregates).toEqual([]);
   });
 
   it('sends a previous action index of 0 as "0", which the UI links', async () => {

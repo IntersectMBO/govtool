@@ -356,10 +356,10 @@ test('committee-lineage aggregates: NoConfidence yes includes always-no-confiden
   assert.equal(drep.yes, String(534967421824635n + 138316910791856n));
   assert.equal(drep.no, '490675179099982');
   const spo = n.voteAggregates.find((a) => a.role === 'spo');
-  assert.deepEqual([spo.yes, spo.no, spo.abstain, spo.notVoted, spo.totalEligible], ['320', '100', '90', '490', '1000']);
+  assert.equal(spo, undefined, 'historical protocol-10 defaults require historical pool registration data');
   const u = (await chainData.governance.proposals.get(uc2.proposal_id)).data;
   const t = Object.fromEntries(u.voteAggregates.map((a) => [a.role, a.threshold]));
-  assert.deepEqual(t, { drep: { numerator: 3, denominator: 5 }, spo: { numerator: 51, denominator: 100 } });
+  assert.deepEqual(t, { drep: { numerator: 3, denominator: 5 } });
   const before = (await chainData.governance.proposals.get(uc1.proposal_id)).data;
   // uc1 tallied at 580, before bootstrap ended (protocol 9): DRep threshold 0.
   assert.deepEqual(before.voteAggregates.find((a) => a.role === 'drep').threshold, { numerator: 0, denominator: 1 });

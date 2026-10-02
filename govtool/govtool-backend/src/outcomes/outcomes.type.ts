@@ -1,5 +1,6 @@
 import type { ApiInteger } from 'src/common/integer';
 import type { LegacyDescription } from 'src/common/legacy-description';
+import type { VoteAggregate } from '@govtool/data-providers/chain-data';
 import type { LegacyParamProposal } from 'src/epoch/epoch.type';
 
 /**
@@ -89,6 +90,8 @@ export type OutcomeDetailRow = {
   cc_yes_votes: ApiInteger | null;
   cc_no_votes: ApiInteger | null;
   cc_abstain_votes: ApiInteger | null;
+  /** Complete per-role tallies at this action's tally epoch; absent roles are unavailable. */
+  vote_aggregates: VoteAggregate[];
   /**
    * A decimal string, as the outcomes service sent it: the UI tests it for
    * truthiness before linking the previous action, so a number 0 would hide

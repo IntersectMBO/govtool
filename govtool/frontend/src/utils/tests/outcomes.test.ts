@@ -3,11 +3,9 @@ import { describe, expect, it } from "vitest";
 import { encodeCIP129Identifier } from "../cip129identifier";
 import {
   encodeOutcomeCommitteeColdId,
-  formatOutcomeVoteValue,
   getOutcomeCIP129Id,
   getOutcomeProposalStatus,
   getOutcomeVoteEnd,
-  lovelaceToRoundedUpAda,
   toOutcomeGovActionId,
 } from "../outcomes";
 
@@ -88,21 +86,6 @@ describe("encodeOutcomeCommitteeColdId", () => {
 
   it("returns an empty string for a hash that is not 28 bytes", () => {
     expect(encodeOutcomeCommitteeColdId("abc")).toBe("");
-  });
-});
-
-describe("vote value formatting", () => {
-  it("shows the committee count as is", () => {
-    expect(formatOutcomeVoteValue(5, true)).toBe(5);
-  });
-
-  it("shows stake as suffixed ada", () => {
-    expect(formatOutcomeVoteValue(2_500_000_000_000, false)).toBe("₳ 2.50M");
-  });
-
-  it("rounds lovelace up to whole ada", () => {
-    expect(lovelaceToRoundedUpAda(1_000_001)).toBe(2);
-    expect(lovelaceToRoundedUpAda(undefined)).toBe(0);
   });
 });
 

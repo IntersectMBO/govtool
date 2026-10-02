@@ -929,7 +929,6 @@ describe('GET /drep/list', () => {
       qualifications: null,
       imageUrl: null,
       imageHash: null,
-      votesLastYear: 7,
       // `list-dreps.sql` COALESCEs them to `[]` regardless of the anchor, so
       // the legacy field is never null.
       identityReferences: [],

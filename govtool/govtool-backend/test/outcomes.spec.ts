@@ -33,7 +33,7 @@ import {
   DocumentSummaryCache,
   RESOLVED_TTL_MS,
   UNRESOLVED_TTL_MS,
-} from '../src/outcomes/text-cache';
+} from '../src/metadata/text-cache';
 import { ProposalService } from '../src/proposal/proposal.service';
 import { SystemService } from '../src/system/system.service';
 import { actionId } from './ids';

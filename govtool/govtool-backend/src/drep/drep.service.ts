@@ -31,6 +31,7 @@ import {
   mapLimit,
   resolveBody,
 } from 'src/metadata/enrich';
+import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { readAll } from 'src/common/snapshot';
 import { ProposalService } from 'src/proposal/proposal.service';
 import {
@@ -104,9 +105,20 @@ const SNAPSHOT_DREP_SORTS: readonly DRepSort[] = [
   'activity',
 ];
 
+/**
+ * Room for every DRep's name on mainnet several times over; a value is one
+ * short string.
+ */
+const NAME_CACHE_MAX_ENTRIES = 50_000;
+
 @Injectable()
 export class DRepService {
   private readonly drepListSnapshotNamespace = 'drepListSnapshot';
+  /** Each DRep's CIP-119 `givenName` by (hash, url), for name search. */
+  private readonly nameCache = new DocumentSummaryCache<{
+    givenName: string | null;
+  }>(NAME_CACHE_MAX_ENTRIES);
+  private warmingNames = false;
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
@@ -299,7 +311,15 @@ export class DRepService {
     const sort = params.sort ?? 'Random';
     const seed = params.seed ?? '';
 
-    let dreps = [...(await this.getDRepListSnapShot(search))];
+    // A term that is not a DRep id is a name, as in the Haskell backend's
+    // `given_name ILIKE`. No provider indexes names, so it is matched over the
+    // whole directory against the names the warmer has resolved.
+    const isName =
+      search !== '' && tryLegacyDRepCandidates(search) === undefined;
+    let dreps = [...(await this.getDRepListSnapShot(isName ? '' : search))];
+    if (isName) {
+      dreps = this.filterByName(dreps, search);
+    }
 
     if (params.status.length > 0) {
       dreps = dreps.filter((drep) => params.status.includes(drep.status));
@@ -402,7 +422,10 @@ export class DRepService {
             proposals,
             selectedTypes,
           );
-          proposals = this.proposalService.filterBySearch(proposals, search);
+          proposals = await this.proposalService.filterBySearch(
+            proposals,
+            search,
+          );
           proposals = this.proposalService.sortProposals(proposals, sort);
 
           return proposals.flatMap((proposal) => {
@@ -413,6 +436,56 @@ export class DRepService {
           });
         }),
     );
+  }
+
+  /**
+   * Resolves every DRep's name into the name cache, so a name search finds
+   * them: a directory holds thousands of DReps, more than a search could
+   * resolve on demand. One run at a time; failures only leave a name
+   * unresolved, and the metadata service keeps each document once fetched,
+   * so later runs are quick.
+   */
+  async warmSearchNames(): Promise<void> {
+    const metadata = this.metadata;
+    if (metadata === null || this.warmingNames) return;
+    this.warmingNames = true;
+    try {
+      const dreps = await this.getDRepListSnapShot('');
+      await mapLimit(
+        dreps,
+        ENRICH_CONCURRENCY,
+        ({ url, metadataHash: hash }) =>
+          !url || !hash
+            ? Promise.resolve(undefined)
+            : this.nameCache.get(
+                hash,
+                url,
+                async () => {
+                  const fields = drepFields(
+                    await resolveBody(metadata, { url, hash }),
+                  );
+                  return fields ? { givenName: fields.givenName } : undefined;
+                },
+                { awaitRefresh: true },
+              ),
+      );
+    } finally {
+      this.warmingNames = false;
+    }
+  }
+
+  /**
+   * DReps whose resolved name contains `search`, ignoring case. Reads only
+   * names already cached: one not resolved yet does not match, and is
+   * picked up once the warmer reaches it.
+   */
+  private filterByName(dreps: DRepListItem[], search: string): DRepListItem[] {
+    const needle = search.toLowerCase();
+    return dreps.filter(({ url, metadataHash }) => {
+      if (!url || !metadataHash) return false;
+      const name = this.nameCache.peek(metadataHash, url)?.givenName;
+      return !!name && name.toLowerCase().includes(needle);
+    });
   }
 
   async warmDefaultListSnapshot(): Promise<void> {

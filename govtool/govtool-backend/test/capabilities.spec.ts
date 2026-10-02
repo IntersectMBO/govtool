@@ -26,6 +26,7 @@ import type {
   ProviderCapabilities,
 } from '@govtool/data-providers/chain-data';
 import { ChainDataError } from '@govtool/data-providers/chain-data';
+import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 
 import { AdaHolderService } from '../src/ada-holder/ada-holder.service';
 import { CacheService } from '../src/cache/cache.service';
@@ -411,10 +412,9 @@ describe('RAISE: the proposal list is filtered and sorted in memory', () => {
 
   /**
    * The provider declares `exactId` search only, and the backend still matches
-   * a substring — of the action id, which is what it has. The four CIP-108
-   * strings the legacy search also matched are metadata, and chain data no
-   * longer resolves any, so free text over a title is gone until a metadata
-   * service is wired in.
+   * a substring of the action id. The four CIP-108 strings come from the
+   * anchored documents, through the metadata service; see the search tests
+   * below.
    */
   it('searches over the whole snapshot, not by exact id alone', async () => {
     const body = await proposalService(actions).list({
@@ -511,6 +511,98 @@ describe('LOWER: laundering an absence into a number', () => {
       }),
     ]).list({ status: [], page: 0, pageSize: 10 });
     expect(body.elements[0].deposit).toBe(0);
+  });
+});
+
+/** Serves each anchor url's document; any other url fails to resolve. */
+function metadataService(
+  documents: Record<string, Record<string, unknown>>,
+): MetadataServiceV1 {
+  return {
+    getMetadata: (hash, url) =>
+      url !== undefined && url in documents
+        ? Promise.resolve({
+            ok: true,
+            hash,
+            body: documents[url],
+            fetchedAt: '2026-10-02T00:00:00Z',
+          })
+        : Promise.reject(new Error('not served')),
+    getCipMetadata: () => Promise.reject(new Error('unused')),
+    refresh: () => Promise.reject(new Error('unused')),
+    getReport: () => Promise.resolve(null),
+    listReports: () => Promise.resolve([]),
+  };
+}
+
+describe('RAISE: search reaches names and titles, which no provider indexes', () => {
+  const anchor = (url: string) => ({ url, dataHash: 'e'.repeat(64) });
+
+  it('finds an action by a word of its title, abstract, motivation or rationale', async () => {
+    const actions = [
+      govAction({ anchor: anchor('https://x/bridge.jsonld') }),
+      govAction({
+        id: actionId(TX, 1),
+        index: 1,
+        anchor: anchor('https://x/other.jsonld'),
+      }),
+    ];
+    const service = new ProposalService(
+      chain({
+        governance: {
+          proposals: { list: () => Promise.resolve(page(actions)) },
+        },
+      }),
+      passthroughCache(),
+      metadataService({
+        'https://x/bridge.jsonld': {
+          body: { title: 'Fund the Bridge', rationale: 'Because' },
+        },
+        'https://x/other.jsonld': { body: { title: 'Something else' } },
+      }),
+    );
+    const search = (term: string) =>
+      service.list({ type: [], page: 0, pageSize: 10, search: term });
+
+    expect((await search('bridge')).elements.map((e) => e.index)).toEqual([0]);
+    expect((await search('BECAUSE')).total).toBe(1);
+    expect((await search('nowhere')).total).toBe(0);
+  });
+
+  it('finds a DRep by its name once the warmer has resolved it', async () => {
+    const alice = drep({ anchor: anchor('https://x/alice.jsonld') });
+    const bob = drep({
+      id: drepId('b'),
+      anchor: anchor('https://x/bob.jsonld'),
+    });
+    const cache = passthroughCache();
+    const api = chain({
+      governance: {
+        dreps: { list: () => Promise.resolve(page([alice, bob])) },
+      },
+      system: { getCapabilities: () => Promise.resolve(env(PROVIDER)) },
+    });
+    const service = new DRepService(
+      api,
+      new ProposalService(api, cache, null),
+      cache,
+      metadataService({
+        'https://x/alice.jsonld': { body: { givenName: 'Alice Example' } },
+        'https://x/bob.jsonld': { body: { givenName: 'Bob' } },
+      }),
+    );
+    const search = (term: string) =>
+      service.list({ status: [], page: 0, pageSize: 10, search: term });
+
+    // Names are document text: none is known before the warmer runs.
+    expect((await search('alice')).total).toBe(0);
+
+    await service.warmSearchNames();
+
+    const found = await search('ALICE ex');
+    expect(found.total).toBe(1);
+    expect(found.elements[0].givenName).toBe('Alice Example');
+    expect((await search('carol')).total).toBe(0);
   });
 });
 

@@ -5388,3 +5388,28 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
 - A request that fails outright (timeout, network, 5xx) reaches the frontend as `INTERNAL_ERROR` with
   the request's own error text, shown in the same place as a report, so no card is left validating
   forever and the author still sees why.
+
+## D155 — Search matches DRep names and action text again, from the metadata service
+
+**Date:** 2026-10-02
+**Amends:** the `/drep/list` and `/proposal/list` search, which matched ids only once document text left
+chain data (D40, D45, D87 left free text to an index provider; none was wired).
+**Issue:** [#4262](https://github.com/IntersectMBO/govtool/issues/4262)
+
+- The Haskell backend searched DReps by exact id or `given_name ILIKE`, and actions by id or by title,
+  abstract, motivation and rationale `ILIKE`. The new backend matched ids only on every provider: a name
+  went to the provider's `exactId` search, and action text was filtered while it was still null, before
+  the page's documents were resolved.
+- No provider indexes document text, so the backend matches it itself, over its whole snapshot, with
+  the text read through the metadata service and kept per (hash, url) in the same stale-while-revalidate
+  cache the outcomes search uses, now in `src/metadata/text-cache.ts`.
+- Actions: a search reads every candidate's four strings before filtering and paging. Live actions are a
+  few dozen, so a search waits for any not cached yet, as the outcomes search does.
+- DReps: a term that is not a DRep id is a name, matched case-insensitively as a substring over the whole
+  directory. A directory holds thousands of DReps, more than a search can resolve on demand, so it
+  matches the names already cached and never fetches. The cache warmer resolves every DRep's name after
+  each snapshot refresh; until its first run completes after a start, a DRep whose name is not cached
+  yet is not found. The DRep vote history's action search gets the same action text match.
+- Without a metadata service there is no document text, and search matches ids only, as before. The
+  declared `drepDirectory.search` options are unchanged: the backend already claimed free text, and now
+  honours it.

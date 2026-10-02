@@ -1,7 +1,7 @@
 /**
- * The title and abstract of anchored documents, kept by (hash, url) so an
- * outcomes search does not ask the metadata service for every action's
- * document on each request.
+ * The few fields a search reads from anchored documents (an action's title
+ * and abstract, a DRep's name), kept by (hash, url) so a search does not ask
+ * the metadata service for every document on each request.
  *
  * Stale-while-revalidate: only the first fetch of a key is awaited. Once a
  * key holds a value (a summary, or "unresolved"), an expired entry is still
@@ -12,18 +12,18 @@
  * mismatch, over the time budget) soon, so a document the metadata service
  * fetches later is picked up. A refresh that fails or comes back unresolved
  * keeps a summary already held. Bounded, least recently used out first;
- * values are two short strings, not the documents.
+ * values are a few short strings, not the documents.
  */
 
 export type DocumentSummary = { title: string | null; abstract: string | null };
 
-type Resolve = () => Promise<DocumentSummary | undefined>;
+type Resolve<T> = () => Promise<T | undefined>;
 
-type Entry = {
+type Entry<T> = {
   expiresAt: number;
-  value: Promise<DocumentSummary | undefined>;
+  value: Promise<T | undefined>;
   /** Set once the first fetch has settled. */
-  settled?: { summary: DocumentSummary | undefined };
+  settled?: { summary: T | undefined };
   refresh?: Promise<void>;
 };
 
@@ -32,11 +32,11 @@ export const UNRESOLVED_TTL_MS = 5 * 60 * 1000;
 export const TEXT_CACHE_MAX_ENTRIES = 4096;
 export const REFRESH_CONCURRENCY = 8;
 
-const ttl = (summary: DocumentSummary | undefined) =>
+const ttl = (summary: unknown) =>
   summary === undefined ? UNRESOLVED_TTL_MS : RESOLVED_TTL_MS;
 
-export class DocumentSummaryCache {
-  private readonly entries = new Map<string, Entry>();
+export class DocumentSummaryCache<T = DocumentSummary> {
+  private readonly entries = new Map<string, Entry<T>>();
   private running = 0;
   private readonly queue: Array<() => void> = [];
 
@@ -59,9 +59,9 @@ export class DocumentSummaryCache {
   get(
     hash: string,
     url: string,
-    resolve: Resolve,
+    resolve: Resolve<T>,
     options: { awaitRefresh?: boolean } = {},
-  ): Promise<DocumentSummary | undefined> {
+  ): Promise<T | undefined> {
     const key = `${hash.toLowerCase()} ${url}`;
     const hit = this.entries.get(key);
     if (hit !== undefined) {
@@ -74,7 +74,7 @@ export class DocumentSummaryCache {
         ? refresh.then(() => hit.value)
         : hit.value;
     }
-    const entry: Entry = {
+    const entry: Entry<T> = {
       // Held while in flight, so a concurrent search waits on the same fetch.
       expiresAt: Number.POSITIVE_INFINITY,
       value: resolve().catch(() => undefined),
@@ -92,10 +92,19 @@ export class DocumentSummaryCache {
     return entry.value;
   }
 
+  /**
+   * The summary already held for a key, without fetching or waiting: for a
+   * search over more documents than it could resolve on demand, which relies
+   * on the warmer having filled the cache.
+   */
+  peek(hash: string, url: string): T | undefined {
+    return this.entries.get(`${hash.toLowerCase()} ${url}`)?.settled?.summary;
+  }
+
   private async revalidate(
     key: string,
-    entry: Entry,
-    resolve: Resolve,
+    entry: Entry<T>,
+    resolve: Resolve<T>,
   ): Promise<void> {
     try {
       const summary = await this.limited(resolve).catch(() => undefined);

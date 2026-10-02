@@ -49,7 +49,7 @@ import type {
   OutcomeSort,
   SignatureVerificationResult,
 } from './outcomes.type';
-import { DocumentSummaryCache } from './text-cache';
+import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { verifyAuthorWitness, type AuthorWitnessInput } from './signature';
 
 const PDF_TIMEOUT_MS = 10_000;

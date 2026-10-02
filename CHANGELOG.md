@@ -25,6 +25,7 @@ changes.
 - A format failure in a submission form no longer says the data does not match the original file
 - Submission forms check that the entered URL serves the document, instead of accepting a cached copy of its hash, and a failed check shows its full fetch report
 - Metadata validation answers within the frontend's timeout when the metadata service is slow, and a failed check no longer leaves a card loading
+- Searching the DRep directory by name and governance actions by title, abstract, motivation or rationale finds results again ([#4262](https://github.com/IntersectMBO/govtool/issues/4262))
 
 ### Changed
 

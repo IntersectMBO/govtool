@@ -35,6 +35,7 @@ import {
   proposalFields,
   resolveBody,
 } from 'src/metadata/enrich';
+import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import { readAll } from 'src/common/snapshot';
 import {
@@ -85,9 +86,19 @@ type ProposalSnapshotEntry = {
   action: GovAction;
 };
 
+/** The CIP-108 strings a search matches, as the Haskell backend's did. */
+type ProposalSearchText = Pick<
+  ProposalResponse,
+  'title' | 'abstract' | 'motivation' | 'rationale'
+>;
+
 @Injectable()
 export class ProposalService {
   private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
+  /** Search text by (hash, url); see `DocumentSummaryCache`. */
+  private readonly searchTextCache =
+    new DocumentSummaryCache<ProposalSearchText>();
+  private warming = false;
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
@@ -146,7 +157,7 @@ export class ProposalService {
             );
 
           let filtered = this.filterByType(proposals, params.type);
-          filtered = this.filterBySearch(filtered, params.search);
+          filtered = await this.filterBySearch(filtered, params.search);
           filtered = this.sortProposals(filtered, params.sort);
 
           const total = filtered.length;
@@ -462,31 +473,81 @@ export class ProposalService {
     );
   }
 
-  filterBySearch(
+  /**
+   * The action id in either form, or the title, abstract, motivation or
+   * rationale, as the Haskell backend searched them. The four strings are
+   * document text, which the snapshot does not carry, so every candidate's
+   * is read through the search text cache before filtering and paging.
+   */
+  async filterBySearch(
     proposals: ProposalResponse[],
     search?: string,
-  ): ProposalResponse[] {
+  ): Promise<ProposalResponse[]> {
     if (!search) {
       return proposals;
     }
 
     const searchLower = search.toLowerCase();
+    const texts = await this.searchTexts(proposals);
 
     return proposals.filter((proposal) => {
       const govActionId = `${proposal.txHash}#${proposal.index}`;
+      const text = texts.get(proposal.id) ?? proposal;
       const values = [
         govActionId,
         // The CIP-129 action id, which is what `id` carries now and what a
         // provider's own `exactId` search matches.
         proposal.id,
-        proposal.title,
-        proposal.abstract,
-        proposal.motivation,
-        proposal.rationale,
+        text.title,
+        text.abstract,
+        text.motivation,
+        text.rationale,
       ].filter((value): value is string => value !== null);
 
       return values.some((value) => value.toLowerCase().includes(searchLower));
     });
+  }
+
+  /**
+   * Resolves every live action's search text into the cache, so the first
+   * search after a start or a new block does not wait on the documents. One
+   * run at a time; failures only leave entries unresolved.
+   */
+  async warmSearchText(): Promise<void> {
+    if (this.metadata === null || this.warming) return;
+    this.warming = true;
+    try {
+      const live = (await this.getProposalSnapshot(''))
+        .filter(({ status }) => status === 'live')
+        .map(({ proposal }) => proposal);
+      await this.searchTexts(live, true);
+    } finally {
+      this.warming = false;
+    }
+  }
+
+  private async searchTexts(
+    proposals: ProposalResponse[],
+    awaitRefresh = false,
+  ): Promise<Map<string, ProposalSearchText>> {
+    const out = new Map<string, ProposalSearchText>();
+    const metadata = this.metadata;
+    if (metadata === null) return out;
+    const texts = await mapLimit(proposals, ENRICH_CONCURRENCY, (p) => {
+      const { url, metadataHash: hash } = p;
+      if (!url || !hash) return Promise.resolve(undefined);
+      return this.searchTextCache.get(
+        hash,
+        url,
+        async () => proposalFields(await resolveBody(metadata, { url, hash })),
+        { awaitRefresh },
+      );
+    });
+    proposals.forEach((p, i) => {
+      const text = texts[i];
+      if (text !== undefined) out.set(p.id, text);
+    });
+    return out;
   }
 
   sortProposals(

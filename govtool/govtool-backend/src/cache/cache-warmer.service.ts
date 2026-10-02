@@ -93,11 +93,19 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
         );
         // Not awaited: document text comes from the metadata service and
         // must not hold up the next snapshot refresh.
-        void this.outcomes?.warmSearchText().catch((error: unknown) => {
-          this.logger.warn(
-            `Could not warm outcomes search text: ${error instanceof Error ? error.message : String(error)}`,
-          );
-        });
+        const warmText = (what: string, run: () => Promise<void>) =>
+          void run().catch((error: unknown) => {
+            this.logger.warn(
+              `Could not warm ${what}: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          });
+        warmText('outcomes search text', () =>
+          this.outcomes ? this.outcomes.warmSearchText() : Promise.resolve(),
+        );
+        warmText('proposal search text', () =>
+          this.proposalService.warmSearchText(),
+        );
+        warmText('DRep names', () => this.drepService.warmSearchNames());
       }
     } finally {
       this.refreshing = false;

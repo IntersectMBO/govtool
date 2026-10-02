@@ -79,6 +79,7 @@ export type FeatureId =
   | 'network.treasury'
   | 'spo.directory'
   | 'spo.voteHistory'
+  | 'survey.linkedVoting'
   | 'voter.resolve';
 
 export interface Unavailable {
@@ -272,9 +273,21 @@ function providerControls(
  * claim is about a deployment, and which chain that deployment follows is part
  * of naming it.
  */
+/**
+ * Which optional chain-data members the provider has. Availability is the
+ * interface (SPEC.md §4): an absent namespace is the only way a provider says
+ * it cannot serve something, so it is read off the provider object, not off
+ * its declaration.
+ */
+export interface ProviderSurface {
+  /** `chain.surveys`: CIP-179 survey definitions (SPEC.md §5.6). */
+  surveys: boolean;
+}
+
 export function backendFeatures(
   provider: ProviderCapabilities,
   network: NetworkId,
+  surface: ProviderSurface = { surveys: false },
 ): FeatureSet {
   const options = providerControls(provider);
   for (const control of SUPPLIED_BY_BACKEND) {
@@ -299,6 +312,14 @@ export function backendFeatures(
     Unavailable,
   ][]) {
     unavailable[feature] = why;
+  }
+  if (!surface.surveys) {
+    unavailable['survey.linkedVoting'] = {
+      cause: 'noSource',
+      reason:
+        'The configured chain-data provider does not serve CIP-179 survey ' +
+        'definitions (surveys.getDefinition).',
+    };
   }
 
   return {

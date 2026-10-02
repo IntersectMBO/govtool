@@ -44,7 +44,9 @@ export class SystemService {
         const { data, meta } = await this.readCapabilities();
         // The network comes off the envelope: a capability claim is about a
         // deployment, and which chain it follows is part of naming it.
-        return backendFeatures(data, meta.network);
+        return backendFeatures(data, meta.network, {
+          surveys: this.chain.surveys !== undefined,
+        });
       }),
     );
   }

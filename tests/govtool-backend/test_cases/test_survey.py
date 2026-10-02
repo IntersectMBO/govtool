@@ -10,11 +10,12 @@ pytestmark = pytest.mark.skipif(
     reason="Set RUN_SURVEY_TESTS=1 when targeting the TypeScript backend",
 )
 
-CACHE_CONTROL = "public, max-age=31536000, immutable"
+# A rollback can undo the publishing transaction, so a definition is kept briefly (D164).
+CACHE_CONTROL = "public, max-age=60"
 
 
-def assert_not_immutable(response):
-    assert "immutable" not in response.headers.get("Cache-Control", "").lower()
+def assert_not_cached(response):
+    assert response.headers.get("Cache-Control") == "no-store"
 
 
 @pytest.fixture(scope="session")
@@ -70,7 +71,7 @@ def test_invalid_survey_hash(govtool_api, tx_id):
 
     assert response.status_code == 400, response.text
     assert response.json()["errorType"] == "ValidationError"
-    assert_not_immutable(response)
+    assert_not_cached(response)
 
 
 @pytest.mark.parametrize(
@@ -84,7 +85,7 @@ def test_invalid_survey_index(govtool_api, index):
 
     assert response.status_code == 400, response.text
     assert response.json()["errorType"] == "ValidationError"
-    assert_not_immutable(response)
+    assert_not_cached(response)
 
 
 def test_missing_survey_metadata(govtool_api):
@@ -96,4 +97,4 @@ def test_missing_survey_metadata(govtool_api):
         "errorType": "NotFoundError",
         "message": f"No metadata label 17 found for transaction {tx_id}",
     }
-    assert_not_immutable(response)
+    assert_not_cached(response)

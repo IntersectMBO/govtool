@@ -19,8 +19,10 @@
     "verify": "npm run typecheck && npm run build && npm test"
   },
   "dependencies": {
+    "@emurgo/cardano-serialization-lib-nodejs": "14.1.2",
     "@govtool/data-providers": "file:../govtool-data-providers",
-    "bech32": "^2.0.0"
+    "bech32": "^2.0.0",
+    "blakejs": "^1.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

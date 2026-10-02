@@ -39,6 +39,7 @@ test('optional members: present exactly where Koios serves them', () => {
     chainData.governance.proposals.listVotes,
     chainData.governance.proposals.listActivity,
     chainData.governance.pools.listVotes,
+    chainData.surveys?.getDefinition,
   ];
   for (const fn of present) assert.equal(typeof fn, 'function');
   // Omitted, with the reason in the module header: no per-delegator snapshot, no delegation targets on account_updates.

@@ -12,7 +12,11 @@ import {
   GOVERNANCE_ACTIONS_SORT_CAPABILITY_KEYS,
 } from "@consts";
 import type { ControlId, FeatureId, FeatureSet } from "@/models/featureSet";
-import { allowedOptions, isAvailable } from "@/models/featureSet";
+import {
+  SURVEY_LINKED_VOTING,
+  allowedOptions,
+  isAvailable,
+} from "@/models/featureSet";
 
 import { GovernanceActionType } from "@/types/governanceAction";
 import { env } from "@/config/env";
@@ -269,10 +273,13 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
         (env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === "true" ||
           env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === true) &&
         !!env.VITE_PDF_API_URL,
+      // The env flag (on unless set to false) and the backend's provider
+      // both have to allow it. While the feature set is loading or failed,
+      // isFeatureAvailable fails open, as for every other feature.
       isCip179Enabled:
-        env.VITE_IS_CIP179_ENABLED === "true" ||
-        env.VITE_IS_CIP179_ENABLED === true ||
-        false,
+        (env.VITE_IS_CIP179_ENABLED === "true" ||
+          env.VITE_IS_CIP179_ENABLED === true) &&
+        isFeatureAvailable(SURVEY_LINKED_VOTING),
       isVotingOnGovernanceActionEnabled,
       areDRepVoteTotalsDisplayed,
       areSPOVoteTotalsDisplayed,

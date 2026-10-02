@@ -50,6 +50,7 @@ names and a name-based reader silently gets `undefined`.
 | pools        | `list`, `get`, `listVotes`                                                                               |                                                                                                                                                                       |
 | committee    | `getCommittee` (+ past epochs), `getMember`, `getConstitution`                                           |                                                                                                                                                                       |
 | transactions | `get`                                                                                                    |                                                                                                                                                                       |
+| surveys      | `getDefinition` (CIP-179, label 17)                                                                      |                                                                                                                                                                       |
 
 Declared (`system.getCapabilities()`, `capabilities()`):
 
@@ -80,6 +81,17 @@ Declared (`system.getCapabilities()`, `capabilities()`):
 - **Unknown but well-formed addresses** get an explicit empty answer
   (`isRegistered: false`, `null`, an empty page) rather than `NOT_FOUND`: a
   brand-new wallet is exactly this case.
+- **Survey definitions** are `tx_metadata.bytes` for key 17, served as
+  stored and never rebuilt from the `json` column, which loses byte strings,
+  integer map keys and integer precision. db-sync stores each label as a
+  singleton map (`Map.singleton key md` in `insertTxMetadata`), so the row
+  already is the `{17: payload}` the contract asks for, with every definition
+  the transaction publishes. No row is `null`. Two label-17 rows for one
+  transaction, a row without bytes, bytes that are not hex or not a
+  `{17: ...}` map, or more than 1 MiB are corrupt source data and refused as
+  `INTERNAL`. `scripts/live-surveys.mjs` checks a real definition, given its
+  hash in `SURVEY_TX_HASH`; it is not part of `npm run live`, because it
+  needs a survey transaction on the network being checked.
 - **Pages** are capped at 1,000 rows; a larger request is refused, never
   silently shortened.
 
@@ -99,7 +111,8 @@ npm run build
 DBSYNC_POSTGRES_HOST=... DBSYNC_POSTGRES_PORT=... DBSYNC_POSTGRES_USER=... \
 DBSYNC_POSTGRES_PASSWORD=... DBSYNC_DATABASE=... \
 [NETWORK=preview] [KOIOS_URL=https://preview.koios.rest/api/v1] [SKIP_KOIOS=1] \
-node scripts/live-dreps.mjs        # also live-proposals, live-network, live-committee-pools
+node scripts/live-dreps.mjs        # also live-proposals, live-network, live-committee-pools,
+                                   # live-surveys (with SURVEY_TX_HASH=...)
 ```
 
 Each script is read-only, asserts the contract's invariants on real rows and

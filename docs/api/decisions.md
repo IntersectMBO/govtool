@@ -5613,3 +5613,47 @@ Source: [Conway committee tally](https://github.com/IntersectMBO/cardano-ledger/
 - The minimum-size veto counts eligible cold members, rather than distinct hot credentials.
   db-sync already counts cold members and needs no change. Historical Koios committee
   aggregates remain unavailable because current authorisations cannot reconstruct them.
+
+## D164 — CIP-179 surveys return as an optional chain-data namespace (closes OPEN-48)
+
+**Date:** 2026-10-02
+**Amends:** the contract reconciliation that deleted `surveys.ts` ("one judgement call, flagged for
+review"), and OPEN-48.
+**Issue:** [#4263](https://github.com/IntersectMBO/govtool/issues/4263)
+
+- Surveys return. The frontend's CIP-179 v5 workflow was enabled by default while every survey lookup
+  answered 501, so an author who linked a survey could not create the action. The workflow is
+  GovTool's, it existed before, and all three live providers can serve it.
+- `ChainDataApiV1.surveys?: SurveysApi` with `getDefinition(txHash)`, SPEC.md §5.6. Optional: an absent
+  namespace means the provider cannot, as for every other optional member (§4). The answer is the
+  transaction's whole label-17 metadata as a singleton CBOR map `{17: payload}`, never rebuilt from
+  JSON, which loses byte strings, integer keys and precision. Missing transaction or label is `null`;
+  a transaction whose bytes the source does not hold is `PROVIDER_UNAVAILABLE`; corrupt data is
+  `INTERNAL`. Equivalence across providers is on the decoded value, not the bytes.
+- db-sync reads `tx_metadata.bytes`, which is already that map. Koios reads `/tx_cbor` (its
+  `/tx_metadata` is decoded JSON only); it needs a Koios instance that retains transaction CBOR. A
+  bounded reader finds the body and auxiliary data without decoding them, the body must hash to the
+  requested transaction and the auxiliary data to the body's `auxiliary_data_hash`, and only the
+  auxiliary data, nested at most 64 deep, is decoded with `@emurgo/cardano-serialization-lib-nodejs`
+  14.1.2 to extract label 17. CSL decodes recursively in wasm: one value nested a few thousand deep
+  anywhere in a transaction, including an inline datum inside tag 24, overflows its stack and breaks
+  every later call in the process, and the route is public.
+  Blockfrost reads `/txs/{hash}/metadata/cbor` (`metadata`, not the deprecated `cbor_metadata`) and
+  normalizes an inner value into the map with the same library. The fixture serves two synthetic
+  definitions, one single and one batched.
+- `GET /survey/definition/:txId/:index` keeps its body and its 400 and 404 answers. It returns the
+  whole batch for any index 0–65535; the frontend selects and validates the definition (version,
+  expiry against the action, eligibility, answers). Reads are cached for 60 seconds per transaction,
+  shared between concurrent requests and never cached on failure. The HTTP cache policy drops from a
+  year, immutable, to `public, max-age=60`, since a rollback can undo the publishing transaction;
+  errors are `no-store`.
+- `/system/features` gains `survey.linkedVoting`, unavailable (`noSource`) when the provider has no
+  `surveys` namespace. The frontend enables CIP-179 only when `VITE_IS_CIP179_ENABLED` allows it (on
+  unless set to `false`) and the feature is available; while the feature set is loading or failed it
+  fails open, as for every feature. `VITE_IS_CIP179_ENABLED=false` is the emergency switch.
+- A linked survey reaches the frontend only through the hash-verified CIP-108 document in a
+  proposal's `json` (D154): a document that fails its hash check supplies no link.
+- Release gate, not satisfied by automated tests: each provider against a real network, the same
+  real survey transactions (including a batch of two or more definitions) decoding to the same value
+  on all three, and a public response submitted with a vote on preview. A Koios instance without CBOR
+  retention, or a Blockfrost endpoint without the route, keeps that deployment's gate closed.

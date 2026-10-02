@@ -8,6 +8,12 @@
 /** A named UI surface the backend may declare unavailable. */
 export type FeatureId = string;
 
+/**
+ * CIP-179 survey linking and responses: the backend declares it unavailable
+ * when its chain-data provider serves no survey definitions.
+ */
+export const SURVEY_LINKED_VOTING: FeatureId = "survey.linkedVoting";
+
 /** A list control whose options the backend may narrow, such as a sort menu. */
 export type ControlId = string;
 

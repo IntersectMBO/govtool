@@ -9,6 +9,10 @@
  * The project id is read from the environment only. It is never printed, and
  * the request log below records paths without headers.
  *
+ * SURVEY_TX_HASH=<64 hex> names a transaction carrying a CIP-179 survey
+ * definition (label 17) on NETWORK, for the surveys.getDefinition check.
+ * Unset, that check is reported as skipped, not passed.
+ *
  * LIVE_FULL=1 also reads the WHOLE DRep directory the way the backend's
  * snapshot does (about 4k requests on mainnet) to measure its cost. Without
  * it the directory cost is measured on one 100-row page and extrapolated.
@@ -57,6 +61,7 @@ const { chainData } = createBlockfrostProvider({
 
 let failures = 0;
 let passes = 0;
+const skipped = [];
 const check = (label, ok, detail) => {
   if (ok) passes++;
   else {
@@ -362,9 +367,31 @@ check('tx on chain', tx.onChain === true && tx.includedAt.epoch === proposals[0]
 const { data: missing } = await chainData.transactions.get('00'.repeat(32));
 check('unknown tx not on chain', missing.onChain === false);
 
+/* -- surveys ------------------------------------------------------------------ */
+
+console.log('surveys');
+const { data: noSurvey } = await measured('surveys.getDefinition (unknown tx)', () => chainData.surveys.getDefinition('00'.repeat(32)));
+check('unknown tx has no survey', noSurvey === null, noSurvey);
+const surveyTx = env.SURVEY_TX_HASH?.trim();
+if (surveyTx) {
+  const { data: survey } = await measured('surveys.getDefinition', () => chainData.surveys.getDefinition(surveyTx.toUpperCase()));
+  check('survey found', survey !== null, `no label-17 metadata on ${surveyTx}`);
+  if (survey) {
+    check('survey txHash lowercase', survey.txHash === surveyTx.toLowerCase(), survey.txHash);
+    check('survey label 17', survey.metadataLabel === 17);
+    // CSL re-serializes canonically: a one-entry map (a1) keyed by 17 (11).
+    check('survey payload is the singleton map {17: payload}', /^a111(?:[0-9a-f]{2})+$/.test(survey.payloadCborHex), survey.payloadCborHex.slice(0, 16));
+    console.log(`  ${survey.txHash}: ${survey.payloadCborHex.length / 2} bytes of label-17 CBOR`);
+  }
+} else {
+  skipped.push('surveys.getDefinition on a real survey (set SURVEY_TX_HASH)');
+  console.log('  SKIPPED surveys.getDefinition on a real survey: set SURVEY_TX_HASH');
+}
+
 /* -- report ------------------------------------------------------------------- */
 
-console.log(`\n${passes} passed, ${failures} failed; ${requests} requests in total, ${throttled} answered 429`);
+console.log(`\n${passes} passed, ${failures} failed, ${skipped.length} skipped; ${requests} requests in total, ${throttled} answered 429`);
+for (const label of skipped) console.log(`  skipped: ${label}`);
 console.log('cost by method:', costs);
 console.log('requests by route:', Object.fromEntries([...byRoute.entries()].sort((a, b) => b[1] - a[1])));
 process.exit(failures ? 1 : 0);

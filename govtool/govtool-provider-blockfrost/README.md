@@ -41,6 +41,7 @@ own short `message`, with the id redacted should it ever appear — and a 403
 | pools        | `list`, `get`                                                                                             | `listVotes`: `/pools/{id}/votes` rows do not say which action was voted on                                                                                                                                                                                                                                        |
 | committee    | `getCommittee`, `getMember`, `getConstitution`                                                            | `termStartEpoch` is `null` (not in `/governance/committee`)                                                                                                                                                                                                                                                       |
 | transactions | `get`                                                                                                     |                                                                                                                                                                                                                                                                                                                   |
+| surveys      | `surveys.getDefinition` via `/txs/{hash}/metadata/cbor`                                                   | not yet verified against live data: hosted Blockfrost and self-hosted blockfrost-ryo each need their own `SURVEY_TX_HASH` run                                                                                                                                                                                     |
 
 Declared (`system.getCapabilities()`, `capabilities()`):
 
@@ -93,6 +94,17 @@ vote list). Each is refused with `CAPABILITY_UNSUPPORTED`, never approximated.
   v6.8). A vote's hot key is resolved to its cold one through it. A cold-id
   voter lookup on an action with a committee vote under a hot key no current
   member holds is refused: Blockfrost keeps no rotation history.
+- **Surveys** (CIP-179) are `/txs/{hash}/metadata/cbor`: the row whose
+  `label` is `"17"`, its `metadata` hex (the deprecated `cbor_metadata` is
+  never read). The bytes are validated and re-serialized with
+  `@emurgo/cardano-serialization-lib-nodejs` (pinned 14.1.2) into the
+  singleton map `{17: payload}`: a map whose only key is 17 is kept, a bare
+  payload is wrapped, any other key set is `INTERNAL`. `src/cbor.ts` only
+  checks that the hex is exactly one CBOR item, because CSL ignores trailing
+  bytes. A 404 or no label-17 row is `null`; `metadata: null` is
+  `PROVIDER_UNAVAILABLE`; two label-17 rows, over 1 MiB or malformed CBOR is
+  `INTERNAL`; 402/403/418/429/5xx/timeouts keep their transport codes. One
+  request per call.
 - **DRep vote listing** follows the db-sync provider's window rules (first
   registration to retirement; votable epochs; bootstrap excludes non-Info
   actions). It is ordered by action, not by vote time — Blockfrost does not
@@ -168,6 +180,7 @@ cost is the per-proposal record plus its transaction's date and CBOR.
 npm run verify     # typecheck, build, fixture tests (node --test test/*.test.mjs)
 BLOCKFROST_PROJECT_ID=... npm run live              # every method against mainnet, ~2.3k requests
 BLOCKFROST_PROJECT_ID=... LIVE_FULL=1 npm run live  # plus the full DRep snapshot, ~3.8k more
+BLOCKFROST_PROJECT_ID=... SURVEY_TX_HASH=<tx> npm run live  # plus surveys.getDefinition on a real survey; unset, it is reported skipped
 ```
 
 Fixture tests use an injected `fetch` answering invented Blockfrost-shaped

@@ -120,6 +120,14 @@ export function cbor(v) {
   if (v === null) return Buffer.from([0xf6]);
   if (v === true || v === false) return Buffer.from([v ? 0xf5 : 0xf4]);
   if (typeof v === 'number') return v >= 0 ? head(0, v) : head(1, -1 - v);
+  if (typeof v === 'bigint') {
+    // Always the 8-byte head, so a 64-bit value keeps every bit.
+    const n = v >= 0n ? v : -1n - v;
+    const b = Buffer.alloc(9);
+    b[0] = ((v >= 0n ? 0 : 1) << 5) | 27;
+    b.writeBigUInt64BE(n, 1);
+    return b;
+  }
   if (typeof v === 'string') return Buffer.concat([head(3, Buffer.byteLength(v)), Buffer.from(v)]);
   if (Buffer.isBuffer(v)) return Buffer.concat([head(2, v.length), v]);
   if (Array.isArray(v)) return Buffer.concat([head(4, v.length), ...v.map(cbor)]);

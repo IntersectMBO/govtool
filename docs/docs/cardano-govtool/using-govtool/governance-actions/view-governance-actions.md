@@ -6,7 +6,7 @@ description: You can view all Governance Actions with or without connecting a wa
 
 ## Starting from the Landing Page
 
-Open "Governance Actions" in the top menu and choose "Live Voting". The same menu also contains "Proposals" (proposals under discussion) and "Outcomes" (results of past Governance Actions), where those features are enabled.
+Open "Governance Actions" in the top menu and choose "Live Voting". The same menu also contains "Proposals" (proposals under discussion, where the proposal discussion forum is enabled) and "Governance action history" (results of past Governance Actions).
 
 <div align="left"><figure><img src="/img/gitbook/gov%20actions%20menu%20item.png" alt=""><figcaption></figcaption></figure></div>
 

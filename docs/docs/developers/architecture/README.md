@@ -6,8 +6,8 @@
 
 GovTool is a decentralized application for [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md) governance. The [`IntersectMBO/govtool`](https://github.com/IntersectMBO/govtool) repository contains:
 
-- **Frontend** (`govtool/frontend`): React + Vite web app. It talks to the backend and metadata validation services over REST, and to wallets over CIP-30 / CIP-95. The Proposal Discussion pillar (`govtool/frontend/src/pdf-ui`) and the Governance Outcomes UI are part of the frontend source, enabled with the `VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` and `VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED` flags.
-- **Backend** (`govtool/govtool-backend`): NestJS (TypeScript) read-only API on port 9999 (Swagger at `/swagger-ui`). It is the service built by CI and deployed (`ghcr.io/intersectmbo/govtool-backend`), and it also serves the outcomes API under `/outcomes`. It is configured through `GOVTOOL_*` environment variables, listed in [`govtool-backend/.env.example`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-backend/.env.example).
+- **Frontend** (`govtool/frontend`): React + Vite web app. It talks to the backend and metadata validation services over REST, and to wallets over CIP-30 / CIP-95. The Proposal Discussion pillar (`govtool/frontend/src/pdf-ui`), enabled with the `VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` flag, and governance action history, always enabled, are part of the frontend source.
+- **Backend** (`govtool/govtool-backend`): NestJS (TypeScript) read-only API on port 9999 (Swagger at `/swagger-ui`). It is the service built by CI and deployed (`ghcr.io/intersectmbo/govtool-backend`), and it also serves governance action records under `/governance-actions`. It is configured through `GOVTOOL_*` environment variables, listed in [`govtool-backend/.env.example`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-backend/.env.example).
 - **Data providers**: the backend reads chain data through a provider-agnostic contract (`govtool/govtool-data-providers`). One package implements it per source:
   - `govtool-provider-dbsync`: cardano-db-sync (the default, used by the hosted deployments)
   - `govtool-provider-koios` and `govtool-provider-blockfrost`: the public Koios and Blockfrost APIs, with no database of your own (trial)
@@ -34,7 +34,7 @@ The design decisions behind the data layer, the API surface and the provider con
 - [react-hook-form](https://react-hook-form.com/) and [yup](https://github.com/jquense/yup): Forms and validation.
 - [i18next](https://www.i18next.com/): Translations.
 - [cardano-serialization-lib](https://github.com/Emurgo/cardano-serialization-lib) (`@emurgo/cardano-serialization-lib-asmjs`): Serialization and deserialization of Cardano data structures, and transaction building.
-- The Proposal Discussion pillar UI (`src/pdf-ui`, vendored from `@intersect.mbo/pdf-ui`) and the Governance Outcomes UI, both part of the frontend source.
+- The Proposal Discussion pillar UI (`src/pdf-ui`, vendored from `@intersect.mbo/pdf-ui`) and the governance action history UI, both part of the frontend source.
 
 ### Description
 
@@ -97,7 +97,7 @@ Frontend is a React application using Vite as a build tool to enhance developmen
 
 ### Description
 
-The backend is a read-only API. It keeps the routes and response bodies of the Haskell backend it replaced, which the frontend was written against, and adds `GET /system/capabilities` and `GET /system/features` (the feature set the frontend reads at boot), the metadata routes and the outcomes routes under `/outcomes`.
+The backend is a read-only API. It keeps the routes and response bodies of the Haskell backend it replaced, which the frontend was written against, and adds `GET /system/capabilities` and `GET /system/features` (the feature set the frontend reads at boot), the metadata routes and the governance action routes under `/governance-actions`.
 
 The backend holds no database handle of its own. Every chain read goes through the chain-data contract, satisfied by the provider named in `GOVTOOL_CHAIN_DATA_PROVIDER` (`dbsync`, `koios`, `blockfrost` or `fixture`). The db-sync provider owns its SQL queries (`govtool/govtool-provider-dbsync/src`). The backend caches the results in memory, warms the cache in the background, and returns governance data (DReps, proposals, votes, epoch parameters, transaction status) to the frontend. It does not talk to cardano-node directly. Transactions are built in the frontend and signed and submitted by the user's wallet.
 

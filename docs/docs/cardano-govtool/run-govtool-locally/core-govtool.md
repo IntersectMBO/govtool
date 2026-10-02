@@ -9,7 +9,7 @@ Core GovTool is comprised of the frontend, backend and metadata services which w
 * Drep Directory,
 * Guides
 * FAQs
-* Governance Actions Outcomes (served by the backend under `/outcomes`)
+* Governance action history (served by the backend under `/governance-actions`)
 
 with or without a wallet connected
 

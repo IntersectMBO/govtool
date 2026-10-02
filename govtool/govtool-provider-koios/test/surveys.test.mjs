@@ -10,7 +10,9 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import CSL from '@emurgo/cardano-serialization-lib-nodejs';
+import blake from 'blakejs';
 
+import { MAX_DECODED_DEPTH } from '../dist/cbor.js';
 import { MAX_TX_CBOR_BYTES } from '../dist/surveys.js';
 import { provider, rejectsWith } from './helpers.mjs';
 
@@ -55,6 +57,8 @@ function buildTx({ metadata = [], aux = true, salt = 1 } = {}) {
       // Not owned: Transaction.new consumes it.
       auxData = CSL.AuxiliaryData.new();
       auxData.set_metadata(md);
+      // As on chain, the body commits to its auxiliary data.
+      body.set_auxiliary_data_hash(own(CSL.hash_auxiliary_data(auxData)));
     }
     const tx = own(CSL.Transaction.new(body, own(CSL.TransactionWitnessSet.new()), auxData));
     const cbor = tx.to_hex();
@@ -64,6 +68,32 @@ function buildTx({ metadata = [], aux = true, salt = 1 } = {}) {
     for (const o of owned) o.free();
   }
 }
+
+/* -- a transaction, assembled byte by byte ------------------------------------ */
+
+const blake2b256 = (hex) => blake.blake2bHex(Buffer.from(hex, 'hex'), undefined, 32);
+const bytesHead = (n) => (n < 24 ? (0x40 + n).toString(16) : n < 256 ? `58${n.toString(16).padStart(2, '0')}` : `59${n.toString(16).padStart(4, '0')}`);
+/** `[[...[]...]]`, `depth` arrays deep. */
+const nested = (depth) => '81'.repeat(depth) + '80';
+/** One output whose inline datum (tag 24, decoded by CSL with the body) is `datumHex`. */
+const outputWithDatum = (datumHex) =>
+  `81a300${bytesHead(29)}61${'11'.repeat(28)}011a000f4240028201d818${bytesHead(datumHex.length / 2)}${datumHex}`;
+
+/**
+ * For shapes CSL cannot be asked to build. The body commits to `auxHex` unless
+ * `declaredAuxHash` overrides it (`null` declares none); `outputs` and
+ * `witnesses` are raw CBOR; `mary` drops `is_valid` for the three-item form.
+ */
+function rawTx({ auxHex = null, declaredAuxHash, outputs = '80', witnesses = 'a0', mary = false, salt = 1 } = {}) {
+  const declared = declaredAuxHash !== undefined ? declaredAuxHash : auxHex && blake2b256(auxHex);
+  const fields = [`0081825820${Buffer.alloc(32, salt).toString('hex')}00`, `01${outputs}`, '021a00029810'];
+  if (declared) fields.push(`075820${declared}`);
+  const body = `a${fields.length}${fields.join('')}`;
+  const cbor = mary ? `83${body}${witnesses}${auxHex ?? 'f6'}` : `84${body}${witnesses}f5${auxHex ?? 'f6'}`;
+  return { cbor, hash: blake2b256(body) };
+}
+
+const txCborOf = (...txs) => txCbor(Object.fromEntries(txs.map((t) => [t.hash, t.cbor])));
 
 /** A fake `/tx_cbor` over `{ hash: cbor }`, answering only the hashes asked for. */
 const txCbor = (byHash) => (_url, init) =>
@@ -280,6 +310,70 @@ test('CBOR of another transaction, or a row for another hash, is INTERNAL', asyn
 
   const wrongRow = provider({ tx_cbor: [{ tx_hash: other.hash, cbor: other.cbor }] });
   await rejectsWith(wrongRow.chainData.surveys.getDefinition(asked.hash), 'INTERNAL');
+});
+
+test('deep nesting anywhere in the transaction never reaches CSL, which keeps working', async () => {
+  // Enough to overflow CSL's wasm stack, which then fails every call in the process.
+  const DEEP = 2500;
+  const deepMetadata = rawTx({ auxHex: `a21902a2${nested(DEEP)}11${PAYLOAD_ONE}`, salt: 1 });
+  const deepInlineDatum = rawTx({ auxHex: ROW_ONE, outputs: outputWithDatum(nested(DEEP)), salt: 2 });
+  const deepWitnessDatum = rawTx({ auxHex: ROW_ONE, witnesses: `a10481${nested(DEEP)}`, salt: 3 });
+  const plain = buildTx({ metadata: [[17, PAYLOAD_ONE]] });
+  const { chainData } = provider({ tx_cbor: txCborOf(deepMetadata, deepInlineDatum, deepWitnessDatum, plain) });
+
+  // Auxiliary data is decoded, so it is refused on its nesting before CSL sees it.
+  await assert.rejects(
+    chainData.surveys.getDefinition(deepMetadata.hash),
+    (e) => e.code === 'INTERNAL' && e.details?.depth > MAX_DECODED_DEPTH,
+  );
+  // The body and witnesses are never decoded, so their nesting does not matter.
+  for (const tx of [deepInlineDatum, deepWitnessDatum]) {
+    assert.equal((await chainData.surveys.getDefinition(tx.hash)).data.payloadCborHex, ROW_ONE);
+  }
+  assert.equal((await chainData.surveys.getDefinition(plain.hash)).data.payloadCborHex, ROW_ONE);
+});
+
+test('auxiliary data nested to the bound is decoded; one level more is refused', async () => {
+  assert.equal(MAX_DECODED_DEPTH, 64);
+  // The outer map is one level, so `nested(n)` under label 674 is n + 1.
+  const atBound = rawTx({ auxHex: `a21902a2${nested(MAX_DECODED_DEPTH - 1)}11${PAYLOAD_ONE}`, salt: 1 });
+  const over = rawTx({ auxHex: `a21902a2${nested(MAX_DECODED_DEPTH)}11${PAYLOAD_ONE}`, salt: 2 });
+  const { chainData } = provider({ tx_cbor: txCborOf(atBound, over) });
+  assert.equal((await chainData.surveys.getDefinition(atBound.hash)).data.payloadCborHex, ROW_ONE);
+  await rejectsWith(chainData.surveys.getDefinition(over.hash), 'INTERNAL');
+});
+
+test('auxiliary data the body does not commit to is INTERNAL, never served', async () => {
+  const committed = blake2b256(ROW_ONE);
+  const cases = {
+    'swapped for other metadata': rawTx({ auxHex: `a111${PAYLOAD_BIG}`, declaredAuxHash: committed, salt: 1 }),
+    'present but undeclared': rawTx({ auxHex: ROW_ONE, declaredAuxHash: null, salt: 2 }),
+    'declared but absent': rawTx({ auxHex: null, declaredAuxHash: committed, salt: 3 }),
+  };
+  const { chainData } = provider({ tx_cbor: txCborOf(...Object.values(cases)) });
+  for (const [name, tx] of Object.entries(cases)) {
+    await assert.rejects(
+      chainData.surveys.getDefinition(tx.hash),
+      (e) => e.code === 'INTERNAL' && /does not match the transaction body/.test(e.message),
+      name,
+    );
+  }
+});
+
+test('the auxiliary data hash is over the bytes as sent, in every auxiliary data format', async () => {
+  const txs = [
+    // Shelley: the metadata map, here with label 17 in a non-minimal two-byte head.
+    rawTx({ auxHex: `a11811${PAYLOAD_ONE}`, salt: 1 }),
+    // Allegra/Mary: [metadata, native scripts], in the three-item transaction form.
+    rawTx({ auxHex: `82${ROW_ONE}80`, mary: true, salt: 2 }),
+    // Alonzo onward: tag 259 over {0: metadata}.
+    rawTx({ auxHex: `d90103a100${ROW_ONE}`, salt: 3 }),
+  ];
+  const { chainData } = provider({ tx_cbor: txCborOf(...txs) });
+  for (const tx of txs) {
+    const res = await chainData.surveys.getDefinition(tx.hash);
+    assert.deepEqual(decodeCbor(res.data.payloadCborHex), decodeCbor(ROW_ONE));
+  }
 });
 
 test('transport failures propagate with their codes, never as null', async () => {

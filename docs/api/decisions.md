@@ -5630,9 +5630,14 @@ review"), and OPEN-48.
   JSON, which loses byte strings, integer keys and precision. Missing transaction or label is `null`;
   a transaction whose bytes the source does not hold is `PROVIDER_UNAVAILABLE`; corrupt data is
   `INTERNAL`. Equivalence across providers is on the decoded value, not the bytes.
-- db-sync reads `tx_metadata.bytes`, which is already that map. Koios reads `/tx_cbor`, checks the
-  transaction hash and extracts label 17 with `@emurgo/cardano-serialization-lib-nodejs` 14.1.2 (its
-  `/tx_metadata` is decoded JSON only); it needs a Koios instance that retains transaction CBOR.
+- db-sync reads `tx_metadata.bytes`, which is already that map. Koios reads `/tx_cbor` (its
+  `/tx_metadata` is decoded JSON only); it needs a Koios instance that retains transaction CBOR. A
+  bounded reader finds the body and auxiliary data without decoding them, the body must hash to the
+  requested transaction and the auxiliary data to the body's `auxiliary_data_hash`, and only the
+  auxiliary data, nested at most 64 deep, is decoded with `@emurgo/cardano-serialization-lib-nodejs`
+  14.1.2 to extract label 17. CSL decodes recursively in wasm: one value nested a few thousand deep
+  anywhere in a transaction, including an inline datum inside tag 24, overflows its stack and breaks
+  every later call in the process, and the route is public.
   Blockfrost reads `/txs/{hash}/metadata/cbor` (`metadata`, not the deprecated `cbor_metadata`) and
   normalizes an inner value into the map with the same library. The fixture serves two synthetic
   definitions, one single and one batched.

@@ -71,12 +71,17 @@ Declared (`system.getCapabilities()`, `capabilities()`):
 - **Pages** are capped at 1,000 rows, which is also PostgREST's cap on a
   response; a larger request is refused, never silently shortened.
 - **Survey definitions** are read from the transaction's own bytes
-  (`/tx_cbor`), decoded with `@emurgo/cardano-serialization-lib-nodejs`
-  (pinned), checked against the requested hash, and served as the singleton
-  metadata map `{17: payload}`. Never from `/tx_metadata`, whose JSON loses
-  byte strings, integer keys and integer precision. No such transaction, no
-  auxiliary data and no label 17 are all `null`; CBOR over 1 MiB, malformed,
-  or of another transaction is `INTERNAL`.
+  (`/tx_cbor`) and served as the singleton metadata map `{17: payload}`.
+  Never from `/tx_metadata`, whose JSON loses byte strings, integer keys and
+  integer precision. The body's bytes must hash to the requested transaction
+  and the auxiliary data's to the hash the body declares. Only the auxiliary
+  data, nested at most 64 deep, is decoded with
+  `@emurgo/cardano-serialization-lib-nodejs` (pinned): CSL decodes
+  recursively, and one deeply nested value would overflow its wasm stack and
+  break every later call. No such transaction, no auxiliary data and no label
+  17 are all `null`; CBOR over 1 MiB, malformed, nested too deeply, of another
+  transaction, or with auxiliary data the body does not commit to is
+  `INTERNAL`.
 - **Request bodies** over roughly five kilobytes are rejected by Koios, which
   is a limit on bytes and not on the number of identifiers, so batches are
   sized by measured bytes.

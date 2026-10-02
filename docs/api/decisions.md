@@ -5614,7 +5614,7 @@ Source: [Conway committee tally](https://github.com/IntersectMBO/cardano-ledger/
   db-sync already counts cold members and needs no change. Historical Koios committee
   aggregates remain unavailable because current authorisations cannot reconstruct them.
 
-## D156 — CIP-179 surveys return as an optional chain-data namespace (closes OPEN-48)
+## D164 — CIP-179 surveys return as an optional chain-data namespace (closes OPEN-48)
 
 **Date:** 2026-10-02
 **Amends:** the contract reconciliation that deleted `surveys.ts` ("one judgement call, flagged for

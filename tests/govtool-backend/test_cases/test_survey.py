@@ -10,7 +10,7 @@ pytestmark = pytest.mark.skipif(
     reason="Set RUN_SURVEY_TESTS=1 when targeting the TypeScript backend",
 )
 
-# A rollback can undo the publishing transaction, so a definition is kept briefly (D156).
+# A rollback can undo the publishing transaction, so a definition is kept briefly (D164).
 CACHE_CONTROL = "public, max-age=60"
 
 

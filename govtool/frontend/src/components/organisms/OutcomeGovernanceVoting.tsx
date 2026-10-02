@@ -22,6 +22,13 @@ type OutcomeGovernanceVotingProps = {
  * ledger ratifies: always-abstain stake leaves the denominator, and
  * always-no-confidence stake counts as yes on a NoConfidence action and as
  * no on every other.
+ *
+ * The action's figures already count the automatic votes: the DRep
+ * always-no-confidence stake in yes or no, and each pool's passive
+ * always-no-confidence and always-abstain stake in yes, no or abstain. Only
+ * the DRep always-abstain stake is left out of the DRep abstain figure, so it
+ * is the one added here. A null figure is one the data source cannot give for
+ * this action; that group shows as unavailable rather than as no votes.
  */
 export const OutcomeGovernanceVoting = ({
   action,
@@ -38,7 +45,6 @@ export const OutcomeGovernanceVoting = ({
 
   const { proposal_params: proposalParams, status } = action;
   const type = action.type as GovernanceActionType;
-  const isNoConfidence = type === GovernanceActionType.NoConfidence;
   const isHardFork = type === GovernanceActionType.HardForkInitiation;
   const isDataReady = !isLoading && !!networkMetrics;
 
@@ -88,28 +94,37 @@ export const OutcomeGovernanceVoting = ({
     ).toPrecision(2),
   );
 
+  const isUnknown = (...figures: (number | null)[]) =>
+    figures.some((figure) => figure === null);
+  const isDRepUnavailable = isUnknown(
+    action.yes_votes,
+    action.no_votes,
+    action.abstain_votes,
+  );
+  const isSPOUnavailable = isUnknown(
+    action.pool_yes_votes,
+    action.pool_no_votes,
+    action.pool_abstain_votes,
+  );
+  const isCCUnavailable = isUnknown(
+    action.cc_yes_votes,
+    action.cc_no_votes,
+    action.cc_abstain_votes,
+  );
+
   // DReps
   const dRepAbstainVotes = Number(action.abstain_votes) + alwaysAbstain;
   const dRepRatificationStake = dRepsStake - dRepAbstainVotes;
-  const dRepYesVotes = isNoConfidence
-    ? Number(action.yes_votes) + noConfidence
-    : Number(action.yes_votes);
-  const dRepNoVotes = isNoConfidence
-    ? Number(action.no_votes)
-    : Number(action.no_votes) + noConfidence;
+  const dRepYesVotes = Number(action.yes_votes);
+  const dRepNoVotes = Number(action.no_votes);
   const dRepNotVotedVotes =
     dRepRatificationStake - (dRepYesVotes + dRepNoVotes);
 
   // SPOs
-  const poolAbstainVotes =
-    Number(action.pool_abstain_votes) + alwaysAbstainForSPOs;
+  const poolAbstainVotes = Number(action.pool_abstain_votes);
   const poolRatificationStake = sPOsStake - poolAbstainVotes;
-  const poolYesVotes = isNoConfidence
-    ? Number(action.pool_yes_votes) + noConfidenceForSPOs
-    : Number(action.pool_yes_votes);
-  const poolNoVotes = isNoConfidence
-    ? Number(action.pool_no_votes)
-    : Number(action.pool_no_votes) + noConfidenceForSPOs;
+  const poolYesVotes = Number(action.pool_yes_votes);
+  const poolNoVotes = Number(action.pool_no_votes);
   const poolNotVotedVotes =
     poolRatificationStake - (poolYesVotes + poolNoVotes);
 
@@ -120,13 +135,22 @@ export const OutcomeGovernanceVoting = ({
   const ccNotVotedVotes =
     committeeMembers - (ccYesVotes + ccNoVotes + ccAbstainVotes);
 
-  const percentage = (yes: number, total: number) =>
-    (total ? (yes / total) * 100 : undefined);
-  const dRepYesPercentage = percentage(dRepYesVotes, dRepRatificationStake);
-  const poolYesPercentage = percentage(poolYesVotes, poolRatificationStake);
+  const percentage = (yes: number, total: number, isUnavailable: boolean) =>
+    (total && !isUnavailable ? (yes / total) * 100 : undefined);
+  const dRepYesPercentage = percentage(
+    dRepYesVotes,
+    dRepRatificationStake,
+    isDRepUnavailable,
+  );
+  const poolYesPercentage = percentage(
+    poolYesVotes,
+    poolRatificationStake,
+    isSPOUnavailable,
+  );
   const ccYesPercentage = percentage(
     ccYesVotes,
     committeeMembers - ccAbstainVotes,
+    isCCUnavailable,
   );
   const complement = (value?: number) =>
     (value !== undefined ? 100 - value : undefined);
@@ -175,7 +199,7 @@ export const OutcomeGovernanceVoting = ({
         totalControlled={dRepsStake}
         totalAbstainVotes={dRepAbstainVotes}
         autoAbstainVotes={alwaysAbstain}
-        explicitAbstainVotes={action.abstain_votes}
+        explicitAbstainVotes={Number(action.abstain_votes)}
         notVotedVotes={dRepNotVotedVotes}
         noConfidenceVotes={noConfidence}
         threshold={dRepThreshold}
@@ -183,6 +207,7 @@ export const OutcomeGovernanceVoting = ({
         noPercentage={complement(dRepYesPercentage)}
         ratificationThreshold={dRepRatificationStake}
         isDisplayed={isDRepDisplayed}
+        isUnavailable={isDRepUnavailable}
         isDataReady={isDataReady}
         dataTestId="DReps-voting-results-data"
       />
@@ -197,7 +222,10 @@ export const OutcomeGovernanceVoting = ({
         totalControlled={sPOsStake}
         totalAbstainVotes={poolAbstainVotes}
         autoAbstainVotes={alwaysAbstainForSPOs}
-        explicitAbstainVotes={action.pool_abstain_votes}
+        explicitAbstainVotes={Math.max(
+          0,
+          poolAbstainVotes - alwaysAbstainForSPOs,
+        )}
         notVotedVotes={poolNotVotedVotes}
         noConfidenceVotes={noConfidenceForSPOs}
         threshold={sPOThreshold}
@@ -205,6 +233,7 @@ export const OutcomeGovernanceVoting = ({
         noPercentage={complement(poolYesPercentage)}
         ratificationThreshold={poolRatificationStake}
         isDisplayed={isSPODisplayed}
+        isUnavailable={isSPOUnavailable}
         isDataReady={isDataReady}
         dataTestId="SPOs-voting-results-data"
       />
@@ -223,6 +252,7 @@ export const OutcomeGovernanceVoting = ({
         noPercentage={complement(ccYesPercentage)}
         isCC
         isDisplayed={isCCDisplayed}
+        isUnavailable={isCCUnavailable}
         isDataReady={isDataReady}
         dataTestId="CC-voting-results-data"
       />
@@ -237,14 +267,14 @@ export const OutcomeGovernanceVoting = ({
           <OutcomeIndicator
             title={t("outcome.votes.dReps")}
             passed={hasPassed(dRepYesPercentage, dRepThreshold)}
-            isDisplayed={isDRepDisplayed}
+            isDisplayed={isDRepDisplayed && !isDRepUnavailable}
             isLoading={isLoading}
             dataTestId="DReps-voting-results-outcome"
           />
           <OutcomeIndicator
             title={t("outcome.votes.sPos")}
             passed={hasPassed(poolYesPercentage, sPOThreshold)}
-            isDisplayed={isSPODisplayed}
+            isDisplayed={isSPODisplayed && !isSPOUnavailable}
             isLoading={isLoading}
             dataTestId="SPOs-voting-results-outcome"
           />
@@ -254,7 +284,7 @@ export const OutcomeGovernanceVoting = ({
               ccYesPercentage !== undefined &&
               ccYesPercentage >= ccThreshold * 100
             }
-            isDisplayed={isCCDisplayed}
+            isDisplayed={isCCDisplayed && !isCCUnavailable}
             isLoading={isLoading}
             dataTestId="CC-voting-results-outcome"
           />

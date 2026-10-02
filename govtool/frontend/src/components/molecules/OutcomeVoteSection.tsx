@@ -255,6 +255,7 @@ type OutcomeVoteSectionProps = {
   noPercentage?: number;
   isCC?: boolean;
   isDisplayed: boolean;
+  isUnavailable?: boolean;
   isDataReady: boolean;
   dataTestId?: string;
 };
@@ -280,6 +281,7 @@ export const OutcomeVoteSection = ({
   ratificationThreshold = 0,
   isCC = false,
   isDisplayed,
+  isUnavailable = false,
   isDataReady,
   dataTestId,
 }: OutcomeVoteSectionProps) => {
@@ -413,6 +415,13 @@ export const OutcomeVoteSection = ({
             <strong>{t("outcome.votes.votingNotAvailable")}</strong>{" "}
             {t("outcome.votes.onThisTypeOfAction")}
           </span>
+        </Typography>
+      ) : isUnavailable ? (
+        <Typography
+          data-testid="vote-totals-unavailable-label"
+          sx={{ fontWeight: 400, fontSize: 13 }}
+        >
+          {t("outcome.votes.totalsUnavailable")}
         </Typography>
       ) : (
         <Grid container spacing={1.875}>

@@ -25,6 +25,9 @@ changes.
 - A format failure in a submission form no longer says the data does not match the original file
 - Submission forms check that the entered URL serves the document, instead of accepting a cached copy of its hash, and a failed check shows its full fetch report
 - Metadata validation answers within the frontend's timeout when the metadata service is slow, and a failed check no longer leaves a card loading
+- The outcomes page no longer counts automatic DRep no-confidence votes and passive pool votes twice ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
+- Live-action DRep percentages divide by active DRep stake plus always-no-confidence stake again, as before the backend change ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
+- Vote totals a data source cannot give for an action are shown as unavailable instead of as zero votes ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
 - Governance action details show again: treasury withdrawal rows, the hard fork version, committee members, removals and threshold, and the constitution's guardrails script ([#4261](https://github.com/IntersectMBO/govtool/issues/4261))
 - A governance action's authors and their signatures are shown and verified again ([#4261](https://github.com/IntersectMBO/govtool/issues/4261))
 

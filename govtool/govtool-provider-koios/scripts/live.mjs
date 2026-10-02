@@ -153,7 +153,7 @@ const SPO_VOTES = (a) =>
 const tallyEpochOf = (a, currentEpoch) =>
   a.lifecycle.ratifiedAt?.epoch ?? a.lifecycle.expiredAt?.epoch ?? a.lifecycle.droppedAt?.epoch ?? currentEpoch;
 /**
- * Whether Koios can reproduce the SPO tally (D156): the current epoch's, a hard
+ * Whether Koios can reproduce the SPO tally (D159): the current epoch's, a hard
  * fork's (silent pools never default), or a bootstrap one's (silent pools
  * abstain). Past protocol-10 defaults need pool registration history.
  */

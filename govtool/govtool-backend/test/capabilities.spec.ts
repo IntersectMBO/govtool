@@ -670,6 +670,7 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
     const bob = drep({
       id: drepId('b'),
       anchor: anchor('https://x/bob.jsonld'),
+      activity: { voted: 3, votable: 3 },
     });
     const cache = passthroughCache();
     const api = chain({
@@ -684,7 +685,7 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
       cache,
       metadataService({
         'https://x/alice.jsonld': { body: { givenName: 'Alice Example' } },
-        'https://x/bob.jsonld': { body: { givenName: 'Bob' } },
+        'https://x/bob.jsonld': { body: { givenName: 'Bob Alice' } },
       }),
     );
     const search = (term: string) =>
@@ -699,6 +700,21 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
     expect(found.total).toBe(1);
     expect(found.elements[0].givenName).toBe('Alice Example');
     expect((await search('carol')).total).toBe(0);
+
+    const sorted = await service.list({
+      status: [],
+      search: 'alice',
+      sort: 'Activity',
+      page: 0,
+      pageSize: 10,
+    });
+    expect(sorted.elements.map(({ givenName }) => givenName)).toEqual([
+      'Bob Alice',
+      'Alice Example',
+    ]);
+    expect(sorted.elements.every((row) => !('votesLastYear' in row))).toBe(
+      true,
+    );
   });
 });
 

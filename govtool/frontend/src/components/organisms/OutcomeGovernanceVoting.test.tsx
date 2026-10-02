@@ -108,6 +108,68 @@ describe("action-specific outcome tallies", () => {
     threshold: { numerator: 51, denominator: 100 },
   };
 
+  it("does not count automatic votes a second time", () => {
+    render(
+      <OutcomeGovernanceVoting
+        action={{
+          ...action,
+          type: "NoConfidence",
+          yes_votes: 75000000,
+          pool_yes_votes: 40000000,
+          pool_abstain_votes: 20000000,
+          vote_aggregates: [
+            {
+              ...drep,
+              yes: "75000000",
+              no: "0",
+              abstain: "0",
+              notVoted: "75000000",
+              totalEligible: "150000000",
+            },
+            {
+              ...spo,
+              abstain: "20000000",
+              no: "0",
+              notVoted: "40000000",
+            },
+          ],
+        }}
+      />,
+    );
+    // Automatic DRep votes are already included in yes; passive SPO votes
+    // are already included in abstain. Each non-abstaining denominator is 50% yes.
+    expect(
+      screen.getByTestId("outcome.votes.dReps-yes-votes-submitted"),
+    ).toHaveTextContent("₳ 75 - 50.00%");
+    expect(
+      screen.getByTestId("outcome.votes.sPos-yes-votes-submitted"),
+    ).toHaveTextContent("₳ 40 - 50.00%");
+  });
+
+  it("shows a group without totals as unavailable, not as no votes", () => {
+    render(
+      <OutcomeGovernanceVoting
+        action={{
+          ...action,
+          type: "NoConfidence",
+          pool_yes_votes: null,
+          pool_no_votes: null,
+          pool_abstain_votes: null,
+          vote_aggregates: [drep],
+        }}
+      />,
+    );
+    expect(
+      screen.getByTestId("SPOs-voting-results-data-unavailable"),
+    ).toBeVisible();
+    expect(
+      screen.getByTestId("outcome.votes.dReps-yes-votes-submitted"),
+    ).toBeVisible();
+    expect(
+      screen.queryByTestId("outcome.votes.sPos-yes-votes-submitted"),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders an available SPO aggregate even when proposal parameters are unavailable", () => {
     render(
       <OutcomeGovernanceVoting

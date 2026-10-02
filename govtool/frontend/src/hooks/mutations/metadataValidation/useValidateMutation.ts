@@ -36,7 +36,11 @@ export const useValidateMutation = <MetadataType>() => {
       })
       .catch((error) => {
         console.error(error);
-        return { valid: false, status: MetadataValidationStatus.INTERNAL_ERROR };
+        return {
+          valid: false,
+          status: MetadataValidationStatus.INTERNAL_ERROR,
+          error: error instanceof Error ? error.message : String(error),
+        };
       });
 
   const contextValue = useMemo(

@@ -1,3 +1,5 @@
+import type { MetadataAnchor } from "./metadataReport";
+
 // Mirrors govtool-backend/src/metadata/metadata-status.enum.ts.
 export enum MetadataValidationStatus {
   URL_NOT_FOUND = "URL_NOT_FOUND",
@@ -32,6 +34,20 @@ export type ValidateMetadataResult<MetadataType> = {
   valid: boolean;
   metadata?: MetadataType;
   issues?: MetadataIssue[];
+  /** The metadata service's fetch report behind a failure, when it has one. */
+  reportId?: string;
+  /**
+   * Set by the frontend, not the backend: why the request itself failed
+   * (timeout, network, 5xx), beside `INTERNAL_ERROR`.
+   */
+  error?: string;
+};
+
+/** What a failed submission check knows, for `MetadataFailureDetails`. */
+export type MetadataSubmissionFailure = {
+  anchor: MetadataAnchor;
+  reportId?: string;
+  error?: string;
 };
 
 export type MetadataValidationDTO = {

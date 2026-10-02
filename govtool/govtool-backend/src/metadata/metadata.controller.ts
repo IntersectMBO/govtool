@@ -6,11 +6,12 @@ import {
   Param,
   Post,
   Query,
+  Req,
   Res,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import type {
   MetadataRefreshOutcome,
   MetadataReport,
@@ -47,9 +48,12 @@ export class MetadataController {
 
   @Post('validate')
   validateMetadata(
+    @Req() request: Request,
     @Body() body: ValidateMetadataDto,
   ): Promise<ValidateMetadataResult> {
-    return this.metadataService.validateMetadata(body);
+    return this.metadataService.validateMetadata(body, {
+      clientKey: request.ip ?? request.socket.remoteAddress ?? 'unknown',
+    });
   }
 
   /** Always 200 with a `MetadataResult`: a failure is a value, not an error. */

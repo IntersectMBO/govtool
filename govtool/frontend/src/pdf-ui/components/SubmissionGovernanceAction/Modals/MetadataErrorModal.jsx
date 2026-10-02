@@ -37,6 +37,7 @@ const MetadataErrorModal = ({
     onClose,
     buttonOneClick,
     buttonTwoClick,
+    children,
 }) => {
     const texts = TEXTS[status] ?? TEXTS.INTERNAL_ERROR;
 
@@ -66,7 +67,9 @@ const MetadataErrorModal = ({
                 onClick: buttonTwoClick,
                 dataTestId: 'metadata-error-modal-cancel-button',
             }}
-        />
+        >
+            {children}
+        </PdfStatusModal>
     );
 };
 

@@ -12,6 +12,7 @@ import type {
 } from '@govtool/data-providers/metadata';
 
 import { ConfigService } from '../config/config.service';
+import { UploadRateLimiter } from '../ipfs/upload-rate-limiter';
 import { METADATA } from '../providers/providers.module';
 
 import { ValidateMetadataDto } from './dto/validate-metadata.dto';
@@ -35,9 +36,27 @@ const CIP108_ABSTRACT_MAX_LENGTH = 2500;
  */
 const SERVICE_BUDGET_MS = 15_000;
 
+/**
+ * Submission checks through the metadata service fetch every time and keep a
+ * report of each failure forever, so they are rate-limited per client and per
+ * instance. Over the limit the check still runs, with the local fetch and no
+ * report (D152).
+ */
+const VERIFY_LIMITS = {
+  perClientLimit: 30,
+  globalLimit: 600,
+  windowSeconds: 600,
+  maxTrackedClients: 10_000,
+};
+
+type ServiceAnswer =
+  | { ok: true; document: Record<string, unknown> }
+  | { ok: false; status: MetadataValidationStatus; reportId?: string };
+
 @Injectable()
 export class MetadataService {
   private readonly logger = new Logger(MetadataService.name);
+  private readonly verifyLimiter = new UploadRateLimiter(VERIFY_LIMITS);
 
   constructor(
     private readonly config: ConfigService,
@@ -68,30 +87,39 @@ export class MetadataService {
 
   /**
    * Resolve through the metadata service when one is configured: it caches by
-   * hash, fails over across IPFS gateways and guards against private
-   * addresses, none of which the local fetch does. Returns `undefined` when
-   * there is no service, it cannot be reached or it does not answer within
-   * `SERVICE_BUDGET_MS`, so the caller falls back to the local fetch rather
-   * than reporting a working document as missing.
+   * hash, fails over across IPFS gateways, guards against private addresses
+   * and keeps a fetch report of every failure, none of which the local fetch
+   * does. With `verify` it fetches the url whatever the cache holds (D152).
+   * Returns `undefined` when there is no service, it cannot verify, the client
+   * is over the verify limit, it cannot be reached or it does not answer
+   * within `SERVICE_BUDGET_MS`, so the caller falls back to the local fetch
+   * rather than reporting a working document as missing.
    */
   private async resolveThroughService(
     hash: string,
     url: string,
-  ): Promise<
-    | { ok: true; document: Record<string, unknown> }
-    | { ok: false; status: MetadataValidationStatus }
-    | undefined
-  > {
-    if (!this.metadataService) return undefined;
+    verify: { clientKey: string } | undefined,
+  ): Promise<ServiceAnswer | undefined> {
+    const service = this.metadataService;
+    if (!service) return undefined;
+    if (verify) {
+      if (!service.verify) return undefined;
+      if (!this.verifyLimiter.consume(verify.clientKey).allowed) {
+        this.logger.warn(
+          `metadata verify rate limit hit for client ${verify.clientKey}, verifying with a local fetch`,
+        );
+        return undefined;
+      }
+    }
     let timer: NodeJS.Timeout | undefined;
     try {
       const timeout = new Promise<undefined>((resolve) => {
         timer = setTimeout(() => resolve(undefined), SERVICE_BUDGET_MS);
       });
-      const result = await Promise.race([
-        this.metadataService.getMetadata(hash.toLowerCase(), url),
-        timeout,
-      ]);
+      const request = verify
+        ? service.verify!(hash.toLowerCase(), url)
+        : service.getMetadata(hash.toLowerCase(), url);
+      const result = await Promise.race([request, timeout]);
       if (!result) {
         this.logger.warn(
           `metadata service gave no answer within ${SERVICE_BUDGET_MS} ms, falling back to a local fetch`,
@@ -108,7 +136,7 @@ export class MetadataService {
         result.code === 'FETCH_ERROR' && result.message.startsWith('Refused')
           ? MetadataValidationStatus.URL_BLOCKED
           : MetadataService.LEGACY_STATUS[result.code];
-      return { ok: false, status };
+      return { ok: false, status, reportId: result.reportId };
     } catch (error) {
       this.logger.warn(
         `metadata service unavailable, falling back to a local fetch: ${error instanceof Error ? error.message : String(error)}`,
@@ -120,27 +148,36 @@ export class MetadataService {
   }
 
   /**
-   * `verifyUrl` skips the metadata service: its content is keyed by hash and
-   * ignores the url once known (D112), so it cannot prove that `url` serves
-   * the document. Submission sets it; reads take the cache.
+   * `verifyUrl` fetches `url` now instead of answering from the service's
+   * hash cache, which ignores the url once the content is known (D112), so it
+   * could not prove that `url` serves the document. Submission sets it; reads
+   * take the cache. A failure the service saw carries its `reportId` either
+   * way, so the author can see why (D152).
    *
    * `options.includeAuthors` adds the document's CIP-100 `authors` to
    * `metadata`, as the outcomes UI reads them; the legacy route omits them.
+   * `options.clientKey` is who asked, for the verify rate limit.
    */
   async validateMetadata(
     { hash, url, standard: paramStandard, verifyUrl }: ValidateMetadataDto,
-    options: { includeAuthors?: boolean } = {},
+    options: { includeAuthors?: boolean; clientKey?: string } = {},
   ): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus | undefined;
+    let reportId: string | undefined;
     let metadata: Record<string, unknown> | undefined;
     let issues: MetadataIssue[] = [];
     let standard = paramStandard;
 
     try {
-      const viaService = verifyUrl
-        ? undefined
-        : await this.resolveThroughService(hash, url);
-      if (viaService && !viaService.ok) throw viaService.status;
+      const viaService = await this.resolveThroughService(
+        hash,
+        url,
+        verifyUrl ? { clientKey: options.clientKey ?? 'internal' } : undefined,
+      );
+      if (viaService && !viaService.ok) {
+        reportId = viaService.reportId;
+        throw viaService.status;
+      }
 
       // The service has already verified the hash over the exact bytes; the
       // local path verifies it below.
@@ -223,6 +260,7 @@ export class MetadataService {
       valid: !status,
       metadata,
       ...(showIssues && { issues }),
+      ...(status && reportId && { reportId }),
     };
   }
 

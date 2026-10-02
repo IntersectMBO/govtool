@@ -111,13 +111,23 @@ describe('validation through the metadata service', () => {
   };
   const stub = (
     getMetadata: MetadataServiceV1['getMetadata'],
+    verify?: MetadataServiceV1['verify'],
   ): MetadataServiceV1 => ({
     getMetadata,
     getCipMetadata: () => Promise.reject(new Error('unused')),
     refresh: () => Promise.reject(new Error('unused')),
+    ...(verify && { verify }),
     getReport: () => Promise.resolve(null),
     listReports: () => Promise.resolve([]),
   });
+  const notFound = {
+    ok: false,
+    code: 'FETCH_ERROR',
+    category: 'NETWORK',
+    message: 'Unexpected Status code: 404',
+    reportId: 'rep-1',
+    checkedAt: '2026-10-02T00:00:00Z',
+  } as const;
   const input = {
     url: 'https://ipfs.io/ipfs/QmaAAqY6zwaLRSoqDdQBAMRoYKjydxJfEkpwtSiCWKJCdi',
     hash: 'AB'.repeat(32),
@@ -208,7 +218,71 @@ describe('validation through the metadata service', () => {
     expect(fetchMetadataText).toHaveBeenCalled();
   });
 
-  it('with verifyUrl fetches the url itself and never asks the cache', async () => {
+  it('carries the reportId of a failure the service saw', async () => {
+    const service = new MetadataService(
+      config,
+      stub(() => Promise.resolve(notFound)),
+    );
+    await expect(service.validateMetadata(input)).resolves.toEqual({
+      status: 'URL_NOT_FOUND',
+      valid: false,
+      metadata: undefined,
+      reportId: 'rep-1',
+    });
+  });
+
+  it('with verifyUrl asks the service to verify, not the cache, and carries its report', async () => {
+    const getMetadata = jest.fn<
+      ReturnType<MetadataServiceV1['getMetadata']>,
+      Parameters<MetadataServiceV1['getMetadata']>
+    >();
+    const verify = jest.fn<
+      ReturnType<NonNullable<MetadataServiceV1['verify']>>,
+      Parameters<NonNullable<MetadataServiceV1['verify']>>
+    >(() => Promise.resolve(notFound));
+    const service = new MetadataService(config, stub(getMetadata, verify));
+    await expect(
+      service.validateMetadata({ ...input, verifyUrl: true }),
+    ).resolves.toMatchObject({
+      status: 'URL_NOT_FOUND',
+      valid: false,
+      reportId: 'rep-1',
+    });
+    expect(verify).toHaveBeenCalledWith('ab'.repeat(32), input.url);
+    expect(getMetadata).not.toHaveBeenCalled();
+    expect(fetchMetadataText).not.toHaveBeenCalled();
+  });
+
+  it('with verifyUrl over the rate limit verifies with a local fetch instead', async () => {
+    const raw = JSON.stringify(doc);
+    const hash = blake.blake2bHex(raw, undefined, 32);
+    const verify = jest.fn<
+      ReturnType<NonNullable<MetadataServiceV1['verify']>>,
+      Parameters<NonNullable<MetadataServiceV1['verify']>>
+    >(() =>
+      Promise.resolve({
+        ok: true,
+        hash,
+        body: doc,
+        fetchedAt: '2026-10-02T00:00:00Z',
+      }),
+    );
+    jest.mocked(fetchMetadataText).mockResolvedValue(raw);
+    const service = new MetadataService(
+      config,
+      stub(() => Promise.reject(new Error('unused')), verify),
+    );
+    for (let i = 0; i < 31; i++) {
+      await service.validateMetadata(
+        { ...input, hash, verifyUrl: true },
+        { clientKey: 'client-a' },
+      );
+    }
+    expect(verify).toHaveBeenCalledTimes(30);
+    expect(fetchMetadataText).toHaveBeenCalledTimes(1);
+  });
+
+  it('with verifyUrl and no verify on the service fetches the url itself and never asks the cache', async () => {
     const raw = JSON.stringify(doc);
     jest.mocked(fetchMetadataText).mockResolvedValueOnce(raw);
     const getMetadata = jest.fn<

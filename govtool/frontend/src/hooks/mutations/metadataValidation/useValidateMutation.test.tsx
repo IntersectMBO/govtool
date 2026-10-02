@@ -52,7 +52,9 @@ describe("useValidateMutation", () => {
     await hook.result.current.validateMetadata(body);
     await expect(
       hook.result.current.validateMetadata({ ...body, verifyUrl: true }),
-    ).resolves.toMatchObject({ status: MetadataValidationStatus.URL_NOT_FOUND });
+    ).resolves.toMatchObject({
+      status: MetadataValidationStatus.URL_NOT_FOUND,
+    });
     expect(mocks.postValidate).toHaveBeenLastCalledWith({
       ...body,
       verifyUrl: true,

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Box } from '@mui/material';
 import { Button, Spacer, Typography } from '@atoms';
-import { Step } from '@molecules';
+import { MetadataFailureDetails, Step } from '@molecules';
 import { PdfInput } from '../../PdfFields';
 import { useNavigate } from 'react-router';
 import { useAppContext } from '../../../context/context';
@@ -45,6 +45,9 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
     const [showExternalDataNotMatchModal, setShowExternalDataNotMatchModal] =
         useState(false);
     const [showUrlErrorModal, setShowUrlErrorModal] = useState(false);
+    // What the failed check knows (its fetch report, or why it could not
+    // run), shown in whichever error modal opens (D152).
+    const [metadataFailure, setMetadataFailure] = useState(null);
     // The status shown by MetadataErrorModal, or null while it is closed.
     const [metadataErrorStatus, setMetadataErrorStatus] = useState(null);
     const [showCancelRegistrationModal, setShowCancelRegistrationModal] =
@@ -146,7 +149,11 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                 verifyUrl: true,
             }).catch((error) => {
                 console.error(error);
-                return { valid: false, status: 'INTERNAL_ERROR' };
+                return {
+                    valid: false,
+                    status: 'INTERNAL_ERROR',
+                    error: String(error?.message ?? error),
+                };
             });
 
             if (response?.valid) {
@@ -234,11 +241,16 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                                 prop_submission_tx_hash: tx,
                             }
                         );
-                        setShowGovernanceActionSubmittedModal(true); 
+                        setShowGovernanceActionSubmittedModal(true);
                     }
                 }
             } else {
                 console.error(response);
+                setMetadataFailure({
+                    anchor: { url, hash: hashData },
+                    reportId: response?.reportId,
+                    error: response?.error,
+                });
                 if (response?.status === 'URL_NOT_FOUND') {
                     setShowUrlErrorModal(true);
                 } else if (hasMetadataErrorModal(response?.status)) {
@@ -312,6 +324,15 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
             handleCreateGAJsonLD();
         }
     }, [!!walletAPI, proposal]);
+
+    const failureDetails = metadataFailure && (
+        <MetadataFailureDetails
+            anchor={metadataFailure.anchor}
+            reportId={metadataFailure.reportId}
+            error={metadataFailure.error}
+            sx={{ mt: 2, textAlign: 'left' }}
+        />
+    );
 
     return (
         <Box
@@ -450,7 +471,9 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                     setShowExternalDataNotMatchModal(false);
                     setShowCancelRegistrationModal(true);
                 }}
-            />
+            >
+                {failureDetails}
+            </ExternalDataNotMatchModal>
             <MetadataErrorModal
                 status={metadataErrorStatus}
                 open={metadataErrorStatus !== null}
@@ -460,7 +483,9 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                     setMetadataErrorStatus(null);
                     setShowCancelRegistrationModal(true);
                 }}
-            />
+            >
+                {failureDetails}
+            </MetadataErrorModal>
             <UrlErrorModal
                 open={showUrlErrorModal}
                 onClose={() => setShowUrlErrorModal(false)}
@@ -469,7 +494,9 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                     setShowUrlErrorModal(false);
                     setShowCancelRegistrationModal(true);
                 }}
-            />
+            >
+                {failureDetails}
+            </UrlErrorModal>
 
             <CancelRegistrationModal
                 open={showCancelRegistrationModal}

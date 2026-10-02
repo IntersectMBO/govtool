@@ -101,6 +101,33 @@ describe("MetadataFailureDetails", () => {
     expect(toggle).toHaveTextContent("Hide details");
   });
 
+  it("shows the report of a failed submission check even when the cache has the document", () => {
+    state.result = { ok: true, hash: anchor.hash, body: {}, fetchedAt: "" };
+    state.reportsById = { s1: report("s1", "Unexpected Status code: 404") };
+    render(<MetadataFailureDetails anchor={anchor} reportId="s1" />);
+
+    fireEvent.click(screen.getByTestId("metadata-failure-details-toggle"));
+
+    expect(reportQuery).toHaveBeenLastCalledWith("s1", true);
+    expect(screen.getByText("Unexpected Status code: 404")).toBeInTheDocument();
+  });
+
+  it("shows why a check could not run when it has no report", () => {
+    state.result = undefined;
+    render(
+      <MetadataFailureDetails
+        anchor={anchor}
+        error="timeout of 30000ms exceeded"
+      />,
+    );
+    expect(screen.getByTestId("metadata-check-error")).toHaveTextContent(
+      "timeout of 30000ms exceeded",
+    );
+    expect(
+      screen.queryByTestId("metadata-failure-details-toggle"),
+    ).not.toBeInTheDocument();
+  });
+
   it("shows no retry button unless allowed", () => {
     render(<MetadataFailureDetails anchor={anchor} />);
     expect(

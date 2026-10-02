@@ -28,6 +28,10 @@ export interface StatusModalState {
    * report for it, the modal offers it so the author can see why (D117).
    */
   metadataAnchor?: MetadataAnchor;
+  /** The failed check's own report, shown instead of the anchor's (D152). */
+  metadataReportId?: string;
+  /** Why the check could not run, when it could not. */
+  metadataError?: string;
 }
 
 export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
@@ -87,7 +91,11 @@ export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
         </Typography>
         {state?.metadataAnchor && (
           <Box sx={{ mt: 2, textAlign: "left" }}>
-            <MetadataFailureDetails anchor={state.metadataAnchor} />
+            <MetadataFailureDetails
+              anchor={state.metadataAnchor}
+              reportId={state.metadataReportId}
+              error={state.metadataError}
+            />
           </Box>
         )}
       </ModalContents>

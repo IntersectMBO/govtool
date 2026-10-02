@@ -502,6 +502,7 @@ Resolves anchors into documents. Required.
 getMetadata(hash: Hex, url?: string): Promise<MetadataResult>;
 getCipMetadata(cip: number, hash: Hex, url?: string): Promise<CipMetadataResult>;
 refresh(hash: Hex, url: string): Promise<MetadataResult>;
+verify?(hash: Hex, url: string): Promise<MetadataResult>;
 ```
 
 ```ts
@@ -551,6 +552,12 @@ cached success. It returns a `MetadataRefreshOutcome`: at most one real fetch
 per (url, hash) per minute, whoever asks, and inside that window the latest
 result with `retryAfterSeconds` (D125). It is expensive and amplifying, so a
 backend should expose it with care (D93).
+
+`verify` fetches **U** now whatever the cache holds, for submission, where the
+url itself goes on chain and a cached hash proves nothing about it (D152). A
+failure has a report like any other, so the author sees why. It is not windowed:
+the backend rate-limits it. Optional; without it the backend verifies with its
+own fetch, which has no report.
 
 **Failure codes**, one per pipeline stage:
 

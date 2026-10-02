@@ -24,7 +24,8 @@ export class ValidateMetadataDto {
   /**
    * Fetch `url` now and check its bytes against `hash`, bypassing the
    * metadata service's hash cache. For submission, where the url itself goes
-   * on chain and must serve the document; a read leaves it unset (D152).
+   * on chain and must serve the document; a read leaves it unset. A failure
+   * the metadata service saw carries its `reportId` (D152).
    */
   @IsOptional()
   @IsBoolean()

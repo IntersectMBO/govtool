@@ -27,4 +27,10 @@ export type ValidateMetadataResult = {
   metadata?: Record<string, unknown>;
   /** Present only when the document breaks a rule of its standard. */
   issues?: MetadataIssue[];
+  /**
+   * The metadata service's fetch report behind a failure, for
+   * `GET /metadata/reports/:id`. Absent when the failure was not the
+   * service's, such as a local fetch (D152).
+   */
+  reportId?: string;
 };

@@ -4,13 +4,15 @@ import { Box } from "@mui/material";
 import { IMAGES, storageInformationErrorModals } from "@consts";
 import { Button, Typography } from "@atoms";
 import { useScreenDimension, useTranslation, useVoteContextForm } from "@hooks";
-import { MetadataValidationStatus } from "@models";
+import { MetadataSubmissionFailure, MetadataValidationStatus } from "@models";
+import { MetadataFailureDetails } from "@molecules";
 
 type VoteContextCheckResultProps = {
   submitVoteContext: () => void;
   closeModal: () => void;
   setStep: Dispatch<SetStateAction<number>>;
   errorMessage?: string;
+  metadataFailure?: MetadataSubmissionFailure;
 };
 
 export const VoteContextCheckResult = ({
@@ -18,6 +20,7 @@ export const VoteContextCheckResult = ({
   closeModal,
   setStep,
   errorMessage,
+  metadataFailure,
 }: VoteContextCheckResultProps) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
@@ -60,6 +63,15 @@ export const VoteContextCheckResult = ({
       <Typography>
         {statusModal?.message ?? errorMessage ?? "You can now proceed to vote."}
       </Typography>
+      {errorMessage && metadataFailure && (
+        <Box sx={{ mt: 2, textAlign: "left", width: "100%" }}>
+          <MetadataFailureDetails
+            anchor={metadataFailure.anchor}
+            reportId={metadataFailure.reportId}
+            error={metadataFailure.error}
+          />
+        </Box>
+      )}
       {!errorMessage ? (
         <Button
           data-testid="go-to-vote-modal-button"

@@ -21,22 +21,35 @@ type Props = {
   votes: SubmittedVotesData;
 };
 
-export const VotesSubmitted = ({
-  type: govActionType,
-  votes: {
-    dRepYesVotes,
-    dRepAbstainVotes,
-    dRepNoVotes,
-    poolYesVotes,
-    poolAbstainVotes,
-    poolNoVotes,
-    ccYesVotes,
-    ccAbstainVotes,
-    ccNoVotes,
-    type,
-    protocolParams,
-  },
-}: Props) => {
+export const VotesSubmitted = ({ type: govActionType, votes }: Props) => {
+  const { type, protocolParams } = votes;
+  // A null figure is one the backend could not get from its data source: that
+  // group shows as unavailable rather than as no votes.
+  const isDRepUnavailable = [
+    votes.dRepYesVotes,
+    votes.dRepNoVotes,
+    votes.dRepAbstainVotes,
+  ].includes(null);
+  const isSPOUnavailable = [
+    votes.poolYesVotes,
+    votes.poolNoVotes,
+    votes.poolAbstainVotes,
+  ].includes(null);
+  const isCCUnavailable = [
+    votes.ccYesVotes,
+    votes.ccNoVotes,
+    votes.ccAbstainVotes,
+  ].includes(null);
+  const dRepYesVotes = votes.dRepYesVotes ?? 0;
+  const dRepNoVotes = votes.dRepNoVotes ?? 0;
+  const dRepAbstainVotes = votes.dRepAbstainVotes ?? 0;
+  const poolYesVotes = votes.poolYesVotes ?? 0;
+  const poolNoVotes = votes.poolNoVotes ?? 0;
+  const poolAbstainVotes = votes.poolAbstainVotes ?? 0;
+  const ccYesVotes = votes.ccYesVotes ?? 0;
+  const ccNoVotes = votes.ccNoVotes ?? 0;
+  const ccAbstainVotes = votes.ccAbstainVotes ?? 0;
+
   const isSecurityGroup = useCallback(
     () =>
       Object.values(SECURITY_RELEVANT_PARAMS_MAP).some(
@@ -202,65 +215,96 @@ export const VotesSubmitted = ({
           gap: 4.5,
         }}
       >
-        {areDRepVoteTotalsDisplayed(type, isSecurityGroup()) && (
-          <VotesGroup
-            type="dReps"
-            yesVotes={dRepYesVotes}
-            yesVotesPercentage={dRepYesVotesPercentage}
-            noVotes={dRepNoVotes}
-            noVotesPercentage={dRepNoVotesPercentage}
-            abstainVotes={totalAbstainVotes}
-            notVotedVotes={dRepNotVotedVotes}
-            notVotedPercentage={dRepNotVotedVotesPercentage}
-            threshold={getGovActionVotingThreshold({
-              govActionType: type,
-              protocolParams,
-              voterType: "dReps",
-              epochParams,
-            })}
-          />
-        )}
-        {areSPOVoteTotalsDisplayed(type, isSecurityGroup()) && (
-          <VotesGroup
-            type="sPos"
-            yesVotes={poolYesVotes}
-            yesVotesPercentage={poolYesVotesPercentage}
-            noVotes={poolNoVotes}
-            noVotesPercentage={poolNoVotesPercentage}
-            abstainVotes={poolAbstainVotes}
-            notVotedVotes={poolNotVotedVotes}
-            notVotedPercentage={poolNotVotedVotesPercentage}
-            threshold={getGovActionVotingThreshold({
-              govActionType: type,
-              protocolParams,
-              voterType: "sPos",
-              epochParams,
-            })}
-          />
-        )}
-        {areCCVoteTotalsDisplayed(type) && areCommitteeMetricsAvailable && (
-          <VotesGroup
-            type="ccCommittee"
-            yesVotes={ccYesVotes}
-            noVotes={ccNoVotes}
-            abstainVotes={ccAbstainVotes}
-            yesVotesPercentage={ccYesVotesPercentage}
-            noVotesPercentage={ccNoVotesPercentage}
-            notVotedVotes={ccNotVotedVotes}
-            notVotedPercentage={ccNotVotedVotesPercentage}
-            threshold={
-              type !== GovernanceActionType.InfoAction
-                ? Number(ccThreshold)
-                : null
-            }
-          />
-        )}
+        {areDRepVoteTotalsDisplayed(type, isSecurityGroup()) &&
+          isDRepUnavailable && <UnavailableVotesGroup type="dReps" />}
+        {areDRepVoteTotalsDisplayed(type, isSecurityGroup()) &&
+          !isDRepUnavailable && (
+            <VotesGroup
+              type="dReps"
+              yesVotes={dRepYesVotes}
+              yesVotesPercentage={dRepYesVotesPercentage}
+              noVotes={dRepNoVotes}
+              noVotesPercentage={dRepNoVotesPercentage}
+              abstainVotes={totalAbstainVotes}
+              notVotedVotes={dRepNotVotedVotes}
+              notVotedPercentage={dRepNotVotedVotesPercentage}
+              threshold={getGovActionVotingThreshold({
+                govActionType: type,
+                protocolParams,
+                voterType: "dReps",
+                epochParams,
+              })}
+            />
+          )}
+        {areSPOVoteTotalsDisplayed(type, isSecurityGroup()) &&
+          isSPOUnavailable && <UnavailableVotesGroup type="sPos" />}
+        {areSPOVoteTotalsDisplayed(type, isSecurityGroup()) &&
+          !isSPOUnavailable && (
+            <VotesGroup
+              type="sPos"
+              yesVotes={poolYesVotes}
+              yesVotesPercentage={poolYesVotesPercentage}
+              noVotes={poolNoVotes}
+              noVotesPercentage={poolNoVotesPercentage}
+              abstainVotes={poolAbstainVotes}
+              notVotedVotes={poolNotVotedVotes}
+              notVotedPercentage={poolNotVotedVotesPercentage}
+              threshold={getGovActionVotingThreshold({
+                govActionType: type,
+                protocolParams,
+                voterType: "sPos",
+                epochParams,
+              })}
+            />
+          )}
+        {areCCVoteTotalsDisplayed(type) &&
+          areCommitteeMetricsAvailable &&
+          isCCUnavailable && <UnavailableVotesGroup type="ccCommittee" />}
+        {areCCVoteTotalsDisplayed(type) &&
+          areCommitteeMetricsAvailable &&
+          !isCCUnavailable && (
+            <VotesGroup
+              type="ccCommittee"
+              yesVotes={ccYesVotes}
+              noVotes={ccNoVotes}
+              abstainVotes={ccAbstainVotes}
+              yesVotesPercentage={ccYesVotesPercentage}
+              noVotesPercentage={ccNoVotesPercentage}
+              notVotedVotes={ccNotVotedVotes}
+              notVotedPercentage={ccNotVotedVotesPercentage}
+              threshold={
+                type !== GovernanceActionType.InfoAction
+                  ? Number(ccThreshold)
+                  : null
+              }
+            />
+          )}
       </Box>
     </Box>
   );
 };
 
 export type VoterType = "ccCommittee" | "dReps" | "sPos";
+
+/** A group that votes on the action but whose totals are not known. */
+const UnavailableVotesGroup = ({ type }: { type: VoterType }) => {
+  const { t } = useTranslation();
+  return (
+    <Box
+      sx={{ display: "flex", flexDirection: "column", gap: "12px" }}
+      data-testid={`submitted-votes-${type}-unavailable`}
+    >
+      <Typography
+        sx={{ fontSize: "18px", fontWeight: "600", lineHeight: "24px" }}
+      >
+        {t(`govActions.${type}`)}
+      </Typography>
+      <Typography sx={{ fontSize: 14 }}>
+        {t("govActions.voteTotalsUnavailable")}
+      </Typography>
+    </Box>
+  );
+};
 
 type VotesGroupProps = {
   type: VoterType;

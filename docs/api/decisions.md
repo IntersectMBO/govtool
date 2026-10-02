@@ -5388,3 +5388,31 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
 - A request that fails outright (timeout, network, 5xx) reaches the frontend as `INTERNAL_ERROR` with
   the request's own error text, shown in the same place as a report, so no card is left validating
   forever and the author still sees why.
+
+## D153 — One convention for automatic votes; an unknown tally is null
+
+**Date:** 2026-10-02
+**Amends:** the outcomes UI's own arithmetic (D149) and the legacy `/proposal` and outcomes vote fields.
+**Issue:** [#4260](https://github.com/IntersectMBO/govtool/issues/4260)
+
+- Every provider reports an action's vote aggregates with the automatic votes already in them: the
+  always-no-confidence DRep stake as yes on a NoConfidence action and as no on every other, and each
+  pool's passive always-no-confidence and always-abstain stake the same way (pools not after a hard
+  fork, and every silent pool as abstain before protocol 10). The DRep always-abstain stake is the one
+  automatic figure left out of the action's abstain, because it sits outside the DRep denominator.
+- The consumer adds nothing else. The outcomes page added the always-no-confidence stake to the DRep
+  yes or no and the pools' passive stake to their yes, no and abstain a second time, so a 50% result
+  read as 66.7% or 83.3% and the pass indicator could flip. It now adds only the DRep always-abstain
+  stake to the DRep abstain.
+- `/network/total-stake`'s `totalStakeControlledByDReps` is active DRep stake plus the
+  always-no-confidence stake again, as the Haskell backend reported it: the live-action page divides
+  DRep yes and no, which include that stake, by it. The contract's field of the same name stays the
+  active stake; the backend adds the two at its edge. The outcomes route already did.
+- A tally figure the data source does not have is `null` on both the legacy `/proposal` routes and the
+  outcomes routes, never 0, which reads as "nobody voted": the provider serves no aggregates for the
+  action (Blockfrost on a concluded one), or a role's aggregate is a `percent`. A role left out of
+  aggregates the provider does serve does not vote on the action and stays 0, as the Haskell backend's
+  cast-vote counts were. Sorting by yes votes puts unknown totals last.
+- The frontend shows a group whose figures are null as unavailable, with no pass or fail indicator.
+- Not changed here: the Koios provider leaves the committee aggregate out of a concluded action rather
+  than guess its denominator, which this rule reads as "does not vote" and so reports as 0.

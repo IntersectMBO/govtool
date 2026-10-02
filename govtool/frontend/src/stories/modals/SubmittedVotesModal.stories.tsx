@@ -53,10 +53,10 @@ async function assertVotes(
   canvas: ReturnType<typeof within>,
   args: SubmittedVotesModalState,
 ) {
-  const dRepYesVotesText = `₳ ${correctAdaFormatWithSuffix(args.dRepYesVotes)}`;
-  const dRepNoVotesText = `₳ ${correctAdaFormatWithSuffix(args.dRepNoVotes)}`;
+  const dRepYesVotesText = `₳ ${correctAdaFormatWithSuffix(args.dRepYesVotes ?? 0)}`;
+  const dRepNoVotesText = `₳ ${correctAdaFormatWithSuffix(args.dRepNoVotes ?? 0)}`;
   const dRepAbstainVotesText = `₳ ${correctAdaFormatWithSuffix(
-    args.dRepAbstainVotes,
+    args.dRepAbstainVotes ?? 0,
   )}`;
 
   await expect(canvas.getByText(dRepYesVotesText)).toBeVisible();

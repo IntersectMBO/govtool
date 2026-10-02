@@ -9,7 +9,6 @@ import type {
   GovActionLineage,
   GovAction,
   GovActionStatus,
-  VoteAggregate,
 } from '@govtool/data-providers/chain-data';
 
 import { CacheService } from 'src/cache/cache.service';
@@ -21,11 +20,7 @@ import {
   epochStartTime,
   type EpochSchedule,
 } from 'src/common/legacy-network';
-import {
-  compareIntegers,
-  dbInteger,
-  type ApiInteger,
-} from 'src/common/integer';
+import { compareFiguresDescending, voteFigure } from 'src/common/vote-figures';
 import { toLegacyNullableNumber } from 'src/common/legacy';
 import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
@@ -348,15 +343,6 @@ export class ProposalService {
     schedule: EpochSchedule | null = null,
   ): ProposalResponse {
     const { submitted, expires } = action.lifecycle;
-    const aggregates = new Map(
-      (action.voteAggregates ?? []).map((aggregate) => [
-        aggregate.role,
-        aggregate,
-      ]),
-    );
-    const drep = aggregates.get('drep');
-    const spo = aggregates.get('spo');
-    const cc = aggregates.get('cc');
 
     return {
       // The legacy `id` was db-sync's internal row id. No provider carries one
@@ -394,15 +380,15 @@ export class ProposalService {
       abstract: null,
       motivation: null,
       rationale: null,
-      dRepYesVotes: this.aggregateValue(drep, 'yes'),
-      dRepNoVotes: this.aggregateValue(drep, 'no'),
-      dRepAbstainVotes: this.aggregateValue(drep, 'abstain'),
-      poolYesVotes: this.aggregateValue(spo, 'yes'),
-      poolNoVotes: this.aggregateValue(spo, 'no'),
-      poolAbstainVotes: this.aggregateValue(spo, 'abstain'),
-      ccYesVotes: this.aggregateValue(cc, 'yes'),
-      ccNoVotes: this.aggregateValue(cc, 'no'),
-      ccAbstainVotes: this.aggregateValue(cc, 'abstain'),
+      dRepYesVotes: voteFigure(action, 'drep', 'yes'),
+      dRepNoVotes: voteFigure(action, 'drep', 'no'),
+      dRepAbstainVotes: voteFigure(action, 'drep', 'abstain'),
+      poolYesVotes: voteFigure(action, 'spo', 'yes'),
+      poolNoVotes: voteFigure(action, 'spo', 'no'),
+      poolAbstainVotes: voteFigure(action, 'spo', 'abstain'),
+      ccYesVotes: voteFigure(action, 'cc', 'yes'),
+      ccNoVotes: voteFigure(action, 'cc', 'no'),
+      ccAbstainVotes: voteFigure(action, 'cc', 'abstain'),
       prevGovActionIndex: toLegacyNullableNumber(
         action.previousAction?.index ?? null,
       ),
@@ -430,24 +416,6 @@ export class ProposalService {
     epoch: number,
   ): string | null {
     return schedule === null ? null : epochStartTime(schedule, epoch);
-  }
-
-  /**
-   * One choice off a vote aggregate, as the legacy integer field.
-   *
-   * The legacy fields are whole numbers — lovelace for the DRep and pool rows,
-   * a head count for the committee — so a `percent` aggregate has nothing to
-   * put in them. Reporting the fraction rounded to 0 would read as "no votes",
-   * so it is refused instead.
-   */
-  private aggregateValue(
-    aggregate: VoteAggregate | undefined,
-    choice: 'yes' | 'no' | 'abstain',
-  ): ApiInteger {
-    if (aggregate === undefined || aggregate.representation === 'percent') {
-      return 0;
-    }
-    return dbInteger(aggregate[choice]);
   }
 
   filterByType(
@@ -510,7 +478,10 @@ export class ProposalService {
 
       case 'MostYesVotes':
         return copied.sort((a, b) =>
-          compareIntegers(this.totalYesVotes(b), this.totalYesVotes(a)),
+          compareFiguresDescending(
+            this.totalYesVotes(a),
+            this.totalYesVotes(b),
+          ),
         );
 
       default:
@@ -524,12 +495,12 @@ export class ProposalService {
    * comparator on values that large returns 0 for totals that differ, which
    * silently scrambles the sort.
    */
-  private totalYesVotes(proposal: ProposalResponse): bigint {
-    return (
-      BigInt(proposal.dRepYesVotes) +
-      BigInt(proposal.poolYesVotes) +
-      BigInt(proposal.ccYesVotes)
-    );
+  private totalYesVotes(proposal: ProposalResponse): bigint | null {
+    const { dRepYesVotes, poolYesVotes, ccYesVotes } = proposal;
+    if (dRepYesVotes === null || poolYesVotes === null || ccYesVotes === null) {
+      return null;
+    }
+    return BigInt(dRepYesVotes) + BigInt(poolYesVotes) + BigInt(ccYesVotes);
   }
 
   private nullableDateSortValue(value: string | null): number {

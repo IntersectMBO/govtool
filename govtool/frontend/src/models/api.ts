@@ -203,16 +203,17 @@ export type ProposalVote = {
   vote: Vote;
 };
 
+/** A `null` figure is one the backend could not get from its data source. */
 export type SubmittedVotesData = {
-  dRepYesVotes: number;
-  dRepNoVotes: number;
-  dRepAbstainVotes: number;
-  ccYesVotes: number;
-  ccNoVotes: number;
-  ccAbstainVotes: number;
-  poolYesVotes: number;
-  poolNoVotes: number;
-  poolAbstainVotes: number;
+  dRepYesVotes: number | null;
+  dRepNoVotes: number | null;
+  dRepAbstainVotes: number | null;
+  ccYesVotes: number | null;
+  ccNoVotes: number | null;
+  ccAbstainVotes: number | null;
+  poolYesVotes: number | null;
+  poolNoVotes: number | null;
+  poolAbstainVotes: number | null;
   type: GovernanceActionType;
   protocolParams: EpochParams | null;
 };

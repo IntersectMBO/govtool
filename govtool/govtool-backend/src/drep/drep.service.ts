@@ -405,12 +405,18 @@ export class DRepService {
           proposals = this.proposalService.filterBySearch(proposals, search);
           proposals = this.proposalService.sortProposals(proposals, sort);
 
-          return proposals.flatMap((proposal) => {
+          const ordered = proposals.flatMap((proposal) => {
             const pair = byGovActionId.get(
               `${proposal.txHash}#${proposal.index}`,
             );
             return pair === undefined ? [] : [{ ...pair, proposal }];
           });
+          // The details page opens a row as it is, without reading the
+          // proposal again, so each carries its document and authors.
+          return mapLimit(ordered, ENRICH_CONCURRENCY, async (pair) => ({
+            ...pair,
+            proposal: await this.proposalService.withDocument(pair.proposal),
+          }));
         }),
     );
   }

@@ -45,7 +45,7 @@ create_secret() {
   echo
   if [ -z "$value" ]; then
     [ -n "$optional" ] || die "$1 is required"
-    # Whitespace-only secrets are skipped by the entrypoint, i.e. unset.
+    # Whitespace-only secrets are skipped by the apps' secret reader, i.e. unset.
     value=" "
   fi
   printf %s "$value" | docker secret create "$name" - >/dev/null

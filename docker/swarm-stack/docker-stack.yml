@@ -10,22 +10,13 @@
 #   https://${BASE_DOMAIN}/swagger-ui  backend API docs
 #   metadata                           internal only, reached by the backend
 #
-# Secrets are files under /run/secrets named after the variable they set; the
-# entrypoint below exports each one before starting the image's own command.
-# Whitespace-only secrets are skipped, so an optional one can be created as " ".
-
-x-secrets-env: &secrets-env
-  - sh
-  - -c
-  - |
-    for f in /run/secrets/*; do
-      [ -f "$$f" ] || continue
-      v="$$(cat "$$f")"
-      [ -n "$$(printf %s "$$v" | tr -d '[:space:]')" ] || continue
-      export "$$(basename "$$f")=$$v"
-    done
-    exec "$$@"
-  - sh
+# Secrets are Swarm secrets mounted at /run/secrets/<lowercase name>. Each
+# app reads its secret from the environment first and falls back to that
+# file (`<NAME>_FILE` overrides the path), so no secret value appears in
+# `environment:` or in the service definition. Only true secrets live here;
+# hostnames, db names, users and urls stay in `environment:` where they help
+# debugging. A whitespace-only secret counts as unset, so an optional one can
+# be created as " ".
 
 x-deploy: &deploy
   replicas: 1
@@ -76,7 +67,6 @@ secrets:
 services:
   backend:
     image: ${IMAGE_REGISTRY:-ghcr.io/intersectmbo}/govtool-backend:${GOVTOOL_TAG:-dev}
-    entrypoint: *secrets-env
     command: ["node", "dist/main.js"]
     environment:
       GOVTOOL_PORT: "9999"
@@ -98,9 +88,9 @@ services:
       VIRTUAL_HOST_2: https://${BASE_DOMAIN}/swagger-ui -> :9999/swagger-ui
     secrets:
       - source: dbsync_password
-        target: GOVTOOL_DBSYNC_PASSWORD
+        target: govtool_dbsync_password
       - source: pinata_api_jwt
-        target: GOVTOOL_PINATA_API_JWT
+        target: govtool_pinata_api_jwt
     networks:
       - gateway
       - internal
@@ -154,7 +144,6 @@ services:
   # gateways and refuses private addresses. Never on the gateway network.
   metadata:
     image: ${IMAGE_REGISTRY:-ghcr.io/intersectmbo}/govtool-metadata-service:${GOVTOOL_TAG:-dev}
-    entrypoint: *secrets-env
     # The image's own command: migrate, then serve.
     command: ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node /api/index.js"]
     environment:
@@ -163,7 +152,7 @@ services:
       IPFS_PRIMARY_GATEWAY: ${IPFS_PRIMARY_GATEWAY:-}
     secrets:
       - source: metadata_database_url
-        target: DATABASE_URL
+        target: database_url
     networks:
       - internal
       - metadata-db

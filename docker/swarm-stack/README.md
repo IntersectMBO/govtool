@@ -103,6 +103,19 @@ merge to develop.
 
 ## Secrets
 
+Only true secrets are Swarm secrets: the db-sync password, the Pinata JWT
+and the metadata `DATABASE_URL`. Hostnames, database names, users and urls
+stay in `environment:`, where they help debugging and expose nothing
+sensitive.
+
+Each app reads a secret from its environment variable first and falls back
+to the file at `<NAME>_FILE`, defaulting to the Swarm mount
+`/run/secrets/<lowercase name>` (e.g. `GOVTOOL_DBSYNC_PASSWORD` from
+`/run/secrets/govtool_dbsync_password`). The stack mounts each secret at
+that default path, so no `*_FILE` variable is needed and no secret value
+appears in the service definition: `docker service inspect` shows only
+non-sensitive config.
+
 Swarm secrets are immutable, so `secrets` and `init-metadata-db` never change
 an existing one, and a secret in use cannot be removed. To rotate one, stop
 the stack first (a short outage):
@@ -113,8 +126,3 @@ docker secret rm preview-govtool_dbsync_password
 ./deploy.sh secrets
 ./deploy.sh deploy
 ```
-
-Each secret is mounted under `/run/secrets` named after the variable it sets
-(`GOVTOOL_DBSYNC_PASSWORD`, `GOVTOOL_PINATA_API_JWT`, `DATABASE_URL`); the
-stack's entrypoint exports them before starting the image's own command, so
-none appear in the service definition.

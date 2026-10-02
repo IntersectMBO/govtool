@@ -9,9 +9,9 @@ publishes to GHCR. It runs three services:
 | `backend`  | `ghcr.io/intersectmbo/govtool-backend`          | `https://${BASE_DOMAIN}/api/`, `/swagger-ui` |
 | `metadata` | `ghcr.io/intersectmbo/govtool-metadata-service` | internal only, from the backend  |
 
-The backend also serves the outcomes API (`/api/outcomes`) and metadata
-validation (`/api/metadata`), so the separate metadata-validation and outcomes
-services are no longer needed.
+The backend also serves governance action records (`/api/governance-actions`)
+and metadata validation (`/api/metadata`), so the separate metadata-validation
+and outcomes services are no longer needed.
 
 Deployment is done with
 [docker-stack](https://github.com/mesudip/docker-stack)
@@ -119,7 +119,8 @@ drop the services this file no longer defines:
 docker-stack deploy --prune "$STACK_NAME" docker-stack.yml
 ```
 
-Then check the frontend's outcomes pages and remove the old outcomes stack:
+Then check the frontend's governance action history pages and remove the old
+outcomes stack:
 
 ```bash
 docker stack rm preview-outcome

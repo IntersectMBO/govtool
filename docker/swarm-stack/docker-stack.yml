@@ -8,7 +8,7 @@
 #
 #   https://${BASE_DOMAIN}/            frontend
 #   https://${BASE_DOMAIN}/api/        backend (prefix stripped), including
-#                                      /api/outcomes and /api/metadata
+#                                      /api/governance-actions and /api/metadata
 #   https://${BASE_DOMAIN}/swagger-ui  backend API docs
 #   metadata                           internal only, reached by the backend
 #
@@ -125,10 +125,8 @@ services:
       VITE_NETWORK_FLAG: ${NETWORK_FLAG:-0}
       VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND:-}
       VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${PROPOSAL_DISCUSSION_FORUM_ENABLED:-true}
-      VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: ${GOVERNANCE_OUTCOMES_PILLAR_ENABLED:-true}
       VITE_IS_CIP179_ENABLED: ${CIP179_ENABLED:-true}
       VITE_PDF_API_URL: ${PDF_API_URL:-}
-      VITE_OUTCOMES_API_URL: https://${BASE_DOMAIN}/api/outcomes
       VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-}
       VITE_IPFS_PROJECT_ID: ${IPFS_PROJECT_ID:-}
       VITE_CHATWOOT_URL: ${CHATWOOT_URL:-}

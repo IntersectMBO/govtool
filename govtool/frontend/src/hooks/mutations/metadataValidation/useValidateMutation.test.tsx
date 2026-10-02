@@ -38,6 +38,7 @@ describe("useValidateMutation", () => {
     await expect(hook.result.current.validateMetadata(body)).resolves.toEqual({
       valid: false,
       status: MetadataValidationStatus.INTERNAL_ERROR,
+      error: "timeout of 30000ms",
     });
   });
 

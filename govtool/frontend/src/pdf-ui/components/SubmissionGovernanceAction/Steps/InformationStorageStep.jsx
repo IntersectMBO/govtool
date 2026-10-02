@@ -143,6 +143,7 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                 url: url,
                 hash: hashData,
                 standard: 'CIP108',
+                verifyUrl: true,
             }).catch((error) => {
                 console.error(error);
                 return { valid: false, status: 'INTERNAL_ERROR' };

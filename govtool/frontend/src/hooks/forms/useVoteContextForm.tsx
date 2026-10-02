@@ -69,6 +69,7 @@ export const useVoteContextForm = (
         const result = await validateMetadata({
           hash,
           url: data.storingURL,
+          verifyUrl: true,
         });
 
         if (result.status) {

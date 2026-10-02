@@ -27,6 +27,14 @@ import { fetchMetadataText, MetadataFetchError } from './safe-metadata-fetch';
 const CIP108_TITLE_MAX_LENGTH = 80;
 const CIP108_ABSTRACT_MAX_LENGTH = 2500;
 
+/**
+ * How long validation waits for the metadata service before falling back to
+ * the local fetch, which is capped at 10 s. Together they stay under the
+ * frontend's 30 s request timeout; the service keeps fetching after this and
+ * caches the result for the next read (D152).
+ */
+const SERVICE_BUDGET_MS = 15_000;
+
 @Injectable()
 export class MetadataService {
   private readonly logger = new Logger(MetadataService.name);
@@ -62,8 +70,9 @@ export class MetadataService {
    * Resolve through the metadata service when one is configured: it caches by
    * hash, fails over across IPFS gateways and guards against private
    * addresses, none of which the local fetch does. Returns `undefined` when
-   * there is no service or it cannot be reached, so the caller falls back to
-   * the local fetch rather than reporting a working document as missing.
+   * there is no service, it cannot be reached or it does not answer within
+   * `SERVICE_BUDGET_MS`, so the caller falls back to the local fetch rather
+   * than reporting a working document as missing.
    */
   private async resolveThroughService(
     hash: string,
@@ -74,11 +83,21 @@ export class MetadataService {
     | undefined
   > {
     if (!this.metadataService) return undefined;
+    let timer: NodeJS.Timeout | undefined;
     try {
-      const result = await this.metadataService.getMetadata(
-        hash.toLowerCase(),
-        url,
-      );
+      const timeout = new Promise<undefined>((resolve) => {
+        timer = setTimeout(() => resolve(undefined), SERVICE_BUDGET_MS);
+      });
+      const result = await Promise.race([
+        this.metadataService.getMetadata(hash.toLowerCase(), url),
+        timeout,
+      ]);
+      if (!result) {
+        this.logger.warn(
+          `metadata service gave no answer within ${SERVICE_BUDGET_MS} ms, falling back to a local fetch`,
+        );
+        return undefined;
+      }
       if (result.ok) {
         return {
           ok: true,
@@ -95,15 +114,21 @@ export class MetadataService {
         `metadata service unavailable, falling back to a local fetch: ${error instanceof Error ? error.message : String(error)}`,
       );
       return undefined;
+    } finally {
+      clearTimeout(timer);
     }
   }
 
   /**
+   * `verifyUrl` skips the metadata service: its content is keyed by hash and
+   * ignores the url once known (D112), so it cannot prove that `url` serves
+   * the document. Submission sets it; reads take the cache.
+   *
    * `options.includeAuthors` adds the document's CIP-100 `authors` to
    * `metadata`, as the outcomes UI reads them; the legacy route omits them.
    */
   async validateMetadata(
-    { hash, url, standard: paramStandard }: ValidateMetadataDto,
+    { hash, url, standard: paramStandard, verifyUrl }: ValidateMetadataDto,
     options: { includeAuthors?: boolean } = {},
   ): Promise<ValidateMetadataResult> {
     let status: MetadataValidationStatus | undefined;
@@ -112,7 +137,9 @@ export class MetadataService {
     let standard = paramStandard;
 
     try {
-      const viaService = await this.resolveThroughService(hash, url);
+      const viaService = verifyUrl
+        ? undefined
+        : await this.resolveThroughService(hash, url);
       if (viaService && !viaService.ok) throw viaService.status;
 
       // The service has already verified the hash over the exact bytes; the

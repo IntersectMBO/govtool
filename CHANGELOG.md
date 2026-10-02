@@ -23,6 +23,8 @@ changes.
 - A DRep's own vote is returned on a proposal, and voted-on actions are left out of its proposal list
 - Blank CIP-108 titles and abstracts are rejected
 - A format failure in a submission form no longer says the data does not match the original file
+- Submission forms check that the entered URL serves the document, instead of accepting a cached copy of its hash
+- Metadata validation answers within the frontend's timeout when the metadata service is slow, and a failed check no longer leaves a card loading
 
 ### Changed
 

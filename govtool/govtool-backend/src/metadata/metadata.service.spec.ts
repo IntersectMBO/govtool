@@ -207,6 +207,68 @@ describe('validation through the metadata service', () => {
     await service.validateMetadata(input);
     expect(fetchMetadataText).toHaveBeenCalled();
   });
+
+  it('with verifyUrl fetches the url itself and never asks the cache', async () => {
+    const raw = JSON.stringify(doc);
+    jest.mocked(fetchMetadataText).mockResolvedValueOnce(raw);
+    const getMetadata = jest.fn<
+      ReturnType<MetadataServiceV1['getMetadata']>,
+      Parameters<MetadataServiceV1['getMetadata']>
+    >();
+    const service = new MetadataService(config, stub(getMetadata));
+    await expect(
+      service.validateMetadata({
+        ...input,
+        hash: blake.blake2bHex(raw, undefined, 32),
+        verifyUrl: true,
+      }),
+    ).resolves.toMatchObject({ valid: true });
+    expect(getMetadata).not.toHaveBeenCalled();
+    expect(fetchMetadataText).toHaveBeenCalledWith(
+      input.url,
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('with verifyUrl rejects a url that does not serve the document, even when the hash is cached', async () => {
+    jest
+      .mocked(fetchMetadataText)
+      .mockRejectedValueOnce(
+        new MetadataFetchError(MetadataValidationStatus.URL_NOT_FOUND),
+      );
+    const service = new MetadataService(
+      config,
+      stub(() =>
+        Promise.resolve({
+          ok: true,
+          hash: 'ab'.repeat(32),
+          body: doc,
+          fetchedAt: '2026-09-24T00:00:00Z',
+        }),
+      ),
+    );
+    await expect(
+      service.validateMetadata({ ...input, verifyUrl: true }),
+    ).resolves.toMatchObject({ status: 'URL_NOT_FOUND', valid: false });
+  });
+
+  it('falls back to the local fetch when the service exceeds its budget', async () => {
+    jest.useFakeTimers();
+    try {
+      jest.mocked(fetchMetadataText).mockResolvedValueOnce(JSON.stringify(doc));
+      const service = new MetadataService(
+        config,
+        stub(() => new Promise(() => {})),
+      );
+      const pending = service.validateMetadata(input);
+      await jest.advanceTimersByTimeAsync(15_000);
+      await pending;
+      expect(fetchMetadataText).toHaveBeenCalled();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });
 
 describe('CIP-108 title and abstract validation', () => {

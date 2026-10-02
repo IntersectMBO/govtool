@@ -387,7 +387,8 @@ is replaced by the shared 2 MB constant (D120).
 
 **`govtool/metadata-validation` is deleted** (done 2026-10-01; the backend's
 `POST /metadata/validate` answers in its place, with an `issues` list naming
-the fields at fault). Its route is to be served by `?cip=` on the merged
+the fields at fault, and `verifyUrl: true` for submission, which fetches the
+url rather than trusting the hash cache, D152). Its route is to be served by `?cip=` on the merged
 service, and
 `/api/v1/metadata/validations` in the REST v1 spec becomes a thin proxy or is
 dropped in favour of the GET.

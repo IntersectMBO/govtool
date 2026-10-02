@@ -195,6 +195,7 @@ export const useRegisterAsdRepForm = (
         const { status } = await validateMetadata({
           url: data.storingURL,
           hash,
+          verifyUrl: true,
         });
 
         if (status) {

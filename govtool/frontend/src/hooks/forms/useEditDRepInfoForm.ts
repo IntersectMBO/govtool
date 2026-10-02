@@ -146,6 +146,7 @@ export const useEditDRepInfoForm = (
         const { status } = await validateMetadata({
           url,
           hash,
+          verifyUrl: true,
         });
 
         if (status) {

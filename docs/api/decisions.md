@@ -5358,3 +5358,26 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
 - The image differs from the Haskell one in one way a deployment sees: the db-sync connection and network
   come only from environment variables, never from the config file.
 - The outcomes API is served by this backend, so no deployment runs the separate outcomes service.
+
+## D152 — Submission checks the url; reads take the hash cache
+
+**Date:** 2026-10-02
+**Amends:** D112 (the url is a hint) for `POST /metadata/validate` at submission time.
+
+- D112 is right for reads: content under a hash is authoritative, whatever url asked for it. At
+  submission the url itself goes on chain, so a cached hash says nothing about whether the url serves
+  it. Through the service, a url that serves nothing passed as `valid: true` once the hash was known.
+  The removed metadata-validation service always fetched the url, so this only surfaced once the
+  frontend validated through the backend.
+- `POST /metadata/validate` takes an optional `verifyUrl: true`. With it the backend skips the metadata
+  service and fetches the url itself, under the same guards as before (no private addresses, no
+  redirects, size cap, 10 s), and checks the hash over the bytes it got. Nothing is forwarded to the
+  service, so D119 is unaffected.
+- The frontend sets it on every submission: DRep registration and edit, vote rationale, governance
+  action creation, and the proposal discussion's submission step. Cards and details pages leave it
+  unset and keep the cache.
+- Validation waits at most 15 s for the metadata service, then falls back to the local fetch (10 s), so
+  the whole request answers inside the frontend's 30 s timeout. The service is not cancelled; it
+  finishes and caches for the next read.
+- A request that fails outright reaches the frontend as `INTERNAL_ERROR` rather than a rejection, so
+  no card is left validating forever.

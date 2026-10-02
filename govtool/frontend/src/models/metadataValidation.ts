@@ -38,6 +38,11 @@ export type MetadataValidationDTO = {
   url: string;
   hash: string;
   standard?: MetadataStandard;
+  /**
+   * Fetch the url now instead of trusting the backend's hash cache. Set it
+   * when submitting, where the url itself goes on chain.
+   */
+  verifyUrl?: boolean;
 };
 
 export type DRepMetadata = {

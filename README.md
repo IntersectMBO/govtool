@@ -38,7 +38,7 @@ Learn more; [docs.gov.tools](https://docs.gov.tools/cardano-govtool/using-govtoo
 
 - [Backend](./govtool/govtool-backend/README.md)
 - [Frontend](./govtool/frontend/README.md)
-- [In repo documentation](./docs/)
+- [Documentation (docs.gov.tools source)](./docs/)
 - [Tests](./tests/)
 
 ### Utilities

@@ -200,10 +200,7 @@ const MenuNavItem: FC<{
   closeDrawer: () => void;
 }> = ({ closeDrawer, navItem }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
 
   // Create a ref array for child links to manage cliking within MenuItem but outside of Link
   const linkRefs = useRef<Array<HTMLElement | null>>([]);
@@ -222,11 +219,6 @@ const MenuNavItem: FC<{
         if (
           !isProposalDiscussionForumEnabled &&
           item.dataTestId === "proposed-governance-actions-link"
-        )
-          return false;
-        if (
-          !isGovernanceOutcomesPillarEnabled &&
-          item.dataTestId === "governance-actions-outcomes-link"
         )
           return false;
         return true;

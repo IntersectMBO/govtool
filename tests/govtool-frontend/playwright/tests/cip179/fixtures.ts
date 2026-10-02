@@ -133,7 +133,6 @@ export async function setup(
           ? {}
           : { VITE_IS_CIP179_ENABLED: String(enabled) }),
         VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false",
-        VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "false",
       };
       Object.defineProperty(w, "__ENV__", {
         value: fixtureEnv,

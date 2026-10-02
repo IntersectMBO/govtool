@@ -263,6 +263,49 @@ test('SPO figures: bootstrap abstains the silent, NoConfidence counts passive no
   assert.throws(() => spoFigures('InfoAction', { ...pcSummary }, 10), (e) => e.code === 'INTERNAL');
 });
 
+test('current committee approval honours the minimum size, with the bootstrap exception', async () => {
+  const read = async (major, minimum) => {
+    const { chainData, calls } = provider(routes({
+      epoch_params: () => [{ ...paramsRow(EPOCH, major), committee_min_size: minimum }],
+    }));
+    const action = (await chainData.governance.proposals.get(pc.proposal_id)).data;
+    assert.ok(calls.find((c) => c.endpoint === 'epoch_params').url.searchParams.get('select').split(',').includes('committee_min_size'));
+    return action.voteAggregates.find((a) => a.role === 'cc');
+  };
+  const small = await read(10, 3);
+  assert.equal(small.yes, '1');
+  assert.equal(small.abstain, '1');
+  assert.equal(small.totalEligible, '2');
+  assert.equal(small.passing, false, 'a 100% non-abstaining yes ratio cannot override minimum size');
+  assert.equal((await read(10, 2)).passing, undefined);
+  assert.equal((await read(9, 3)).passing, undefined);
+  await assert.rejects(read(10, null), { code: 'STALE_DATA' });
+});
+
+test('committee tallies and minimum size count cold members sharing a hot credential', async () => {
+  const members = [
+    committeeInfo.members[0],
+    { ...committeeInfo.members[0], cc_cold_hex: hash(8) },
+    { ...committeeInfo.members[0], cc_cold_hex: hash(9), cc_hot_hex: hash(18) },
+    ...committeeInfo.members.slice(2),
+  ];
+  for (const choice of ['Yes', 'No', 'Abstain', null]) {
+    const { chainData } = provider(routes({
+      committee_info: [{ ...committeeInfo, members }],
+      epoch_params: () => [{ ...paramsRow(EPOCH, 10), committee_min_size: 3 }],
+      vote_list: choice === null ? [] : [vote('ConstitutionalCommittee', hotId(14), pc, choice, at(EPOCH, 20))],
+    }));
+    const action = (await chainData.governance.proposals.get(pc.proposal_id)).data;
+    const cc = action.voteAggregates.find((a) => a.role === 'cc');
+    assert.equal(cc.totalEligible, '3');
+    assert.equal(cc.yes, choice === 'Yes' ? '2' : '0');
+    assert.equal(cc.no, choice === 'No' ? '2' : '0');
+    assert.equal(cc.abstain, choice === 'Abstain' ? '2' : '0');
+    assert.equal(cc.notVoted, choice === null ? '3' : '1');
+    assert.equal(cc.passing, undefined, 'three eligible cold members meet the minimum');
+  }
+});
+
 test('list maps rows, attaches aggregates, pages with an exact total', async () => {
   const { chainData, calls } = provider(routes());
   const page = await chainData.governance.proposals.list({ page: 1, size: 2 });
@@ -301,6 +344,7 @@ test('a live action gets a cc count aggregate from the eligible committee', asyn
     notVoted: '0',
     totalEligible: '2',
     threshold: { numerator: 3, denominator: 5 },
+    passing: false,
   });
   assert.equal(data.voteAggregates.find((a) => a.role === 'spo'), undefined, 'minPoolCost is not a security parameter');
   assert.deepEqual(data.body.changes, { minPoolCost: '75000000' });
@@ -356,10 +400,10 @@ test('committee-lineage aggregates: NoConfidence yes includes always-no-confiden
   assert.equal(drep.yes, String(534967421824635n + 138316910791856n));
   assert.equal(drep.no, '490675179099982');
   const spo = n.voteAggregates.find((a) => a.role === 'spo');
-  assert.deepEqual([spo.yes, spo.no, spo.abstain, spo.notVoted, spo.totalEligible], ['320', '100', '90', '490', '1000']);
+  assert.equal(spo, undefined, 'historical protocol-10 defaults require historical pool registration data');
   const u = (await chainData.governance.proposals.get(uc2.proposal_id)).data;
   const t = Object.fromEntries(u.voteAggregates.map((a) => [a.role, a.threshold]));
-  assert.deepEqual(t, { drep: { numerator: 3, denominator: 5 }, spo: { numerator: 51, denominator: 100 } });
+  assert.deepEqual(t, { drep: { numerator: 3, denominator: 5 } });
   const before = (await chainData.governance.proposals.get(uc1.proposal_id)).data;
   // uc1 tallied at 580, before bootstrap ended (protocol 9): DRep threshold 0.
   assert.deepEqual(before.voteAggregates.find((a) => a.role === 'drep').threshold, { numerator: 0, denominator: 1 });

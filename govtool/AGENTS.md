@@ -39,7 +39,7 @@ govtool-metadata-http: the metadata contract as a client of
 govtool-metadata-service, which is private to the backend.
 govtool-backend: the backend (D151), on the contract; the legacy routes and bodies
 plus /system/capabilities, /system/features, four metadata routes and the
-outcomes UI's routes under /outcomes (D143). The outcomes UI itself is frontend
+governance action records under /governance-actions (D162). The action history view is frontend
 source, on GovTool's components (D149).
 govtool-pdf-backend: the proposal discussion forum (pdf) backend, NestJS +
 Prisma + its own Postgres, wire-compatible with the Strapi v4 surface the

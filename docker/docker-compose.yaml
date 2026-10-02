@@ -81,7 +81,6 @@ services:
             UMAMI_SSL_VERIFY: ${UMAMI_SSL_VERIFY:-true}
             TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-}
             REAL_IP_HEADER: ${REAL_IP_HEADER:-X-Forwarded-For}
-            VITE_OUTCOMES_API_URL: ${VITE_OUTCOMES_API_URL:-http://localhost:9999/outcomes}
         ports:
             - "80:80"
         depends_on:

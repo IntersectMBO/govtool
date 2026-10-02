@@ -1,4 +1,4 @@
 export * from "./API";
-export * from "./OutcomesAPI";
+export * from "./GovernanceActionsAPI";
 
 export * from "./requests";

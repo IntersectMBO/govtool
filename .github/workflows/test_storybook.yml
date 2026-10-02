@@ -21,8 +21,6 @@ jobs:
           node-version-file: "govtool/frontend/.nvmrc"
       - name: Install dependencies
         run: |
-          npm config set @intersect.mbo:registry "https://registry.npmjs.org/" --location=global
-          npm config set //registry.npmjs.org/:_authToken ${NPMRC_TOKEN} --location=global  
           npm ci
       - name: Install Playwright
         run: npx playwright install --with-deps
@@ -36,4 +34,3 @@ jobs:
 
     env:
       NODE_OPTIONS: --max_old_space_size=4096
-      NPMRC_TOKEN: ${{ secrets.NPMRC_TOKEN }}

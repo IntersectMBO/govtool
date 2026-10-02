@@ -205,19 +205,29 @@ npm run test:headless:voting-pillar
 
 ---
 
-#### 3. **Outcomes**
+#### 3. **Governance action history**
 
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:outcomes
+npm run test:governance-action-history
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:outcomes
+npm run test:headless:governance-action-history
 ```
+
+For offline desktop/mobile aggregate replays, run:
+
+```bash
+npm run test:governance-action-aggregates
+```
+
+This starts a local Vite server and mocks HTTP; it needs no backend or wallet.
+The deployment suite excludes these fixtures. To replay a captured provider
+comparison, set `GOVTOOL_AGGREGATES_REPORT=/path/to/report.json` for the same command.
 
 ---
 

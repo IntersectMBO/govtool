@@ -11,7 +11,7 @@ CI: `.github/workflows/test_integration_devnet.yml` (push to `dev` and
   anchor file server on the Docker network `adaup-devnet`.
 - App (`docker-compose.yml`, all ports on loopback): govtool-backend on the
   db-sync provider (`GOVTOOL_DBSYNC_NETWORK=devnet`, genesis from adaup's
-  config volume; serves `/outcomes` too), the metadata service and its
+  config volume; serves `/governance-actions` too), the metadata service and its
   Postgres, the metadata bucket (`tests/test-metadata-api`: anchor uploads,
   IPFS pinning via `GOVTOOL_PINNING_PROVIDER=test`, and the `/ipfs/<cid>`
   gateway for the backend, metadata service, db-sync and browser), the pdf
@@ -46,7 +46,7 @@ starts existing images without rebuilding. Step timings go to
 
 `seed.sh`: fixture anchors into the bucket; `cardano devnet smoke` twice
 (round 1 ratifies `DEVNET_SEED_RATIFY` plus extra treasury withdrawals and
-waits for enactment, for outcomes data; round 2 ratifies nothing, so one proposal of every type stays live);
+waits for enactment, for action history data; round 2 ratifies nothing, so one proposal of every type stays live);
 `scripts/seed-pytest-wallets.sh` registers the backend suite's fixed DReps
 and ADA holders from `tests/govtool-backend/test_data.json`; then waits for
 the backend to list every type and for DRep voting power (next epoch).
@@ -69,7 +69,7 @@ read first, so derived URLs follow it). Useful knobs:
   of Docker memory); `../../tests/devnet/frontend/prebuilt.Dockerfile`
   serves a host build (`cd govtool/frontend && npm ci && npm run build`).
 - `DEVNET_SEED_ACTIONS` / `DEVNET_SEED_RATIFY`, `DEVNET_SEED_EXTRA_TREASURY`
-  (10 more enacted withdrawals: outcomes need a second page), `FAUCET_FUND_ADA`,
+  (10 more enacted withdrawals: action history needs a second page), `FAUCET_FUND_ADA`,
   `DEVNET_TEST_WORKERS` (4), `DEVNET_TX_TIMEOUT` (120000 ms).
 - Playwright selection: `DEVNET_PLAYWRIGHT_PROJECTS`,
   `DEVNET_PLAYWRIGHT_FILES`, `DEVNET_PLAYWRIGHT_GREP_INVERT`,

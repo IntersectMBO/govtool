@@ -104,9 +104,9 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   }, []);
 
   // GovTool forces `Activity` on mount and keeps it across navigation, so it is
-  // the selection most likely to be gated away. When the provider can order the
-  // directory by nothing at all (the real Koios case), clear the selection
-  // rather than sending a key the list cannot honour.
+  // the selection most likely to be gated away: Koios directory rows omit
+  // activity. Pick an allowed fallback, or clear the selection if no ordering
+  // is available, rather than sending a key the backend cannot honour.
   useEffect(() => {
     if (!dRepDirectorySort.isAvailable) {
       if (chosenSorting) setChosenSorting("");

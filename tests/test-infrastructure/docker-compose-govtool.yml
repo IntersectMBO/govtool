@@ -41,16 +41,13 @@ services:
       args:
         VITE_BASE_URL: "/api"
         VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND}
-        NPMRC_TOKEN: ${NPMRC_TOKEN}
         VITE_APP_ENV: ${APP_ENV:-test}
         VITE_USERSNAP_SPACE_API_KEY: ${USERSNAP_SPACE_API_KEY}
         VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "true"
         VITE_METADATA_API_URL: https://${BASE_DOMAIN}/metadata-validation
         VITE_PDF_API_URL: ${PDF_API_URL}
-        VITE_OUTCOMES_API_URL: ${OUTCOMES_API_URL}
         VITE_IPFS_GATEWAY: ${IPFS_GATEWAY}
         VITE_IPFS_PROJECT_ID: ${IPFS_PROJECT_ID}
-        VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "true"
     environment:
       VIRTUAL_HOST: https://${BASE_DOMAIN}
     networks:
@@ -81,8 +78,6 @@ services:
     build:
       context: ../../govtool/frontend
       dockerfile: storybook.Dockerfile
-      args:
-        NPMRC_TOKEN: ${NPMRC_TOKEN}
     environment:
       VIRTUAL_HOST: https://storybook-${BASE_DOMAIN}
     networks:

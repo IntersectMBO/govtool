@@ -5,7 +5,7 @@ import { Modal, ScrollToTop } from "@atoms";
 import {
   PATHS,
   PDF_PATHS,
-  OUTCOMES_PATHS,
+  GOV_ACTION_HISTORY_PATHS,
   USER_PATHS,
   BUDGET_DISCUSSION_PATHS,
 } from "@consts";
@@ -46,13 +46,10 @@ import {
 import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
 import { DashboardHome } from "./pages/DashboardHome";
-import { GovernanceActionOutComesPillar } from "./pages/GovernanceActionOutComes";
+import { GovernanceActionHistoryPage } from "./pages/GovernanceActionHistory";
 
 export default () => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { enable, isEnabled } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
@@ -100,7 +97,9 @@ export default () => {
     };
 
     const isOnAllowedPage = [PATHS.home, PATHS.governanceActions, PATHS.governanceActionsAction]
-        .includes(window.location.pathname);
+        .includes(window.location.pathname) ||
+      pathname === GOV_ACTION_HISTORY_PATHS.governanceActionHistory ||
+      pathname.startsWith(`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/`);
 
     const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
 
@@ -143,15 +142,15 @@ export default () => {
             />
           </>
         )}
-        {isGovernanceOutcomesPillarEnabled && !isEnabled && (
+        {!isEnabled && (
           <>
             <Route
-              path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
-              element={<GovernanceActionOutComesPillar />}
+              path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
+              element={<GovernanceActionHistoryPage />}
             />
             <Route
               path={USER_PATHS.governanceActionsVotedByMe}
-              element={<GovernanceActionOutComesPillar />}
+              element={<GovernanceActionHistoryPage />}
             />
           </>
         )}
@@ -169,18 +168,14 @@ export default () => {
               />
             </>
           )}
-          {isGovernanceOutcomesPillarEnabled && (
-            <>
-              <Route
-                path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
-                element={<GovernanceActionOutComesPillar />}
-              />
-              <Route
-                path={USER_PATHS.governanceActionsVotedByMe}
-                element={<GovernanceActionOutComesPillar />}
-              />
-            </>
-          )}
+          <Route
+            path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
+            element={<GovernanceActionHistoryPage />}
+          />
+          <Route
+            path={USER_PATHS.governanceActionsVotedByMe}
+            element={<GovernanceActionHistoryPage />}
+          />
           <Route
             path={PATHS.dashboardGovernanceActions}
             element={<DashboardGovernanceActions />}

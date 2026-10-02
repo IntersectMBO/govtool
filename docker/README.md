@@ -57,5 +57,5 @@ docker compose up -d --no-build
 
 ## Service endpoints
 - Frontend: http://localhost
-- Backend API: http://localhost:9999, including the outcomes API under `/outcomes` and metadata validation under `/metadata`
+- Backend API: http://localhost:9999, including governance action records under `/governance-actions` and metadata validation under `/metadata`
 - Metadata service and its Postgres (`metadata`, `metadata-db`): internal only, reached by the backend. Set `METADATA_DB_PASSWORD` in `docker/.env` first.

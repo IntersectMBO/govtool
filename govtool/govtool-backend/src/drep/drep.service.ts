@@ -316,7 +316,15 @@ export class DRepService {
     // whole directory against the names the warmer has resolved.
     const isName =
       search !== '' && tryLegacyDRepCandidates(search) === undefined;
-    let dreps = [...(await this.getDRepListSnapShot(isName ? '' : search))];
+    const snapshot = await this.getDRepListSnapShot(isName ? '' : search);
+    const activityVotes = new Map(
+      snapshot.flatMap((drep) =>
+        drep.activity === undefined
+          ? []
+          : [[drepIdToHex(drep.id), drep.activity.voted] as const],
+      ),
+    );
+    let dreps = snapshot.map((drep) => this.toLegacyListItem(drep));
     if (isName) {
       dreps = this.filterByName(dreps, search);
     }
@@ -326,7 +334,9 @@ export class DRepService {
     }
 
     dreps = this.filterDRepsBySearchRule(dreps, search);
-    dreps = this.sortDReps(dreps, sort, seed);
+    dreps = await asHttp(() =>
+      this.sortDReps(dreps, sort, seed, activityVotes),
+    );
 
     const total = dreps.length;
     const offset = page * pageSize;
@@ -456,7 +466,9 @@ export class DRepService {
     if (metadata === null || this.warmingNames) return;
     this.warmingNames = true;
     try {
-      const dreps = await this.getDRepListSnapShot('');
+      const dreps = (await this.getDRepListSnapShot('')).map((drep) =>
+        this.toLegacyListItem(drep),
+      );
       await mapLimit(
         dreps,
         ENRICH_CONCURRENCY,
@@ -522,7 +534,7 @@ export class DRepService {
     }
   }
 
-  private getDRepListSnapShot(search: string): Promise<DRepListItem[]> {
+  private getDRepListSnapShot(search: string): Promise<DRep[]> {
     return this.cacheService.getOrSetStaleWhileRevalidate(
       this.drepListSnapshotNamespace,
       search,
@@ -541,7 +553,7 @@ export class DRepService {
    * rather than reshuffling, so asking for the default would cap the snapshot
    * at one page.
    */
-  private async fetchDRepListSnapshot(search: string): Promise<DRepListItem[]> {
+  private async fetchDRepListSnapshot(search: string): Promise<DRep[]> {
     return asHttp(async () => {
       const sort = await this.snapshotSort();
       const read = (term: string) =>
@@ -578,7 +590,7 @@ export class DRepService {
           .filter((drep) => decodeCip129DRepId(drep.id) !== undefined)
           .map((drep) => [drep.id, drep]),
       );
-      return [...unique.values()].map((drep) => this.toLegacyListItem(drep));
+      return [...unique.values()];
     });
   }
 
@@ -631,9 +643,6 @@ export class DRepService {
       qualifications: null,
       imageUrl: null,
       imageHash: null,
-      // Participation is "voted out of votable since registration" now, not a
-      // trailing year — the legacy field name outlived the window.
-      votesLastYear: drep.activity?.voted ?? null,
       // `list-dreps.sql` COALESCEs both reference arrays to `[]`, so the
       // legacy field is an array even for a DRep with no metadata anchor.
       // Never `null`.
@@ -735,11 +744,12 @@ export class DRepService {
     });
   }
 
-  private sortDReps(
+  private async sortDReps(
     dreps: DRepListItem[],
     sort?: DRepListSort,
     seed?: string,
-  ): DRepListItem[] {
+    activityVotes: ReadonlyMap<string, number> = new Map(),
+  ): Promise<DRepListItem[]> {
     const copied = [...dreps];
 
     switch (sort) {
@@ -751,10 +761,26 @@ export class DRepService {
           compareIntegers(b.votingPower ?? -1, a.votingPower ?? -1),
         );
 
-      case 'Activity':
-        return copied.sort(
-          (a, b) => (b.votesLastYear ?? -1) - (a.votesLastYear ?? -1),
-        );
+      case 'Activity': {
+        const { data } = await this.chain.system.getCapabilities();
+        if (!data.sorts.dreps.includes('activity')) {
+          throw new ChainDataError(
+            'CAPABILITY_UNSUPPORTED',
+            'The configured chain-data provider does not support directory activity sorting',
+          );
+        }
+        const ranked = copied.map((item) => {
+          const count = activityVotes.get(item.drepId);
+          if (count === undefined) {
+            throw new ChainDataError(
+              'CAPABILITY_UNSUPPORTED',
+              'The configured chain-data provider does not supply directory activity for every DRep',
+            );
+          }
+          return { item, count };
+        });
+        return ranked.sort((a, b) => b.count - a.count).map(({ item }) => item);
+      }
 
       case 'RegistrationDate':
         return copied.sort(

@@ -155,7 +155,7 @@ export class MetadataService {
    * way, so the author can see why (D152).
    *
    * `options.includeAuthors` adds the document's CIP-100 `authors` to
-   * `metadata`, as the outcomes UI reads them; the legacy route omits them.
+   * `metadata`, as the governance action UI reads them; the legacy route omits them.
    * `options.clientKey` is who asked, for the verify rate limit.
    */
   async validateMetadata(

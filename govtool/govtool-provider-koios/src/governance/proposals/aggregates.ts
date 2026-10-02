@@ -26,6 +26,9 @@
  *     bootstrap (< 10)    a pool that did not vote abstains; notVoted = 0
  *     otherwise           passive always-no-confidence is Yes on NoConfidence
  *                         and No elsewhere; passive always-abstain abstains
+ *   Historical protocol-10 default votes are omitted: Koios resolves reward
+ *   accounts through the current pool-info cache, which cannot reproduce pool
+ *   registration history. Hard forks and bootstrap do not use that default.
  *
  * CC. `/proposal_voting_summary` counts committee votes but never the number
  *   of members eligible AS OF the tally epoch, and Koios has no history of
@@ -40,7 +43,7 @@ import type { Ratio, VoteAggregate, VoterRole } from '@govtool/data-providers/ch
 import type { Ctx } from '../../context';
 import { internal, staleData } from '../../errors';
 import { inList } from '../../http';
-import { encodeCommitteeHotId } from '../../ids';
+import { encodeCommitteeColdId, encodeCommitteeHotId } from '../../ids';
 import { toLovelace } from '../../numbers';
 import { maxRatio, requireRatio } from '../../ratio';
 import type { CommitteeInfoRow, EpochParamsRow, ProposalRow, VotingSummaryRow } from '../../rows';
@@ -175,17 +178,20 @@ function aggregate(role: VoterRole, figures: Figures, threshold: Ratio): VoteAgg
   };
 }
 
-/** The committee's eligible members now, keyed by hot credential, and its quorum. */
-export function eligibleCommittee(info: CommitteeInfoRow | undefined, epoch: number): { hot: Set<string>; quorum: Ratio } | undefined {
+/** Eligible cold members and their authorised hot credentials, plus the quorum. */
+export function eligibleCommittee(info: CommitteeInfoRow | undefined, epoch: number): { hotByCold: Map<string, string>; quorum: Ratio } | undefined {
   if (!info || !info.members || info.quorum_numerator === null || info.quorum_denominator === null) return undefined;
-  const hot = new Set<string>();
+  const hotByCold = new Map<string, string>();
   for (const m of info.members) {
     if (m.status !== 'authorized' || !m.cc_hot_hex || m.cc_hot_has_script === null) continue;
     if (m.expiration_epoch === null || m.expiration_epoch < epoch) continue;
-    hot.add(encodeCommitteeHotId(m.cc_hot_hex.toLowerCase(), m.cc_hot_has_script));
+    hotByCold.set(
+      encodeCommitteeColdId(m.cc_cold_hex.toLowerCase(), m.cc_cold_has_script),
+      encodeCommitteeHotId(m.cc_hot_hex.toLowerCase(), m.cc_hot_has_script),
+    );
   }
   return {
-    hot,
+    hotByCold,
     quorum: requireRatio({ numerator: info.quorum_numerator, denominator: info.quorum_denominator }, 'committee quorum'),
   };
 }
@@ -216,7 +222,7 @@ export async function loadAggregates(ctx: Ctx, targets: readonly TallyTarget[], 
       { epoch_no: inList(epochs.map(String)) },
       {
         select:
-          'epoch_no,protocol_major,dvt_motion_no_confidence,dvt_committee_normal,dvt_committee_no_confidence,' +
+          'epoch_no,protocol_major,committee_min_size,dvt_motion_no_confidence,dvt_committee_normal,dvt_committee_no_confidence,' +
           'dvt_update_to_constitution,dvt_hard_fork_initiation,dvt_p_p_network_group,dvt_p_p_economic_group,' +
           'dvt_p_p_technical_group,dvt_p_p_gov_group,dvt_treasury_withdrawal,pvt_motion_no_confidence,' +
           'pvt_committee_normal,pvt_committee_no_confidence,pvt_hard_fork_initiation,pvtpp_security_group',
@@ -253,14 +259,27 @@ export async function loadAggregates(ctx: Ctx, targets: readonly TallyTarget[], 
     });
     const list: VoteAggregate[] = [];
     if (t.drep) list.push(aggregate('drep', drepFigures(target.row.proposal_type, s), t.drep));
-    if (t.spo) list.push(aggregate('spo', spoFigures(target.row.proposal_type, s, p.protocol_major ?? 0), t.spo));
+    const reliableSpoDefaults = isLive || target.row.proposal_type === 'HardForkInitiation' || (p.protocol_major ?? 0) < 10;
+    if (t.spo && reliableSpoDefaults) list.push(aggregate('spo', spoFigures(target.row.proposal_type, s, p.protocol_major ?? 0), t.spo));
     if (t.cc && cc) {
-      const votes = ccVotes.filter((v) => v.proposal_id === target.row.proposal_id && cc.hot.has(v.voter_id));
-      const count = (choice: string) => BigInt(votes.filter((v) => v.vote === choice).length);
+      const votes = new Map(ccVotes.filter((v) => v.proposal_id === target.row.proposal_id).map((v) => [v.voter_id, v.vote]));
+      // The ledger walks cold members. One hot credential's vote can apply
+      // to several seats, so neither tallies nor minimum size deduplicate it.
+      const hotKeys = [...cc.hotByCold.values()];
+      const count = (choice: string) => BigInt(hotKeys.filter((hot) => votes.get(hot) === choice).length);
       const yes = count('Yes');
       const no = count('No');
       const abstain = count('Abstain');
-      list.push(aggregate('cc', { yes, no, abstain, notVoted: BigInt(cc.hot.size) - yes - no - abstain }, t.cc));
+      const result = aggregate('cc', { yes, no, abstain, notVoted: BigInt(cc.hotByCold.size) - yes - no - abstain }, t.cc);
+      if (target.row.proposal_type !== 'InfoAction' && (p.protocol_major ?? 0) >= 10) {
+        const minSize = p.committee_min_size;
+        if (minSize == null) throw staleData('Koios has no committee minimum size for the tally epoch yet', { epoch: s.epoch_no });
+        if (!Number.isSafeInteger(minSize) || minSize < 0) throw internal('Koios sent an invalid committee minimum size');
+        // The ledger refuses approval from an undersized committee, even
+        // when its voting ratio meets quorum. Bootstrap bypasses this gate.
+        if (cc.hotByCold.size < minSize) result.passing = false;
+      }
+      list.push(result);
     }
     out.set(target.row.proposal_id, list);
   });

@@ -141,11 +141,27 @@ function checkAggregate(label, a) {
   check(`${label} representation`, a.representation === (a.role === 'cc' ? 'count' : 'stake'), a.representation);
 }
 
+/** Contract names of the security-group parameters, the only ones stake pools vote on. */
+const SECURITY_CHANGES = new Set([
+  'maxBlockBodySize', 'maxTxSize', 'maxBlockHeaderSize', 'maxValSize', 'maxBlockExecutionUnits',
+  'minFeeA', 'minFeeB', 'coinsPerUtxoByte', 'govActionDeposit', 'minFeeRefScriptCostPerByte',
+]);
 const SPO_VOTES = (a) =>
-  a.type === 'NoConfidence' || a.type === 'UpdateCommittee' || a.type === 'HardForkInitiation' || a.type === 'InfoAction' || a.type === 'ParameterChange';
+  ['NoConfidence', 'UpdateCommittee', 'HardForkInitiation', 'InfoAction'].includes(a.type) ||
+  (a.type === 'ParameterChange' && Object.keys(a.body.changes ?? {}).some((k) => SECURITY_CHANGES.has(k)));
+/** The epoch whose distribution decided the action: its conclusion, or the current epoch while live. */
+const tallyEpochOf = (a, currentEpoch) =>
+  a.lifecycle.ratifiedAt?.epoch ?? a.lifecycle.expiredAt?.epoch ?? a.lifecycle.droppedAt?.epoch ?? currentEpoch;
+/**
+ * Whether Koios can reproduce the SPO tally (D159): the current epoch's, a hard
+ * fork's (silent pools never default), or a bootstrap one's (silent pools
+ * abstain). Past protocol-10 defaults need pool registration history.
+ */
+const SPO_REPRODUCIBLE = (a, tallyEpoch, currentEpoch, protocolMajor) =>
+  tallyEpoch === currentEpoch || a.type === 'HardForkInitiation' || protocolMajor < 10;
 const CC_VOTES = (a) => !['NoConfidence', 'UpdateCommittee'].includes(a.type);
 
-function checkAction(label, a, currentEpoch) {
+function checkAction(label, a, currentEpoch, protocolMajors) {
   check(`${label} id matches tx hash and index`, isGovActionId(a.id, a.txHash, a.index), a.id);
   check(`${label} body type is the action type`, a.body?.type === a.type, { type: a.type, body: a.body?.type });
   const l = a.lifecycle;
@@ -175,13 +191,21 @@ function checkAction(label, a, currentEpoch) {
   const aggs = a.voteAggregates ?? [];
   const roles = aggs.map((x) => x.role);
   check(`${label} has a drep aggregate`, roles.includes('drep'), roles);
-  if (SPO_VOTES(a) && a.type !== 'ParameterChange') check(`${label} has an spo aggregate`, roles.includes('spo'), roles);
+  const tallyEpoch = tallyEpochOf(a, currentEpoch);
+  const protocolMajor = protocolMajors.get(tallyEpoch);
   if (!SPO_VOTES(a)) check(`${label} has no spo aggregate`, !roles.includes('spo'), roles);
+  else if (protocolMajor !== undefined) {
+    const reproducible = SPO_REPRODUCIBLE(a, tallyEpoch, currentEpoch, protocolMajor);
+    check(
+      `${label} ${reproducible ? 'has an spo aggregate' : 'omits an unreproducible historical spo aggregate'}`,
+      roles.includes('spo') === reproducible,
+      { roles, tallyEpoch, protocolMajor },
+    );
+  }
   const live = l.status === 'live';
   if (live && CC_VOTES(a)) check(`${label} live action has a cc aggregate`, roles.includes('cc'), roles);
   if (!CC_VOTES(a)) check(`${label} no cc aggregate`, !roles.includes('cc'), roles);
   for (const x of aggs) checkAggregate(`${label} ${x.role}`, x);
-  void currentEpoch;
 }
 
 /* -- run --------------------------------------------------------------------- */
@@ -294,7 +318,13 @@ check(
   'newest first',
   all.every((a, i) => i === 0 || Date.parse(all[i - 1].lifecycle.submitted.time) >= Date.parse(a.lifecycle.submitted.time)),
 );
-for (const a of all) checkAction(a.id.slice(0, 22), a, currentEpoch);
+// Protocol version at each tally epoch, which decides how silent pools vote.
+const protocolMajors = new Map();
+for (const epoch of new Set(all.map((a) => tallyEpochOf(a, currentEpoch)))) {
+  const p = await step(`params at tally epoch ${epoch}`, () => c.network.getProtocolParams({ epoch }));
+  if (p) protocolMajors.set(epoch, p.data.protocolVersion.major);
+}
+for (const a of all) checkAction(a.id.slice(0, 22), a, currentEpoch, protocolMajors);
 const byStatus = Object.groupBy ? Object.groupBy(all, (a) => a.lifecycle.status) : {};
 note(`proposals by status: ${Object.entries(byStatus).map(([k, v]) => `${k} ${v.length}`).join(', ')}`);
 const concludedWithoutCc = all.filter((a) => a.lifecycle.status !== 'live' && CC_VOTES(a) && !(a.voteAggregates ?? []).some((x) => x.role === 'cc'));

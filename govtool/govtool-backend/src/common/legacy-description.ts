@@ -35,7 +35,7 @@ const ledgerRef = (action: GovAction) =>
 /**
  * db-sync's `description` column as the Haskell backend reshaped it by type,
  * in the shapes the frontend's detail tabs read on both the `/proposal`
- * (`details`) and outcomes (`description`) routes: withdrawals as an array, the hard fork version, the constitution
+ * (`details`) and governance action (`description`) routes: withdrawals as an array, the hard fork version, the constitution
  * anchor and guardrails script, and the committee change with each added
  * member's current and new term. `{}` where the action proposes nothing
  * the UI renders.

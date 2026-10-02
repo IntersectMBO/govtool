@@ -72,7 +72,6 @@ export type DRepListItem = {
   qualifications: string | null;
   imageUrl: string | null;
   imageHash: string | null;
-  votesLastYear: number | null;
   identityReferences: unknown;
   linkReferences: unknown;
 };

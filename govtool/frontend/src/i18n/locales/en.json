@@ -444,8 +444,8 @@
       "invalidValueType": "Invalid value type"
     }
   },
-  "outcome": {
-    "label": "Outcome",
+  "actionRecord": {
+    "label": "Governance action",
     "abstract": "Abstract",
     "motivation": "Motivation",
     "rationale": "Rationale",
@@ -523,6 +523,12 @@
     },
     "votes": {
       "title": "Votes Submitted for this Governance Action:",
+      "dataUnavailable": "The configured data provider does not support this voting breakdown.",
+      "dataInconsistent": "The data provider returned an inconsistent voting breakdown, so it is not displayed.",
+      "totalEligible": "Total Eligible Voting Power",
+      "eligibleMembers": "Eligible Committee Members",
+      "ratificationDenominator": "Eligible Non-Abstaining Votes",
+      "noEligibleVotes": "There are no eligible non-abstaining votes for this tally.",
       "dReps": "DReps",
       "sPos": "SPOs",
       "cCommitteeFull": "Constitutional Committee",
@@ -546,7 +552,7 @@
       "ratificationThreshold": "Ratification Threshold Stake"
     },
     "ratifiedStatus": {
-      "title": "Outcome",
+      "title": "Voting result",
       "valueRatified": "Ratified",
       "valueNotRatified": "Not Ratified"
     },
@@ -575,8 +581,8 @@
       "proposedOn": "Proposed on:"
     }
   },
-  "outcomesList": {
-    "title": "Outcomes",
+  "governanceActionHistoryList": {
+    "title": "Governance action history",
     "noResults": {
       "title": "No governance actions found",
       "description": "Governance actions are searchable by their ID both CIP-105 (legacy) and CIP-129 formats, title and abstract contents."
@@ -782,9 +788,9 @@
       "title": "Live Voting",
       "label": "Live Voting"
     },
-    "outcomes": {
-      "title": "Outcomes",
-      "label": "Outcomes"
+    "history": {
+      "title": "Governance action history",
+      "label": "Governance action history"
     },
     "votedByMe": {
       "title": "Voted by me",

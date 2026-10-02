@@ -119,6 +119,8 @@ export default defineConfig({
       name: "independent (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testIgnore: [
+        // Replays use the separate local /fixture-api configuration.
+        "**/governance-actions.aggregates.ui.spec.ts",
         "**/cip179/**",
         "**/*.delegation.spec.ts",
         "**/*.wallet.spec.ts",
@@ -134,6 +136,7 @@ export default defineConfig({
       name: "mobile",
       use: { ...devices["Pixel 5"] },
       testIgnore: [
+        "**/governance-actions.aggregates.ui.spec.ts",
         "**/cip179/**",
         "**/*.loggedin.spec.ts",
         "**/*.dRep.spec.ts",

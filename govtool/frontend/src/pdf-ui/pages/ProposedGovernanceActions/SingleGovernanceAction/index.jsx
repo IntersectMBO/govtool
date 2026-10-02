@@ -67,10 +67,9 @@ import UserValidation from '../../../components/UserValidation/UserValidation';
 import { PdfModal } from '../../../components/PdfModal';
 import { PdfTextArea } from '../../../components/PdfFields';
 import { cyan, errorRed, gray } from '@/consts/colors';
-import { OUTCOMES_PATHS } from '@/consts/paths';
-import { useFeatureFlag } from '@/context/featureFlag';
-import { useGetOutcomeGovernanceActionQuery } from '@/hooks/queries/useGetOutcomeGovernanceActionQuery';
-import { getOutcomeVoteEnd } from '@/utils/outcomes';
+import { GOV_ACTION_HISTORY_PATHS } from '@/consts/paths';
+import { useGetGovernanceActionRecordQuery } from '@/hooks/queries/useGetGovernanceActionRecordQuery';
+import { getGovernanceActionVoteEnd } from '@/utils/governanceActions';
 
 // Layout follows GovTool's GovernanceActionDetailsCard: a two-column card
 // (data on the left, actions on the right) with radius 20 and boxShadow2.
@@ -249,19 +248,18 @@ const SingleGovernanceAction = ({ id }) => {
 
     // Once the submitted action is decided, the page reports the vote's end
     // and links to its outcome instead of asking for votes (#3301).
-    const { isGovernanceOutcomesPillarEnabled } = useFeatureFlag();
     const submissionTxHash =
         proposal?.attributes?.content?.attributes?.prop_submission_tx_hash;
     const { governanceAction: submittedAction } =
-        useGetOutcomeGovernanceActionQuery(
-            isGovernanceOutcomesPillarEnabled && submissionTxHash
+        useGetGovernanceActionRecordQuery(
+            submissionTxHash
                 ? `${submissionTxHash}#0`
                 : ''
         );
-    const voteEnd = submittedAction ? getOutcomeVoteEnd(submittedAction) : null;
-    const seeOutcome = () =>
+    const voteEnd = submittedAction ? getGovernanceActionVoteEnd(submittedAction) : null;
+    const seeGovernanceAction = () =>
         navigate(
-            `${OUTCOMES_PATHS.governanceActionsOutcomes}/governance_actions/${submissionTxHash}#0`
+            `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${submissionTxHash}#0`
         );
 
     const targetRef = useRef();
@@ -1585,7 +1583,7 @@ const SingleGovernanceAction = ({ id }) => {
                                                 {`${formatIsoDate(voteEnd.time) || '-'} (Epoch ${voteEnd.epoch ?? '-'})`}
                                             </Typography>
                                         </DetailRow>
-                                        <DetailRow label='Outcome:'>
+                                        <DetailRow label='Voting result:'>
                                             <Typography
                                                 variant='body1'
                                                 sx={valueSx}
@@ -1704,10 +1702,10 @@ const SingleGovernanceAction = ({ id }) => {
                                                     <Link
                                                         variant='outlined'
                                                         data-testid='see-outcome-link'
-                                                        onClick={seeOutcome}
+                                                        onClick={seeGovernanceAction}
                                                         sx={textLinkSx}
                                                     >
-                                                        See Outcome
+                                                        See voting result
                                                     </Link>
                                                 ) : (
                                                 <Link

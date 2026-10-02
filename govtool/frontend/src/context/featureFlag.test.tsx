@@ -1,4 +1,12 @@
-import { describe, it, expect, vi, beforeEach, MockedFunction } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  MockedFunction,
+} from "vitest";
 import { renderHook } from "@testing-library/react";
 import {
   DREP_DIRECTORY_SORTING,
@@ -535,5 +543,42 @@ describe("capability-derived feature flags", () => {
         true,
       );
     });
+  });
+});
+
+describe("isCip179Enabled", () => {
+  const original = env.VITE_IS_CIP179_ENABLED;
+  const cip179 = () =>
+    renderHook(() => useFeatureFlag(), { wrapper: FeatureFlagProvider })
+      .result.current.isCip179Enabled;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockUseAppContext.mockReturnValue(mockUseAppContextReturnValue);
+    env.VITE_IS_CIP179_ENABLED = "true";
+  });
+
+  afterEach(() => {
+    env.VITE_IS_CIP179_ENABLED = original;
+  });
+
+  it("is on while capabilities are still loading", () => {
+    expect(cip179()).toBe(true);
+  });
+
+  it("is on when the provider serves survey definitions", () => {
+    withCapabilities(makeFeatureSet());
+    expect(cip179()).toBe(true);
+  });
+
+  it("is off when the provider serves no survey definitions", () => {
+    withCapabilities(makeFeatureSet(unavailable("survey.linkedVoting")));
+    expect(cip179()).toBe(false);
+  });
+
+  it("stays off when the environment turns it off, whatever the provider", () => {
+    env.VITE_IS_CIP179_ENABLED = false;
+    withCapabilities(makeFeatureSet());
+    expect(cip179()).toBe(false);
   });
 });

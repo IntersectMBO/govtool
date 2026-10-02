@@ -15,6 +15,7 @@ import { createCtx } from './context';
 import { createGovernanceApi } from './governance';
 import { createKoiosHttp } from './http';
 import { createNetworkApi } from './network';
+import { createSurveysApi } from './surveys';
 import { createSystemApi } from './system';
 import { createTransactionsApi } from './transactions';
 
@@ -48,6 +49,7 @@ export function createKoiosProvider(options: KoiosProviderOptions): KoiosProvide
       accounts: createAccountsApi(ctx),
       governance: createGovernanceApi(ctx),
       transactions: createTransactionsApi(ctx),
+      surveys: createSurveysApi(ctx),
       system: createSystemApi(ctx),
     },
   };

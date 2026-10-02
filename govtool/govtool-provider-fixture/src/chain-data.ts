@@ -18,6 +18,7 @@ import type {
   ProposalsApi,
   ProviderCapabilities,
   ProviderIdentity,
+  SurveysApi,
   SystemApi,
   TransactionsApi,
   VoteAggregate,
@@ -315,6 +316,24 @@ export function createChainData(data: FixtureData): ChainDataApiV1 {
     },
   };
 
+  /* -- surveys (CIP-179) --------------------------------------------------- */
+
+  /**
+   * Label-17 metadata by tx hash. The definitions are SYNTHETIC (see
+   * data/surveys.json): the mainnet capture holds no survey. An unknown hash
+   * is `null`, never a fabricated definition.
+   */
+  const surveys: SurveysApi = {
+    getDefinition: async (txHash) => {
+      const hash = typeof txHash === 'string' ? txHash.trim().toLowerCase() : '';
+      if (!/^[0-9a-f]{64}$/.test(hash)) throw invalid('txHash must be 64 hex characters');
+      const payloadCborHex = data.surveys[hash];
+      return Promise.resolve(
+        env(payloadCborHex ? { txHash: hash, metadataLabel: 17 as const, payloadCborHex } : null),
+      );
+    },
+  };
+
   /* -- system -------------------------------------------------------------- */
 
   const identity: ProviderIdentity = {
@@ -352,6 +371,7 @@ export function createChainData(data: FixtureData): ChainDataApiV1 {
     accounts,
     governance: { dreps, proposals, pools, committee },
     transactions,
+    surveys,
     system,
   };
 }

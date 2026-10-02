@@ -283,3 +283,9 @@ export interface TxInfoRow {
   absolute_slot: number;
   tx_timestamp: number;
 }
+
+/** `/tx_cbor`: `cbor` is null when the instance does not retain transaction bytes. */
+export interface TxCborRow {
+  tx_hash: string;
+  cbor: string | null;
+}

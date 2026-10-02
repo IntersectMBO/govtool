@@ -226,8 +226,14 @@ dropped from the shape:
   through its DRep or its action, so a transaction hash cannot be asked what it
   voted on.
 
-`GET /survey/definition/:txId/:index` answers 501: survey definitions are
-transaction metadata and no provider serves them.
+`GET /survey/definition/:txId/:index` serves a CIP-179 survey definition from
+the provider's optional `surveys` namespace (SPEC.md §5.6): the transaction's
+whole label-17 metadata as a singleton CBOR map, for any index 0–65535; the
+frontend selects the definition. A missing label is a 404, a provider without
+the namespace a 501 (and `/system/features` reports `survey.linkedVoting`
+unavailable, so the frontend hides CIP-179). A definition is cached for 60
+seconds per transaction and sent with `Cache-Control: public, max-age=60`;
+an error is `no-store` and never cached.
 
 ## Tests
 

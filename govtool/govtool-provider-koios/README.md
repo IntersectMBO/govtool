@@ -31,6 +31,7 @@ Global `fetch`, no HTTP library, no cache (SPEC.md §3.6).
 | pools        | `list`, `get`, `listVotes`                                                               |                                                                                                                                                        |
 | committee    | `getCommittee`, `getMember`, `getConstitution`                                           |                                                                                                                                                        |
 | transactions | `get`                                                                                    |                                                                                                                                                        |
+| surveys      | `getDefinition` (CIP-179, label 17, from `/tx_cbor`)                                     | Requires an instance that retains transaction CBOR: a transaction whose `cbor` Koios does not serve is `PROVIDER_UNAVAILABLE` (retryable), never `null` |
 
 Declared (`system.getCapabilities()`, `capabilities()`):
 
@@ -69,6 +70,13 @@ Declared (`system.getCapabilities()`, `capabilities()`):
   hot credential each receive that credential's vote.
 - **Pages** are capped at 1,000 rows, which is also PostgREST's cap on a
   response; a larger request is refused, never silently shortened.
+- **Survey definitions** are read from the transaction's own bytes
+  (`/tx_cbor`), decoded with `@emurgo/cardano-serialization-lib-nodejs`
+  (pinned), checked against the requested hash, and served as the singleton
+  metadata map `{17: payload}`. Never from `/tx_metadata`, whose JSON loses
+  byte strings, integer keys and integer precision. No such transaction, no
+  auxiliary data and no label 17 are all `null`; CBOR over 1 MiB, malformed,
+  or of another transaction is `INTERNAL`.
 - **Request bodies** over roughly five kilobytes are rejected by Koios, which
   is a limit on bytes and not on the number of identifiers, so batches are
   sized by measured bytes.
@@ -81,6 +89,7 @@ npm run live                          # every method against mainnet, contract i
 KOIOS_NETWORK=preprod npm run live
 KOIOS_BASE_URL=https://koios.example/api/v1 KOIOS_NETWORK=mainnet npm run live
 KOIOS_TOKEN=... npm run live          # the token is never printed
+KOIOS_SURVEY_TX_HASH=... npm run live # also check a real CIP-179 survey tx; reported as skipped when unset
 ```
 
 Fixture tests use an injected `fetch` answering invented Koios-shaped JSON.

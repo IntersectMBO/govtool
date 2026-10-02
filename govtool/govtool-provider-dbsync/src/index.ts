@@ -13,6 +13,7 @@ import { createCtx } from './context';
 import { createPgDb, guardDb, type Db, type PgDbOptions } from './db';
 import { createGovernanceApi } from './governance';
 import { createNetworkApi } from './network';
+import { createSurveysApi } from './surveys';
 import { createSystemApi } from './system';
 import { createTransactionsApi } from './transactions';
 
@@ -61,6 +62,7 @@ export function createDbSyncProvider(options: DbSyncProviderOptions): DbSyncProv
       accounts: createAccountsApi(ctx),
       governance: createGovernanceApi(ctx),
       transactions: createTransactionsApi(ctx),
+      surveys: createSurveysApi(ctx),
       system: createSystemApi(ctx),
     },
     close: async () => {

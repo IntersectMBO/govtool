@@ -33,11 +33,33 @@ Captured from mainnet, chosen for spread rather than size:
 | Pools | 10 |
 | Committee | the real committee, with cold and hot credentials |
 | Accounts | 17 real stake addresses with balances and delegations |
+| Survey definitions | 2, **synthetic** (below) |
 
 Everything in `data/mainnet.json` is **already in contract shapes**. Mapping
 happens at capture time, so the provider is a pure reader and a shape bug
 fails when the fixture is captured rather than when it is read. The file is
 committed, so nothing needs capturing to run the stack.
+
+## Survey definitions (CIP-179), synthetic
+
+`chainData.surveys.getDefinition(txHash)` serves label-17 metadata (SPEC.md
+§5.6). The mainnet capture holds no survey, so the two definitions in
+`data/surveys.json` are **synthetic**: hand-made CBOR in the db-sync row shape,
+copied from `frontend/src/cip179/fixtures/dbSyncMetadata.json`. Their tx hashes
+are deliberately fake and exist on no network:
+
+| tx hash | holds |
+|---|---|
+| `1717171717171717171717171717171717171717171717171717171717171717` | one definition (`dbSyncRowCborHex`) |
+| `7171717171717171717171717171717171717171717171717171717171717171` | two definitions in one transaction (`batchedDbSyncRowCborHex`) |
+
+Each answer is `{ txHash, metadataLabel: 17, payloadCborHex }`, where
+`payloadCborHex` is the whole singleton map `{17: payload}`; selecting a survey
+index and decoding is the consumer's job. The hash is trimmed and matched
+case-insensitively, and reported lowercase. Any other well-formed hash answers
+`null`; a malformed one rejects with `INVALID_INPUT`. `npm run capture` does
+not touch `data/surveys.json`, and a custom `dataFile` without a `surveys` key
+gets these two.
 
 ## Refreshing the dataset
 
@@ -66,6 +88,8 @@ useful for testing degradation:
   chain data correctly returns nothing.
 - **no `protocolParams.epoch`**: one frozen epoch, so a past-epoch read is
   genuinely unavailable and is refused rather than faked.
+- **surveys from synthetic data only**: `surveys.getDefinition` answers for
+  the two hashes above and `null` for every real transaction.
 - **no `accounts.getVotingPower`, `getPoolDelegation` or delegation history**,
   and no `listUpdateHistory` or `listActivity`: the capture does not carry
   them, so the methods are absent rather than half-filled.
@@ -76,7 +100,7 @@ useful for testing degradation:
 npm run verify
 ```
 
-21 tests covering the conventions (ratios, integer strings, 1-based paging),
+26 tests covering the conventions (ratios, integer strings, 1-based paging),
 the DRep directory, the voted/not-voted listing and its denominator, typed
-bodies, lineage-keyed `getEnacted`, committee identity, the index, and the
-satellite services.
+bodies, lineage-keyed `getEnacted`, committee identity, survey definitions,
+the index, and the satellite services.

@@ -28,6 +28,7 @@ import type {
   ProviderIdentity,
   SpoVoter,
   StakeDistribution,
+  SurveyDefinition,
   TransactionState,
   VoteAggregate,
   VoteRecord,
@@ -434,6 +435,40 @@ export const minimalProvider: ChainDataApiV1 = {
     getHealth: () => Promise.resolve(envelope({ status: 'healthy' as const })),
   },
 };
+
+/* -- surveys (optional namespace) ------------------------------------------ */
+
+export const surveyDefinition: SurveyDefinition = {
+  txHash: TX,
+  metadataLabel: 17,
+  // {17: [0, []]}: a singleton label-17 map around an empty definitions batch.
+  payloadCborHex: 'a111820080',
+};
+
+/** A provider with surveys: the same minimal provider plus the namespace. */
+export const providerWithSurveys: ChainDataApiV1 = {
+  ...minimalProvider,
+  surveys: {
+    getDefinition: (txHash) =>
+      txHash === TX
+        ? Promise.resolve(envelope(surveyDefinition))
+        : Promise.resolve(envelope(null)),
+  },
+};
+
+/* A source that has the transaction but not its bytes rejects, asynchronously. */
+export const surveysWithoutBytes: NonNullable<ChainDataApiV1['surveys']> = {
+  getDefinition: () =>
+    Promise.reject(
+      new ChainDataError('PROVIDER_UNAVAILABLE', 'no CBOR retained', {
+        retryable: true,
+      }),
+    ),
+};
+
+/* An absent namespace is how a provider says it has no surveys. */
+export const surveysAreOptional: ChainDataApiV1['surveys'] =
+  minimalProvider.surveys;
 
 /* -- the optional components ------------------------------------------------ */
 

@@ -21,3 +21,7 @@ export const internal = (message: string, details?: Record<string, unknown>, cau
 /** Koios has not caught up with something it will know shortly. */
 export const staleData = (message: string, details?: Record<string, unknown>) =>
   new ChainDataError('STALE_DATA', message, { retryable: true, ...(details ? { details } : {}) });
+
+/** Koios has the record but cannot serve the part asked for; another instance or a later try may. */
+export const unavailable = (message: string, details?: Record<string, unknown>) =>
+  new ChainDataError('PROVIDER_UNAVAILABLE', message, { retryable: true, ...(details ? { details } : {}) });

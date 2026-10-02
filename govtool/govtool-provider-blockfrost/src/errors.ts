@@ -14,3 +14,10 @@ export const unsupported = (what: string) =>
 
 export const internal = (message: string, details?: Record<string, unknown>) =>
   new ChainDataError('INTERNAL', message, details ? { details } : {});
+
+/**
+ * The source has the resource but not the part asked for. Retryable: a
+ * Blockfrost instance that has not filled it in yet may on a later read.
+ */
+export const unavailable = (message: string, details?: Record<string, unknown>) =>
+  new ChainDataError('PROVIDER_UNAVAILABLE', message, { retryable: true, ...(details ? { details } : {}) });

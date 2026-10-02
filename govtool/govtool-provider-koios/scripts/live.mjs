@@ -7,6 +7,7 @@
  *   KOIOS_NETWORK=preprod npm run live
  *   KOIOS_BASE_URL=https://koios.example/api/v1 KOIOS_NETWORK=mainnet npm run live
  *   KOIOS_TOKEN=... npm run live            # the token is never printed
+ *   KOIOS_SURVEY_TX_HASH=<tx hash> npm run live  # a CIP-179 survey transaction; skipped when unset
  *
  * Exercises every method and asserts the contract's own invariants on real
  * answers — the things a fixture cannot catch because whoever writes the
@@ -14,6 +15,7 @@
  * between checks, to stay inside the public tier's rate limit. Exits non-zero
  * on any failed check.
  */
+import CSL from '@emurgo/cardano-serialization-lib-nodejs';
 import { bech32 } from 'bech32';
 
 import { capabilities, createKoiosProvider } from '../dist/index.js';
@@ -38,6 +40,11 @@ const { chainData: c } = createKoiosProvider({
 let passes = 0;
 let failures = 0;
 const notes = [];
+const skipped = [];
+const skip = (label, why) => {
+  skipped.push(`${label}: ${why}`);
+  console.log(`  SKIP ${label} — ${why}`);
+};
 const check = (label, ok, detail) => {
   if (ok) passes++;
   else {
@@ -587,6 +594,45 @@ const missing = await step('transactions.get unknown', () => c.transactions.get(
 check('unknown tx is not on chain', missing?.data.onChain === false && missing.data.includedAt === undefined);
 await rejects('bad tx hash', () => c.transactions.get('xyz'), 'INVALID_INPUT');
 
+console.log('surveys');
+const noSurvey = await step('surveys.getDefinition unknown', () => c.surveys.getDefinition('ab'.repeat(32)));
+check('unknown tx has no survey (null)', noSurvey?.data === null && isEnvelope(noSurvey), noSurvey);
+await rejects('bad survey tx hash', () => c.surveys.getDefinition('xyz'), 'INVALID_INPUT');
+const surveyTx = env.KOIOS_SURVEY_TX_HASH?.trim().toLowerCase();
+let surveyFound = false;
+if (!surveyTx) {
+  skip('surveys.getDefinition on a survey transaction', 'KOIOS_SURVEY_TX_HASH is unset; not checked');
+} else {
+  // Rejects with PROVIDER_UNAVAILABLE when the instance does not retain transaction CBOR.
+  const survey = await step('surveys.getDefinition', () => c.surveys.getDefinition(surveyTx));
+  const d = survey?.data;
+  check('survey envelope', isEnvelope(survey), survey?.meta);
+  check('survey tx carries label 17', d != null, d);
+  surveyFound = d != null;
+  if (d) {
+    check('survey txHash is the lowercase hash asked for', d.txHash === surveyTx, d.txHash);
+    check('survey metadataLabel is 17', d.metadataLabel === 17, d.metadataLabel);
+    check('survey payload is hex CBOR {17: ...}', /^a111([0-9a-f]{2})+$/.test(d.payloadCborHex), d.payloadCborHex.slice(0, 40));
+    let md;
+    let label;
+    let value;
+    try {
+      md = CSL.GeneralTransactionMetadata.from_hex(d.payloadCborHex);
+      label = CSL.BigNum.from_str('17');
+      value = md.get(label);
+      check('survey payload decodes as a singleton label-17 metadata map', md.len() === 1 && value !== undefined);
+    } catch (error) {
+      check('survey payload decodes', false, String(error));
+    } finally {
+      value?.free();
+      label?.free();
+      md?.free();
+    }
+    const upper = await step('surveys.getDefinition uppercase', () => c.surveys.getDefinition(surveyTx.toUpperCase()));
+    check('survey lookup is case-insensitive', upper?.data?.payloadCborHex === d.payloadCborHex);
+  }
+}
+
 
 /* -- independent cross-checks against raw Koios ------------------------------ */
 
@@ -602,6 +648,14 @@ async function raw(path, body) {
   await pause();
   if (!res.ok) throw new Error(`raw ${path}: ${res.status}`);
   return res.json();
+}
+if (surveyFound) {
+  try {
+    const rows = await raw('tx_metadata', { _tx_hashes: [surveyTx] });
+    check('Koios /tx_metadata also has label 17 for the survey tx', rows[0]?.metadata != null && '17' in rows[0].metadata, rows[0]?.metadata);
+  } catch (error) {
+    check('raw /tx_metadata ran', false, error.message);
+  }
 }
 try {
   const liveRows = all.filter((a) => a.lifecycle.status === 'live');
@@ -665,6 +719,7 @@ try {
   check('cross-checks ran', false, error.message);
 }
 
-console.log(`\n${passes} passed, ${failures} failed, ${requests} requests`);
+console.log(`\n${passes} passed, ${failures} failed, ${skipped.length} skipped, ${requests} requests`);
 for (const n of notes) console.log(`note: ${n}`);
+for (const n of skipped) console.log(`skipped (not passed): ${n}`);
 process.exit(failures === 0 ? 0 : 1);

@@ -34,9 +34,6 @@ Chain Data API, [#4224](https://github.com/IntersectMBO/govtool/issues/4224) /
 
 ## Open questions
 
-- Whether CIP-179 surveys return to the contract. The entity is absent because
-  the spec does not mention it, which was a judgement call rather than a
-  decision; the backend's `/survey/definition` route answers 501 meanwhile.
 - Whether the synchronous-throw hazard belongs in SPEC.md §11.
 - Whether the contract gains an HTTP binding alongside the TypeScript
   interface. As built, a provider must be a TypeScript module; the Koios and

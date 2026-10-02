@@ -25,6 +25,7 @@ changes.
 - db-sync no longer counts a DRep vote invalidated by retirement, including after re-registration
 - db-sync proposal rankings use the same retirement validity rule as the displayed vote tallies
 - SPO voting results and thresholds are shown for parameter changes that only update block execution steps
+- CIP-179 surveys work again: a governance action can link a survey and DReps can answer it with their vote, on db-sync, Koios and Blockfrost; with a data source that cannot serve surveys, the survey fields are hidden instead of blocking submission ([#4263](https://github.com/IntersectMBO/govtool/issues/4263))
 - IPFS upload accepts only a CIP-100 JSON-LD document and no longer returns Pinata error details ([#4171](https://github.com/IntersectMBO/govtool/issues/4171))
 - Server errors are logged and reported to Sentry ([#2776](https://github.com/IntersectMBO/govtool/issues/2776))
 - A DRep's own vote is returned on a proposal, and voted-on actions are left out of its proposal list
@@ -43,6 +44,7 @@ changes.
 
 - Governance action history is always available and uses the configured GovTool backend
 - DRep activity sorting is offered only when the provider supplies directory activity
+- `/survey/definition` responses are cached for 60 seconds (`public, max-age=60`) instead of a year as immutable, and errors are sent `no-store` ([#4263](https://github.com/IntersectMBO/govtool/issues/4263))
 - `govtool-backend` is the backend: CI, the Docker image and the deployment compose use it. The image reads its db-sync connection from `GOVTOOL_DBSYNC_*` environment variables
 - Governance action records are served by `govtool-backend` under `/governance-actions`
 - Metadata validation is served by the backend under `/metadata`; the frontend calls it on `VITE_BASE_URL`

@@ -16,6 +16,7 @@ import { createCtx } from './context';
 import { createGovernanceApi } from './governance';
 import { BlockfrostHttp } from './http';
 import { createNetworkApi } from './network';
+import { createSurveysApi } from './surveys';
 import { createSystemApi } from './system';
 import { createTransactionsApi } from './transactions';
 
@@ -57,6 +58,7 @@ export function createBlockfrostProvider(options: BlockfrostProviderOptions): Bl
       accounts: createAccountsApi(ctx),
       governance: createGovernanceApi(ctx),
       transactions: createTransactionsApi(ctx),
+      surveys: createSurveysApi(ctx),
       system: createSystemApi(ctx),
     },
   };

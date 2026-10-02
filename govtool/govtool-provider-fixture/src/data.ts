@@ -47,9 +47,25 @@ export interface FixtureData {
   committee: Committee | null;
   constitution: Constitution;
   accounts: { account: Account; delegation: Delegation | null }[];
+  /**
+   * CIP-179 label-17 metadata by lowercase tx hash: a singleton CBOR map
+   * `{17: payload}`, hex. SYNTHETIC: the mainnet capture holds no survey, so
+   * these come from `data/surveys.json`, not from the capture.
+   */
+  surveys: Record<string, string>;
+}
+
+/** The synthetic survey definitions; see the `_comment` in the file. */
+function loadSurveys(): Record<string, string> {
+  const file = join(__dirname, '..', 'data', 'surveys.json');
+  const parsed = JSON.parse(readFileSync(file, 'utf8')) as { definitions: Record<string, string> };
+  return parsed.definitions;
 }
 
 export function loadFixture(path?: string): FixtureData {
   const file = path ?? join(__dirname, '..', 'data', 'mainnet.json');
-  return JSON.parse(readFileSync(file, 'utf8')) as FixtureData;
+  const parsed = JSON.parse(readFileSync(file, 'utf8')) as Omit<FixtureData, 'surveys'> &
+    Partial<Pick<FixtureData, 'surveys'>>;
+  // A dataset may carry its own surveys; otherwise the synthetic pair is served.
+  return { ...parsed, surveys: parsed.surveys ?? loadSurveys() };
 }

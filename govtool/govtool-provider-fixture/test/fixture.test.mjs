@@ -207,6 +207,50 @@ test('committee members are identified by the cold credential', async () => {
   assert.ok(data.quorum.denominator > 0);
 });
 
+/* -- surveys (CIP-179), synthetic ----------------------------------------- */
+
+const SINGLE = '17'.repeat(32);
+const BATCHED = '71'.repeat(32);
+
+test('a single-definition survey transaction serves its label-17 map', async () => {
+  const { data, meta } = await chain.surveys.getDefinition(SINGLE);
+  assert.equal(meta.provider, 'fixture');
+  assert.equal(data.txHash, SINGLE);
+  assert.equal(data.metadataLabel, 17);
+  // Singleton {17: [5, [definition]]}: a1 11 82 00 81 ...
+  assert.match(data.payloadCborHex, /^a111820081/);
+});
+
+test('a batched survey transaction serves both definitions, not one index', async () => {
+  const { data } = await chain.surveys.getDefinition(BATCHED);
+  assert.equal(data.txHash, BATCHED);
+  assert.equal(data.metadataLabel, 17);
+  // Two definitions under the one label: a1 11 82 00 82 ...
+  assert.match(data.payloadCborHex, /^a111820082/);
+  assert.ok(data.payloadCborHex.length > (await chain.surveys.getDefinition(SINGLE)).data.payloadCborHex.length);
+});
+
+test('a survey tx hash is matched case-insensitively and reported lowercase', async () => {
+  const { data } = await chain.surveys.getDefinition(`  ${BATCHED.toUpperCase()}\n`);
+  assert.equal(data.txHash, BATCHED);
+  assert.equal(data.metadataLabel, 17);
+});
+
+test('an unknown survey tx hash is null, not a fabricated definition', async () => {
+  const { data } = await chain.surveys.getDefinition('0'.repeat(64));
+  assert.equal(data, null);
+});
+
+test('a malformed survey tx hash rejects asynchronously with INVALID_INPUT', async () => {
+  for (const bad of ['', 'xyz', '17'.repeat(31), '17'.repeat(33), 'g'.repeat(64), undefined]) {
+    let pending;
+    assert.doesNotThrow(() => {
+      pending = chain.surveys.getDefinition(bad);
+    });
+    await assert.rejects(pending, (e) => e.code === 'INVALID_INPUT');
+  }
+});
+
 /* -- the index -------------------------------------------------------------- */
 
 test('the index searches resolved metadata, which chain data does not hold', async () => {

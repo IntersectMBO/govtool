@@ -492,6 +492,42 @@ and it is also what the index provider makes searchable — see [§7](#7-index-p
 **Transactions.** The required surface is **whether the transaction is on
 chain**. Nothing more.
 
+### 5.6 Survey definitions
+
+**Optional.** `surveys?: SurveysApi` serves CIP-179 survey definitions; an
+absent namespace means the provider cannot.
+
+```ts
+interface SurveyDefinition {
+  txHash: Hex;
+  metadataLabel: 17;
+  payloadCborHex: Hex;
+}
+
+interface SurveysApi {
+  getDefinition(txHash: string): Promise<Envelope<SurveyDefinition | null>>;
+}
+```
+
+- **On chain only.** A survey definition is transaction metadata under label 17. Reading it never fetches a URL.
+- **The whole label, as CBOR.** `payloadCborHex` is a singleton CBOR metadata
+  map `{17: payload}`, the complete label-17 value: every definition the
+  transaction publishes, not one selected index. It is never rebuilt from a
+  JSON rendering of the metadata, which loses byte strings, integer map keys
+  and integer precision. Providers must preserve CBOR types and integers; two
+  providers may serialize the same value differently, so equivalence is
+  checked on the decoded value, not the bytes.
+- **Missing is `null`.** A transaction that does not exist and one without
+  label 17 are both `null`; a metadata table cannot tell them apart. A source
+  that has the transaction but not its bytes rejects with
+  `PROVIDER_UNAVAILABLE` (retryable); corrupt source data is `INTERNAL`;
+  transport failures use their usual codes (§3.5). None of these is `null`.
+- **The consumer decodes.** Selecting the survey index, and validating the
+  CIP-179 version, expiry, eligibility and answers, is the consumer's job.
+- A malformed `txHash` is `INVALID_INPUT`; a valid one is matched
+  case-insensitively and reported lowercase. Providers do not cache; the
+  backend owns caching. Errors reject asynchronously (§3.5).
+
 ---
 
 ## 6. Metadata service

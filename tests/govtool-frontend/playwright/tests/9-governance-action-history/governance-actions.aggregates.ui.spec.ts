@@ -43,7 +43,8 @@ const fixture = (txByte: string, overrides: Partial<Sample>): Sample => ({
   ...overrides,
 });
 const samples: Sample[] = process.env.GOVTOOL_AGGREGATES_REPORT
-  ? JSON.parse(readFileSync(process.env.GOVTOOL_AGGREGATES_REPORT, "utf8")).actions
+  ? JSON.parse(readFileSync(process.env.GOVTOOL_AGGREGATES_REPORT, "utf8"))
+      .actions
   : [
       fixture("aa", { status: "expired", koios: [drep, spo] }),
       fixture("bb", {}),
@@ -151,9 +152,10 @@ for (const sample of samples) {
       const url = new URL(route.request().url());
       let json: unknown = null;
       if (url.pathname.includes("/network/metrics")) networkMetricsRequests++;
+      else if (url.pathname === "/fixture-api/governance-actions")
+        json = [action];
       else if (
-        url.pathname ===
-        `/fixture-api/governance-actions/${sample.txHash}`
+        url.pathname === `/fixture-api/governance-actions/${sample.txHash}`
       )
         json = action;
       else if (url.pathname.includes("/epoch/params"))
@@ -233,13 +235,32 @@ for (const sample of samples) {
         ).toContainText("-");
       }
       if (aggregate?.passing === false && type !== "InfoAction") {
-        const indicator = page.getByTestId(`${prefix}-voting-results-indicator`);
+        const indicator = page.getByTestId(
+          `${prefix}-voting-results-indicator`
+        );
         await expect(indicator).not.toContainText("-");
         await expect(indicator.getByTestId("vote-result-icon")).toHaveCSS(
           "background-color",
           "rgb(211, 47, 47)"
         );
       }
+    }
+    if (sample === samples[0]) {
+      await page.goto("/governance_actions/history");
+      await expect(
+        page.getByRole("heading", { name: "Governance action history" })
+      ).toBeVisible();
+      const details = page.getByTestId(
+        `${sample.txHash}#${sample.index}-view-details`
+      );
+      await expect(details).toHaveAttribute(
+        "href",
+        `/governance_actions/history/${sample.txHash}#${sample.index}`
+      );
+      await details.click();
+      await expect(
+        page.getByTestId("single-action-voting-numbers")
+      ).toBeVisible();
     }
     expect(networkMetricsRequests).toBe(0);
     expect(errors).toEqual([]);

@@ -132,3 +132,46 @@ export function proposalFields(body: Json | undefined) {
     rationale: text(body, 'rationale'),
   };
 }
+
+/** A string field as written, unwrapping JSON-LD `{"@value": ...}`. */
+const raw = (object: unknown, key: string): string | null => {
+  if (!isObject(object)) return null;
+  const value = unwrap(object[key]);
+  return typeof value === 'string' ? value : null;
+};
+
+/**
+ * The CIP-100 authors of a document, as the Haskell backend listed them: one
+ * row per `authors` entry with its name and witness flattened, which the
+ * frontend shows and verifies the signatures of.
+ */
+export function authorsOf(document: Json) {
+  const authors = unwrap(document['authors']);
+  if (!Array.isArray(authors)) return [];
+  return authors.filter(isObject).map((author) => {
+    const witness = unwrap(author['witness']);
+    return {
+      name: raw(author, 'name'),
+      publicKey: raw(witness, 'publicKey'),
+      signature: raw(witness, 'signature'),
+      witnessAlgorithm: raw(witness, 'witnessAlgorithm'),
+    };
+  });
+}
+
+/**
+ * Everything a governance action's response takes from its anchored
+ * document: the CIP-108 text, the whole document as `json` and its authors.
+ */
+export function proposalDocumentFields(document: Json | undefined) {
+  if (!document) return undefined;
+  const body = document['body'];
+  return {
+    title: text(body, 'title'),
+    abstract: text(body, 'abstract'),
+    motivation: text(body, 'motivation'),
+    rationale: text(body, 'rationale'),
+    json: document,
+    authors: authorsOf(document),
+  };
+}

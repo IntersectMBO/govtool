@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import type {
   ChainDataApiV1,
+  Committee,
   GovActionLineage,
   GovAction,
   GovActionStatus,
@@ -32,9 +33,12 @@ import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 import {
   ENRICH_CONCURRENCY,
   mapLimit,
+  proposalDocumentFields,
   proposalFields,
   resolveBody,
+  resolveDocument,
 } from 'src/metadata/enrich';
+import { toLegacyDescription } from 'src/common/legacy-description';
 import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import { readAll } from 'src/common/snapshot';
@@ -122,17 +126,21 @@ export class ProposalService {
     private readonly network: LegacyNetwork = new LegacyNetwork(chain),
   ) {}
 
-  /** A proposal with its CIP-108 text filled from the anchored document. */
-  private async withText(
-    proposal: ProposalResponse,
-  ): Promise<ProposalResponse> {
-    const text = proposalFields(
-      await resolveBody(this.metadata, {
+  /**
+   * A proposal with what the anchored document gives filled in: its CIP-108
+   * text, the document itself as `json` and its authors, as the Haskell
+   * backend read them from `off_chain_vote_data`. Every route that sends a
+   * proposal to the frontend applies it: the list, the detail and a DRep's
+   * vote history, whose rows the details page opens without asking again.
+   */
+  async withDocument(proposal: ProposalResponse): Promise<ProposalResponse> {
+    const fields = proposalDocumentFields(
+      await resolveDocument(this.metadata, {
         url: proposal.url,
         hash: proposal.metadataHash,
       }),
     );
-    return text ? { ...proposal, ...text } : proposal;
+    return fields ? { ...proposal, ...fields } : proposal;
   }
 
   async list(params: {
@@ -185,7 +193,7 @@ export class ProposalService {
             elements: await mapLimit(
               filtered.slice(start, start + params.pageSize),
               ENRICH_CONCURRENCY,
-              (proposal) => this.withText(proposal),
+              (proposal) => this.withDocument(proposal),
             ),
           };
         }),
@@ -221,7 +229,7 @@ export class ProposalService {
     }
 
     return {
-      proposal: await this.withText(proposals[0]),
+      proposal: await this.withDocument(proposals[0]),
       vote: null,
     };
   }
@@ -326,13 +334,29 @@ export class ProposalService {
           submitted.time === undefined ||
           (expires !== null && expires.time === undefined),
       );
-      const schedule = undated ? await this.network.epochSchedule() : null;
+      const [schedule, committee] = await Promise.all([
+        undated ? this.network.epochSchedule() : null,
+        this.committeeFor(elements),
+      ]);
       return elements.map((action) => ({
-        proposal: this.toLegacyProposal(action, schedule),
+        proposal: this.toLegacyProposal(action, schedule, committee),
         status: action.lifecycle.status,
         action,
       }));
     });
+  }
+
+  /**
+   * The current committee, read only when an UpdateCommittee needs it for
+   * each added member's current term. Best effort: only that column needs it.
+   */
+  private async committeeFor(actions: GovAction[]): Promise<Committee | null> {
+    if (!actions.some((a) => a.body.type === 'UpdateCommittee')) return null;
+    try {
+      return (await this.chain.governance.committee.getCommittee()).data;
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -372,6 +396,7 @@ export class ProposalService {
   toLegacyProposal(
     action: GovAction,
     schedule: EpochSchedule | null = null,
+    committee: Committee | null = null,
   ): ProposalResponse {
     const { submitted, expires } = action.lifecycle;
     const aggregates = new Map(
@@ -392,9 +417,9 @@ export class ProposalService {
       txHash: action.txHash,
       index: action.index,
       type: LEGACY_TYPE[action.type],
-      // Was db-sync's raw `description` column. The typed body is what the
-      // action proposes, and there is no untyped fallback any more.
-      details: action.body,
+      // db-sync's `description` reshaped by type, as the Haskell backend sent
+      // it and the frontend's detail tabs read it.
+      details: toLegacyDescription(action, committee),
       expiryDate:
         expires === null
           ? null
@@ -414,8 +439,8 @@ export class ProposalService {
           ? toLegacyParamProposal(action.body.changes)
           : null,
       // The four CIP-108 strings, `json` and `authors` come from the anchored
-      // document. Chain data emits the anchor and never resolves it, and this
-      // backend has no metadata service wired, so they are absent.
+      // document, which chain data never resolves: they are null here and
+      // filled through the metadata service when a page is served.
       title: null,
       abstract: null,
       motivation: null,

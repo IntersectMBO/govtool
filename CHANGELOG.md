@@ -28,6 +28,8 @@ changes.
 - The outcomes page no longer counts automatic DRep no-confidence votes and passive pool votes twice ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
 - Live-action DRep percentages divide by active DRep stake plus always-no-confidence stake again, as before the backend change ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
 - Vote totals a data source cannot give for an action are shown as unavailable instead of as zero votes ([#4260](https://github.com/IntersectMBO/govtool/issues/4260))
+- Governance action details show again: treasury withdrawal rows, the hard fork version, committee members, removals and threshold, and the constitution's guardrails script ([#4261](https://github.com/IntersectMBO/govtool/issues/4261))
+- A governance action's authors and their signatures are shown and verified again ([#4261](https://github.com/IntersectMBO/govtool/issues/4261))
 
 ### Changed
 

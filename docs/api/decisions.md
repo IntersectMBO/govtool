@@ -5419,3 +5419,28 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
 - The frontend shows a group whose figures are null as unavailable, with no pass or fail indicator.
 - Not changed here: the Koios provider leaves the committee aggregate out of a concluded action rather
   than guess its denominator, which this rule reads as "does not vote" and so reports as 0.
+
+## D154 — `/proposal` details and authors take the Haskell shapes again
+
+**Date:** 2026-10-02
+**Amends:** the legacy `/proposal` mapping, which sent the contract's typed body as `details` and left
+`json` and `authors` empty.
+**Issue:** [#4261](https://github.com/IntersectMBO/govtool/issues/4261)
+
+- `details` is db-sync's `description` reshaped by type, as the Haskell backend's `list-proposals.sql`
+  did and the frontend's detail tabs read it: a treasury withdrawal as `[{receivingAddress, amount}]`, a
+  hard fork as `{major, minor}`, a committee change as `{tag, members, membersToBeRemoved, threshold}`
+  with each added member's current term from the committee in force, a constitution as
+  `{anchor, script}`, and `{data: …}` for the rest. The outcomes route already built these for its
+  `description`; the one function now serves both.
+- The current committee is read once per proposal snapshot, and only when an UpdateCommittee needs it.
+  If it cannot be read, a member's current term is null, as for a member not yet on the committee.
+- `json` and `authors` come from the anchored document, resolved through the metadata service with the
+  four CIP-108 strings: `json` is the whole document, and `authors` lists each CIP-100 author as
+  `{name, publicKey, signature, witnessAlgorithm}`, as the Haskell backend read them from
+  `off_chain_vote_data`. The frontend shows the authors and verifies their signatures from these.
+- The same enrichment applies to every route that sends a proposal: `/proposal/list`, `/proposal/get`
+  and a DRep's vote history (`/drep/getVotes`), whose rows the details page opens as they are, without
+  reading the proposal again.
+- Unchanged: `/proposal/enacted-details` still sends the typed body as `description`. The Haskell
+  backend sent db-sync's raw column there, and nothing reads it.

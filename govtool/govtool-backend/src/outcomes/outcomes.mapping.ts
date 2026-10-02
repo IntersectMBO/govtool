@@ -1,16 +1,14 @@
-import { bech32 } from 'bech32';
 import type {
   Committee,
   EpochStamp,
   GovAction,
 } from '@govtool/data-providers/chain-data';
 
-import { dbInteger } from 'src/common/integer';
+import { toLegacyDescription } from 'src/common/legacy-description';
 import type { EpochSchedule } from 'src/common/legacy-network';
 import { compareFiguresDescending, voteFigure } from 'src/common/vote-figures';
 import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import type {
-  OutcomeDescription,
   OutcomeDetailRow,
   OutcomeListRow,
   OutcomeSort,
@@ -55,24 +53,6 @@ export const NO_TEXT: OutcomeText = {
   rationale: null,
 };
 
-/** CIP-129 committee cold credential → its hash and key/script flag. */
-export function decodeColdCredential(
-  id: string,
-): { hash: string; isScript: boolean } | null {
-  try {
-    const decoded = bech32.decode(id, 1023);
-    const bytes = Buffer.from(bech32.fromWords(decoded.words));
-    if (decoded.prefix !== 'cc_cold' || bytes.length !== 29) return null;
-    if (bytes[0] !== 0x12 && bytes[0] !== 0x13) return null;
-    return {
-      hash: bytes.subarray(1).toString('hex'),
-      isScript: bytes[0] === 0x13,
-    };
-  } catch {
-    return null;
-  }
-}
-
 /** Epoch-number → epoch-start instant, as `Date#toISOString` renders it. */
 export function epochStartIso(
   schedule: EpochSchedule | null,
@@ -98,96 +78,6 @@ function stampTime(
     if (!Number.isNaN(ms)) return new Date(ms).toISOString();
   }
   return epochStartIso(schedule, stamp.epoch);
-}
-
-const ledgerRef = (action: GovAction) =>
-  action.previousAction === null
-    ? null
-    : {
-        govActionIx: action.previousAction.index,
-        txId: action.previousAction.txHash,
-      };
-
-/**
- * The `description` column, by type, in the shapes the UI's detail tabs
- * read: withdrawals as an array, the hard fork version, the constitution
- * anchor and guardrails script, and the committee change with each added
- * member's current and new term. `{}` where the action proposes nothing
- * the UI renders.
- */
-export function toOutcomeDescription(
-  action: GovAction,
-  committee: Committee | null,
-): OutcomeDescription {
-  const body = action.body;
-  switch (body.type) {
-    case 'TreasuryWithdrawals':
-      return body.withdrawals.map((w) => ({
-        receivingAddress: w.stakeAddress,
-        amount: dbInteger(w.amount),
-      }));
-    case 'InfoAction':
-      return { data: { tag: 'InfoAction' } };
-    case 'HardForkInitiation':
-      return {
-        major: body.protocolVersion.major,
-        minor: body.protocolVersion.minor,
-      };
-    case 'NoConfidence':
-      return { data: ledgerRef(action) };
-    case 'ParameterChange':
-      // The UI renders a parameter change from `proposal_params`; this is the
-      // ledger's [previous action, changes, guardrails] triple, with the
-      // contract's parameter names.
-      return {
-        data: [
-          ledgerRef(action),
-          body.changes,
-          body.guardrailsScriptHash ?? null,
-        ],
-      };
-    case 'NewConstitution':
-      return {
-        anchor: { dataHash: body.anchor.dataHash, url: body.anchor.url },
-        script: body.guardrailsScriptHash ?? null,
-      };
-    case 'UpdateCommittee': {
-      const current = new Map(
-        (committee?.members ?? []).map((m) => [
-          m.coldCredential,
-          m.termExpiryEpoch,
-        ]),
-      );
-      const credential = (id: string) => {
-        const decoded = decodeColdCredential(id);
-        return {
-          hash: decoded?.hash ?? id,
-          type: decoded?.isScript ? 'scriptHash' : 'keyHash',
-          hasScript: decoded?.isScript ?? false,
-        };
-      };
-      return {
-        tag: 'UpdateCommittee',
-        members: body.added.map((m) => {
-          const c = credential(m.coldCredential);
-          return {
-            hash: c.hash,
-            type: c.type,
-            expirationEpoch: current.get(m.coldCredential) ?? null,
-            hasScript: c.hasScript,
-            newExpirationEpoch: m.termExpiryEpoch,
-          };
-        }),
-        membersToBeRemoved: body.removed.map((m) =>
-          credential(m.coldCredential),
-        ),
-        threshold:
-          body.quorum.denominator === 0
-            ? null
-            : body.quorum.numerator / body.quorum.denominator,
-      };
-    }
-  }
 }
 
 const epochOf = (stamp: EpochStamp | null) => stamp?.epoch ?? null;
@@ -229,7 +119,7 @@ function common(
     tx_hash: action.txHash,
     index: action.index,
     type: OUTCOME_TYPE[action.type],
-    description: toOutcomeDescription(action, committee),
+    description: toLegacyDescription(action, committee),
     expiry_date: stampTime(expires, schedule),
     expiration: expires?.epoch ?? null,
     time: stampTime(submitted, schedule),

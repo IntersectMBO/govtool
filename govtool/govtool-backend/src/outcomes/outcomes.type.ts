@@ -1,4 +1,5 @@
 import type { ApiInteger } from 'src/common/integer';
+import type { LegacyDescription } from 'src/common/legacy-description';
 import type { LegacyParamProposal } from 'src/epoch/epoch.type';
 
 /**
@@ -37,8 +38,7 @@ export type OutcomeStatusTimes = {
   expired_time: string | null;
 };
 
-export type OutcomeDescription =
-  Record<string, unknown> | { receivingAddress: string; amount: ApiInteger }[];
+export type OutcomeDescription = LegacyDescription;
 
 export type OutcomeListRow = {
   id: string;

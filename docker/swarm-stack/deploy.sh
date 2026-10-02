@@ -2,7 +2,6 @@
 ## Deploy GovTool to Docker Swarm.
 ##
 ## Usage: ./deploy.sh <command>
-##   prepare           label this node govtool=true (single-node swarm only)
 ##   secrets           create the db-sync password and Pinata JWT secrets
 ##   init-metadata-db  create the metadata role and database on the proposal
 ##                     stack's Postgres, and the secret holding its url
@@ -50,18 +49,6 @@ create_secret() {
   fi
   printf %s "$value" | docker secret create "$name" - >/dev/null
   echo "secret $name created"
-}
-
-cmd_prepare() {
-  local nodes
-  nodes=$(docker node ls -q | wc -l | tr -d ' ')
-  if [ "$nodes" -ne 1 ]; then
-    echo "This swarm has $nodes nodes; label the one to run GovTool:"
-    echo "  docker node update --label-add govtool=true <node>"
-    exit 1
-  fi
-  docker node update --label-add govtool=true "$(docker node ls -q)" >/dev/null
-  echo "labelled this node govtool=true"
 }
 
 cmd_secrets() {
@@ -123,7 +110,7 @@ cmd_check() {
       { echo "secret ${STACK_NAME}_$s does not exist" >&2; missing=1; }
   done
   [ "$(docker node ls -q --filter node.label=govtool=true | wc -l)" -gt 0 ] ||
-    { echo "no node is labelled govtool=true (./deploy.sh prepare)" >&2; missing=1; }
+    { echo "no node is labelled govtool=true (see README: label a node first)" >&2; missing=1; }
   [ "$missing" -eq 0 ] || die "fix the above, then retry"
   echo "ok: $STACK_NAME on $BASE_DOMAIN, images tagged ${GOVTOOL_TAG:-dev}"
 }
@@ -142,7 +129,6 @@ cmd_status() {
 }
 
 case "${1:-}" in
-  prepare) cmd_prepare ;;
   secrets) cmd_secrets ;;
   init-metadata-db) cmd_init_metadata_db ;;
   check) cmd_check ;;

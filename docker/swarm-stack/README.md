@@ -42,12 +42,15 @@ Fill in `.env`; at least `STACK_NAME`, `BASE_DOMAIN`, the `DBSYNC_*` values and
 `NETWORK_FLAG`. `DBSYNC_NETWORK` must match the database, or every route
 answers 500.
 
+Label the node that will run GovTool: every service is placed with the
+constraint `node.labels.govtool == true`, so the stack deploys nothing
+until at least one node carries it.
+
 ```bash
-./deploy.sh prepare
+docker node update --label-add govtool=true <node>
 ```
 
-Labels the node `govtool=true`. On a multi-node swarm, label the node yourself
-with `docker node update --label-add govtool=true <node>`.
+On a single-node swarm `<node>` is the id from `docker node ls -q`.
 
 ```bash
 ./deploy.sh secrets

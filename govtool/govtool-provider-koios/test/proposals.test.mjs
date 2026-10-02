@@ -282,6 +282,30 @@ test('current committee approval honours the minimum size, with the bootstrap ex
   await assert.rejects(read(10, null), { code: 'STALE_DATA' });
 });
 
+test('committee tallies and minimum size count cold members sharing a hot credential', async () => {
+  const members = [
+    committeeInfo.members[0],
+    { ...committeeInfo.members[0], cc_cold_hex: hash(8) },
+    { ...committeeInfo.members[0], cc_cold_hex: hash(9), cc_hot_hex: hash(18) },
+    ...committeeInfo.members.slice(2),
+  ];
+  for (const choice of ['Yes', 'No', 'Abstain', null]) {
+    const { chainData } = provider(routes({
+      committee_info: [{ ...committeeInfo, members }],
+      epoch_params: () => [{ ...paramsRow(EPOCH, 10), committee_min_size: 3 }],
+      vote_list: choice === null ? [] : [vote('ConstitutionalCommittee', hotId(14), pc, choice, at(EPOCH, 20))],
+    }));
+    const action = (await chainData.governance.proposals.get(pc.proposal_id)).data;
+    const cc = action.voteAggregates.find((a) => a.role === 'cc');
+    assert.equal(cc.totalEligible, '3');
+    assert.equal(cc.yes, choice === 'Yes' ? '2' : '0');
+    assert.equal(cc.no, choice === 'No' ? '2' : '0');
+    assert.equal(cc.abstain, choice === 'Abstain' ? '2' : '0');
+    assert.equal(cc.notVoted, choice === null ? '3' : '1');
+    assert.equal(cc.passing, undefined, 'three eligible cold members meet the minimum');
+  }
+});
+
 test('list maps rows, attaches aggregates, pages with an exact total', async () => {
   const { chainData, calls } = provider(routes());
   const page = await chainData.governance.proposals.list({ page: 1, size: 2 });

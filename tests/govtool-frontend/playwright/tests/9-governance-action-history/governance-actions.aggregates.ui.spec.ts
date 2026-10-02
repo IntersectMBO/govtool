@@ -176,6 +176,17 @@ for (const sample of samples) {
       else if (url.pathname.includes("/proposal/")) json = { data: null };
       await route.fulfill({ status: 200, json });
     });
+    if (sample === samples[0]) {
+      await page.addInitScript(() => {
+        if (!sessionStorage.getItem("wallet-restore-regression")) {
+          sessionStorage.setItem("wallet-restore-regression", "true");
+          localStorage.setItem(
+            "wallet_data_name",
+            JSON.stringify("unavailable-wallet")
+          );
+        }
+      });
+    }
     await page.goto(
       `/governance_actions/history/${sample.txHash}#${sample.index}`
     );
@@ -246,7 +257,24 @@ for (const sample of samples) {
       }
     }
     if (sample === samples[0]) {
+      await expect
+        .poll(() =>
+          page.evaluate(() => localStorage.getItem("wallet_data_name"))
+        )
+        .toBeNull();
+      await expect(panel).toBeVisible();
+      await page.evaluate(() =>
+        localStorage.setItem(
+          "wallet_data_name",
+          JSON.stringify("unavailable-wallet")
+        )
+      );
       await page.goto("/governance_actions/history");
+      await expect
+        .poll(() =>
+          page.evaluate(() => localStorage.getItem("wallet_data_name"))
+        )
+        .toBeNull();
       await expect(
         page.getByRole("heading", { name: "Governance action history" })
       ).toBeVisible();

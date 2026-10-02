@@ -97,7 +97,9 @@ export default () => {
     };
 
     const isOnAllowedPage = [PATHS.home, PATHS.governanceActions, PATHS.governanceActionsAction]
-        .includes(window.location.pathname);
+        .includes(window.location.pathname) ||
+      pathname === GOV_ACTION_HISTORY_PATHS.governanceActionHistory ||
+      pathname.startsWith(`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/`);
 
     const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
 

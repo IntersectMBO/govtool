@@ -18,6 +18,8 @@ changes.
 
 ### Fixed
 
+- Koios committee tallies count each eligible cold member when members share an authorised hot credential
+- Public governance action history stays open when a saved wallet extension is unavailable
 - Committee vote indicators respect the ledger's minimum committee size outside bootstrap
 - Governance action history displays each provider's action-specific vote tally independently, preserves exact threshold comparisons, and identifies unavailable historical voting data
 - db-sync no longer counts a DRep vote invalidated by retirement, including after re-registration

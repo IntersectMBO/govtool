@@ -5598,3 +5598,18 @@ D149 and D158 (the legacy Outcomes terminology in frontend source and browser ch
 - Governance-action browser regression checks share the existing frontend browser CI
   job with CIP-179, including dependency and Chromium installation. Browser-only edits
   do not run frontend unit tests, lint or type checking; frontend source changes do.
+
+## D163 — Committee hot credentials do not identify seats
+
+**Date:** 2026-10-02
+**Amends:** D161 (minimum-size calculation in the Koios implementation).
+**Evidence:** The ledger walks cold committee credentials and looks up each member's authorised
+hot credential when tallying. Multiple cold members can therefore use the same hot vote.
+Source: [Conway committee tally](https://github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/src/Cardano/Ledger/Conway/Rules/Ratify.hs#L131-L158).
+
+- Koios current-epoch committee aggregates retain the eligible cold-to-hot mapping. Each
+  cold member contributes one seat and receives its hot credential's latest vote, including
+  abstentions; a member whose hot credential has not voted contributes to not-voted.
+- The minimum-size veto counts eligible cold members, rather than distinct hot credentials.
+  db-sync already counts cold members and needs no change. Historical Koios committee
+  aggregates remain unavailable because current authorisations cannot reconstruct them.

@@ -65,6 +65,8 @@ Declared (`system.getCapabilities()`, `capabilities()`):
   than answered "not voted".
   A current-epoch committee aggregate below `committeeMinSize` supplies
   `passing: false` outside bootstrap, while retaining the vote breakdown.
+  Tallies and minimum size count cold members: members sharing an authorised
+  hot credential each receive that credential's vote.
 - **Pages** are capped at 1,000 rows, which is also PostgREST's cap on a
   response; a larger request is refused, never silently shortened.
 - **Request bodies** over roughly five kilobytes are rejected by Koios, which

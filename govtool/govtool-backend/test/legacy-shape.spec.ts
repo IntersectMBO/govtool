@@ -1395,8 +1395,8 @@ describe('GET /proposal/list', () => {
       txHash: TX,
       index: 0,
       type: 'InfoAction',
-      // Was db-sync's raw `description` column; the typed body replaces it.
-      details: { type: 'InfoAction' },
+      // db-sync's `description` as the Haskell backend reshaped it by type.
+      details: { data: { tag: 'InfoAction' } },
       expiryDate: '2026-03-01T00:00:00.000Z',
       expiryEpochNo: 510,
       createdDate: '2026-01-05T00:00:00.000Z',
@@ -1715,6 +1715,147 @@ describe('GET /proposal/list', () => {
       title: null,
       json: null,
       authors: [],
+    });
+  });
+
+  describe('details and authors, as the Haskell backend sent them', () => {
+    // A key-hash cold credential: header 0x12, then 28 zero bytes.
+    const COLD =
+      'cc_cold1zgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6yewvh';
+    const details = (
+      body: GovAction['body'],
+      committee: Parameters<ProposalService['toLegacyProposal']>[2] = null,
+    ) =>
+      proposalService({}).toLegacyProposal(
+        govAction({ type: body.type, body }),
+        null,
+        committee,
+      ).details;
+
+    it('lists a treasury withdrawal as receiving address and amount rows', () => {
+      expect(
+        details({
+          type: 'TreasuryWithdrawals',
+          withdrawals: [{ stakeAddress: 'stake1example', amount: '5000000' }],
+          totalAmount: '5000000',
+        }),
+      ).toEqual([{ receivingAddress: 'stake1example', amount: 5000000 }]);
+    });
+
+    it('gives a hard fork its major and minor version', () => {
+      expect(
+        details({
+          type: 'HardForkInitiation',
+          protocolVersion: { major: 10, minor: 2 },
+        }),
+      ).toEqual({ major: 10, minor: 2 });
+    });
+
+    it('gives a new constitution its anchor and guardrails script', () => {
+      expect(
+        details({
+          type: 'NewConstitution',
+          anchor: { url: 'https://x/c.txt', dataHash: 'a'.repeat(64) },
+          guardrailsScriptHash: 'b'.repeat(56),
+        }),
+      ).toEqual({
+        anchor: { url: 'https://x/c.txt', dataHash: 'a'.repeat(64) },
+        script: 'b'.repeat(56),
+      });
+    });
+
+    it('gives a committee change its members, removals and threshold', () => {
+      expect(
+        details(
+          {
+            type: 'UpdateCommittee',
+            added: [{ coldCredential: COLD, termExpiryEpoch: 600 }],
+            removed: [{ coldCredential: COLD }],
+            quorum: { numerator: 2, denominator: 3 },
+          },
+          {
+            members: [
+              {
+                role: 'cc',
+                coldCredential: COLD,
+                hotCredential: null,
+                termStartEpoch: 500,
+                termExpiryEpoch: 520,
+                hasResigned: false,
+              },
+            ],
+            quorum: { numerator: 2, denominator: 3 },
+            enactedBy: null,
+          },
+        ),
+      ).toEqual({
+        tag: 'UpdateCommittee',
+        members: [
+          {
+            hash: '0'.repeat(56),
+            type: 'keyHash',
+            // The member's current term, from the committee in force.
+            expirationEpoch: 520,
+            hasScript: false,
+            newExpirationEpoch: 600,
+          },
+        ],
+        membersToBeRemoved: [
+          { hash: '0'.repeat(56), type: 'keyHash', hasScript: false },
+        ],
+        threshold: 2 / 3,
+      });
+    });
+
+    it('fills json and the authors from the anchored document', async () => {
+      const document = {
+        body: { title: 'Fund it', abstract: 'Because' },
+        authors: [
+          {
+            name: 'Alice',
+            witness: {
+              witnessAlgorithm: 'ed25519',
+              publicKey: 'c'.repeat(64),
+              signature: 'd'.repeat(128),
+            },
+          },
+        ],
+      };
+      const service = new ProposalService(
+        chain({
+          governance: {
+            proposals: { list: () => Promise.resolve(page([govAction()])) },
+          },
+        }),
+        passthroughCache(),
+        {
+          getMetadata: () =>
+            Promise.resolve({
+              ok: true,
+              hash: 'e'.repeat(64),
+              body: document,
+              fetchedAt: '2026-10-02T00:00:00Z',
+            }),
+          getCipMetadata: () => Promise.reject(new Error('unused')),
+          refresh: () => Promise.reject(new Error('unused')),
+          getReport: () => Promise.resolve(null),
+          listReports: () => Promise.resolve([]),
+        },
+      );
+      const body = await service.list({ type: [], page: 0, pageSize: 10 });
+      expect(body.elements[0]).toMatchObject({
+        title: 'Fund it',
+        abstract: 'Because',
+        json: document,
+        authors: [
+          {
+            name: 'Alice',
+            publicKey: 'c'.repeat(64),
+            signature: 'd'.repeat(128),
+            witnessAlgorithm: 'ed25519',
+          },
+        ],
+      });
     });
   });
 

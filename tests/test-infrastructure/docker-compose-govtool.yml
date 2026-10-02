@@ -78,7 +78,6 @@ services:
     build:
       context: ../../govtool/frontend
       dockerfile: storybook.Dockerfile
-      args:
     environment:
       VIRTUAL_HOST: https://storybook-${BASE_DOMAIN}
     networks:

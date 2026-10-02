@@ -569,6 +569,82 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
     expect((await search('nowhere')).total).toBe(0);
   });
 
+  it('matches an action id without reading any other document', async () => {
+    const getMetadata = jest.fn<
+      ReturnType<MetadataServiceV1['getMetadata']>,
+      Parameters<MetadataServiceV1['getMetadata']>
+    >(() => Promise.reject(new Error('down')));
+    const actions = [0, 1].map((index) =>
+      govAction({
+        id: actionId(TX, index),
+        index,
+        anchor: anchor(`https://x/${index}.jsonld`),
+      }),
+    );
+    const service = new ProposalService(
+      chain({
+        governance: {
+          proposals: { list: () => Promise.resolve(page(actions)) },
+        },
+      }),
+      passthroughCache(),
+      { ...metadataService({}), getMetadata },
+    );
+
+    for (const term of [actionId(TX, 1), `${TX}#1`]) {
+      const body = await service.list({
+        type: [],
+        page: 0,
+        pageSize: 10,
+        search: term,
+      });
+      expect(body.elements.map((e) => e.index)).toEqual([1]);
+    }
+    // Only the matched row's own document, to fill the page: the search
+    // itself never asked for one.
+    expect(getMetadata.mock.calls.map(([, url]) => url)).toEqual([
+      'https://x/1.jsonld',
+      'https://x/1.jsonld',
+    ]);
+  });
+
+  it('answers a text search within its wait, however many documents are slow', async () => {
+    jest.useFakeTimers();
+    try {
+      // Forty documents that never resolve: on demand, eight at a time and
+      // four seconds each, they would take twenty seconds.
+      const actions = Array.from({ length: 40 }, (_, index) =>
+        govAction({
+          id: actionId(TX, index),
+          index,
+          anchor: anchor(`https://x/${index}.jsonld`),
+        }),
+      );
+      const service = new ProposalService(
+        chain({
+          governance: {
+            proposals: { list: () => Promise.resolve(page(actions)) },
+          },
+        }),
+        passthroughCache(),
+        { ...metadataService({}), getMetadata: () => new Promise(() => {}) },
+      );
+      let answered = false;
+      const pending = service
+        .list({ type: [], page: 0, pageSize: 10, search: 'bridge' })
+        .then((body) => {
+          answered = true;
+          return body;
+        });
+
+      await jest.advanceTimersByTimeAsync(5_000);
+      expect(answered).toBe(true);
+      expect((await pending).total).toBe(0);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('finds a DRep by its name once the warmer has resolved it', async () => {
     const alice = drep({ anchor: anchor('https://x/alice.jsonld') });
     const bob = drep({

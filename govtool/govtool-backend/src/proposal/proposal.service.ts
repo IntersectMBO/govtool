@@ -86,6 +86,21 @@ type ProposalSnapshotEntry = {
   action: GovAction;
 };
 
+/**
+ * The longest a text search waits for document text it has not cached. The
+ * rest is matched from what the cache already holds; the fetches carry on and
+ * fill it for the next search. Well inside the frontend's 30 s timeout, and
+ * independent of how many actions are searched (a DRep's whole vote history).
+ */
+const SEARCH_TEXT_WAIT_MS = 5_000;
+
+/**
+ * A term that can only be an action id, or a prefix of one: a CIP-129
+ * `gov_action1…` id, or a transaction hash (eight or more hex digits) with
+ * an optional `#index`. Matched against ids alone, with no metadata wait.
+ */
+const ACTION_ID_TERM = /^(gov_action1[0-9a-z]*|[0-9a-f]{8,}(#\d*)?)$/i;
+
 /** The CIP-108 strings a search matches, as the Haskell backend's did. */
 type ProposalSearchText = Pick<
   ProposalResponse,
@@ -488,7 +503,9 @@ export class ProposalService {
     }
 
     const searchLower = search.toLowerCase();
-    const texts = await this.searchTexts(proposals);
+    const texts = ACTION_ID_TERM.test(search.trim())
+      ? new Map<string, ProposalSearchText>()
+      : await this.searchTexts(proposals, { waitMs: SEARCH_TEXT_WAIT_MS });
 
     return proposals.filter((proposal) => {
       const govActionId = `${proposal.txHash}#${proposal.index}`;
@@ -520,29 +537,54 @@ export class ProposalService {
       const live = (await this.getProposalSnapshot(''))
         .filter(({ status }) => status === 'live')
         .map(({ proposal }) => proposal);
-      await this.searchTexts(live, true);
+      await this.searchTexts(live, { awaitRefresh: true });
     } finally {
       this.warming = false;
     }
   }
 
+  /**
+   * Each action's search text through the cache. With `waitMs`, waits at most
+   * that long in all and then takes whatever the cache holds, so a search
+   * does not slow down with the number of uncached documents; the warmer
+   * passes `awaitRefresh` and waits for every document instead.
+   */
   private async searchTexts(
     proposals: ProposalResponse[],
-    awaitRefresh = false,
+    options: { awaitRefresh?: boolean; waitMs?: number } = {},
   ): Promise<Map<string, ProposalSearchText>> {
     const out = new Map<string, ProposalSearchText>();
     const metadata = this.metadata;
     if (metadata === null) return out;
-    const texts = await mapLimit(proposals, ENRICH_CONCURRENCY, (p) => {
+    // Never rejects: the cache treats a failed resolution as unresolved.
+    const all = mapLimit(proposals, ENRICH_CONCURRENCY, (p) => {
       const { url, metadataHash: hash } = p;
       if (!url || !hash) return Promise.resolve(undefined);
       return this.searchTextCache.get(
         hash,
         url,
         async () => proposalFields(await resolveBody(metadata, { url, hash })),
-        { awaitRefresh },
+        { awaitRefresh: options.awaitRefresh },
       );
     });
+    let texts: (ProposalSearchText | undefined)[];
+    if (options.waitMs === undefined) {
+      texts = await all;
+    } else {
+      let timer: NodeJS.Timeout | undefined;
+      const timeout = new Promise<undefined>((resolve) => {
+        timer = setTimeout(() => resolve(undefined), options.waitMs);
+      });
+      texts =
+        (await Promise.race([all, timeout]).finally(() =>
+          clearTimeout(timer),
+        )) ??
+        proposals.map(({ url, metadataHash }) =>
+          url && metadataHash
+            ? this.searchTextCache.peek(metadataHash, url)
+            : undefined,
+        );
+    }
     proposals.forEach((p, i) => {
       const text = texts[i];
       if (text !== undefined) out.set(p.id, text);

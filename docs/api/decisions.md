@@ -5403,8 +5403,12 @@ chain data (D40, D45, D87 left free text to an index provider; none was wired).
 - No provider indexes document text, so the backend matches it itself, over its whole snapshot, with
   the text read through the metadata service and kept per (hash, url) in the same stale-while-revalidate
   cache the outcomes search uses, now in `src/metadata/text-cache.ts`.
-- Actions: a search reads every candidate's four strings before filtering and paging. Live actions are a
-  few dozen, so a search waits for any not cached yet, as the outcomes search does.
+- Actions: a search reads every candidate's four strings before filtering and paging. It waits at most
+  5 s in all for text it has not cached, then matches what the cache holds; the fetches carry on and fill
+  it for the next search. So a search's time does not grow with the number of documents, which matters
+  for a DRep's whole vote history. The warmer fills the cache for live actions after each refresh.
+- A term that can only be an action id (a `gov_action1…` id, or eight or more hex digits with an
+  optional `#index`) is matched against ids alone and reads no document.
 - DReps: a term that is not a DRep id is a name, matched case-insensitively as a substring over the whole
   directory. A directory holds thousands of DReps, more than a search can resolve on demand, so it
   matches the names already cached and never fetches. The cache warmer resolves every DRep's name after

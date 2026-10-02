@@ -101,11 +101,11 @@ export class ProposalService {
   /**
    * A proposal with what the anchored document gives filled in: its CIP-108
    * text, the document itself as `json` and its authors, as the Haskell
-   * backend read them from `off_chain_vote_data`.
+   * backend read them from `off_chain_vote_data`. Every route that sends a
+   * proposal to the frontend applies it: the list, the detail and a DRep's
+   * vote history, whose rows the details page opens without asking again.
    */
-  private async withText(
-    proposal: ProposalResponse,
-  ): Promise<ProposalResponse> {
+  async withDocument(proposal: ProposalResponse): Promise<ProposalResponse> {
     const fields = proposalDocumentFields(
       await resolveDocument(this.metadata, {
         url: proposal.url,
@@ -165,7 +165,7 @@ export class ProposalService {
             elements: await mapLimit(
               filtered.slice(start, start + params.pageSize),
               ENRICH_CONCURRENCY,
-              (proposal) => this.withText(proposal),
+              (proposal) => this.withDocument(proposal),
             ),
           };
         }),
@@ -201,7 +201,7 @@ export class ProposalService {
     }
 
     return {
-      proposal: await this.withText(proposals[0]),
+      proposal: await this.withDocument(proposals[0]),
       vote: null,
     };
   }

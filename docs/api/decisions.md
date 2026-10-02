@@ -5408,5 +5408,8 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
   four CIP-108 strings: `json` is the whole document, and `authors` lists each CIP-100 author as
   `{name, publicKey, signature, witnessAlgorithm}`, as the Haskell backend read them from
   `off_chain_vote_data`. The frontend shows the authors and verifies their signatures from these.
+- The same enrichment applies to every route that sends a proposal: `/proposal/list`, `/proposal/get`
+  and a DRep's vote history (`/drep/getVotes`), whose rows the details page opens as they are, without
+  reading the proposal again.
 - Unchanged: `/proposal/enacted-details` still sends the typed body as `description`. The Haskell
   backend sent db-sync's raw column there, and nothing reads it.

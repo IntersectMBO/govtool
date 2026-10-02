@@ -33,6 +33,7 @@ import type {
 } from '@govtool/data-providers/chain-data';
 import { Logger } from '@nestjs/common';
 import { ChainDataError } from '@govtool/data-providers/chain-data';
+import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 
 import { AccountService } from '../src/account/account.service';
 import { AdaHolderService } from '../src/ada-holder/ada-holder.service';
@@ -716,7 +717,10 @@ function capabilitiesWith(dreps: DRepSort[]): ProviderCapabilities {
   };
 }
 
-function drepService(chainStub: StubApi): DRepService {
+function drepService(
+  chainStub: StubApi,
+  metadata: MetadataServiceV1 | null = null,
+): DRepService {
   const cache = passthroughCache();
   const api = chain({
     ...chainStub,
@@ -726,8 +730,8 @@ function drepService(chainStub: StubApi): DRepService {
       ...chainStub.system,
     },
   });
-  const proposals = new ProposalService(api, cache, null);
-  return new DRepService(api, proposals, cache, null);
+  const proposals = new ProposalService(api, cache, metadata);
+  return new DRepService(api, proposals, cache, metadata);
 }
 
 describe('GET /drep/info/:drepId', () => {
@@ -2086,6 +2090,71 @@ describe('GET /drep/getVotes/:drepId', () => {
     });
     expect(votes[0].proposal.id).toBe(ACTION_ID);
     expect(votes[0].proposal.type).toBe('InfoAction');
+  });
+
+  it('gives each voted action its document and authors, as the detail page reads them', async () => {
+    // The details page opens a vote-history row without reading the proposal
+    // again, so the row must carry what /proposal/get would.
+    const document = {
+      body: { title: 'Fund it' },
+      authors: [
+        {
+          name: 'Alice',
+          witness: {
+            witnessAlgorithm: 'ed25519',
+            publicKey: 'c'.repeat(64),
+            signature: 'd'.repeat(128),
+          },
+        },
+      ],
+    };
+    const service = drepService(
+      {
+        governance: {
+          dreps: {
+            listVotes: () =>
+              voteRows([
+                {
+                  voted: true,
+                  action: { id: ACTION_ID, type: 'InfoAction' },
+                  choice: 'yes',
+                  anchor: null,
+                  txRef: { txHash: '9'.repeat(64) },
+                  at: { epoch: 501, time: '2026-01-10T00:00:00.000Z' },
+                },
+              ]),
+          },
+          proposals: { list: () => Promise.resolve(page([govAction()])) },
+        },
+      },
+      {
+        getMetadata: () =>
+          Promise.resolve({
+            ok: true,
+            hash: 'e'.repeat(64),
+            body: document,
+            fetchedAt: '2026-10-02T00:00:00Z',
+          }),
+        getCipMetadata: () => Promise.reject(new Error('unused')),
+        refresh: () => Promise.reject(new Error('unused')),
+        getReport: () => Promise.resolve(null),
+        listReports: () => Promise.resolve([]),
+      },
+    );
+
+    const [{ proposal }] = await service.getVotes(DREP_ID);
+    expect(proposal).toMatchObject({
+      title: 'Fund it',
+      json: document,
+      authors: [
+        {
+          name: 'Alice',
+          publicKey: 'c'.repeat(64),
+          signature: 'd'.repeat(128),
+          witnessAlgorithm: 'ed25519',
+        },
+      ],
+    });
   });
 
   it('drops the not-voted rows the listing also carries', async () => {

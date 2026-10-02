@@ -332,8 +332,9 @@ describe('GET /network/*', () => {
     await expect(service.getNetworkTotalStake()).resolves.toEqual({
       // Both exceed Number.MAX_SAFE_INTEGER (9.0e15), so they stay bigint and
       // the response interceptor writes them unquoted. Rounding them to a
-      // double would move the figure by thousands of ada.
-      totalStakeControlledByDReps: 31000000000000000n,
+      // double would move the figure by thousands of ada. The DRep figure
+      // includes the always-no-confidence stake, as the Haskell backend's did.
+      totalStakeControlledByDReps: 31000000900000000n,
       totalStakeControlledBySPOs: 22000000000000000n,
       alwaysAbstainVotingPower: 4000000000000,
       alwaysNoConfidenceVotingPower: 900000000,
@@ -1863,9 +1864,9 @@ describe('GET /proposal/list', () => {
     });
   });
 
-  it('reports a percent aggregate as 0 rather than a rounded fraction', async () => {
+  it('reports a percent aggregate as null rather than a rounded fraction', async () => {
     // The legacy fields are whole lovelace and head counts; 0.67 has nothing
-    // to put in them, and rounding it would read as "no votes".
+    // to put in them, and 0 would read as "no votes" (D153).
     const service = proposalService({
       governance: {
         proposals: {
@@ -1892,7 +1893,24 @@ describe('GET /proposal/list', () => {
       },
     });
     const body = await service.list({ type: [], page: 0, pageSize: 10 });
-    expect(body.elements[0].dRepYesVotes).toBe(0);
+    expect(body.elements[0].dRepYesVotes).toBeNull();
+  });
+
+  it('reports every vote figure as null when the provider serves no aggregates', async () => {
+    const service = proposalService({
+      governance: {
+        proposals: {
+          list: () =>
+            Promise.resolve(page([govAction({ voteAggregates: undefined })])),
+        },
+      },
+    });
+    const body = await service.list({ type: [], page: 0, pageSize: 10 });
+    expect(body.elements[0]).toMatchObject({
+      dRepYesVotes: null,
+      poolYesVotes: null,
+      ccYesVotes: null,
+    });
   });
 
   it('filters by the legacy type name and pages the result', async () => {

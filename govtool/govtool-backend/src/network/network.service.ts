@@ -40,10 +40,21 @@ export class NetworkService {
     return this.cacheService.getOrSet('networkTotalStake', 'default', () =>
       asHttp(async () => {
         const { data } = await this.chain.network.getStakeDistribution();
+        const activeDReps = this.required(
+          data.totalStakeControlledByDReps,
+          'totalStakeControlledByDReps',
+        );
+        const noConfidence = this.required(
+          data.alwaysNoConfidenceVotingPower,
+          'alwaysNoConfidenceVotingPower',
+        );
         return {
-          totalStakeControlledByDReps: this.required(
-            data.totalStakeControlledByDReps,
-            'totalStakeControlledByDReps',
+          // As the Haskell backend reported it: active DReps plus the
+          // always-no-confidence stake, which the ledger counts in the DRep
+          // denominator. The frontend divides the DRep yes and no stake,
+          // which already include it, by this figure.
+          totalStakeControlledByDReps: this.toInteger(
+            (BigInt(activeDReps) + BigInt(noConfidence)).toString(),
           ),
           totalStakeControlledBySPOs: this.required(
             data.totalStakeControlledBySPOs,
@@ -53,10 +64,7 @@ export class NetworkService {
             data.alwaysAbstainVotingPower,
             'alwaysAbstainVotingPower',
           ),
-          alwaysNoConfidenceVotingPower: this.required(
-            data.alwaysNoConfidenceVotingPower,
-            'alwaysNoConfidenceVotingPower',
-          ),
+          alwaysNoConfidenceVotingPower: noConfidence,
         };
       }),
     );

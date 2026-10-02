@@ -2,16 +2,11 @@ import type {
   Committee,
   EpochStamp,
   GovAction,
-  VoteAggregate,
 } from '@govtool/data-providers/chain-data';
 
-import {
-  compareIntegers,
-  dbInteger,
-  type ApiInteger,
-} from 'src/common/integer';
 import { toLegacyDescription } from 'src/common/legacy-description';
 import type { EpochSchedule } from 'src/common/legacy-network';
+import { compareFiguresDescending, voteFigure } from 'src/common/vote-figures';
 import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import type {
   OutcomeDetailRow,
@@ -110,22 +105,8 @@ function toOutcomeStatusTimes(
   };
 }
 
-/**
- * One tally figure, as a JSON integer. A `percent` aggregate has no integer
- * to give, and a missing role is no votes; both read as 0, as on the legacy
- * `/proposal` routes.
- */
-function tally(
-  action: GovAction,
-  role: VoteAggregate['role'],
-  choice: 'yes' | 'no' | 'abstain',
-): ApiInteger {
-  const aggregate = action.voteAggregates?.find((a) => a.role === role);
-  if (aggregate === undefined || aggregate.representation === 'percent') {
-    return 0;
-  }
-  return dbInteger(aggregate[choice]);
-}
+/** One tally figure, or `null` when it is not known (see `voteFigure`). */
+const tally = voteFigure;
 
 function common(
   action: GovAction,
@@ -300,9 +281,9 @@ export function compareOutcomes(sort: OutcomeSort) {
     if (sort === 'oldestFirst') primary = ea - eb;
     else if (sort === 'newestFirst') primary = eb - ea;
     else
-      primary = compareIntegers(
-        tally(b, 'drep', 'yes'),
+      primary = compareFiguresDescending(
         tally(a, 'drep', 'yes'),
+        tally(b, 'drep', 'yes'),
       );
     if (primary !== 0) return primary;
     const byTime = submittedMs(b) - submittedMs(a);

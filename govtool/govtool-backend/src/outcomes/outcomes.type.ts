@@ -45,9 +45,9 @@ export type OutcomeListRow = {
   tx_hash: string;
   index: number;
   type: string;
-  yes_votes: ApiInteger;
-  no_votes: ApiInteger;
-  abstain_votes: ApiInteger;
+  yes_votes: ApiInteger | null;
+  no_votes: ApiInteger | null;
+  abstain_votes: ApiInteger | null;
   description: OutcomeDescription;
   expiry_date: string | null;
   expiration: number | null;
@@ -80,15 +80,15 @@ export type OutcomeDetailRow = {
   abstract: string | null;
   motivation: string | null;
   rationale: string | null;
-  yes_votes: ApiInteger;
-  no_votes: ApiInteger;
-  abstain_votes: ApiInteger;
-  pool_yes_votes: ApiInteger;
-  pool_no_votes: ApiInteger;
-  pool_abstain_votes: ApiInteger;
-  cc_yes_votes: ApiInteger;
-  cc_no_votes: ApiInteger;
-  cc_abstain_votes: ApiInteger;
+  yes_votes: ApiInteger | null;
+  no_votes: ApiInteger | null;
+  abstain_votes: ApiInteger | null;
+  pool_yes_votes: ApiInteger | null;
+  pool_no_votes: ApiInteger | null;
+  pool_abstain_votes: ApiInteger | null;
+  cc_yes_votes: ApiInteger | null;
+  cc_no_votes: ApiInteger | null;
+  cc_abstain_votes: ApiInteger | null;
   /**
    * A decimal string, as the outcomes service sent it: the UI tests it for
    * truthiness before linking the previous action, so a number 0 would hide

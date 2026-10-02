@@ -37,10 +37,11 @@ vi.mock(
   }),
 );
 vi.mock("@utils", () => import("../../utils/outcomeVoteAggregate"));
-vi.mock("@consts", async (importOriginal) => ({
-  SECURITY_RELEVANT_PARAMS_MAP: (
-    await importOriginal<typeof import("@consts")>()
-  ).SECURITY_RELEVANT_PARAMS_MAP,
+vi.mock("@consts", () => ({
+  SECURITY_RELEVANT_PARAMS_MAP: {
+    maxTxSize: "max_tx_size",
+    maxBlockExecutionSteps: "max_block_ex_steps",
+  },
   primaryBlue: { c500: "blue" },
   successGreen: { c500: "green", c600: "green" },
   errorRed: { c500: "red" },

@@ -18,6 +18,9 @@ changes.
 
 ### Fixed
 
+- Outcomes displays each provider's action-specific vote tally independently, preserves exact threshold comparisons, and identifies unavailable historical voting data
+- db-sync no longer counts a DRep vote invalidated by retirement, including after re-registration
+- SPO voting results and thresholds are shown for parameter changes that only update block execution steps
 - IPFS upload accepts only a CIP-100 JSON-LD document and no longer returns Pinata error details ([#4171](https://github.com/IntersectMBO/govtool/issues/4171))
 - Server errors are logged and reported to Sentry ([#2776](https://github.com/IntersectMBO/govtool/issues/2776))
 - A DRep's own vote is returned on a proposal, and voted-on actions are left out of its proposal list
@@ -34,6 +37,8 @@ changes.
 
 ### Changed
 
+- Outcomes is always available and defaults to the configured GovTool backend under `/outcomes`
+- DRep activity sorting is offered only when the provider supplies directory activity
 - `govtool-backend` is the backend: CI, the Docker image and the deployment compose use it. The image reads its db-sync connection from `GOVTOOL_DBSYNC_*` environment variables
 - The outcomes API is served by the backend under `/outcomes`; the separate outcomes service is no longer deployed
 - Metadata validation is served by the backend under `/metadata`; the frontend calls it on `VITE_BASE_URL`
@@ -42,6 +47,7 @@ changes.
 
 ### Removed
 
+- The obsolete `votesLastYear` DRep directory response field and the `VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED` frontend variable
 - The Haskell backend (`govtool/backend`) and the TypeScript port (`govtool/backend-ts`)
 - The standalone metadata validation service (`govtool/metadata-validation`) and its image
 - The `VITE_METADATA_API_URL` frontend variable

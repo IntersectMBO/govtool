@@ -69,6 +69,19 @@ export const refreshMetadata = async (req: Request, res: Response): Promise<any>
     return res.status(200).json(outcome);
 };
 
+/**
+ * POST /api/metadata/:hash/verify?url= — fetch the url now, whatever the cache
+ * holds, for submission (D152). 200 with a `MetadataResult`; a failure carries
+ * its reportId. Not windowed: the backend rate-limits it.
+ */
+export const verifyMetadata = async (req: Request, res: Response): Promise<any> => {
+    const hashBuf = parseHash(req.params.hash);
+    const url = req.query.url;
+    if (!hashBuf) return res.status(400).json({ message: "Invalid hash provided in request" });
+    if (!isValidUrl(url)) return res.status(400).json({ message: "A valid url is required" });
+    return res.status(200).json(await service.verify(hashBuf, url));
+};
+
 /** GET /api/metadata/reports/:id */
 export const getReport = async (req: Request, res: Response): Promise<any> => {
     const id = req.params.id;

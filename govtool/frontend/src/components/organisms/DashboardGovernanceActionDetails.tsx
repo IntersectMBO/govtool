@@ -19,7 +19,13 @@ import {
 import { getFullGovActionId, getShortenedGovActionId } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
-import { MetadataStandard, ProposalData, ProposalVote } from "@/models";
+import {
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+  ProposalVote,
+} from "@/models";
 import { useValidateMutation } from "@/hooks/mutations";
 
 type DashboardGovernanceActionDetailsState = {
@@ -45,6 +51,7 @@ export const DashboardGovernanceActionDetails = () => {
     MetadataValidationStatus | undefined
   >();
   const [isMetadataValid, setIsMetadataValid] = useState<boolean | undefined>();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const fullProposalId = txHash && getFullGovActionId(txHash, +index);
   const shortenedGovActionId =
     txHash && getShortenedGovActionId(txHash, +index);
@@ -77,7 +84,7 @@ export const DashboardGovernanceActionDetails = () => {
     const validate = async () => {
       setIsValidating(true);
 
-      const { status, metadata, valid } = await validateMetadata({
+      const { status, metadata, valid, issues } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: extendedProposal?.url,
         hash: extendedProposal?.metadataHash ?? "",
@@ -94,6 +101,7 @@ export const DashboardGovernanceActionDetails = () => {
       }
 
       setMetadataStatus(status);
+      setMetadataIssues(issues);
       setIsValidating(false);
       setIsMetadataValid(valid);
     };
@@ -181,6 +189,7 @@ export const DashboardGovernanceActionDetails = () => {
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
             isDataMissing={metadataStatus}
+            metadataIssues={metadataIssues}
             isInProgress={
               pendingTransaction.vote?.resourceId ===
               fullProposalId?.replace("#", "")

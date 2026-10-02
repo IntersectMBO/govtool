@@ -613,6 +613,40 @@ describe('POST /api/metadata/:hash/refresh', () => {
   });
 });
 
+describe('POST /api/metadata/:hash/verify', () => {
+  const verifyPath = (hash: string, url: string) =>
+    `/api/metadata/${hash}/verify?url=${encodeURIComponent(url)}`;
+
+  it('should fetch the url even when the hash is cached, and report the failure', async () => {
+    await request(server).get(resolvePath(testMetadataHash, `http://localhost:${port()}/valid-meta`));
+    const response = await request(server).post(
+      verifyPath(testMetadataHash, `http://localhost:${port()}/not-found`),
+    );
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ ok: false, code: 'FETCH_ERROR' });
+    expect(response.body.reportId).toBeTruthy();
+  });
+
+  it('should answer a url that serves the document', async () => {
+    const response = await request(server).post(
+      verifyPath(testMetadataHash, `http://localhost:${port()}/valid-meta`),
+    );
+    expect(response.body).toMatchObject({ ok: true, hash: testMetadataHash, body: testMetadata });
+  });
+
+  it('should fetch every time, with no window', async () => {
+    const url = `http://localhost:${port()}/mutable`;
+    await request(server).post(verifyPath(testMetadataHash, url));
+    await request(server).post(verifyPath(testMetadataHash, url));
+    expect(fetchCount).toBe(2);
+  });
+
+  it('should reject a missing url or bad hash', async () => {
+    expect((await request(server).post(`/api/metadata/${testMetadataHash}/verify`)).status).toBe(400);
+    expect((await request(server).post(`/api/metadata/nothex/verify?url=http%3A%2F%2Fx.test`)).status).toBe(400);
+  });
+});
+
 describe('IPFS gateways', () => {
   const base = () => `http://localhost:${port()}`;
   const gw = (name: string) => `${base()}/${name}`;

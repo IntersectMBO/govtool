@@ -27,6 +27,14 @@ import { MetadataRetryButton } from "./MetadataRetryButton";
 
 type MetadataFailureDetailsProps = {
   anchor: MetadataAnchor | null | undefined;
+  /**
+   * The report of the check that just failed, such as a submission's
+   * (D152). Shown instead of looking the anchor up, whose cached answer can
+   * differ from what the url served just now.
+   */
+  reportId?: string;
+  /** Why the check could not run at all, when it could not. */
+  error?: string;
   /** Show the retry button (D118): gov-action pages, and a DRep's own page. */
   canRetry?: boolean;
   /** Called once a retry resolves the document, so the page can reload it. */
@@ -47,6 +55,8 @@ const formatTimestamp = (value: string) => {
  */
 export const MetadataFailureDetails = ({
   anchor,
+  reportId,
+  error,
   canRetry,
   onRecovered,
   sx,
@@ -59,10 +69,13 @@ export const MetadataFailureDetails = ({
   );
   const [retryNotice, setRetryNotice] = useState<string | null>(null);
 
-  const { metadataResult } = useGetMetadataResolveQuery(anchor);
+  const isOwnCheck = !!reportId || !!error;
+  const { metadataResult } = useGetMetadataResolveQuery(
+    isOwnCheck ? null : anchor,
+  );
   const failure: MetadataFailure | undefined =
     metadataResult && metadataResult.ok === false ? metadataResult : undefined;
-  const latestReportId = failure?.reportId ?? null;
+  const latestReportId = reportId ?? failure?.reportId ?? null;
 
   // A retry that fetched again moves the latest report; follow it.
   useEffect(() => {
@@ -72,7 +85,7 @@ export const MetadataFailureDetails = ({
   const shownReportId = selectedReportId ?? latestReportId;
   const { reports } = useGetMetadataReportsQuery(
     anchor,
-    isExpanded && !!failure,
+    isExpanded && !!latestReportId,
   );
   const {
     report,
@@ -92,7 +105,7 @@ export const MetadataFailureDetails = ({
   };
 
   if (!anchor) return null;
-  if (!failure) {
+  if (!failure && !isOwnCheck) {
     return retryNotice ? (
       <Typography
         variant="body2"
@@ -139,6 +152,16 @@ export const MetadataFailureDetails = ({
           <MetadataRetryButton anchor={anchor} onOutcome={onOutcome} />
         )}
       </Box>
+
+      {error && (
+        <Typography
+          variant="body2"
+          data-testid="metadata-check-error"
+          sx={{ fontFamily: "monospace", wordBreak: "break-word" }}
+        >
+          {error}
+        </Typography>
+      )}
 
       {retryNotice && (
         <Typography variant="body2" data-testid="metadata-retry-notice">

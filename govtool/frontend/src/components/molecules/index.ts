@@ -34,6 +34,7 @@ export * from "./GovernanceActionsDatesBox";
 export * from "./GovernanceVotedOnCard";
 export * from "./LinkWithIcon";
 export * from "./MetadataFailureDetails";
+export * from "./MetadataWarningInfoBox";
 export * from "./MetadataReportBody";
 export * from "./MetadataReportView";
 export * from "./MetadataRetryButton";

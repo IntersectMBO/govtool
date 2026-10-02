@@ -1,5 +1,9 @@
 export { default as UrlErrorModal } from './Modals/UrlErrorModal.jsx';
 export { default as ExternalDataNotMatchModal } from './Modals/ExternalDataNotMatchModal.jsx';
+export {
+    default as MetadataErrorModal,
+    hasMetadataErrorModal,
+} from './Modals/MetadataErrorModal.jsx';
 export { default as CancelRegistrationModal } from './Modals/CancelRegistrationModal.jsx';
 export { default as GovernanceActionSubmittedModal } from './Modals/GovernanceActionSubmittedModal.jsx';
 export { default as CancelGovActionSubmissionModal } from './Modals/CancelGovActionSubmissionModal.jsx';

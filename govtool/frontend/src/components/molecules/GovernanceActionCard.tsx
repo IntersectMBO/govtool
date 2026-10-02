@@ -16,7 +16,7 @@ import {
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
 } from "@utils";
-import { ProposalData } from "@models";
+import { MetadataIssue, MetadataValidationStatus, ProposalData } from "@models";
 
 type ActionTypeProps = Omit<
   ProposalData,
@@ -26,6 +26,7 @@ type ActionTypeProps = Omit<
   inProgress?: boolean;
   isValidating?: boolean;
   metadataStatus?: MetadataValidationStatus;
+  metadataIssues?: MetadataIssue[];
 };
 
 export const GovernanceActionCard: FC<ActionTypeProps> = ({
@@ -42,6 +43,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
   title,
   isValidating,
   metadataStatus,
+  metadataIssues,
   ...otherProposalData
 }) => {
   const { isMobile, screenWidth } = useScreenDimension();
@@ -89,6 +91,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
         <GovernanceActionCardHeader
           title={title}
           isDataMissing={metadataStatus}
+          metadataIssues={metadataIssues}
           isValidating={isValidating}
         />
         {!!metadataStatus && (

@@ -5,7 +5,7 @@ import { Button } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { DataMissingHeader } from "@molecules";
-import { DRepData } from "@/models";
+import { DRepData, MetadataValidationStatus } from "@/models";
 
 type DRepDetailsProps = {
   dRepData: DRepData;

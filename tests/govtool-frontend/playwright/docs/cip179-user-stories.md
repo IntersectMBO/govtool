@@ -34,7 +34,7 @@ User stories follow the maintainer's [User Story / Acceptance Criteria format](h
 
 ## Automated coverage and running locally
 
-Every story ID above appears in the corresponding test title in [authoring.spec.ts](../tests/cip179/authoring.spec.ts) or [survey.spec.ts](../tests/cip179/survey.spec.ts). Parameterized cases run in both desktop Chromium and mobile Chromium. The normal funded-wallet test configuration excludes this suite; the dedicated configuration starts the actual frontend itself.
+Every story ID above appears in the corresponding test title in [authoring.spec.ts](../tests/cip179/authoring.spec.ts) or [survey.spec.ts](../tests/cip179/survey.spec.ts). Parameterized cases run in both desktop Chromium and mobile Chromium. The suite runs in every default run of the main configuration as the `cip179 (desktop)` and `cip179 (mobile)` projects, against that run's frontend (the devnet's included); `npm run test:headless:cip179` runs only it and `npm run test:headless:no-cip179` skips it. The dedicated configuration (`npm run test:cip179`) starts the actual frontend itself instead.
 
 From the repository root, using the frontend's `.nvmrc` Node version:
 

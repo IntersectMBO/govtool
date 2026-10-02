@@ -21,6 +21,7 @@ export * from "./getGovActionId";
 export * from "./getGovActionVotingThresholdKey";
 export * from "./getLengthInBytes";
 export * from "./getMetadataDataMissingStatusTranslation";
+export * from "./getMetadataIssueMessage";
 export * from "./getProposalTypeLabel";
 export * from "./ipfsGateway";
 export * from "./isValidFormat";

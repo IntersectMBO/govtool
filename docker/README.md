@@ -13,14 +13,13 @@ From the repo root
 cd docker
 cp .env.example .env
 ```
-Also create the frontend and metadata-validation environment files:
+Also create the frontend environment file:
 
 ```bash
 cp ../govtool/frontend/.env.example ../govtool/frontend/.env
-cp ../govtool/metadata-validation/.env.example ../govtool/metadata-validation/.env
 ```
 
-Docker Compose loads the frontend container's runtime configuration from `govtool/frontend/.env`. Edit that file to configure the backend and metadata-validation URLs, network, and optional frontend integrations.
+Docker Compose loads the frontend container's runtime configuration from `govtool/frontend/.env`. Edit that file to configure the backend URL (metadata validation is served by the backend under `/metadata`), network, and optional frontend integrations.
 
 Fill in the db-sync details and required service URLs in `docker/.env`.
 
@@ -58,5 +57,5 @@ docker compose up -d --no-build
 
 ## Service endpoints
 - Frontend: http://localhost
-- Backend API: http://localhost:9999, including the outcomes API under `/outcomes`
-- Metadata validation: http://localhost:3000
+- Backend API: http://localhost:9999, including the outcomes API under `/outcomes` and metadata validation under `/metadata`
+- Metadata service and its Postgres (`metadata`, `metadata-db`): internal only, reached by the backend. Set `METADATA_DB_PASSWORD` in `docker/.env` first.

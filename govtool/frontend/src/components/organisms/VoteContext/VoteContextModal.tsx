@@ -13,7 +13,7 @@ import {
 } from "@organisms";
 import { NodeObject } from "jsonld";
 import { VoteContextFormValues, useVoteContextForm } from "@hooks";
-import { Vote } from "@/models";
+import { MetadataSubmissionFailure, Vote } from "@/models";
 
 export type VoteContextModalState = {
   onSubmit: (url: string, hash: string | null, voteContextText: string) => void;
@@ -34,6 +34,9 @@ export const VoteContextModal = () => {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined,
   );
+  const [metadataFailure, setMetadataFailure] = useState<
+    MetadataSubmissionFailure | undefined
+  >(undefined);
   const [jsonldContent, setJsonldContent] = useState<NodeObject | null>(null);
   const [metadataHash, setMetadataHash] = useState<string | null>(null);
 
@@ -76,6 +79,8 @@ export const VoteContextModal = () => {
             setStoreDataYourself={setStoreDataYourself}
             setSavedHash={setSavedHash}
             setErrorMessage={setErrorMessage}
+            setMetadataFailure={setMetadataFailure}
+            metadataFailure={metadataFailure}
             jsonldContent={jsonldContent}
             setJsonldContent={setJsonldContent}
             metadataHash={metadataHash}
@@ -108,6 +113,8 @@ const VoteContextFlow = ({
   setStoreDataYourself,
   setSavedHash,
   setErrorMessage,
+  setMetadataFailure,
+  metadataFailure,
   jsonldContent,
   setJsonldContent,
   metadataHash,
@@ -123,6 +130,10 @@ const VoteContextFlow = ({
   setStoreDataYourself: Dispatch<SetStateAction<boolean>>;
   setSavedHash: Dispatch<SetStateAction<string | null>>;
   setErrorMessage: Dispatch<SetStateAction<string | undefined>>;
+  setMetadataFailure: Dispatch<
+    SetStateAction<MetadataSubmissionFailure | undefined>
+  >;
+  metadataFailure: MetadataSubmissionFailure | undefined;
   jsonldContent: NodeObject | null;
   setJsonldContent: Dispatch<SetStateAction<NodeObject | null>>;
   metadataHash: string | null;
@@ -162,6 +173,7 @@ const VoteContextFlow = ({
           setSavedHash={setSavedHash}
           setStep={setStep}
           setErrorMessage={setErrorMessage}
+          setMetadataFailure={setMetadataFailure}
           onCancel={onCancel}
         />
       )}
@@ -171,6 +183,7 @@ const VoteContextFlow = ({
           closeModal={onCancel}
           setStep={setStep}
           errorMessage={errorMessage}
+          metadataFailure={metadataFailure}
         />
       )}
     </>

@@ -358,6 +358,13 @@ export const refresh = async (hash: Buffer, url: string): Promise<RefreshOutcome
   return { refetched: true, result: await fetchAndRecord(hash, url) };
 };
 
+/**
+ * Submission (D152): the url itself goes on chain, so cached content under the
+ * hash proves nothing about it. Always one real fetch, recorded like any other.
+ */
+export const verify = (hash: Buffer, url: string): Promise<MetadataResult> =>
+  fetchAndRecord(hash, url);
+
 /* -- reports ------------------------------------------------------------------ */
 
 const encodeBody = (bytes: Buffer) => {

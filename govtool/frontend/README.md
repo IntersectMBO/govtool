@@ -43,7 +43,6 @@ Vite prints the local URL when it starts, normally `http://localhost:5173`.
 The values copied from `.env.example` are suitable for a local frontend connected to the standard local services:
 
 - `VITE_BASE_URL`: GovTool backend API URL. The local Docker setup uses `http://localhost:9999`.
-- `VITE_METADATA_API_URL`: Metadata validation service URL. The local Docker setup uses `http://localhost:3000`.
 - `VITE_NETWORK_FLAG`: Cardano network selector; use `0` for a test network and `1` for mainnet.
 - `VITE_IS_DEV`: Keep this `true` locally to enable development behavior and skip the production maintenance check.
 - `VITE_IPFS_GATEWAY`: Gateway used to load `ipfs://` content.

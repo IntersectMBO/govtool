@@ -70,12 +70,21 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          # The frontend's version: the cip179 tests load its dependencies.
+          node-version-file: "./govtool/frontend/.nvmrc"
           cache: "npm"
-          cache-dependency-path: "./tests/govtool-frontend/playwright/package-lock.json"
+          cache-dependency-path: |
+            ./tests/govtool-frontend/playwright/package-lock.json
+            ./govtool/frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
+
+      # The cip179 project encodes its fixtures with the frontend's own
+      # codecs, imported from its source and node_modules.
+      - name: Install frontend dependencies for the cip179 tests
+        working-directory: govtool/frontend
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Cache Playwright browsers
         id: cache-playwright-browsers

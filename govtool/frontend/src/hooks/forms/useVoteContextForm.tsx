@@ -4,7 +4,7 @@ import { blake2bHex } from "blakejs";
 import { NodeObject } from "jsonld";
 
 import { downloadJson, generateJsonld, generateMetadataBody } from "@utils";
-import { MetadataValidationStatus } from "@models";
+import { MetadataSubmissionFailure, MetadataValidationStatus } from "@models";
 import { CIP_100_CONTEXT } from "@/consts";
 
 import { useValidateMutation } from "../mutations";
@@ -19,6 +19,9 @@ export const useVoteContextForm = (
   setSavedHash?: Dispatch<SetStateAction<string | null>>,
   setStep?: Dispatch<SetStateAction<number>>,
   setErrorMessage?: Dispatch<SetStateAction<string | undefined>>,
+  setMetadataFailure?: Dispatch<
+    SetStateAction<MetadataSubmissionFailure | undefined>
+  >,
 ) => {
   const { validateMetadata } = useValidateMutation();
   const [hash, setHash] = useState<string | null>(null);
@@ -63,19 +66,28 @@ export const useVoteContextForm = (
     async (data: VoteContextFormValues) => {
       try {
         if (!hash) {
-          throw new Error(MetadataValidationStatus.INVALID_HASH);
+          throw MetadataValidationStatus.INVALID_HASH;
         }
 
         const result = await validateMetadata({
           hash,
           url: data.storingURL,
+          verifyUrl: true,
         });
 
         if (result.status) {
+          if (setMetadataFailure) {
+            setMetadataFailure({
+              anchor: { url: data.storingURL, hash },
+              reportId: result.reportId,
+              error: result.error,
+            });
+          }
           throw result.status;
         }
 
         if (setErrorMessage) setErrorMessage(undefined);
+        if (setMetadataFailure) setMetadataFailure(undefined);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -88,7 +100,14 @@ export const useVoteContextForm = (
         if (setStep) setStep(5);
       }
     },
-    [hash, setErrorMessage, setSavedHash, setStep, validateMetadata],
+    [
+      hash,
+      setErrorMessage,
+      setMetadataFailure,
+      setSavedHash,
+      setStep,
+      validateMetadata,
+    ],
   );
 
   return {

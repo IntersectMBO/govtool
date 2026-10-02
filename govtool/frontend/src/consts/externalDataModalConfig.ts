@@ -29,6 +29,27 @@ const urlCannotBeFound = {
   feedbackText: I18n.t("modals.urlCannotBeFound.feedbackText"),
 };
 
+/** A warning modal whose texts all live under `modals.<key>`. */
+const storageErrorModal = (
+  key:
+    | "externalDataIncorrectFormat"
+    | "externalDataTooLarge"
+    | "urlBlocked"
+    | "metadataCheckFailed",
+) =>
+  ({
+    status: "warning",
+    title: I18n.t(`modals.${key}.title`),
+    message: I18n.t(`modals.${key}.message`),
+    buttonText: I18n.t(`modals.${key}.buttonText`),
+    cancelText: I18n.t(`modals.${key}.cancelRegistrationText`),
+    feedbackText: I18n.t(`modals.${key}.feedbackText`),
+  }) as const;
+
+const externalDataIncorrectFormatModal = storageErrorModal(
+  "externalDataIncorrectFormat",
+);
+
 export const storageInformationErrorModals: Record<
   MetadataValidationStatus,
   ModalState<
@@ -36,8 +57,14 @@ export const storageInformationErrorModals: Record<
   >["state"]
 > = {
   [MetadataValidationStatus.URL_NOT_FOUND]: urlCannotBeFound,
-  [MetadataValidationStatus.INCORRECT_FORMAT]: externalDataDoesntMatchModal,
-  [MetadataValidationStatus.INVALID_JSONLD]: externalDataDoesntMatchModal,
+  [MetadataValidationStatus.INCORRECT_FORMAT]: externalDataIncorrectFormatModal,
+  [MetadataValidationStatus.INVALID_JSONLD]: externalDataIncorrectFormatModal,
   [MetadataValidationStatus.INVALID_HASH]: externalDataDoesntMatchModal,
-  [MetadataValidationStatus.EXCEEDS_LIMIT]: externalDataDoesntMatchModal,
+  [MetadataValidationStatus.EXCEEDS_LIMIT]: storageErrorModal(
+    "externalDataTooLarge",
+  ),
+  [MetadataValidationStatus.URL_BLOCKED]: storageErrorModal("urlBlocked"),
+  [MetadataValidationStatus.INTERNAL_ERROR]: storageErrorModal(
+    "metadataCheckFailed",
+  ),
 };

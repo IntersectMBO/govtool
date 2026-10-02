@@ -260,6 +260,17 @@ export interface MetadataServiceV1 {
    */
   refresh(hash: Hex, url: string): Promise<MetadataRefreshOutcome>;
 
+  /**
+   * Fetch `url` now and check it against `hash`, whatever the cache holds, for
+   * submission, where the url itself goes on chain (D152). A failure carries
+   * its `reportId` like any other. Content that verifies is cached as usual.
+   *
+   * Not windowed like `refresh`: the caller answers a person submitting, and
+   * limits its own rate. Optional: absent means the backend verifies with its
+   * own fetch, which has no report.
+   */
+  verify?(hash: Hex, url: string): Promise<MetadataResult>;
+
   /** One fetch report by id, or `null` when there is none. */
   getReport(reportId: string): Promise<MetadataReport | null>;
 

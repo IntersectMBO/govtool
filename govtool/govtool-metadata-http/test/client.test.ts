@@ -284,6 +284,46 @@ describe('refresh', () => {
   });
 });
 
+describe('verify', () => {
+  it('POSTs to the verify route and passes a failure through with its report', async () => {
+    const result = {
+      ok: false,
+      code: 'FETCH_ERROR',
+      category: 'NETWORK',
+      message: 'Unexpected Status code: 404',
+      reportId: 'rep-3',
+      checkedAt: FETCHED_AT,
+    } as const;
+    reply = () => ({ status: 200, body: result });
+    assert.deepEqual(await service().verify!(HASH, URL_), result);
+    const req = last();
+    assert.equal(req.method, 'POST');
+    assert.equal(req.path, `/api/metadata/${HASH}/verify`);
+    assert.equal(req.query.get('url'), URL_);
+  });
+
+  it('passes a success through', async () => {
+    const result = {
+      ok: true,
+      hash: HASH,
+      body: { x: 1 },
+      fetchedAt: FETCHED_AT,
+    } as const;
+    reply = () => ({ status: 200, body: result });
+    assert.deepEqual(await service().verify!(HASH, URL_), result);
+  });
+
+  it('throws on a status or body outside the contract', async () => {
+    reply = () => ({
+      status: 400,
+      body: { message: 'A valid url is required' },
+    });
+    await assert.rejects(service().verify!(HASH, URL_), MetadataHttpError);
+    reply = () => ({ status: 200, body: { ok: 'maybe' } });
+    await assert.rejects(service().verify!(HASH, URL_), MetadataHttpError);
+  });
+});
+
 describe('reports', () => {
   const report: MetadataReport = {
     id: 'rep-1',

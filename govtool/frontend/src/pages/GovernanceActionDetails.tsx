@@ -24,7 +24,12 @@ import {
   getShortenedGovActionId,
 } from "@utils";
 import { Breadcrumbs } from "@molecules";
-import { MetadataStandard, ProposalData } from "@/models";
+import {
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+} from "@/models";
 import { useValidateMutation } from "@/hooks/mutations";
 
 type GovernanceActionDetailsState = {
@@ -66,6 +71,7 @@ export const GovernanceActionDetails = () => {
   const [metadataStatus, setMetadataStatus] = useState<
     MetadataValidationStatus | undefined
   >();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const { validateMetadata } = useValidateMutation();
   // Bumped when a retry resolves the metadata, to validate it again.
   const [validationRevision, setValidationRevision] = useState(0);
@@ -74,7 +80,7 @@ export const GovernanceActionDetails = () => {
     if (!extendedProposal?.url) return;
 
     const validate = async () => {
-      const { status, metadata } = await validateMetadata({
+      const { status, metadata, issues } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: extendedProposal?.url,
         hash: extendedProposal?.metadataHash ?? "",
@@ -90,6 +96,7 @@ export const GovernanceActionDetails = () => {
         }));
       }
       setMetadataStatus(status);
+      setMetadataIssues(issues);
     };
     validate();
   }, [extendedProposal?.url, validationRevision]);
@@ -192,6 +199,7 @@ export const GovernanceActionDetails = () => {
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
                   isDataMissing={metadataStatus}
+                  metadataIssues={metadataIssues}
                   onMetadataRecovered={() =>
                     setValidationRevision((value) => value + 1)
                   }

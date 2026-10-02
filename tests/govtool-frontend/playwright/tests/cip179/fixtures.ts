@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 import { Decoder } from "cbor-x";
 import { blake2b } from "blakejs";
 // Use the frontend's pinned codecs, without adding a second dependency version.
@@ -89,6 +89,9 @@ export async function setup(
     presentation?: { body: string; status?: number };
   } = {}
 ) {
+  // The frontend under test: the local Vite server (playwright.cip179.config.ts)
+  // or the run's deployed frontend (playwright.config.ts, devnet included).
+  const origin = new URL(test.info().project.use.baseURL!).origin;
   const transactions = { unsigned: [] as string[], signed: [] as string[] };
   const requests: string[] = [];
   const errors: string[] = [];
@@ -119,9 +122,11 @@ export async function setup(
       params,
     }) => {
       const w = window as any;
-      w.__ENV__ = {
+      // Frozen, so a deployed frontend's own runtime config (the plain
+      // `window.__ENV__ = ...` script docker-entrypoint.sh injects) cannot
+      // replace it; that assignment is then a silent no-op.
+      const fixtureEnv = {
         VITE_BASE_URL: `${location.origin}/fixture-api`,
-        VITE_METADATA_API_URL: `${location.origin}/fixture-metadata`,
         VITE_NETWORK_FLAG: "0",
         VITE_IS_DEV: "true",
         ...(enabled === "default"
@@ -130,6 +135,11 @@ export async function setup(
         VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false",
         VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: "false",
       };
+      Object.defineProperty(w, "__ENV__", {
+        value: fixtureEnv,
+        writable: false,
+        configurable: false,
+      });
       localStorage.setItem("protocol_params", JSON.stringify(params));
       if (!connected) return;
       localStorage.setItem("wallet_data_name", JSON.stringify("fixture"));
@@ -224,7 +234,7 @@ export async function setup(
       });
     }
     // No test is allowed to reach a real API, wallet backend or third party.
-    if (url.origin !== "http://127.0.0.1:4179") return route.abort();
+    if (url.origin !== origin) return route.abort();
     if (!url.pathname.startsWith("/fixture-")) return route.continue();
     requests.push(url.pathname);
     let json: unknown;
@@ -258,7 +268,7 @@ export async function setup(
     else if (url.pathname.startsWith("/fixture-api/survey/definition/")) {
       json = options.envelope ?? envelope(options.survey);
       status = options.surveyStatus ?? 200;
-    } else if (url.pathname === "/fixture-metadata/validate")
+    } else if (url.pathname === "/fixture-api/metadata/validate")
       json = { valid: true, status: null, metadata: proposal };
     else if (url.pathname === "/fixture-api/network/total-stake")
       json = {

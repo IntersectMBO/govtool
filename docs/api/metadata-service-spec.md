@@ -13,8 +13,10 @@ an Express, Prisma and Postgres service in this repository.
 `GOVTOOL_METADATA_SERVICE_URL` is set, and every metadata-derived field
 (`givenName`, `title`, `abstract`, references) is `null` when it is not.
 
-The remaining plan is to fold GovTool's `metadata-validation` module into it
-and retire that module.
+`govtool/metadata-validation`, the standalone validator, is removed
+(2026-10-01): `govtool-backend` serves its `POST /validate` as
+`POST /metadata/validate`. The remaining plan is to move that validation into
+the metadata service.
 
 ---
 
@@ -33,7 +35,7 @@ and retire that module.
 | Fetch hardening | redirect limit 10, 40 s timeout, 2 MB body cap |
 | Lenient parsing | JSON5, so trailing commas and comments survive |
 
-### `govtool/metadata-validation` — NestJS, standalone
+### `govtool/metadata-validation` — NestJS, standalone (removed 2026-10-01)
 
 | Has | Detail |
 |---|---|
@@ -383,8 +385,12 @@ fill in a form, and on details pages to publishers whose document stopped
 showing (D117). The backend's own 1 MB fetch cap, reported as `URL_NOT_FOUND`,
 is replaced by the shared 2 MB constant (D120).
 
-**`govtool/metadata-validation` is then deleted**, not maintained in parallel.
-Its `POST /validate` route is served by `?cip=` on the merged service, and
+**`govtool/metadata-validation` is deleted** (done 2026-10-01; the backend's
+`POST /metadata/validate` answers in its place, with an `issues` list naming
+the fields at fault, and `verifyUrl: true` for submission, which fetches the
+url through the service's `verify` rather than trusting the hash cache and
+carries the fetch report, D152). Its route is to be served by `?cip=` on the merged
+service, and
 `/api/v1/metadata/validations` in the REST v1 spec becomes a thin proxy or is
 dropped in favour of the GET.
 
@@ -400,7 +406,8 @@ dropped in favour of the GET.
    the backend already resolved arrive with status attached; anything the
    frontend holds itself it checks locally with the shared package. Either way
    the round trip disappears.
-5. **Delete `govtool/metadata-validation`.**
+5. **Delete `govtool/metadata-validation`.** Done 2026-10-01, ahead of step 4:
+   the per-card requests go to the backend's `/metadata/validate` until then.
 
 Step 4 lands with the frontend's move to the `/api/v1` routes.
 

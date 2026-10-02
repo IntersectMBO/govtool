@@ -8,12 +8,16 @@ import { useTranslation, useScreenDimension, useVoteContextForm } from "@hooks";
 import { Step } from "@molecules";
 import { ControlledField, VoteContextWrapper } from "@organisms";
 import { URL_REGEX, isValidURLLength, openInNewTab } from "@utils";
+import type { MetadataSubmissionFailure } from "@models";
 import { LINKS } from "@/consts/links";
 
 type VoteContextStoringInformationProps = {
   setStep: Dispatch<SetStateAction<number>>;
   setSavedHash: Dispatch<SetStateAction<string | null>>;
   setErrorMessage: Dispatch<SetStateAction<string | undefined>>;
+  setMetadataFailure: Dispatch<
+    SetStateAction<MetadataSubmissionFailure | undefined>
+  >;
   onCancel: () => void;
 };
 
@@ -21,6 +25,7 @@ export const VoteContextStoringInformation = ({
   setStep,
   setSavedHash,
   setErrorMessage,
+  setMetadataFailure,
   onCancel,
 }: VoteContextStoringInformationProps) => {
   const { t } = useTranslation();
@@ -33,7 +38,12 @@ export const VoteContextStoringInformation = ({
     watch,
     generateMetadata,
     onClickDownloadJson,
-  } = useVoteContextForm(setSavedHash, setStep, setErrorMessage);
+  } = useVoteContextForm(
+    setSavedHash,
+    setStep,
+    setErrorMessage,
+    setMetadataFailure,
+  );
 
   const openGuideAboutStoringInformation = () =>
     openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);

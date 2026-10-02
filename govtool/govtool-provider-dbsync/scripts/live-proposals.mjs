@@ -123,9 +123,14 @@ if (bySort.highestParticipation) {
   const rows = await q(`
     WITH cur AS (SELECT max(no) no FROM epoch),
     f AS (SELECT g.id, COALESCE(g.ratified_epoch, g.expired_epoch, g.dropped_epoch, cur.no) e FROM gov_action_proposal g, cur),
-    v AS (SELECT DISTINCT ON (gov_action_proposal_id, drep_voter) gov_action_proposal_id pid, drep_voter FROM voting_procedure
+    v AS (SELECT DISTINCT ON (gov_action_proposal_id, drep_voter) gov_action_proposal_id pid, drep_voter, tx_id FROM voting_procedure
            WHERE drep_voter IS NOT NULL AND invalid IS NULL ORDER BY gov_action_proposal_id, drep_voter, tx_id DESC, id DESC),
-    voted AS (SELECT f.id, sum(dd.amount) s FROM f JOIN v ON v.pid = f.id JOIN drep_distr dd ON dd.hash_id = v.drep_voter AND dd.epoch_no = f.e AND dd.active_until >= f.e GROUP BY f.id),
+    voted AS (SELECT f.id, sum(dd.amount) s FROM f JOIN v ON v.pid = f.id JOIN drep_distr dd ON dd.hash_id = v.drep_voter AND dd.epoch_no = f.e AND dd.active_until >= f.e
+      WHERE NOT EXISTS (SELECT 1 FROM drep_registration retired
+        JOIN tx rt ON rt.id = retired.tx_id JOIN block rb ON rb.id = rt.block_id
+        WHERE retired.drep_hash_id = v.drep_voter AND retired.deposit < 0
+          AND retired.tx_id > v.tx_id AND rb.epoch_no <= f.e)
+      GROUP BY f.id),
     tot AS (SELECT dd.epoch_no e, sum(dd.amount) FILTER (WHERE dd.active_until >= dd.epoch_no OR dh.view = 'drep_always_no_confidence') s
               FROM drep_distr dd JOIN drep_hash dh ON dh.id = dd.hash_id WHERE dd.epoch_no IN (SELECT e FROM f) GROUP BY 1)
     SELECT encode(t.hash,'hex') h, g.index i, COALESCE(voted.s, 0)::numeric / NULLIF(tot.s, 0) k

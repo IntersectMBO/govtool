@@ -20,6 +20,7 @@ changes.
 
 - Outcomes displays each provider's action-specific vote tally independently, preserves exact threshold comparisons, and identifies unavailable historical voting data
 - db-sync no longer counts a DRep vote invalidated by retirement, including after re-registration
+- db-sync proposal rankings use the same retirement validity rule as the displayed vote tallies
 - SPO voting results and thresholds are shown for parameter changes that only update block execution steps
 - IPFS upload accepts only a CIP-100 JSON-LD document and no longer returns Pinata error details ([#4171](https://github.com/IntersectMBO/govtool/issues/4171))
 - Server errors are logged and reported to Sentry ([#2776](https://github.com/IntersectMBO/govtool/issues/2776))

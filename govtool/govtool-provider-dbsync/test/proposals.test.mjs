@@ -379,6 +379,20 @@ test('filter and search values are bound, never interpolated', async () => {
   assert.match(main.sql, /ORDER BY g\.expiration ASC NULLS LAST, g\.id ASC/);
 });
 
+for (const sort of ['mostYesVotes', 'highestParticipation']) {
+  test(`${sort} applies the same retirement cutoff as the displayed DRep tally`, async () => {
+    const { api, db } = provider([['count(*) AS n', [{ n: '0' }]], ['total_count', []]]);
+    await api.list({ page: 1, size: 5, sort });
+    const { sql } = db.calls[0];
+    assert.match(sql, /eps AS \(SELECT DISTINCT e FROM f\)/);
+    assert.match(sql, /bound AS MATERIALIZED/);
+    assert.match(sql, /vp\.vote::text AS vote, vp\.tx_id/);
+    assert.match(sql, /retired\.drep_hash_id = dv\.voter AND retired\.deposit < 0/);
+    assert.match(sql, /retired\.tx_id > dv\.tx_id AND retired\.tx_id <= bound\.max_tx/);
+    assert.match(sql, /JOIN bound ON bound\.e = f\.e/);
+  });
+}
+
 test('getEnacted is keyed by lineage: committee covers UpdateCommittee AND NoConfidence', async () => {
   const { api, db } = provider([['enacted_epoch IS NOT NULL', (params) => (params[0].includes('NoConfidence') ? [{ tx_hash: TX(4), index: 1 }] : [])]]);
   const committee = await api.getEnacted('committee');

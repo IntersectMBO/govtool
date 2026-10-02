@@ -25,7 +25,7 @@ import { invalidInput, notFound } from '../errors';
 import { decodeGovActionId, encodeGovActionId, isHex } from '../ids';
 import { toInt } from '../numbers';
 import { toPage, toWindow } from '../paging';
-import { loadAggregates, type TallyTarget } from './proposals/aggregates';
+import { BOUND, loadAggregates, validDRepVoteSql, type TallyTarget } from './proposals/aggregates';
 import { LINEAGE_DB_TYPES, TYPE_TO_DB } from './proposals/body';
 import {
   deriveStatus,
@@ -89,9 +89,11 @@ const own = <T extends object>(table: T, key: unknown): key is keyof T =>
 function rankingCtes(sort: 'mostYesVotes' | 'highestParticipation'): string {
   const participation = sort === 'highestParticipation';
   return `,
+  eps AS (SELECT DISTINCT e FROM f),
+  ${BOUND},
   dv AS (
     SELECT DISTINCT ON (vp.gov_action_proposal_id, vp.drep_voter)
-           vp.gov_action_proposal_id AS pid, vp.drep_voter AS voter, vp.vote::text AS vote
+           vp.gov_action_proposal_id AS pid, vp.drep_voter AS voter, vp.vote::text AS vote, vp.tx_id
       FROM voting_procedure vp
      WHERE vp.invalid IS NULL AND vp.drep_voter IS NOT NULL AND vp.gov_action_proposal_id IN (SELECT id FROM f)
      ORDER BY vp.gov_action_proposal_id, vp.drep_voter, vp.tx_id DESC, vp.id DESC),
@@ -100,6 +102,7 @@ function rankingCtes(sort: 'mostYesVotes' | 'highestParticipation'): string {
       FROM f
       JOIN dv ON dv.pid = f.id
       JOIN drep_distr dd ON dd.hash_id = dv.voter AND dd.epoch_no = f.e AND dd.active_until >= f.e
+     WHERE ${validDRepVoteSql('dv', 'f.e')}
      GROUP BY f.id),
   nc AS (
     SELECT dd.epoch_no AS e, sum(dd.amount) AS amount

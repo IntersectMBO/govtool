@@ -71,11 +71,18 @@ const TARGETS = `p AS (SELECT * FROM unnest($1::bigint[], $2::int[]) AS p(id, e)
  * join to `tx` is needed afterwards, which on mainnet would be a scan of
  * every transaction.
  */
-const BOUND = `bound AS MATERIALIZED (
+export const BOUND = `bound AS MATERIALIZED (
     SELECT lb.e,
            (SELECT t.id FROM tx t WHERE t.block_id <= lb.max_block ORDER BY t.block_id DESC, t.id DESC LIMIT 1) AS max_tx
       FROM (SELECT eps.e, (SELECT max(x.id) FROM (SELECT b.id FROM block b WHERE b.epoch_no = eps.e OFFSET 0) x) AS max_block
               FROM eps) lb)`;
+
+/** The same tally-epoch validity rule must govern displayed totals and ranking. */
+export const validDRepVoteSql = (vote: string, epoch: string) => `NOT EXISTS (
+       SELECT 1 FROM drep_registration retired
+       JOIN bound ON bound.e = ${epoch}
+        WHERE retired.drep_hash_id = ${vote}.voter AND retired.deposit < 0
+          AND retired.tx_id > ${vote}.tx_id AND retired.tx_id <= bound.max_tx)`;
 
 const latestVotes = (column: string) => `
   SELECT DISTINCT ON (vp.gov_action_proposal_id, vp.${column})
@@ -101,11 +108,7 @@ WITH ${TARGETS},
       FROM p
       JOIN v ON v.pid = p.id
       JOIN drep_distr dd ON dd.hash_id = v.voter AND dd.epoch_no = p.e AND dd.active_until >= p.e
-     WHERE NOT EXISTS (
-       SELECT 1 FROM drep_registration retired
-       JOIN bound ON bound.e = p.e
-        WHERE retired.drep_hash_id = v.voter AND retired.deposit < 0
-          AND retired.tx_id > v.tx_id AND retired.tx_id <= bound.max_tx)
+     WHERE ${validDRepVoteSql('v', 'p.e')}
      GROUP BY p.id),
   tot AS (
     SELECT dd.epoch_no AS e,

@@ -2,7 +2,7 @@
 
 Voting and delegation pillars APIs [https://be.gov.tools/swagger-ui/#/](https://be.gov.tools/swagger-ui/#/)
 
-Outcomes APIs: served by the GovTool backend under `/outcomes`, replacing the separate outcomes service ([be.outcomes.gov.tools](https://be.outcomes.gov.tools/)).
+Governance action history APIs: served by the GovTool backend under `/governance-actions`, replacing the separate outcomes service ([be.outcomes.gov.tools](https://be.outcomes.gov.tools/)).
 
 Proposal Discussion and Budget proposals APIs [proposal-pillar-api](./proposal-pillar-api/README.md "mention")
 

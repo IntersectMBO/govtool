@@ -36,7 +36,7 @@ The Koios setup is part of a trial of new data sources. It is not used by the ho
 [`docker/docker-compose.yaml`](https://github.com/IntersectMBO/govtool/blob/develop/docker/README.md) runs the published images against a db-sync PostgreSQL instance that you provide. It starts:
 
 * the frontend on port `80`
-* the backend on port `9999`, including the outcomes API under `/outcomes`
+* the backend on port `9999`, including governance action records under `/governance-actions`
 * the metadata validation service on port `3000`
 
 Set `DBSYNC_NETWORK` in `docker/.env` to the network your db-sync follows (`mainnet`, `preprod`, `preview` or `devnet`). If it does not match the database, every backend route answers `500`. See [Core GovTool](./core-govtool.md) for the db-sync prerequisites.

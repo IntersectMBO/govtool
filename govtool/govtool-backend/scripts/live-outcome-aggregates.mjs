@@ -165,6 +165,7 @@ try {
           'abstain',
           'notVoted',
           'totalEligible',
+          'passing',
         ];
         const changed = fields.filter((field) => a[field] !== b[field]);
         if (

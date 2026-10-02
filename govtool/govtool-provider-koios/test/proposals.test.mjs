@@ -263,6 +263,25 @@ test('SPO figures: bootstrap abstains the silent, NoConfidence counts passive no
   assert.throws(() => spoFigures('InfoAction', { ...pcSummary }, 10), (e) => e.code === 'INTERNAL');
 });
 
+test('current committee approval honours the minimum size, with the bootstrap exception', async () => {
+  const read = async (major, minimum) => {
+    const { chainData, calls } = provider(routes({
+      epoch_params: () => [{ ...paramsRow(EPOCH, major), committee_min_size: minimum }],
+    }));
+    const action = (await chainData.governance.proposals.get(pc.proposal_id)).data;
+    assert.ok(calls.find((c) => c.endpoint === 'epoch_params').url.searchParams.get('select').split(',').includes('committee_min_size'));
+    return action.voteAggregates.find((a) => a.role === 'cc');
+  };
+  const small = await read(10, 3);
+  assert.equal(small.yes, '1');
+  assert.equal(small.abstain, '1');
+  assert.equal(small.totalEligible, '2');
+  assert.equal(small.passing, false, 'a 100% non-abstaining yes ratio cannot override minimum size');
+  assert.equal((await read(10, 2)).passing, undefined);
+  assert.equal((await read(9, 3)).passing, undefined);
+  await assert.rejects(read(10, null), { code: 'STALE_DATA' });
+});
+
 test('list maps rows, attaches aggregates, pages with an exact total', async () => {
   const { chainData, calls } = provider(routes());
   const page = await chainData.governance.proposals.list({ page: 1, size: 2 });
@@ -301,6 +320,7 @@ test('a live action gets a cc count aggregate from the eligible committee', asyn
     notVoted: '0',
     totalEligible: '2',
     threshold: { numerator: 3, denominator: 5 },
+    passing: false,
   });
   assert.equal(data.voteAggregates.find((a) => a.role === 'spo'), undefined, 'minPoolCost is not a security parameter');
   assert.deepEqual(data.body.changes, { minPoolCost: '75000000' });

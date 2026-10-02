@@ -5558,3 +5558,20 @@ The latest registration alone therefore cannot establish that its old vote is st
   re-registration remains eligible under the existing activity and stake rules.
 - This aligns the db-sync aggregate with Koios's retirement rule without changing the eligible total
   or silently converting a supported vote into an unavailable aggregate.
+
+## D161 — Committee aggregates carry the minimum-size approval veto
+
+**Date:** 2026-10-02
+**Evidence:** The ledger's `votingCommitteeThresholdInternal` refuses committee approval when
+active membership is below `committeeMinSize`, except during bootstrap. A quorum ratio alone
+cannot reproduce that decision, even with unanimous yes votes or a zero quorum.
+Source: [Conway governance rule](https://github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/src/Cardano/Ledger/Conway/Governance/Internal.hs#L441-L459).
+**Amends:** D158 (deriving passing from an aggregate's ratio alone).
+
+- db-sync and current-epoch Koios committee aggregates retain their complete vote breakdown and
+  quorum, and supply the existing optional `passing: false` when eligible membership is below
+  the tally epoch's minimum size outside bootstrap.
+- Meeting the minimum does not itself mean passing; the existing exact quorum comparison applies.
+  Bootstrap bypasses this size gate, and InfoAction still has no pass/fail indicator.
+- The Outcomes frontend already honours provider decisions. No additional protocol-parameter
+  request or network-wide metric is needed to display the veto.

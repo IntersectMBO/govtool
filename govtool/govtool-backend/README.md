@@ -261,7 +261,7 @@ To check desktop and mobile rendering with those sampled tallies, run from
 `../../tests/govtool-frontend/playwright`:
 
 ```bash
-OUTCOMES_LIVE_REPORT=/tmp/govtool-outcomes-live.json npx playwright test --config playwright.outcomes.config.ts
+OUTCOMES_LIVE_REPORT=/tmp/govtool-outcomes-live.json npm run test:outcomes-aggregates
 ```
 
 These browser checks replay the captured aggregate data through mocked HTTP

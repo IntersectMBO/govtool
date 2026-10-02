@@ -692,24 +692,27 @@ describe('GET /outcomes/governance-actions/:id', () => {
     expect(networkMetrics).not.toHaveBeenCalled();
   });
 
-  it('does not leak provider extensions from aggregates or thresholds', async () => {
-    const aggregate = govAction().voteAggregates![0];
-    const extended = {
-      ...aggregate,
-      privateExtra: 'hidden',
-      threshold: { ...aggregate.threshold, privateExtra: 'hidden' },
-      passing: true,
-    };
-    const row = await service({
-      governance: {
-        proposals: {
-          get: () =>
-            Promise.resolve(env(govAction({ voteAggregates: [extended] }))),
+  it.each([true, false])(
+    'projects passing=%s without leaking provider extensions',
+    async (passing) => {
+      const aggregate = govAction().voteAggregates![0];
+      const extended = {
+        ...aggregate,
+        privateExtra: 'hidden',
+        threshold: { ...aggregate.threshold, privateExtra: 'hidden' },
+        passing,
+      };
+      const row = await service({
+        governance: {
+          proposals: {
+            get: () =>
+              Promise.resolve(env(govAction({ voteAggregates: [extended] }))),
+          },
         },
-      },
-    }).get(TX, '0');
-    expect(row.vote_aggregates).toEqual([{ ...aggregate, passing: true }]);
-  });
+      }).get(TX, '0');
+      expect(row.vote_aggregates).toEqual([{ ...aggregate, passing }]);
+    },
+  );
 
   it('leaves absent aggregates absent rather than synthesizing zero tallies', async () => {
     const row = await service({

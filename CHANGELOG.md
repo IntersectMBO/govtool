@@ -18,6 +18,7 @@ changes.
 
 ### Fixed
 
+- Committee outcome indicators respect the ledger's minimum committee size outside bootstrap
 - Outcomes displays each provider's action-specific vote tally independently, preserves exact threshold comparisons, and identifies unavailable historical voting data
 - db-sync no longer counts a DRep vote invalidated by retirement, including after re-registration
 - db-sync proposal rankings use the same retirement validity rule as the displayed vote tallies

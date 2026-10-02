@@ -21,6 +21,7 @@
   },
   "scripts": {
     "test:cip179": "playwright test --config playwright.cip179.config.ts",
+    "test:outcomes-aggregates": "playwright test --config playwright.outcomes.config.ts",
     "allure:generate": "npx allure generate ./allure-results --clean",
     "allure:open": "npx allure open ./allure-report",
     "allure:serve": "npx allure serve",

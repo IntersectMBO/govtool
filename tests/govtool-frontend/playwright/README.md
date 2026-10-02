@@ -219,6 +219,16 @@ npm run test:outcomes
 npm run test:headless:outcomes
 ```
 
+For offline desktop/mobile aggregate replays, run:
+
+```bash
+npm run test:outcomes-aggregates
+```
+
+This starts a local Vite server and mocks HTTP; it needs no backend or wallet.
+The deployment suite excludes these fixtures. To replay a captured provider
+comparison, set `OUTCOMES_LIVE_REPORT=/path/to/report.json` for the same command.
+
 ---
 
 #### 4. **Proposal Pillar**

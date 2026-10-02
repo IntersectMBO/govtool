@@ -63,6 +63,8 @@ Declared (`system.getCapabilities()`, `capabilities()`):
 - **Committee voters** are resolved from hot to cold credential through the
   committee. A cold-id voter lookup that cannot be resolved is refused rather
   than answered "not voted".
+  A current-epoch committee aggregate below `committeeMinSize` supplies
+  `passing: false` outside bootstrap, while retaining the vote breakdown.
 - **Pages** are capped at 1,000 rows, which is also PostgREST's cap on a
   response; a larger request is refused, never silently shortened.
 - **Request bodies** over roughly five kilobytes are rejected by Koios, which

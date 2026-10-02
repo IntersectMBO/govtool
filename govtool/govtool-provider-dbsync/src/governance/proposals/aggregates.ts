@@ -219,7 +219,7 @@ SELECT p.id::text AS id, p.e, comm.committee_id IS NOT NULL AS has_committee,
 
 /** Thresholds and protocol version at each tally epoch. */
 export const PARAMS_SQL = `
-SELECT epoch_no AS e, protocol_major,
+SELECT epoch_no AS e, protocol_major, committee_min_size,
        dvt_motion_no_confidence, dvt_committee_normal, dvt_committee_no_confidence, dvt_update_to_constitution,
        dvt_hard_fork_initiation, dvt_p_p_network_group, dvt_p_p_economic_group, dvt_p_p_technical_group,
        dvt_p_p_gov_group, dvt_treasury_withdrawal,
@@ -268,7 +268,7 @@ export interface CcRow {
   abstain: string | number;
 }
 
-export type ParamsRow = { e: number; protocol_major: number } & Record<string, number | null>;
+export type ParamsRow = { e: number; protocol_major: number } & Record<string, number | string | null>;
 
 /* ------------------------------------------------------------------------- */
 /* Pure computation                                                           */
@@ -424,7 +424,19 @@ export function assembleAggregates(
     // With no committee in force (after an enacted NoConfidence) there is no
     // quorum and nobody eligible; the committee row is left out rather than
     // given an invented threshold.
-    if (t.cc && c?.has_committee) list.push(aggregate('cc', ccFigures(c), t.cc));
+    if (t.cc && c?.has_committee) {
+      const result = aggregate('cc', ccFigures(c), t.cc);
+      if (target.dbType !== 'InfoAction' && p.protocol_major >= 10) {
+        const minSize = p.committee_min_size;
+        if (minSize == null) throw stale('committee minimum size', target.epoch);
+        // db-sync stores this as an int8, which pg returns as a string.
+        if (!/^\d+$/.test(String(minSize))) throw internal('Invalid committee minimum size');
+        // A quorum ratio cannot approve an undersized committee, even at a
+        // zero threshold. Keep its breakdown, but veto the inferred decision.
+        if (BigInt(c.eligible) < BigInt(minSize)) result.passing = false;
+      }
+      list.push(result);
+    }
     out.set(target.id, list);
   }
   return out;

@@ -219,7 +219,7 @@ export async function loadAggregates(ctx: Ctx, targets: readonly TallyTarget[], 
       { epoch_no: inList(epochs.map(String)) },
       {
         select:
-          'epoch_no,protocol_major,dvt_motion_no_confidence,dvt_committee_normal,dvt_committee_no_confidence,' +
+          'epoch_no,protocol_major,committee_min_size,dvt_motion_no_confidence,dvt_committee_normal,dvt_committee_no_confidence,' +
           'dvt_update_to_constitution,dvt_hard_fork_initiation,dvt_p_p_network_group,dvt_p_p_economic_group,' +
           'dvt_p_p_technical_group,dvt_p_p_gov_group,dvt_treasury_withdrawal,pvt_motion_no_confidence,' +
           'pvt_committee_normal,pvt_committee_no_confidence,pvt_hard_fork_initiation,pvtpp_security_group',
@@ -264,7 +264,16 @@ export async function loadAggregates(ctx: Ctx, targets: readonly TallyTarget[], 
       const yes = count('Yes');
       const no = count('No');
       const abstain = count('Abstain');
-      list.push(aggregate('cc', { yes, no, abstain, notVoted: BigInt(cc.hot.size) - yes - no - abstain }, t.cc));
+      const result = aggregate('cc', { yes, no, abstain, notVoted: BigInt(cc.hot.size) - yes - no - abstain }, t.cc);
+      if (target.row.proposal_type !== 'InfoAction' && (p.protocol_major ?? 0) >= 10) {
+        const minSize = p.committee_min_size;
+        if (minSize == null) throw staleData('Koios has no committee minimum size for the tally epoch yet', { epoch: s.epoch_no });
+        if (!Number.isSafeInteger(minSize) || minSize < 0) throw internal('Koios sent an invalid committee minimum size');
+        // The ledger refuses approval from an undersized committee, even
+        // when its voting ratio meets quorum. Bootstrap bypasses this gate.
+        if (cc.hot.size < minSize) result.passing = false;
+      }
+      list.push(result);
     }
     out.set(target.row.proposal_id, list);
   });

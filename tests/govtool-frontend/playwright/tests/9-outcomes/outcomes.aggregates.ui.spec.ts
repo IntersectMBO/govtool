@@ -27,33 +27,71 @@ type Sample = {
   txHash: string;
   index: number;
   type: string;
-  status: string;
+  status: "live" | "ratified" | "enacted" | "expired" | "dropped";
   epoch: number;
   koios: OutcomeVoteAggregate[];
+  scenario?: string;
+  inconsistentRole?: OutcomeVoteAggregate["role"];
 };
+const fixture = (txByte: string, overrides: Partial<Sample>): Sample => ({
+  txHash: txByte.repeat(32),
+  index: 0,
+  type: "HardForkInitiation",
+  status: "live",
+  epoch: 500,
+  koios: [drep, spo, cc],
+  ...overrides,
+});
 const samples: Sample[] = process.env.OUTCOMES_LIVE_REPORT
   ? JSON.parse(readFileSync(process.env.OUTCOMES_LIVE_REPORT, "utf8")).actions
   : [
-      {
-        txHash: "aa".repeat(32),
-        index: 0,
-        type: "HardForkInitiation",
-        status: "expired",
-        epoch: 500,
-        koios: [drep, spo],
-      },
-      {
-        txHash: "bb".repeat(32),
-        index: 0,
-        type: "HardForkInitiation",
-        status: "live",
-        epoch: 500,
-        koios: [drep, spo, cc],
-      },
+      fixture("aa", { status: "expired", koios: [drep, spo] }),
+      fixture("bb", {}),
+      fixture("cc", { status: "ratified" }),
+      fixture("dd", { status: "enacted" }),
+      fixture("ee", { status: "dropped" }),
+      fixture("ab", { type: "InfoAction" }),
+      fixture("ac", {
+        scenario: "all-abstaining",
+        koios: [
+          {
+            ...drep,
+            yes: "0",
+            no: "0",
+            abstain: drep.totalEligible,
+            notVoted: "0",
+          },
+        ],
+      }),
+      fixture("ad", {
+        scenario: "fractional percentages",
+        koios: [
+          {
+            ...drep,
+            representation: "percent",
+            yes: "0.4",
+            no: "0.1",
+            abstain: "0.2",
+            notVoted: "0.3",
+            totalEligible: "1",
+          },
+        ],
+      }),
+      fixture("ae", {
+        scenario: "inconsistent DRep data",
+        inconsistentRole: "drep",
+        koios: [{ ...drep, yes: "0" }, spo],
+      }),
+      fixture("af", { type: "ParameterChange" }),
+      fixture("ba", { type: "TreasuryWithdrawals", koios: [drep, cc] }),
+      fixture("bc", {
+        scenario: "provider veto",
+        koios: [drep, spo, { ...cc, passing: false }],
+      }),
     ];
 
 for (const sample of samples) {
-  test(`${sample.status} ${sample.type} ${sample.txHash.slice(0, 8)} displays independent aggregates`, async ({
+  test(`${sample.status} ${sample.type} ${sample.scenario ?? sample.txHash.slice(0, 8)} displays independent aggregates`, async ({
     page,
   }) => {
     let networkMetricsRequests = 0;
@@ -61,7 +99,6 @@ for (const sample of samples) {
     page.on("pageerror", (error) => errors.push(error.message));
     const type =
       sample.type === "UpdateCommittee" ? "NewCommittee" : sample.type;
-    const ended = sample.status !== "live";
     const action = {
       id: sample.txHash,
       tx_hash: sample.txHash,
@@ -84,10 +121,12 @@ for (const sample of samples) {
       time: "2026-10-01T00:00:00Z",
       epoch_no: sample.epoch - 2,
       status: {
-        ratified_epoch: sample.status === "enacted" ? sample.epoch : null,
+        ratified_epoch: ["ratified", "enacted"].includes(sample.status)
+          ? sample.epoch
+          : null,
         enacted_epoch: sample.status === "enacted" ? sample.epoch + 1 : null,
         expired_epoch: sample.status === "expired" ? sample.epoch : null,
-        dropped_epoch: null,
+        dropped_epoch: sample.status === "dropped" ? sample.epoch : null,
       },
       status_times: {
         ratified_time: null,
@@ -141,11 +180,13 @@ for (const sample of samples) {
     const panel = page.getByTestId("single-action-outcome-numbers");
     await expect(panel).toBeVisible();
     await expect(panel).toContainText(
-      ended
-        ? sample.status === "enacted"
-          ? "Enacted"
-          : "Expired"
-        : "In Progress"
+      {
+        live: "In Progress",
+        ratified: "Ratified",
+        enacted: "Enacted",
+        expired: "Expired",
+        dropped: "Not Ratified",
+      }[sample.status]
     );
     for (const [role, prefix] of [
       ["drep", "DReps"],
@@ -154,23 +195,50 @@ for (const sample of samples) {
     ]) {
       const section = page.getByTestId(`${prefix}-voting-results-data`);
       const aggregate = sample.koios.find((a) => a.role === role);
-      if (aggregate) {
-        await expect(section.getByRole("progressbar")).toBeVisible();
+      if (aggregate && sample.inconsistentRole !== role) {
+        if (aggregate.totalEligible === aggregate.abstain) {
+          await expect(section.getByRole("progressbar")).toHaveCount(0);
+          await expect(section).toContainText(
+            "There are no eligible non-abstaining votes"
+          );
+        } else {
+          await expect(section.getByRole("progressbar")).toBeVisible();
+        }
         const title = role === "cc" ? "Constitutional Committee" : prefix;
         await section.getByTestId(`${title}-expand-button`).click();
         const value =
-          aggregate.representation === "stake"
-            ? `₳ ${((BigInt(aggregate.yes) + 999999n) / 1000000n).toLocaleString("en-US")}`
-            : BigInt(aggregate.yes).toLocaleString("en-US");
+          aggregate.representation === "percent"
+            ? `${(Number(aggregate.yes) * 100).toFixed(2)}%`
+            : aggregate.representation === "stake"
+              ? `₳ ${((BigInt(aggregate.yes) + 999999n) / 1000000n).toLocaleString("en-US")}`
+              : BigInt(aggregate.yes).toLocaleString("en-US");
         await expect(section.getByTestId(`${title}-yes-votes`)).toHaveText(
           value
         );
       } else {
         await expect(section.getByRole("status")).toBeVisible();
         await expect(section.getByRole("progressbar")).toHaveCount(0);
+        if (sample.inconsistentRole === role) {
+          await expect(section.getByRole("status")).toContainText(
+            "inconsistent voting breakdown"
+          );
+        }
         await expect(
           page.getByTestId(`${prefix}-voting-results-outcome`)
         ).toContainText("-");
+      }
+      if (type === "InfoAction") {
+        await expect(
+          page.getByTestId(`${prefix}-voting-results-outcome`)
+        ).toContainText("-");
+      }
+      if (aggregate?.passing === false && type !== "InfoAction") {
+        const indicator = page.getByTestId(`${prefix}-voting-results-outcome`);
+        await expect(indicator).not.toContainText("-");
+        await expect(indicator.getByTestId("outcome-icon")).toHaveCSS(
+          "background-color",
+          "rgb(211, 47, 47)"
+        );
       }
     }
     expect(networkMetricsRequests).toBe(0);

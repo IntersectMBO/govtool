@@ -21,7 +21,7 @@ type Props = {
   votes: SubmittedVotesData;
 };
 
-export const VotesSubmitted = ({ type: govActionType, votes }: Props) => {
+export const VotesSubmitted = ({ votes }: Props) => {
   const { type, protocolParams } = votes;
   // A null figure is one the backend could not get from its data source: that
   // group shows as unavailable rather than as no votes.
@@ -117,18 +117,10 @@ export const VotesSubmitted = ({ type: govActionType, votes }: Props) => {
     ? (dRepNoVotes / totalStakeControlledByDReps) * 100
     : undefined;
 
+  // The total and the yes and no figures all include the always-no-confidence
+  // stake (D153), so what is left of the non-abstaining stake did not vote.
   const dRepNotVotedVotes = totalStakeControlledByDReps
-    ? totalStakeControlledByDReps -
-      (dRepYesVotes -
-        // As this is already added on backend
-        (govActionType === GovernanceActionType.NoConfidence
-          ? networkTotalStake?.alwaysNoConfidenceVotingPower ?? 0
-          : 0)) -
-      (dRepNoVotes -
-        // As this is already added on backend
-        (govActionType === GovernanceActionType.NoConfidence
-          ? 0
-          : networkTotalStake?.alwaysNoConfidenceVotingPower ?? 0))
+    ? totalStakeControlledByDReps - dRepYesVotes - dRepNoVotes
     : undefined;
   const dRepNotVotedVotesPercentage =
     100 - (dRepYesVotesPercentage ?? 0) - (dRepNoVotesPercentage ?? 0);

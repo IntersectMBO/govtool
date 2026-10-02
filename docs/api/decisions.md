@@ -5408,6 +5408,9 @@ existing frontend code"; where a component exists in both, "Reuse govtool's".
   always-no-confidence stake again, as the Haskell backend reported it: the live-action page divides
   DRep yes and no, which include that stake, by it. The contract's field of the same name stays the
   active stake; the backend adds the two at its edge. The outcomes route already did.
+  The page's DRep "not voted" figure is that total less the abstain, yes and no figures as given; it
+  no longer takes the always-no-confidence stake back out of yes or no first, which counted it as
+  not voted.
 - A tally figure the data source does not have is `null` on both the legacy `/proposal` routes and the
   outcomes routes, never 0, which reads as "nobody voted": the provider serves no aggregates for the
   action (Blockfrost on a concluded one), or a role's aggregate is a `percent`. A role left out of

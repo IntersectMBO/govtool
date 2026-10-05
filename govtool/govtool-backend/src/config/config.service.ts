@@ -63,19 +63,20 @@ export class ConfigService {
       koios: {
         network: this.envString('GOVTOOL_KOIOS_NETWORK', 'mainnet') as
           'mainnet' | 'preprod' | 'preview' | 'guild',
-        token: this.envString('GOVTOOL_KOIOS_TOKEN', '') || null,
+        token: this.secretString('GOVTOOL_KOIOS_TOKEN', '') || null,
         baseUrl: this.envString('GOVTOOL_KOIOS_BASE_URL', '') || null,
       },
       blockfrost: {
         network: this.dbSyncNetwork('GOVTOOL_BLOCKFROST_NETWORK'),
         baseUrl: this.envString('GOVTOOL_BLOCKFROST_BASE_URL', ''),
-        projectId: this.envString('GOVTOOL_BLOCKFROST_PROJECT_ID', '') || null,
+        projectId:
+          this.secretString('GOVTOOL_BLOCKFROST_PROJECT_ID', '') || null,
       },
       cacheMaxEntries: this.positiveInteger('GOVTOOL_CACHE_MAX_ENTRIES', 256),
       ipfsGateway: this.envString('IPFS_GATEWAY', ''),
       ipfsProjectId: this.envString('IPFS_PROJECT_ID', ''),
       pinataApiJwt:
-        this.envString(
+        this.secretString(
           'GOVTOOL_PINATA_API_JWT',
           rawConfig.pinataapijwt ?? '',
         ) || null,
@@ -198,7 +199,7 @@ export class ConfigService {
       host: this.requiredEnvString('GOVTOOL_DBSYNC_HOST'),
       dbname: this.requiredEnvString('GOVTOOL_DBSYNC_DATABASE'),
       user: this.requiredEnvString('GOVTOOL_DBSYNC_USER'),
-      password: this.requiredEnvString('GOVTOOL_DBSYNC_PASSWORD'),
+      password: this.requiredSecretString('GOVTOOL_DBSYNC_PASSWORD'),
       port: this.envNumber('GOVTOOL_DBSYNC_PORT', 5432),
       network: this.dbSyncNetwork(),
       shelleyGenesisPath:
@@ -269,6 +270,42 @@ export class ConfigService {
 
     if (value === undefined || value.trim() === '') {
       throw new Error(`${name} is required`);
+    }
+    return value;
+  }
+
+  /**
+   * A secret: `process.env[name]` wins; when it is missing or blank, read
+   * the file at `process.env[name_FILE]`, defaulting to the Swarm secret
+   * mount `/run/secrets/<lowercase name>`. A missing file counts as unset,
+   * and a whitespace-only file counts as unset, so an optional secret can be
+   * created as `" "` while a required one still throws below.
+   */
+  private secretValue(name: string): string | undefined {
+    const direct = process.env[name];
+    if (direct !== undefined && direct.trim() !== '') {
+      return direct;
+    }
+    const file =
+      process.env[`${name}_FILE`] ?? `/run/secrets/${name.toLowerCase()}`;
+    let content: string;
+    try {
+      content = fs.readFileSync(file, 'utf8');
+    } catch {
+      return undefined;
+    }
+    const value = content.replace(/\r?\n$/, '');
+    return value.trim() === '' ? undefined : value;
+  }
+
+  private secretString(name: string, fallback: string): string {
+    return this.secretValue(name) ?? fallback;
+  }
+
+  private requiredSecretString(name: string): string {
+    const value = this.secretValue(name);
+    if (value === undefined) {
+      throw new Error(`${name} is required (or set ${name}_FILE)`);
     }
     return value;
   }

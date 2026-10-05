@@ -1,0 +1,193 @@
+# GovTool on Docker Swarm: govtool-backend, govtool-frontend and the private
+# govtool-metadata-service, behind an nginx-proxy gateway (VIRTUAL_HOST).
+#
+# Deploy with docker-stack (https://github.com/mesudip/docker-stack), not
+# vanilla `docker stack deploy`: it resolves the secrets below from the
+# deploying shell's environment and versions them, so changed values roll
+# out as new secret versions without hand-written _v2 names.
+#
+#   https://${BASE_DOMAIN}/            frontend
+#   https://${BASE_DOMAIN}/api/        backend (prefix stripped), including
+#                                      /api/governance-actions and /api/metadata
+#   https://${BASE_DOMAIN}/swagger-ui  backend API docs
+#   metadata                           internal only, reached by the backend
+#
+# Secrets are Swarm secrets mounted at /run/secrets/<lowercase name>. Each
+# app reads its secret from the environment first and falls back to that
+# file (`<NAME>_FILE` overrides the path), so no secret value appears in
+# `environment:` or in the service definition. Only true secrets live here;
+# hostnames, db names, users and urls stay in `environment:` where they help
+# debugging. A whitespace-only secret counts as unset.
+
+x-deploy: &deploy
+  replicas: 1
+  placement:
+    constraints:
+      - node.labels.govtool == true
+  restart_policy:
+    condition: any
+    delay: 30s
+  update_config:
+    order: start-first
+    failure_action: rollback
+    monitor: 60s
+  rollback_config:
+    order: start-first
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10M
+    max-file: "5"
+
+networks:
+  # The gateway's network; nginx-proxy routes by VIRTUAL_HOST on it.
+  gateway:
+    external: true
+    name: ${GATEWAY_NETWORK:-frontend}
+  # The network the metadata service's Postgres is on (the proposal stack's).
+  metadata-db:
+    external: true
+    name: ${METADATA_DB_NETWORK:-preview-proposal_postgres}
+  # Backend to metadata service. Not internal: the metadata service fetches
+  # anchors from the internet.
+  internal:
+    driver: overlay
+
+secrets:
+  # Required with CHAIN_DATA_PROVIDER=dbsync: the backend refuses to start
+  # without it. Unused with koios or blockfrost (the single space counts as
+  # unset for the app).
+  dbsync_password:
+    x-template: "${DBSYNC_PASSWORD:- }"
+  # Optional: a Koios API token, or leave it unset for the public tier.
+  koios_token:
+    x-template: "${KOIOS_TOKEN:- }"
+  # Required by hosted Blockfrost with CHAIN_DATA_PROVIDER=blockfrost; a
+  # self-hosted blockfrost-ryo usually needs none.
+  blockfrost_project_id:
+    x-template: "${BLOCKFROST_PROJECT_ID:- }"
+  # Optional: export PINATA_API_JWT, or leave it unset to run without
+  # /ipfs/upload (the single space counts as unset for the app).
+  pinata_api_jwt:
+    x-template: "${PINATA_API_JWT:- }"
+  # Assembled from the metadata db password; the role and database
+  # themselves are created once by hand, see README. Unset or empty
+  # METADATA_DB_PASSWORD fails the deploy before creating anything.
+  metadata_database_url:
+    x-template: "postgresql://metadata:${METADATA_DB_PASSWORD}@${METADATA_DB_HOST:-postgres}:5432/metadata"
+
+services:
+  backend:
+    image: ${IMAGE_REGISTRY:-ghcr.io/intersectmbo}/govtool-backend:${GOVTOOL_TAG:-dev}
+    command: ["node", "dist/main.js"]
+    environment:
+      GOVTOOL_PORT: "9999"
+      GOVTOOL_HOST: 0.0.0.0
+      GOVTOOL_CHAIN_DATA_PROVIDER: ${CHAIN_DATA_PROVIDER:-dbsync}
+      GOVTOOL_DBSYNC_HOST: ${DBSYNC_POSTGRES_HOST}
+      GOVTOOL_DBSYNC_PORT: ${DBSYNC_POSTGRES_PORT:-5432}
+      GOVTOOL_DBSYNC_DATABASE: ${DBSYNC_DATABASE}
+      GOVTOOL_DBSYNC_USER: ${DBSYNC_POSTGRES_USER}
+      # Must match the database, or every route answers 500.
+      GOVTOOL_DBSYNC_NETWORK: ${DBSYNC_NETWORK:-preview}
+      # With CHAIN_DATA_PROVIDER=koios; the base url defaults to the public
+      # Koios of KOIOS_NETWORK (mainnet, preprod, preview or guild).
+      GOVTOOL_KOIOS_NETWORK: ${KOIOS_NETWORK:-preview}
+      GOVTOOL_KOIOS_BASE_URL: ${KOIOS_BASE_URL:-}
+      # With CHAIN_DATA_PROVIDER=blockfrost; the base url defaults to hosted
+      # Blockfrost for BLOCKFROST_NETWORK, and devnet needs one.
+      GOVTOOL_BLOCKFROST_NETWORK: ${BLOCKFROST_NETWORK:-preview}
+      GOVTOOL_BLOCKFROST_BASE_URL: ${BLOCKFROST_BASE_URL:-}
+      GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
+      GOVTOOL_PDF_API_URL: ${PDF_API_URL:-}
+      GOVTOOL_SENTRY_DSN: ${SENTRY_DSN_BACKEND:-}
+      GOVTOOL_SENTRY_ENV: ${APP_ENV:-preview}
+      IPFS_GATEWAY: ${IPFS_GATEWAY:-}
+      IPFS_PROJECT_ID: ${IPFS_PROJECT_ID:-}
+      VIRTUAL_HOST: https://${BASE_DOMAIN}/api/ -> :9999/
+      VIRTUAL_HOST_2: https://${BASE_DOMAIN}/swagger-ui -> :9999/swagger-ui
+    secrets:
+      - source: dbsync_password
+        target: govtool_dbsync_password
+      - source: pinata_api_jwt
+        target: govtool_pinata_api_jwt
+      - source: koios_token
+        target: govtool_koios_token
+      - source: blockfrost_project_id
+        target: govtool_blockfrost_project_id
+    networks:
+      - gateway
+      - internal
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:9999/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      # On first start the cache warmer reads a full DRep and proposal
+      # snapshot before the backend listens.
+      start_period: 300s
+    logging: *logging
+    deploy:
+      <<: *deploy
+      resources:
+        limits:
+          memory: 2G
+
+  frontend:
+    image: ${IMAGE_REGISTRY:-ghcr.io/intersectmbo}/govtool-frontend:${GOVTOOL_TAG:-dev}
+    # Read at container start into window.__ENV__ (docker-entrypoint.sh), so
+    # the published image serves any network and domain.
+    environment:
+      VITE_APP_ENV: ${APP_ENV:-preview}
+      VITE_BASE_URL: https://${BASE_DOMAIN}/api
+      # 0 testnet, 1 mainnet; a mismatch shows as a wallet refusing to connect.
+      VITE_NETWORK_FLAG: ${NETWORK_FLAG:-0}
+      VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND:-}
+      VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${PROPOSAL_DISCUSSION_FORUM_ENABLED:-true}
+      VITE_IS_CIP179_ENABLED: ${CIP179_ENABLED:-true}
+      VITE_PDF_API_URL: ${PDF_API_URL:-}
+      VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-}
+      VITE_IPFS_PROJECT_ID: ${IPFS_PROJECT_ID:-}
+      VITE_CHATWOOT_URL: ${CHATWOOT_URL:-}
+      VITE_CHATWOOT_WEBSITE_TOKEN: ${CHATWOOT_WEBSITE_TOKEN:-}
+      UMAMI_URL: ${UMAMI_URL:-}
+      UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID:-}
+      VIRTUAL_HOST: https://${BASE_DOMAIN}
+    networks:
+      - gateway
+    logging: *logging
+    deploy:
+      <<: *deploy
+      resources:
+        limits:
+          memory: 256M
+
+  # Resolves anchors for the backend: caches by hash, fails over across IPFS
+  # gateways and refuses private addresses. Never on the gateway network.
+  metadata:
+    image: ${IMAGE_REGISTRY:-ghcr.io/intersectmbo}/govtool-metadata-service:${GOVTOOL_TAG:-dev}
+    # The image's own command: migrate, then serve.
+    command: ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node /api/index.js"]
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      IPFS_PRIMARY_GATEWAY: ${IPFS_PRIMARY_GATEWAY:-}
+    secrets:
+      - source: metadata_database_url
+        target: database_url
+    networks:
+      - internal
+      - metadata-db
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    logging: *logging
+    deploy:
+      <<: *deploy
+      resources:
+        limits:
+          memory: 512M

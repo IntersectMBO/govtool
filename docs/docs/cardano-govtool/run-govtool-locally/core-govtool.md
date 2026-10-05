@@ -20,7 +20,7 @@ with or without a wallet connected
 ## Prerequisites
 
 To run Core GovTool against live data you will need access to a **DB-Sync Instance**, this can be run locally or via a third party e.g. Demeter.\
-This is a dependency of the backend service (with `GOVTOOL_CHAIN_DATA_PROVIDER=dbsync`, the default), which will query the information stored in DB-Sync to retrieve and populate the respective pages with information checking for any issues using the Metadata Validation service.
+This is a dependency of the backend service (with `GOVTOOL_CHAIN_DATA_PROVIDER=dbsync`, the default), which will query the information stored in DB-Sync to retrieve and populate the respective pages with information. The backend checks off-chain metadata itself (`/metadata`), with the help of the metadata service.
 
 Set `GOVTOOL_DBSYNC_NETWORK` to the network your DB-Sync follows (`mainnet`, `preprod`, `preview` or `devnet`). If it does not match the database, every backend route answers `500`.
 
@@ -46,3 +46,7 @@ previous versions
 2. Review [frontend.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml), [backend.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/backend/backend.yaml) and [metadata.yaml](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/metadata/metadata.yaml) ensuring to update the Deployment Containers Image Spec ([example](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml#L34)) with the associated image for the service (these can be custom or the images referenced in the current deployments) and metadata -> namespace ([example](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/frontend/frontend.yaml#L5)) if not using the default govtool namespace
 3. Create the Kubernetes Secrets which will house the env vars using `kubectl apply` and `kubectl create secret` in your chosen namespace. The community example still mounts a [config.json](https://github.com/aaboyle878/govtool-k8-manifest/blob/6f297e580250882dcefcfbef4f4abcbf56a6ead4/govtool/mainnet/backend/config.json) for the removed Haskell backend; replace it with the `GOVTOOL_DBSYNC_*` variables
 4. Use `kubectl apply` to launch the frontend backend and metadata services in the same namespace as your secrets -- ([kubectl links](./quick-links.md))
+
+:::note
+The community example's `metadata.yaml` runs the removed `govtool-metadata-validation` image. Replace it with `ghcr.io/intersectmbo/govtool-metadata-service` and its PostgreSQL database, and point the backend at it with `GOVTOOL_METADATA_SERVICE_URL`.
+:::

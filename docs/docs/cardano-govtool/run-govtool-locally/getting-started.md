@@ -13,6 +13,6 @@ Throughout this Wiki section you may find multiple references to backend and fro
 
 * pdf backend will reference the GovTool Proposal Pillar backend
 * backend will reference the Core GovTool Backend, which also serves the Governance Actions Outcomes
-* metadata will reference the Core GovTool Metadata Validation Backend
+* metadata will reference the Core GovTool Metadata Service (`govtool-metadata-service`), which the backend uses to resolve and check metadata
 * frontend will reference the Core GovTool Frontend UI
 

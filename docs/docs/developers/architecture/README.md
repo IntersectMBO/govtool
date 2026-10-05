@@ -6,18 +6,19 @@
 
 GovTool is a decentralized application for [CIP-1694](https://github.com/cardano-foundation/CIPs/blob/master/CIP-1694/README.md) governance. The [`IntersectMBO/govtool`](https://github.com/IntersectMBO/govtool) repository contains:
 
-- **Frontend** (`govtool/frontend`): React + Vite web app. It talks to the backend and metadata validation services over REST, and to wallets over CIP-30 / CIP-95. The Proposal Discussion pillar (`govtool/frontend/src/pdf-ui`), enabled with the `VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` flag, and governance action history, always enabled, are part of the frontend source.
-- **Backend** (`govtool/govtool-backend`): NestJS (TypeScript) read-only API on port 9999 (Swagger at `/swagger-ui`). It is the service built by CI and deployed (`ghcr.io/intersectmbo/govtool-backend`), and it also serves governance action records under `/governance-actions`. It is configured through `GOVTOOL_*` environment variables, listed in [`govtool-backend/.env.example`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-backend/.env.example).
+- **Frontend** (`govtool/frontend`): React + Vite web app. It talks to the backend over REST (`VITE_BASE_URL`), including for metadata validation, and to wallets over CIP-30 / CIP-95. The Proposal Discussion pillar (`govtool/frontend/src/pdf-ui`), enabled with the `VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` flag, and governance action history, always enabled, are part of the frontend source.
+- **Backend** (`govtool/govtool-backend`): NestJS (TypeScript) read-only API on port 9999 (Swagger at `/swagger-ui`). It is the service built by CI and deployed (`ghcr.io/intersectmbo/govtool-backend`), and it also serves governance action records under `/governance-actions` and metadata validation under `/metadata`. It is configured through `GOVTOOL_*` environment variables, listed in [`govtool-backend/.env.example`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-backend/.env.example).
 - **Data providers**: the backend reads chain data through a provider-agnostic contract (`govtool/govtool-data-providers`). One package implements it per source:
   - `govtool-provider-dbsync`: cardano-db-sync (the default, used by the hosted deployments)
-  - `govtool-provider-koios` and `govtool-provider-blockfrost`: the public Koios and Blockfrost APIs, with no database of your own (trial)
+  - `govtool-provider-koios`: the public Koios API, a supported alternative that needs no database of your own
+  - `govtool-provider-blockfrost`: the Blockfrost API (experimental)
   - `govtool-provider-fixture`: a frozen mainnet capture, for local development and tests with no network or credentials
-- **Pinning and metadata packages**: `govtool-pinning-pinata` (IPFS uploads via Pinata), `govtool-pinning-test` (isolated test runs), and `govtool-metadata-http`, the backend's client for `govtool-metadata-service`, which resolves and stores off-chain metadata anchors.
-- **Metadata validation** (`govtool/metadata-validation`): NestJS service (`POST /validate`) that fetches off-chain metadata anchors and checks their hash and format against CIP-100 / CIP-108 / CIP-119.
-- **Proposal Discussion backend** (`govtool/govtool-pdf-backend`): NestJS + Prisma + PostgreSQL replacement for the Strapi backend of the Proposal Pillar, wire-compatible with the API the `pdf-ui` calls. It is in the repository and runs in the local fixture stack, but CI does not build or deploy it yet.
+- **Pinning and metadata packages**: `govtool-pinning-pinata` (IPFS uploads via Pinata), `govtool-pinning-test` (isolated test runs), and `govtool-metadata-http`, the backend's client for the metadata service.
+- **Metadata service** (`govtool/govtool-metadata-service`, image `ghcr.io/intersectmbo/govtool-metadata-service`): resolves off-chain metadata anchors and keeps the documents and fetch reports in its own PostgreSQL database. It is private: only the backend reaches it. Metadata validation (`POST /metadata/validate`) is served by the backend and checks a document's hash and format against CIP-100 / CIP-108 / CIP-119; it replaces the standalone `govtool/metadata-validation` service, which has been removed.
+- **Proposal Discussion backend** (`govtool/govtool-pdf-backend`): NestJS + Prisma + PostgreSQL replacement for the Strapi backend of the Proposal Pillar, wire-compatible with the API the `pdf-ui` calls. CI builds its image (`ghcr.io/intersectmbo/govtool-pdf-backend`), and it runs in the local fixture stack.
 - **Analytics dashboard** (`govtool/analytics-dashboard`): Next.js internal dashboard. It is not part of the core deployment.
 
-The Haskell backend (`govtool/backend`) and its TypeScript port (`govtool/backend-ts`) were removed in [IntersectMBO/govtool#4246](https://github.com/IntersectMBO/govtool/pull/4246), and the separate Outcomes Pillar service is no longer deployed. Until `govtool-pdf-backend` is deployed, the Proposal Discussion backend is the Strapi + PostgreSQL backend in [`IntersectMBO/govtool-proposal-pillar`](https://github.com/IntersectMBO/govtool-proposal-pillar). Deployment manifests live in [`IntersectMBO/govtool-argo`](https://github.com/IntersectMBO/govtool-argo) (Helm + Argo CD). For local development, see [Run GovTool Locally](../../cardano-govtool/run-govtool-locally/README.md).
+The Haskell backend (`govtool/backend`) and its TypeScript port (`govtool/backend-ts`) were removed in [IntersectMBO/govtool#4246](https://github.com/IntersectMBO/govtool/pull/4246), and the separate Outcomes Pillar service is no longer deployed. The Strapi + PostgreSQL backend it replaces is in [`IntersectMBO/govtool-proposal-pillar`](https://github.com/IntersectMBO/govtool-proposal-pillar). Deployment manifests live in [`IntersectMBO/govtool-argo`](https://github.com/IntersectMBO/govtool-argo) (Helm + Argo CD). For local development, see [Run GovTool Locally](../../cardano-govtool/run-govtool-locally/README.md).
 
 The design decisions behind the data layer, the API surface and the provider contract are recorded in the repository under [`docs/api`](https://github.com/IntersectMBO/govtool/blob/develop/docs/api/README.md) and [`govtool-data-providers/SPEC.md`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-data-providers/SPEC.md).
 
@@ -85,7 +86,7 @@ Frontend is a React application using Vite as a build tool to enhance developmen
   - CertificatesBuilder - to build the governance action certificate
   - GovernanceAction - to build the governance action certificate
 
-  Additionally, GA Submission uses Metadata validation service to validate the metadata.
+  Additionally, GA Submission uses the backend's metadata validation (`POST /metadata/validate`) to check that the entered URL serves the document and that its hash matches. A failed check shows the full fetch report.
 
 ## Backend
 
@@ -97,7 +98,7 @@ Frontend is a React application using Vite as a build tool to enhance developmen
 
 ### Description
 
-The backend is a read-only API. It keeps the routes and response bodies of the Haskell backend it replaced, which the frontend was written against, and adds `GET /system/capabilities` and `GET /system/features` (the feature set the frontend reads at boot), the metadata routes and the governance action routes under `/governance-actions`.
+The backend is a read-only API. It keeps the routes and response bodies of the Haskell backend it replaced, which the frontend was written against, and adds `GET /system/capabilities` and `GET /system/features` (the feature set the frontend reads at boot), the metadata routes under `/metadata` (validation, plus resolving anchors and fetch reports through the metadata service) and the governance action routes under `/governance-actions`.
 
 The backend holds no database handle of its own. Every chain read goes through the chain-data contract, satisfied by the provider named in `GOVTOOL_CHAIN_DATA_PROVIDER` (`dbsync`, `koios`, `blockfrost` or `fixture`). The db-sync provider owns its SQL queries (`govtool/govtool-provider-dbsync/src`). The backend caches the results in memory, warms the cache in the background, and returns governance data (DReps, proposals, votes, epoch parameters, transaction status) to the frontend. It does not talk to cardano-node directly. Transactions are built in the frontend and signed and submitted by the user's wallet.
 

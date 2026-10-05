@@ -5,7 +5,7 @@
 The Proposal Pillar backend when combined with the Core GovTool Frontend UI will enable viewing of Budget Proposals and Governance Actions -> Proposals areas
 
 :::info
-The GovTool repository now has its own Proposal Discussion backend, [`govtool/govtool-pdf-backend`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-pdf-backend/README.md) (NestJS, Prisma and PostgreSQL). It replaces the Strapi backend of the Proposal Pillar and serves the same API. It is not deployed yet, but it is the easiest way to run the Proposal Discussion locally: `docker compose up -d --build` in that folder starts it on port `1337`, and the frozen mainnet data setup in [Run GovTool Locally](./README.md) includes it. Point the frontend at it with `VITE_PDF_API_URL`.
+The GovTool repository now has its own Proposal Discussion backend, [`govtool/govtool-pdf-backend`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-pdf-backend/README.md) (NestJS, Prisma and PostgreSQL). It replaces the Strapi backend of the Proposal Pillar and serves the same API. CI builds its image (`ghcr.io/intersectmbo/govtool-pdf-backend`), and it is the easiest way to run the Proposal Discussion locally: `docker compose up -d --build` in that folder starts it on port `1337`, and the frozen mainnet data setup in [Run GovTool Locally](./README.md) includes it. Point the frontend at it with `VITE_PDF_API_URL`.
 
 The rest of this page describes the Proposal Pillar's Strapi backend.
 :::

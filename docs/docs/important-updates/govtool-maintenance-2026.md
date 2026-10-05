@@ -45,7 +45,7 @@ The maintainers have shared the direction they want to take GovTool in. The plan
 
 Running GovTool has meant running your own Cardano node and cardano-db-sync instance. That is a lot to ask of a contributor, and a lot to operate. Where mature community-run projects and providers already offer this data reliably, GovTool will build on them and work with their teams instead of duplicating the effort.
 
-The first step is in the repository: the backend now reads chain data through a provider layer, with db-sync, Koios and Blockfrost providers. db-sync remains the default; the Koios and Blockfrost providers are a trial and are not used by the hosted deployments.
+The first step is in the repository: the backend now reads chain data through a provider layer, with db-sync, Koios and Blockfrost providers. db-sync remains the default, Koios is a supported alternative that needs no database of your own, and the Blockfrost provider is experimental.
 
 ### Better connected to the ecosystem
 

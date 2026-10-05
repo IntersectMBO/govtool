@@ -25,10 +25,10 @@ Off-chain metadata is still fetched live from the internet, IPFS included.
 
 ### Live data from Koios (no db-sync)
 
-[`govtool/docker-compose.koios.yml`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/docker-compose.koios.yml) runs the backend against the public [Koios](https://koios.rest/) API, so you see live chain data without a database of your own. The frontend is on port `8080` and the backend on port `9999`. To use a testnet, set both `KOIOS_NETWORK` and `VITE_NETWORK_FLAG` (`1` for mainnet, `0` for every testnet); if they do not match, the wallet refuses to connect. This setup runs no metadata service, so DRep names and governance action titles are empty.
+[`govtool/docker-compose.koios.yml`](https://github.com/IntersectMBO/govtool/blob/develop/govtool/docker-compose.koios.yml) runs the backend against the public [Koios](https://koios.rest/) API, so you see live chain data without a database of your own. The frontend is on port `8080` and the backend on port `9999`. To use a testnet, set both `KOIOS_NETWORK` and `VITE_NETWORK_FLAG` (`1` for mainnet, `0` for every testnet); if they do not match, the wallet refuses to connect. It also runs the metadata service and its PostgreSQL database, so DRep names and governance action titles are shown.
 
 :::note
-The Koios setup is part of a trial of new data sources. It is not used by the hosted GovTool deployments.
+Koios is a supported alternative to db-sync. What the Koios provider serves and omits is listed in its [README](https://github.com/IntersectMBO/govtool/blob/develop/govtool/govtool-provider-koios/README.md).
 :::
 
 ### Your own db-sync
@@ -37,9 +37,9 @@ The Koios setup is part of a trial of new data sources. It is not used by the ho
 
 * the frontend on port `80`
 * the backend on port `9999`, including governance action records under `/governance-actions`
-* the metadata validation service on port `3000`
+* the metadata service and its PostgreSQL database, which only the backend reaches (metadata validation is served by the backend under `/metadata`)
 
-Set `DBSYNC_NETWORK` in `docker/.env` to the network your db-sync follows (`mainnet`, `preprod`, `preview` or `devnet`). If it does not match the database, every backend route answers `500`. See [Core GovTool](./core-govtool.md) for the db-sync prerequisites.
+Set `METADATA_DB_PASSWORD` in `docker/.env` before you start it. Set `DBSYNC_NETWORK` in `docker/.env` to the network your db-sync follows (`mainnet`, `preprod`, `preview` or `devnet`). If it does not match the database, every backend route answers `500`. See [Core GovTool](./core-govtool.md) for the db-sync prerequisites.
 
 All three setups need Docker with Docker Compose.
 

@@ -2,7 +2,9 @@
 
 GovTool aims to show vote total values which help the user gauge likelihood of ratification of an action. Vote totals are computed for live Governance Actions (not yet ratified, enacted, expired or dropped).
 
-The raw totals come from GovTool's backend, which runs SQL queries on DB-Sync. The percentages and "Not Voted" values are then calculated in the GovTool frontend.
+The raw totals come from GovTool's backend, which reads them from its data provider (by default, SQL queries on DB-Sync). The percentages and "Not Voted" values are then calculated in the GovTool frontend.
+
+If the data provider cannot give a vote total for an action, GovTool shows that total as unavailable instead of as zero votes.
 
 ## DRep Vote Total Equation
 
@@ -46,26 +48,27 @@ The raw totals come from GovTool's backend, which runs SQL queries on DB-Sync. T
 
 #### :ballot\_box: Not Voted Total (remainder of Total Active Stake)
 
-* Total Active Stake − explicit DRep Yes votes − explicit DRep No votes
-  * The auto no confidence stake is therefore counted as "Not Voted" in this value
+* Total Active Stake − Yes Total − No Total
+  * Yes Total and No Total already include the auto no confidence stake, so it is not counted again as "Not Voted"
 
 #### :ballot\_box:  Not Voted Percentage (remainder of Total Active Stake Percentage)
 
 * 100 − Yes Percentage − No Percentage
-  * Unlike the Not Voted value, this treats the auto no confidence stake as part of Yes/No
 
 ## DRep Vote Total Implementation
 
-GovTool's backend (`govtool/govtool-backend`) reads chain data through a data provider. On a db-sync deployment, the [db-sync provider's vote totals query](https://github.com/IntersectMBO/govtool/blob/0242ea69bfba8db293f3b929343984b3c63823ad/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L88-L117) pulls the vote totals for each governance action. The denominator comes from a [separate stake distribution query](https://github.com/IntersectMBO/govtool/blob/0242ea69bfba8db293f3b929343984b3c63823ad/govtool/govtool-provider-dbsync/src/network.ts#L294-L337), and the percentages are calculated in the [frontend](https://github.com/IntersectMBO/govtool/blob/0242ea69bfba8db293f3b929343984b3c63823ad/govtool/frontend/src/components/molecules/VotesSubmitted.tsx#L85-L121).
+GovTool's backend (`govtool/govtool-backend`) reads chain data through a data provider. On a db-sync deployment, the [db-sync provider's vote totals query](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L94-L126) pulls the vote totals for each governance action. The denominator comes from a [separate stake distribution query](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-provider-dbsync/src/network.ts#L294-L337), which the [backend turns into the total stake controlled by DReps](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-backend/src/network/network.service.ts#L43-L67), and the percentages are calculated in the [frontend](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/frontend/src/components/molecules/VotesSubmitted.tsx#L98-L126).
 
 * GovTool takes DRep voting power from [`drep_distr` table of DB-Sync](https://github.com/IntersectMBO/cardano-db-sync/blob/master/doc/schema.md#drep_distr) for the registered DReps and the "predefined voting option DReps", this data is only updated once per epoch.
-* GovTool takes the newest vote from DReps for that governance action, filtering out votes from DReps who have recently retired.
+* GovTool takes the newest vote from DReps for that governance action, and leaves out a vote if the DRep retired after casting it, even if the DRep registered again later.
 * In the provider code
-  * [Takes the newest vote of each voter on the governance action](https://github.com/IntersectMBO/govtool/blob/0242ea69bfba8db293f3b929343984b3c63823ad/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L80-L85)
-  * [Sums the Yes, No and Abstain votes of DReps active in the tally epoch](https://github.com/IntersectMBO/govtool/blob/0242ea69bfba8db293f3b929343984b3c63823ad/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L95-L103)
-  * [Gets the active DRep stake and the voting power of the predefined no confidence DRep](https://github.com/IntersectMBO/govtool/blob/0242ea69bfba8db293f3b929343984b3c63823ad/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L104-L111)
-  * [Counts the predefined no confidence stake as Yes on a Motion of No Confidence and as No on every other action](https://github.com/IntersectMBO/govtool/blob/0242ea69bfba8db293f3b929343984b3c63823ad/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L277-L290)
-  * [Calculates the active DRep stake and the predefined always abstain and no confidence stake for the denominator](https://github.com/IntersectMBO/govtool/blob/0242ea69bfba8db293f3b929343984b3c63823ad/govtool/govtool-provider-dbsync/src/network.ts#L300-L309)
+  * [Takes the newest vote of each voter on the governance action](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L87-L92)
+  * [Leaves out votes made invalid by the DRep's retirement](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L80-L85)
+  * [Sums the Yes, No and Abstain votes of DReps active in the tally epoch](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L103-L112)
+  * [Gets the active DRep stake and the voting power of the predefined no confidence DRep](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L113-L120)
+  * [Counts the predefined no confidence stake as Yes on a Motion of No Confidence and as No on every other action](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-provider-dbsync/src/governance/proposals/aggregates.ts#L286-L299)
+  * [Calculates the active DRep stake and the predefined always abstain and no confidence stake for the denominator](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-provider-dbsync/src/network.ts#L300-L309)
+* In the backend, the [total stake controlled by DReps is the active DRep stake plus the auto no confidence stake](https://github.com/IntersectMBO/govtool/blob/5bad69ac9d891133b58c680ad58f0de755554d9c/govtool/govtool-backend/src/network/network.service.ts#L52-L60)
 
 :::note
 Until September 2026 these totals came from SQL files in the Haskell backend (`govtool/backend/sql`), which has since been removed. See the [last version of `list-proposals.sql`](https://github.com/IntersectMBO/govtool/blob/6522bd43ee52c5de9fe5f9ab0fb14f56858ff0ef/govtool/backend/sql/list-proposals.sql) for reference.

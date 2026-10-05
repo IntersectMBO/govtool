@@ -27,6 +27,27 @@ npm run build    # static site in ./build
 npm run serve    # serve the production build
 ```
 
+## Deployment (GitHub Pages)
+
+`.github/workflows/deploy-docs-pages.yml` builds the site and publishes it to the repository's GitHub Pages on every push to `develop` that touches `docs/`, or when run by hand. It runs only on `IntersectMBO/govtool`, not on forks.
+
+One-time setup (a repository admin):
+
+1. Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+2. Run the workflow (Actions → Deploy Docs to GitHub Pages → Run workflow). The site is published at `https://intersectmbo.github.io/govtool/`.
+
+Optional repository variables (Settings → Secrets and variables → Actions → Variables):
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `DOCS_PAGES_URL` | `https://<owner>.github.io` | Site origin |
+| `DOCS_PAGES_BASE_URL` | `/<repo>/` | Path the site is served under |
+| `DOCS_PAGES_NO_INDEX` | `false` | `true` adds `noindex, nofollow`, for a temporary host |
+
+To serve it as `docs.gov.tools`: add the custom domain under Settings → Pages, point a `CNAME` DNS record for `docs.gov.tools` at `intersectmbo.github.io`, set `DOCS_PAGES_URL=https://docs.gov.tools` and `DOCS_PAGES_BASE_URL=/`, and run the workflow again.
+
+The same build settings work locally: `DOCS_URL`, `DOCS_BASE_URL` and `DOCS_NO_INDEX=true` are read by `docusaurus.config.js`. Raw HTML image paths from the GitBook export (`<img src="/img/...">`) get the base path from `src/remark/base-url-raw-html.js`, so the site also works under a sub-path.
+
 ## Deployment (Docker)
 
 The site is packaged as a static nginx image (`Dockerfile`, `nginx.conf.template`). The container runs as a non-root user and listens on port `8080`, with a health check at `/healthz`.

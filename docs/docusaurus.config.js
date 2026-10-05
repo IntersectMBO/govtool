@@ -6,6 +6,9 @@ const { themes: prismThemes } = require("prism-react-renderer");
 // temporary host before docs.gov.tools is switched over.
 const siteUrl = process.env.DOCS_URL || "https://docs.gov.tools";
 const baseUrl = process.env.DOCS_BASE_URL || "/";
+// Set DOCS_NO_INDEX=true on temporary hosts (e.g. a github.io preview) so
+// search engines do not index a copy of docs.gov.tools.
+const noIndex = process.env.DOCS_NO_INDEX === "true";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -15,6 +18,7 @@ const config = {
 
   url: siteUrl,
   baseUrl,
+  noIndex,
 
   organizationName: "IntersectMBO",
   projectName: "govtool",
@@ -45,6 +49,7 @@ const config = {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl: "https://github.com/IntersectMBO/govtool/tree/develop/docs/",
+          remarkPlugins: [[require("./src/remark/base-url-raw-html"), { baseUrl }]],
         },
         blog: false,
         pages: false,

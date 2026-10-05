@@ -55,10 +55,18 @@ networks:
     driver: overlay
 
 secrets:
-  # Required: export DBSYNC_PASSWORD in the deploying shell. The deploy
-  # fails before creating anything if it is unset or empty.
+  # Required with CHAIN_DATA_PROVIDER=dbsync: the backend refuses to start
+  # without it. Unused with koios or blockfrost (the single space counts as
+  # unset for the app).
   dbsync_password:
-    environment: DBSYNC_PASSWORD
+    x-template: "${DBSYNC_PASSWORD:- }"
+  # Optional: a Koios API token, or leave it unset for the public tier.
+  koios_token:
+    x-template: "${KOIOS_TOKEN:- }"
+  # Required by hosted Blockfrost with CHAIN_DATA_PROVIDER=blockfrost; a
+  # self-hosted blockfrost-ryo usually needs none.
+  blockfrost_project_id:
+    x-template: "${BLOCKFROST_PROJECT_ID:- }"
   # Optional: export PINATA_API_JWT, or leave it unset to run without
   # /ipfs/upload (the single space counts as unset for the app).
   pinata_api_jwt:
@@ -83,6 +91,14 @@ services:
       GOVTOOL_DBSYNC_USER: ${DBSYNC_POSTGRES_USER}
       # Must match the database, or every route answers 500.
       GOVTOOL_DBSYNC_NETWORK: ${DBSYNC_NETWORK:-preview}
+      # With CHAIN_DATA_PROVIDER=koios; the base url defaults to the public
+      # Koios of KOIOS_NETWORK (mainnet, preprod, preview or guild).
+      GOVTOOL_KOIOS_NETWORK: ${KOIOS_NETWORK:-preview}
+      GOVTOOL_KOIOS_BASE_URL: ${KOIOS_BASE_URL:-}
+      # With CHAIN_DATA_PROVIDER=blockfrost; the base url defaults to hosted
+      # Blockfrost for BLOCKFROST_NETWORK, and devnet needs one.
+      GOVTOOL_BLOCKFROST_NETWORK: ${BLOCKFROST_NETWORK:-preview}
+      GOVTOOL_BLOCKFROST_BASE_URL: ${BLOCKFROST_BASE_URL:-}
       GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
       GOVTOOL_PDF_API_URL: ${PDF_API_URL:-}
       GOVTOOL_SENTRY_DSN: ${SENTRY_DSN_BACKEND:-}
@@ -96,6 +112,10 @@ services:
         target: govtool_dbsync_password
       - source: pinata_api_jwt
         target: govtool_pinata_api_jwt
+      - source: koios_token
+        target: govtool_koios_token
+      - source: blockfrost_project_id
+        target: govtool_blockfrost_project_id
     networks:
       - gateway
       - internal

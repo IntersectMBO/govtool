@@ -28,7 +28,10 @@ It assumes what is already on the server:
 - the proposal discussion stack's Postgres on an attachable network,
   `preview-proposal_postgres` by default. The metadata service keeps its own
   `metadata` database and role there.
-- a db-sync Postgres the backend container can reach at `DBSYNC_POSTGRES_HOST`.
+- a chain data source for the backend, chosen by `CHAIN_DATA_PROVIDER`: a
+  db-sync Postgres the backend container can reach at `DBSYNC_POSTGRES_HOST`
+  (`dbsync`, the default), or a Koios or Blockfrost API (`koios`,
+  `blockfrost`), which needs no database.
 
 ## Files
 
@@ -45,9 +48,10 @@ On a manager node with `docker-stack` installed, from this folder:
 cp .env.example .env
 ```
 
-Fill in `.env`; at least `STACK_NAME`, `BASE_DOMAIN`, the `DBSYNC_*` values and
-`NETWORK_FLAG`. `DBSYNC_NETWORK` must match the database, or every route
-answers 500.
+Fill in `.env`; at least `STACK_NAME`, `BASE_DOMAIN`, `NETWORK_FLAG` and the
+settings of the chosen `CHAIN_DATA_PROVIDER`: the `DBSYNC_*` values for
+`dbsync`, `KOIOS_NETWORK` for `koios`, `BLOCKFROST_NETWORK` for `blockfrost`.
+`DBSYNC_NETWORK` must match the database, or every route answers 500.
 
 Label the node that will run GovTool: every service is placed with the
 constraint `node.labels.govtool == true`, so the stack deploys nothing
@@ -59,9 +63,9 @@ docker node update --label-add govtool=true <node>
 
 On a single-node swarm `<node>` is the id from `docker node ls -q`.
 
-Export the settings and the required db-sync password (prompted without
-echo, so it never lands in a file; the deploy fails before creating
-anything if it is unset or empty):
+Export the settings, then the chain data provider's secret, prompted
+without echo so it never lands in a file. With `dbsync`, the db-sync
+password is required:
 
 ```bash
 set -a; . ./.env; set +a
@@ -69,8 +73,17 @@ read -r -s -p "db-sync Postgres password: " DBSYNC_PASSWORD; echo
 export DBSYNC_PASSWORD
 ```
 
-The Pinata JWT is optional: export `PINATA_API_JWT` the same way, or leave
-it unset to run without `/ipfs/upload`.
+The deploy does not check it: every secret the stack does not need is
+created blank, so a missing password deploys and the backend then refuses
+to start, logging `GOVTOOL_DBSYNC_PASSWORD is required`.
+
+With `koios`, export `KOIOS_TOKEN` the same way to raise the rate limit, or
+leave it unset for the public tier. With `blockfrost`, export
+`BLOCKFROST_PROJECT_ID` for hosted Blockfrost; a self-hosted blockfrost-ryo
+set in `BLOCKFROST_BASE_URL` usually needs none.
+
+The Pinata JWT is optional with any provider: export `PINATA_API_JWT` the
+same way, or leave it unset to run without `/ipfs/upload`.
 
 Create the `metadata` role and database once on the proposal stack's
 Postgres, with a generated password. Run this on the node where that
@@ -134,16 +147,21 @@ the new task before stopping the old one and roll back when a task fails
 within 60 s. Pinning a sha or version keeps redeploys reproducible; `dev`
 moves with every merge to develop.
 
-Changing a secret value (a password, the JWT) and redeploying creates a new
-secret version and repoints the services at it; nothing has to be removed by
-hand. `docker-stack versions "$STACK_NAME"` lists the history.
+Changing a secret value (a password, a token, the JWT) and redeploying
+creates a new secret version and repoints the services at it; nothing has to
+be removed by hand. `docker-stack versions "$STACK_NAME"` lists the history.
 
 ## Secrets
 
-Only true secrets are Swarm secrets: the db-sync password, the Pinata JWT
-and the metadata `DATABASE_URL`. Hostnames, database names, users and urls
-stay in `environment:`, where they help debugging and expose nothing
-sensitive.
+Only true secrets are Swarm secrets: the db-sync password, the Koios token,
+the Blockfrost project id, the Pinata JWT and the metadata `DATABASE_URL`.
+Hostnames, database names, users and urls stay in `environment:`, where
+they help debugging and expose nothing sensitive.
+
+All of them are created on every deploy, whichever provider is chosen. An
+unset optional one is stored as a single space, which every app reads as
+unset. Only `METADATA_DB_PASSWORD` is checked at deploy time: without it
+the deploy fails before creating anything.
 
 Each app reads a secret from its environment variable first and falls back
 to the file at `<NAME>_FILE`, defaulting to the Swarm mount

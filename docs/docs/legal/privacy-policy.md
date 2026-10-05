@@ -59,7 +59,7 @@ The Proposals and Budget Proposals features let you discuss ideas before they go
 * **Verification by wallet signature.** You "Verify your identity" by signing a message with your wallet (no transaction, no fee). We store an account linked to your wallet's stake credential. A login token is kept in your browser's session storage, and a session cookie is set to keep you signed in.
 * **Display Name.** You choose a public Display Name. It is shown next to your activity and **cannot be changed** once set. You don't need to give an email address or real name.
 * **Public content.** Proposals, drafts you submit, comments, likes and dislikes, poll votes and reports are linked to your account. Submitted proposals, comments and poll results are public. DReps who verify their DRep key are shown with a DRep tag, their DRep name and DRep ID.
-* **Budget Proposal contact details.** A Budget Proposal asks for information such as the full name and email address of the beneficiary and of the submission lead, and country of residence and nationality. This contact information is **not displayed publicly**. It is available to you and to authorized administrators of the budget process, who may use it to contact you about your proposal. Ownership details that you provide for a Budget Proposal (such as company or group name, domain, social handles and country) may be displayed publicly with the proposal.
+* **Budget Proposals.** A Budget Proposal asks whether it is submitted on behalf of an individual, a company or another group, and then for details such as the company or group name, company domain, country of incorporation, key information identifying the group, a public proposal champion, and the contact details you choose to share (for example an email address or social media handles). **All of this is displayed publicly** with the proposal, and the form asks you to agree to that before you submit. Budget Proposals made with an earlier version of the form may also hold private contact details of the beneficiary and the submission lead (full name, email address, country of residence and nationality). Those details are **not displayed publicly** and are available only to authorized administrators of the budget process, who may use them to contact you about your proposal.
 
 ### 5. Support chat
 
@@ -110,7 +110,7 @@ Where the EU or UK General Data Protection Regulation (GDPR) applies, we rely on
 * **Providing the service** you request, for example showing your Voting Power, building your transactions, or hosting your proposals and comments (performance of a contract, Art. 6(1)(b) GDPR, or our legitimate interest in operating GovTool, Art. 6(1)(f)).
 * **Security, error detection and service improvement**, including server logs, error monitoring and aggregate analytics (legitimate interests, Art. 6(1)(f)).
 * **Support**: answering your chat messages (performance of a contract or legitimate interests; where you give optional details, your consent, Art. 6(1)(a)).
-* **Budget process administration**: using Budget Proposal contact details to run the budget process and contact you about your proposal (performance of a contract or legitimate interests).
+* **Budget process administration**: using the details in Budget Proposals, including private contact details from earlier versions of the form, to run the budget process and contact you about your proposal (performance of a contract or legitimate interests).
 * **Legal obligations**, where we must keep or disclose data by law (Art. 6(1)(c)).
 
 ## Who we share data with
@@ -132,7 +132,7 @@ GovTool is operated by teams and service providers in several countries. Your da
 
 * **Blockchain data and IPFS content** are permanent and outside our control.
 * **Proposals, comments, poll votes and your Display Name** are kept for as long as the Proposals and Budget Proposals features are operated, because they form part of a public discussion record.
-* **Budget Proposal contact details** are kept for as long as needed for the budget process and related legal and accounting obligations.
+* **Private Budget Proposal contact details** from earlier versions of the form are kept for as long as needed for the budget process and related legal and accounting obligations.
 * **Support conversations, server logs, analytics and error monitoring data** are kept only as long as needed for their purpose, after which they are deleted or anonymized.
 * **Browser storage** stays on your device until you clear it.
 

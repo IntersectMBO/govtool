@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { Typography } from '@atoms';
+import { LINKS } from '@/consts/links';
 import { PdfCheckbox } from '../../PdfFields';
 
 import { StepperActionButtons } from '../../BudgetDiscussionParts';
@@ -60,7 +61,7 @@ const BudgetDiscussionSubmit = ({
                                             form in accordance with the{' '}
                                             <span>
                                                 <a
-                                                    href='https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy'
+                                                    href={LINKS.PRIVACY_POLICY}
                                                     target='_blank'
                                                     rel='noopener noreferrer'
                                                 >
@@ -70,7 +71,7 @@ const BudgetDiscussionSubmit = ({
                                             and{' '}
                                             <span>
                                                 <a
-                                                    href='https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use'
+                                                    href={LINKS.TERMS_OF_USE}
                                                     target='_blank'
                                                     rel='noopener noreferrer'
                                                 >

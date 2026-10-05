@@ -27,7 +27,9 @@ jobs:
         working-directory: .
         shell: bash
         run: |
-          if [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+          # A new branch has no previous commit, and a force push leaves the
+          # previous one unfetchable: check everything rather than guess.
+          if [[ "$BEFORE_SHA" =~ ^0+$ ]] || ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
             echo "frontend=true" >> "$GITHUB_OUTPUT"
           else
             changed_files="$(git diff --name-only "$BEFORE_SHA" "$GITHUB_SHA" -- govtool/frontend .github/workflows/code_check_frontend.yml)"

@@ -39,15 +39,9 @@ export const Footer = () => {
 
   const onClickSubscribe = () => openInNewTab(LINKS.NEWSLETTER_SIGNUP);
 
-  const onClickPrivacyPolicy = () =>
-    openInNewTab(
-      "https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy",
-    );
+  const onClickPrivacyPolicy = () => openInNewTab(LINKS.PRIVACY_POLICY);
 
-  const onClickTermOfService = () =>
-    openInNewTab(
-      "https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use",
-    );
+  const onClickTermOfService = () => openInNewTab(LINKS.TERMS_OF_USE);
 
   const onClickFeedback = () => openFeedbackWindow();
 

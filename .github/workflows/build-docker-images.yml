@@ -51,6 +51,16 @@ jobs:
             dockerfile: ./govtool/govtool-pdf-backend/Dockerfile
             image: ghcr.io/${{ github.repository }}-pdf-backend
 
+          - name: govtool-docs
+            workdir: ./docs
+            dockerfile: ./docs/Dockerfile
+            image: ghcr.io/${{ github.repository }}-docs
+            # Public URL the docs site is built for. main and release tags are
+            # production and always build for docs.gov.tools; develop and test
+            # can point at a temporary host with the DOCS_SITE_URL repository variable
+            # (not DOCS_URL, which the Playwright suite reads as its docs base).
+            build_args: DOCS_URL=${{ (github.ref_type == 'tag' || github.ref_name == 'main') && 'https://docs.gov.tools' || vars.DOCS_SITE_URL || 'https://docs.gov.tools' }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -142,6 +152,7 @@ jobs:
         with:
           context: ${{ matrix.context || matrix.workdir }}
           file: ${{ matrix.dockerfile }}
+          build-args: ${{ matrix.build_args }}
           load: true
           push: false
           tags: ${{ steps.meta.outputs.tags }}

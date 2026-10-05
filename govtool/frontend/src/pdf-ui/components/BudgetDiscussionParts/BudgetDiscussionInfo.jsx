@@ -188,7 +188,7 @@ const BudgetDiscussionInfo = ({setStep, step, onClose, setBudgetDiscussionData, 
                                             gutterBottom
                                         >
                                             Or confirm if you would like
-                                            Intersect to repurpose the
+                                            us to repurpose the
                                             information previously provided.
                                             Please note that we may not have
                                             enough details to complete the
@@ -196,7 +196,7 @@ const BudgetDiscussionInfo = ({setStep, step, onClose, setBudgetDiscussionData, 
                                             missing information will be shown as
                                             ‘not provided’. You can confirm this
                                             by contacting
-                                            operational-services@intersectmbo.org
+                                            operational-services@gov.tools
                                             with the following information:
                                         </Typography>
                                     </ListItem>

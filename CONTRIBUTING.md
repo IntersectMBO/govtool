@@ -248,15 +248,15 @@ During development, on every PR;
 
 #### React
 
-Please see [React Style Guide](./docs/style-guides/react/).
+Please see [React Style Guide](./docs/docs/developers/style-guides/react/README.md).
 
 #### CSS in Javascript
 
-Please see [CSS in Javascript Style Guide](./docs/style-guides/css-in-js/).
+Please see [CSS in Javascript Style Guide](./docs/docs/developers/style-guides/css-in-js/README.md).
 
 #### CSS / SASS
 
-Please see [CSS / SASS Style Guide](./docs/style-guides/css-sass/).
+Please see [CSS / SASS Style Guide](./docs/docs/developers/style-guides/css-sass/README.md).
 
 #### TypeScript backend
 

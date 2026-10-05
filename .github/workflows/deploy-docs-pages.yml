@@ -1,0 +1,79 @@
+name: Deploy Docs Preview to GitHub Pages
+
+# Publishes a preview of the Docusaurus site in docs/, as on develop, to this
+# repository's GitHub Pages. It is not the production site: docs.gov.tools is
+# served by the govtool-docs Docker image built from main, whose nginx sends
+# the security and robots headers that GitHub Pages cannot.
+# One-time setup: Settings -> Pages -> Source: "GitHub Actions".
+#
+# Repository variables (all optional):
+#   DOCS_PAGES_URL       Site origin, default https://<owner>.github.io.
+#   DOCS_PAGES_BASE_URL  Path the site is served under, default /<repo>/.
+#   DOCS_PAGES_NO_INDEX  Default "true": pages carry noindex, nofollow so the
+#                        preview does not compete with docs.gov.tools.
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "docs/**"
+      - ".github/workflows/deploy-docs-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a newer push supersedes a queued one, but a
+# running deployment is allowed to finish.
+concurrency:
+  group: docs-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Forks have no Pages site configured for Actions; skip them.
+    if: github.repository_owner == 'IntersectMBO'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+        env:
+          DOCS_URL: ${{ vars.DOCS_PAGES_URL || format('https://{0}.github.io', github.repository_owner) }}
+          DOCS_BASE_URL: ${{ vars.DOCS_PAGES_BASE_URL || format('/{0}/', github.event.repository.name) }}
+          DOCS_NO_INDEX: ${{ vars.DOCS_PAGES_NO_INDEX || 'true' }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

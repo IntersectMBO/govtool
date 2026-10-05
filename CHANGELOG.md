@@ -10,6 +10,17 @@ changes.
 
 ## [Unreleased]
 
+### Added
+
+- Documentation site (docs.gov.tools) in `docs/`, migrated from GitBook to Docusaurus and updated to the current GovTool implementation
+- `govtool-docs` Docker image, built by CI on `main`, `develop`, `test` and version tags; images from `main` and version tags always build for docs.gov.tools
+- A GitHub Pages preview of the documentation, deployed from `develop` and not indexed by search engines
+- Documentation checks on pull requests that touch `docs/`: the site build catches broken links and asset paths, and the Docker image is started and smoke-tested, before merge
+
+### Removed
+
+- The Matomo analytics snippet (analytics.gov.tools) in the frontend; Umami is the only analytics
+
 ## [v2.1.0-alpha.2](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.1...v2.1.0-alpha.2) 2026-10-02
 
 Pre-release. The Haskell backend and the older TypeScript backend

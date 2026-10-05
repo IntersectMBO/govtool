@@ -12,6 +12,9 @@ const userDocs = (legalIndex === -1 ? gitbookSidebar : gitbookSidebar.slice(0, l
 const faqsIndex = userDocs.findIndex(
   (item) => item.type === "category" && item.link && item.link.id === "cardano-govtool/faqs/README",
 );
+if (faqsIndex === -1) {
+  throw new Error("sidebars.js: GovTool FAQs category not found; cannot place the Support page.");
+}
 userDocs.splice(faqsIndex + 1, 0, { type: "doc", id: "cardano-govtool/support", label: "Support" });
 
 const legal = [

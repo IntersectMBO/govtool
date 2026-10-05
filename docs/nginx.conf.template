@@ -1,6 +1,14 @@
 # Rendered at container start by the nginx image entrypoint (envsubst).
 # Only variables defined in the environment are substituted (X_ROBOTS_TAG).
 
+# Hashed build assets never change, so they can be cached for a long time.
+# Set through a map rather than add_header inside a location, because an
+# add_header in a location drops every add_header inherited from the server.
+map $uri $docs_cache_control {
+    ~^/assets/ "public, max-age=31536000, immutable";
+    default    "";
+}
+
 server {
     listen 8080;
     server_name _;
@@ -23,6 +31,8 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
     add_header X-Robots-Tag "${X_ROBOTS_TAG}" always;
+    # Empty (not sent) except under /assets/.
+    add_header Cache-Control $docs_cache_control;
 
     location = /healthz {
         access_log off;
@@ -30,14 +40,7 @@ server {
         return 200 "ok\n";
     }
 
-    # Hashed build assets never change, so they can be cached for a long time.
     location /assets/ {
-        add_header Cache-Control "public, max-age=31536000, immutable";
-        add_header X-Content-Type-Options "nosniff" always;
-        add_header X-Frame-Options "SAMEORIGIN" always;
-        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-        add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
-        add_header X-Robots-Tag "${X_ROBOTS_TAG}" always;
         try_files $uri =404;
     }
 

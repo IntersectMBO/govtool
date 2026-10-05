@@ -27,14 +27,25 @@ npm run build    # static site in ./build
 npm run serve    # serve the production build
 ```
 
-## Deployment (GitHub Pages)
+## Checks on pull requests
 
-`.github/workflows/deploy-docs-pages.yml` builds the site and publishes it to the repository's GitHub Pages on every push to `develop` that touches `docs/`, or when run by hand. It runs only on `IntersectMBO/govtool`, not on forks.
+`.github/workflows/check-docs.yml` builds the site on every pull request that touches `docs/`, at the root path (as docs.gov.tools) and under `/govtool/` (as the GitHub Pages preview). A broken link fails the build, and `scripts/check-images.mjs` fails it when a page references an image that is not in `static/img/`. Run the same checks locally with:
+
+```sh
+npm run build && node scripts/check-images.mjs build
+DOCS_BASE_URL=/govtool/ npm run build && DOCS_BASE_URL=/govtool/ node scripts/check-images.mjs build
+```
+
+## Preview (GitHub Pages)
+
+`.github/workflows/deploy-docs-pages.yml` publishes a preview of the site, as on `develop`, to the repository's GitHub Pages on every push to `develop` that touches `docs/`, or when run by hand. It runs only on `IntersectMBO/govtool`, not on forks.
+
+The preview is not the production site. It carries `noindex, nofollow` by default, so it does not compete with docs.gov.tools in search results, and GitHub Pages cannot send the security headers that the Docker image's nginx sets. docs.gov.tools is served by the Docker image built from `main` (see below).
 
 One-time setup (a repository admin):
 
 1. Settings → Pages → Build and deployment → Source: **GitHub Actions**.
-2. Run the workflow (Actions → Deploy Docs to GitHub Pages → Run workflow). The site is published at `https://intersectmbo.github.io/govtool/`.
+2. Run the workflow (Actions → Deploy Docs Preview to GitHub Pages → Run workflow). The preview is published at `https://intersectmbo.github.io/govtool/`.
 
 Optional repository variables (Settings → Secrets and variables → Actions → Variables):
 
@@ -42,9 +53,7 @@ Optional repository variables (Settings → Secrets and variables → Actions �
 | --- | --- | --- |
 | `DOCS_PAGES_URL` | `https://<owner>.github.io` | Site origin |
 | `DOCS_PAGES_BASE_URL` | `/<repo>/` | Path the site is served under |
-| `DOCS_PAGES_NO_INDEX` | `false` | `true` adds `noindex, nofollow`, for a temporary host |
-
-To serve it as `docs.gov.tools`: add the custom domain under Settings → Pages, point a `CNAME` DNS record for `docs.gov.tools` at `intersectmbo.github.io`, set `DOCS_PAGES_URL=https://docs.gov.tools` and `DOCS_PAGES_BASE_URL=/`, and run the workflow again.
+| `DOCS_PAGES_NO_INDEX` | `true` | `false` lets search engines index the preview |
 
 The same build settings work locally: `DOCS_URL`, `DOCS_BASE_URL` and `DOCS_NO_INDEX=true` are read by `docusaurus.config.js`. Raw HTML image paths from the GitBook export (`<img src="/img/...">`) get the base path from `src/remark/base-url-raw-html.js`, so the site also works under a sub-path.
 
@@ -77,7 +86,7 @@ Runtime environment variables:
 | --- | --- | --- |
 | `X_ROBOTS_TAG` | `all` | Value of the `X-Robots-Tag` header. Use `noindex, nofollow` on temporary hosts |
 
-CI (`.github/workflows/build-docker-images.yml`) also builds and pushes `ghcr.io/intersectmbo/govtool-docs` on `main`, `develop`, `test` and version tags. It uses the `DOCS_URL` repository variable when set.
+CI (`.github/workflows/build-docker-images.yml`) also builds and pushes `ghcr.io/intersectmbo/govtool-docs` on `main`, `develop`, `test` and version tags. Images from `main` and version tags are production and always build for `https://docs.gov.tools`. Images from `develop` and `test` use the `DOCS_SITE_URL` repository variable when set, so they can be built for a temporary host.
 
 ### Run on a server
 

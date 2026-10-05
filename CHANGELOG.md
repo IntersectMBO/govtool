@@ -10,6 +10,13 @@ changes.
 
 ## [Unreleased]
 
+### Added
+
+- Documentation site (docs.gov.tools) in `docs/`, migrated from GitBook to Docusaurus and updated to the current GovTool implementation
+- `govtool-docs` Docker image, built by CI on `main`, `develop`, `test` and version tags; images from `main` and version tags always build for docs.gov.tools
+- A GitHub Pages preview of the documentation, deployed from `develop` and not indexed by search engines
+- A documentation build check on pull requests that touch `docs/`, catching broken links and images before merge
+
 ## [v2.1.0-alpha.2](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.1...v2.1.0-alpha.2) 2026-10-02
 
 Pre-release. The Haskell backend and the older TypeScript backend

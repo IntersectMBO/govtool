@@ -1,0 +1,61 @@
+name: Check Docs
+
+# Builds the Docusaurus site in docs/ on every pull request that touches it.
+# The build fails on a broken link or a broken Markdown link
+# (onBrokenLinks: "throw"), so they are caught before merge rather than in the
+# Docker image build or the Pages deploy.
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".github/workflows/check-docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # docs.gov.tools, as built by the Docker image.
+          - name: root
+            base_url: /
+          # The GitHub Pages preview, served under the repository name.
+          - name: sub-path
+            base_url: /govtool/
+    name: build (${{ matrix.name }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+        env:
+          DOCS_BASE_URL: ${{ matrix.base_url }}
+
+      - name: Check images
+        run: node scripts/check-images.mjs build
+        env:
+          DOCS_BASE_URL: ${{ matrix.base_url }}

@@ -48,7 +48,7 @@ const config = {
         docs: {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/IntersectMBO/govtool/tree/develop/docs/",
+          editUrl: "https://github.com/IntersectMBO/govtool/edit/develop/docs/",
           remarkPlugins: [[require("./src/remark/base-url-raw-html"), { baseUrl }]],
         },
         blog: false,
@@ -77,6 +77,16 @@ const config = {
             // "What is Cardano GovTool?" is now the home page.
             from: "/overview/what-is-cardano-govtool",
             to: "/",
+          },
+          {
+            // Linked from the Proposal Discussion submission flow in the GovTool frontend.
+            from: "/using-govtool/govtool-functions/storing-information-offline",
+            to: "/cardano-govtool/using-govtool/storing-information-offline",
+          },
+          {
+            // The GitBook section root; it has no page of its own here.
+            from: "/cardano-govtool",
+            to: "/cardano-govtool/using-govtool",
           },
           {
             from: "/about/what-is-the-constitutional-committee-portal",

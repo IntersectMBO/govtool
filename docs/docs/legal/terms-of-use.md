@@ -1,13 +1,10 @@
 ---
 description: The terms that apply when you use Cardano GovTool, its documentation and its APIs.
-# Draft for review by Intersect legal before publication.
-# Based on the Intersect Terms of Use (https://docs.intersectmbo.org/intersect-knowledge-base/legal/policies-and-conditions/intersect-internal-policies/terms-of-use),
-# adapted to how GovTool works (non-custodial wallet interactions, on-chain governance, Proposals/Budget Proposals, public APIs).
 ---
 
 # Terms of Use
 
-**Last updated: 28 September 2026**
+**Last updated: 5 October 2026**
 
 These Terms of Use ("**Terms**") govern your use of Cardano GovTool ("**GovTool**"), including:
 
@@ -16,7 +13,7 @@ These Terms of Use ("**Terms**") govern your use of Cardano GovTool ("**GovTool*
 * this documentation site ([docs.gov.tools](https://docs.gov.tools)), and
 * the public GovTool APIs
 
-(together, the "**Services**"). The Services are made available by Intersect MBO ("**Intersect**", "**we**", "**us**").
+(together, the "**Services**"). The Services were initially developed by IntersectMBO. Since September 1st 2026, they are operationally owned and made available by Sireto BV ("**Sireto**", "**we**", "**us**").
 
 By using the Services, you agree to these Terms and to our [Privacy Policy](./privacy-policy.md). If you don't agree, please don't use the Services.
 
@@ -36,8 +33,8 @@ You may use the Services only if you have reached the age of majority where you 
 ## 3. Your wallet and your transactions
 
 * **You are responsible for your wallet**, including keeping your seed phrase and private keys safe. We will never ask for them. Anyone who does is not us.
-* **Review before you sign.** Transactions you sign, such as delegating, registering, voting, retiring or submitting a Governance Action, are final and **cannot be reversed** by GovTool or by Intersect.
-* **Fees and deposits.** Transactions require network fees. Some actions require deposits set by protocol parameters (for example the DRep deposit, stake key deposit and Governance Action deposit). These are paid to and refunded by the Cardano protocol according to its rules, not by Intersect. GovTool shows the expected amounts, but you are responsible for checking them in your wallet before signing.
+* **Review before you sign.** Transactions you sign, such as delegating, registering, voting, retiring or submitting a Governance Action, are final and **cannot be reversed** by GovTool or by Sireto.
+* **Fees and deposits.** Transactions require network fees. Some actions require deposits set by protocol parameters (for example the DRep deposit, stake key deposit and Governance Action deposit). These are paid to and refunded by the Cardano protocol according to its rules, not by Sireto. GovTool shows the expected amounts, but you are responsible for checking them in your wallet before signing.
 * **Test networks.** Test instances (such as preview.gov.tools) use test networks. Test ada has no value, and test instances may be reset, changed or taken offline at any time.
 * **Wallet compatibility.** GovTool works with wallets that support [CIP-95](https://github.com/cardano-foundation/CIPs/tree/master/CIP-0095). Wallets are third-party software, and we are not responsible for how they work.
 
@@ -49,7 +46,7 @@ Governance activity on Cardano is public. Delegations, votes, DRep registrations
 
 "**Your Content**" means anything you create or publish through the Services, such as DRep information, Governance Action and proposal texts, Budget Proposals, comments, poll votes, vote rationales and your Display Name.
 
-* **You own Your Content.** You give Intersect and the teams operating GovTool a worldwide, non-exclusive, royalty-free, perpetual license to host, store, reproduce, display and distribute Your Content as needed to operate, show and improve the Services, including through GovTool's public APIs. For content you publish on-chain or on IPFS, this also covers displaying it as part of the public governance record.
+* **You own Your Content.** You give Sireto and the teams operating GovTool a worldwide, non-exclusive, royalty-free, perpetual license to host, store, reproduce, display and distribute Your Content as needed to operate, show and improve the Services, including through GovTool's public APIs. For content you publish on-chain or on IPFS, this also covers displaying it as part of the public governance record.
 * **You are responsible for Your Content.** You confirm that you have the rights to publish it, that it is accurate to the best of your knowledge, and that it doesn't break the law or anyone else's rights.
 * **Your Display Name cannot be changed** once it is set, and it is shown publicly next to your activity.
 * **Moderation.** We may hide, remove or refuse to display off-chain content in the Services (for example comments, proposals, or DRep information shown in the DRep Directory) that breaks these Terms or the law, or that is reported and found to be abusive. We cannot remove content from the blockchain or from IPFS.
@@ -80,7 +77,7 @@ GovTool's APIs are public and are mainly designed for GovTool itself. Builders m
 
 GovTool's source code is open source under the [Apache License 2.0](https://github.com/IntersectMBO/govtool/blob/develop/LICENSE). Your use of the code is governed by that license. These Terms govern your use of the hosted Services.
 
-The GovTool and Intersect names, logos and branding may not be used in a way that suggests endorsement by, or affiliation with, GovTool or Intersect, without permission. Anyone may run their own instance of the open-source code, but it must not be presented as the official GovTool.
+The GovTool and Sireto names, logos and branding may not be used in a way that suggests endorsement by, or affiliation with, GovTool or Sireto, without permission. Anyone may run their own instance of the open-source code, but it must not be presented as the official GovTool.
 
 ## 9. Third-party services and links
 
@@ -96,15 +93,21 @@ The Services are provided "**as is**" and "**as available**", without warranties
 
 ## 12. Limitation of liability
 
-To the maximum extent permitted by law, Intersect, the teams that build and operate GovTool, and their respective affiliates, officers, employees and contributors will not be liable for any indirect, incidental, special, consequential or punitive damages, or for any loss of funds, digital assets, profits, data or goodwill, arising from or related to your use of the Services. This includes losses from transactions you sign, wallet or network failures, or reliance on information shown in the Services. Our total liability for any claim related to the Services is limited to one hundred US dollars (USD 100). Some jurisdictions don't allow certain limitations, so some of these may not apply to you.
+To the maximum extent permitted by law, Sireto, the teams that build and operate GovTool, and their respective affiliates, officers, employees and contributors will not be liable for any indirect, incidental, special, consequential or punitive damages, or for any loss of funds, digital assets, profits, data or goodwill, arising from or related to your use of the Services. This includes losses from transactions you sign, wallet or network failures, or reliance on information shown in the Services. Our total liability for any claim related to the Services is limited to one hundred US dollars (USD 100). Some jurisdictions don't allow certain limitations, so some of these may not apply to you.
 
 ## 13. Indemnification
 
-You agree to indemnify and hold harmless Intersect and the teams that build and operate GovTool from claims, damages and expenses (including reasonable legal fees) arising from Your Content, your use of the Services, or your breach of these Terms or of the law.
+You agree to indemnify and hold harmless Sireto and the teams that build and operate GovTool from claims, damages and expenses (including reasonable legal fees) arising from Your Content, your use of the Services, or your breach of these Terms or of the law.
 
 ## 14. Governing law and disputes
 
-These Terms are governed by the laws of the State of New York, USA, without regard to conflict-of-law rules. Before starting any formal proceedings, you agree to try to resolve a dispute informally by contacting us at [legal@intersectmbo.org](mailto:legal@intersectmbo.org). Disputes that aren't resolved informally will be resolved by binding individual arbitration administered by the American Arbitration Association, seated in New York, NY, and not in a class action. You may opt out of arbitration by writing to [legal@intersectmbo.org](mailto:legal@intersectmbo.org) within 30 days of first accepting these Terms. Where arbitration doesn't apply, the state and federal courts in New York, NY have exclusive jurisdiction.
+These Terms are governed by the laws of the Netherlands, without regard to conflict-of-law rules.
+
+Before starting any formal proceedings, you agree to first try to resolve any dispute informally by contacting us at [legal@gov.tools](mailto:legal@gov.tools).
+
+If a dispute cannot be resolved informally, it will be submitted to the competent courts of the Netherlands. To the extent permitted by applicable law, the courts of the Netherlands shall have exclusive jurisdiction.
+
+If you are a consumer, this section does not affect any mandatory rights or protections you may have under the laws applicable to you, including any right to bring proceedings before another court where required by applicable consumer protection law.
 
 ## 15. Changes to these Terms
 
@@ -116,6 +119,6 @@ If any part of these Terms is found unenforceable, the rest remains in effect. O
 
 ## 17. Contact
 
-Intersect MBO, 2015 Ionosphere Street, Ste 201, Longmont, CO 80504, USA. Email: [legal@intersectmbo.org](mailto:legal@intersectmbo.org).
+Sireto BV, Zwolle, The Netherlands. Email: [legal@gov.tools](mailto:legal@gov.tools).
 
 To report a security vulnerability, please follow the [GovTool security policy](https://github.com/IntersectMBO/govtool/blob/develop/SECURITY.md).

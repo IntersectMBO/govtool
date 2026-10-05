@@ -1,16 +1,12 @@
 ---
 description: How GovTool handles personal and technical data when you use gov.tools, its documentation and its APIs.
-# Draft for review by Intersect legal before publication.
-# Based on the Intersect Privacy Policy (https://docs.intersectmbo.org/intersect-knowledge-base/legal/policies-and-conditions/intersect-internal-policies/privacy-policy)
-# and on how the GovTool code handles data (IntersectMBO/govtool, develop @ 6522bd4, and the embedded Proposal and Outcomes pillars).
-# Keep the "Data we process" and "Cookies and browser storage" sections in sync with the code when integrations change.
 ---
 
 # Privacy Policy
 
-**Last updated: 28 September 2026**
+**Last updated: 5 October 2026**
 
-This Privacy Policy explains what data is processed when you use Cardano GovTool, and how. GovTool is an open-source, non-custodial application for taking part in Cardano on-chain governance. GovTool is made available by Intersect MBO ("**Intersect**", "**we**", "**us**").
+This Privacy Policy explains what data is processed when you use Cardano GovTool, and how. GovTool is an open-source, non-custodial application for taking part in Cardano on-chain governance. GovTool was initially developed by IntersectMBO. Since September 1st 2026, GovTool is operationally owned and made available by Sireto BV ("**Sireto**", "**we**", "**us**").
 
 This policy applies to:
 
@@ -123,8 +119,8 @@ We do not sell your personal data and we do not share it for advertising. We sha
 
 * with **service providers** who help us run GovTool, under agreements that protect your data. These include hosting and infrastructure providers, Sentry (error monitoring), Pinata (IPFS pinning, only for content you choose to pin), the support chat provider, and an email delivery provider (for Budget Proposal communications),
 * with **community builder teams** who develop and maintain GovTool and its pillars, where they need access to operate, secure or fix the service,
-* when **required by law**, or to protect the rights, safety and security of our users, Intersect or the public, and
-* as part of a reorganization of Intersect, subject to this policy.
+* when **required by law**, or to protect the rights, safety and security of our users, Sireto or the public, and
+* as part of a reorganization of Sireto, subject to this policy.
 
 Public data (blockchain data, published metadata, public proposals and comments, IPFS content) can be viewed, copied and reused by anyone, including other tools that use GovTool's public APIs.
 
@@ -173,6 +169,6 @@ We may update this policy when GovTool changes, for example when we add or remov
 
 ## Contact
 
-For privacy questions or to exercise your rights, contact Intersect at [dataprotection@intersectmbo.org](mailto:dataprotection@intersectmbo.org).
+For privacy questions or to exercise your rights, contact Sireto at [dataprotection@gov.tools](mailto:dataprotection@gov.tools).
 
 For GovTool bugs or feature requests, see [How to submit a bug](../bugs-or-feature-suggestions/how-to-submit-a-bug.md).

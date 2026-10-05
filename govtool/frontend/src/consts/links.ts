@@ -27,4 +27,6 @@ export const LINKS = {
   VIEW_GOVERNANCE_ACTIONS:
     "https://docs.gov.tools/cardano-govtool/using-govtool/governance-actions/view-governance-actions",
   DREPS: "https://docs.gov.tools/cardano-govtool/using-govtool/dreps",
+  PRIVACY_POLICY: "https://docs.gov.tools/legal/privacy-policy",
+  TERMS_OF_USE: "https://docs.gov.tools/legal/terms-of-use",
 };

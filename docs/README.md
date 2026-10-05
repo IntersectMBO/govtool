@@ -106,7 +106,7 @@ The container is published on `127.0.0.1` only. The host reverse proxy terminate
 1. Rebuild the image with `DOCS_URL=https://docs.gov.tools` (the default).
 2. Set `X_ROBOTS_TAG=all` and redeploy.
 3. Point the `docs.gov.tools` DNS record at the server and add it to the host reverse proxy.
-4. Update the GovTool frontend footer to link to `/legal/privacy-policy` and `/legal/terms-of-use` on docs.gov.tools.
+4. The GovTool frontend footer links to `/legal/privacy-policy` and `/legal/terms-of-use` on docs.gov.tools, so docs.gov.tools must serve this site before a frontend with that footer is released.
 
 ## Layout
 

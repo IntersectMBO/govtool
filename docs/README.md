@@ -29,11 +29,18 @@ npm run serve    # serve the production build
 
 ## Checks on pull requests
 
-`.github/workflows/check-docs.yml` builds the site on every pull request that touches `docs/`, at the root path (as docs.gov.tools) and under `/govtool/` (as the GitHub Pages preview). A broken link fails the build, and `scripts/check-images.mjs` fails it when a page references an image that is not in `static/img/`. Run the same checks locally with:
+`.github/workflows/check-docs.yml` runs on every pull request that touches `docs/`, for the root path (as docs.gov.tools) and for `/govtool/` (as the GitHub Pages preview):
+
+- **build**: a broken link fails the Docusaurus build. `scripts/check-images.mjs` then fails it when a page or stylesheet references an image, font or other asset that is not in the build, or, under `/govtool/`, uses a root path without `/govtool/`.
+- **image**: builds the Docker image and starts it. `scripts/smoke-test-image.sh` checks the health check, pages, images, assets with their security and cache headers, the 404 page, and the redirect from `/` to the base path. A mistake in `nginx.conf.template` only shows when nginx starts, so this is where it fails.
+
+Run the same checks locally with:
 
 ```sh
 npm run build && node scripts/check-images.mjs build
 DOCS_BASE_URL=/govtool/ npm run build && DOCS_BASE_URL=/govtool/ node scripts/check-images.mjs build
+docker build -t govtool-docs:check . && scripts/smoke-test-image.sh govtool-docs:check /
+docker build --build-arg DOCS_BASE_URL=/govtool/ -t govtool-docs:check . && scripts/smoke-test-image.sh govtool-docs:check /govtool/
 ```
 
 ## Preview (GitHub Pages)

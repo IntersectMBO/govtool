@@ -64,6 +64,19 @@ const config = {
   ],
 
   plugins: [
+    // The webpack cache in node_modules/.cache is only evicted when this file
+    // changes, not when DOCS_URL or DOCS_BASE_URL do. Without this, a build for
+    // /govtool/ right after one for / reuses CSS with root font paths.
+    function cacheKeyedOnBaseUrl() {
+      return {
+        name: "cache-keyed-on-base-url",
+        configureWebpack(webpackConfig) {
+          const { cache } = webpackConfig;
+          if (!cache || typeof cache !== "object") return {};
+          return { cache: { ...cache, version: `${cache.version}-${siteUrl}${baseUrl}` } };
+        },
+      };
+    },
     [
       "@docusaurus/plugin-client-redirects",
       {

@@ -1,9 +1,13 @@
 name: Check Docs
 
-# Builds the Docusaurus site in docs/ on every pull request that touches it.
-# The build fails on a broken link or a broken Markdown link
-# (onBrokenLinks: "throw"), so they are caught before merge rather than in the
-# Docker image build or the Pages deploy.
+# Checks the documentation site in docs/ on every pull request that touches it:
+# - build: the Docusaurus build fails on a broken link or a broken Markdown
+#   link (onBrokenLinks: "throw"), and scripts/check-images.mjs fails on an
+#   image, font or asset path that is missing or lacks the base path;
+# - image: the Docker image is built and started, and
+#   scripts/smoke-test-image.sh checks that its nginx config serves the site.
+# So these are caught before merge rather than in the image build, the Pages
+# deploy or a container that fails to start.
 
 on:
   pull_request:
@@ -55,7 +59,27 @@ jobs:
         env:
           DOCS_BASE_URL: ${{ matrix.base_url }}
 
-      - name: Check images
+      - name: Check asset paths
         run: node scripts/check-images.mjs build
         env:
           DOCS_BASE_URL: ${{ matrix.base_url }}
+
+  image:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    strategy:
+      fail-fast: false
+      matrix:
+        base_url: ["/", "/govtool/"]
+    name: image (${{ matrix.base_url }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build --build-arg DOCS_BASE_URL=${{ matrix.base_url }} -t govtool-docs:check .
+
+      - name: Smoke-test image
+        run: scripts/smoke-test-image.sh govtool-docs:check ${{ matrix.base_url }}

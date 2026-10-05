@@ -26,12 +26,17 @@ RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:1.28-alpine
 
+# The same path the site was built for: pages, assets and the 404 page are
+# served under it. The default, /, is docs.gov.tools.
+ARG DOCS_BASE_URL=/
+ENV DOCS_BASE_URL=${DOCS_BASE_URL}
+
 # Value of the X-Robots-Tag response header. Use "noindex, nofollow" for
 # temporary or staging hosts so they are not indexed by search engines.
 ENV X_ROBOTS_TAG="all"
 
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=builder /src/build /usr/share/nginx/html
+COPY --from=builder /src/build /usr/share/nginx/docs${DOCS_BASE_URL}
 
 EXPOSE 8080
 

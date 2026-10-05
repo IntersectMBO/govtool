@@ -71,10 +71,7 @@ The **Feedback** button in GovTool opens a support chat (Chatwoot). We receive w
 
 ### 6. Usage analytics
 
-To understand how GovTool is used and to improve it, we use:
-
-* **Matomo**, hosted at analytics.gov.tools, on gov.tools and some test instances. It records page views, clicks on links, and technical information such as your browser, device type, approximate location derived from your IP address, and referring page. Matomo sets first-party cookies (see below).
-* **Umami** (on instances where it is enabled). It records page views without cookies. Requests are sent through GovTool's own servers.
+To understand how GovTool is used and to improve it, we use **Umami** on instances where it is enabled. It records page views without cookies. Requests are sent through GovTool's own servers.
 
 We use analytics data in aggregate. We don't use it to identify you or for advertising.
 
@@ -98,13 +95,12 @@ GovTool itself does not use cookies to track you across other websites. The foll
 
 | Name / type | Set by | Purpose |
 | --- | --- | --- |
-| `_pk_*` cookies | Matomo (analytics.gov.tools) | Usage analytics (distinguishing visits and visitors) |
 | Chat cookies | Chatwoot | Keeping your support conversation |
 | `refreshToken` cookie (httpOnly) | Proposals / Budget Proposals | Keeping you signed in after wallet verification |
 | `wallet_data_name`, `wallet_data_stake_key` (local storage) | GovTool | Remembering which wallet and stake key you connected |
 | `pending_transaction_*` (local storage) | GovTool | Tracking the status of transactions you submitted |
 | Cached network data (local storage), e.g. `protocol_params`, `network_info`, `network_metrics`, `network_total_stake` | GovTool | Faster loading of network information |
-| Display preferences (local storage), e.g. banner state, Outcomes filters and sort order | GovTool | Remembering your settings |
+| Display preferences (local storage), e.g. banner state, governance action history filters and sort order | GovTool | Remembering your settings |
 | `pdfUserJwt` (session storage) | Proposals / Budget Proposals | Your login token for the current session |
 | Scroll position and DRep Directory sort seed (session storage) | GovTool | Navigation in the current session |
 | Theme preference (local storage) | This documentation site | Remembering light/dark mode |

@@ -1,11 +1,12 @@
 # Rendered at container start by the nginx image entrypoint (envsubst).
-# Only variables defined in the environment are substituted (X_ROBOTS_TAG).
+# Only variables defined in the environment are substituted (X_ROBOTS_TAG,
+# DOCS_BASE_URL).
 
 # Hashed build assets never change, so they can be cached for a long time.
 # Set through a map rather than add_header inside a location, because an
 # add_header in a location drops every add_header inherited from the server.
 map $uri $docs_cache_control {
-    ~^/assets/ "public, max-age=31536000, immutable";
+    "~^${DOCS_BASE_URL}assets/" "public, max-age=31536000, immutable";
     default    "";
 }
 
@@ -13,7 +14,8 @@ server {
     listen 8080;
     server_name _;
 
-    root /usr/share/nginx/html;
+    # Not /usr/share/nginx/html, which holds the base image's welcome page.
+    root /usr/share/nginx/docs;
     index index.html;
 
     server_tokens off;
@@ -40,8 +42,18 @@ server {
         return 200 "ok\n";
     }
 
-    location /assets/ {
+    location ~ ^${DOCS_BASE_URL}assets/ {
         try_files $uri =404;
+    }
+
+    # With a base path other than /, there is no page at / itself: send it to
+    # the site. With /, /index.html is the home page and is served as usual.
+    location = / {
+        try_files /index.html @docs_base;
+    }
+
+    location @docs_base {
+        return 302 ${DOCS_BASE_URL};
     }
 
     location / {
@@ -49,5 +61,5 @@ server {
         try_files $uri $uri/index.html $uri.html =404;
     }
 
-    error_page 404 /404.html;
+    error_page 404 ${DOCS_BASE_URL}404.html;
 }

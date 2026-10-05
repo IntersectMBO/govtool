@@ -78,7 +78,7 @@ Build arguments (fixed at build time):
 | Argument | Default | Purpose |
 | --- | --- | --- |
 | `DOCS_URL` | `https://docs.gov.tools` | Public URL of the site (canonical links, Open Graph tags, sitemap) |
-| `DOCS_BASE_URL` | `/` | Path the site is served under |
+| `DOCS_BASE_URL` | `/` | Path the site is served under. Keep `/` for docs.gov.tools. With another path (e.g. `/govtool/`), the image serves the site under it and redirects `/` there |
 
 Runtime environment variables:
 

@@ -17,8 +17,11 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY package.json ./
+COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 USER node
 EXPOSE 1337
 # Migrations and the idempotent lookup seed run on start, so
-# `docker compose up -d` yields a ready schema with its lookup rows.
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/seed/main.js && node dist/main"]
+# `docker compose up -d` yields a ready schema with its lookup rows. The
+# entrypoint first reads DATABASE_URL, JWT_SECRET and REFRESH_SECRET from
+# Swarm secret files when they are not set in the environment.
+ENTRYPOINT ["docker-entrypoint.sh"]

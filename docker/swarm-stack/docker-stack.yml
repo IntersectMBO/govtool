@@ -1,5 +1,6 @@
-# GovTool on Docker Swarm: govtool-backend, govtool-frontend and the private
-# govtool-metadata-service, behind an nginx-proxy gateway (VIRTUAL_HOST).
+# GovTool on Docker Swarm: govtool-backend, govtool-frontend, the private
+# govtool-metadata-service and the proposal discussion forum backend
+# (govtool-pdf-backend), behind an nginx-proxy gateway (VIRTUAL_HOST).
 #
 # Deploy with docker-stack (https://github.com/mesudip/docker-stack), not
 # vanilla `docker stack deploy`: it resolves the secrets below from the
@@ -10,6 +11,8 @@
 #   https://${BASE_DOMAIN}/api/        backend (prefix stripped), including
 #                                      /api/governance-actions and /api/metadata
 #   https://${BASE_DOMAIN}/swagger-ui  backend API docs
+#   https://${BASE_DOMAIN}/pdf/        proposal discussion forum backend
+#                                      (prefix stripped)
 #   metadata                           internal only, reached by the backend
 #
 # Secrets are Swarm secrets mounted at /run/secrets/<lowercase name>. Each
@@ -45,12 +48,12 @@ networks:
   gateway:
     external: true
     name: ${GATEWAY_NETWORK:-frontend}
-  # The network the metadata service's Postgres is on (the proposal stack's).
+  # The network of the Postgres holding the metadata and pdf databases.
   metadata-db:
     external: true
     name: ${METADATA_DB_NETWORK:-preview-proposal_postgres}
-  # Backend to metadata service. Not internal: the metadata service fetches
-  # anchors from the internet.
+  # Between backend, metadata service and pdf backend. Not internal: the
+  # metadata service and the pdf proxy fetch from the internet.
   internal:
     driver: overlay
 
@@ -76,6 +79,17 @@ secrets:
   # METADATA_DB_PASSWORD fails the deploy before creating anything.
   metadata_database_url:
     x-template: "postgresql://metadata:${METADATA_DB_PASSWORD}@${METADATA_DB_HOST:-postgres}:5432/metadata"
+  # The pdf backend's database, on the same Postgres as metadata; its role and
+  # database are created once by hand like metadata's, see README. Unset or
+  # empty PDF_DB_PASSWORD fails the deploy before creating anything.
+  pdf_database_url:
+    x-template: "postgresql://pdf:${PDF_DB_PASSWORD}@${METADATA_DB_HOST:-postgres}:5432/pdf?schema=public"
+  # Signing keys of the forum's access and refresh tokens: at least 32
+  # characters each, and different. Changing one signs every user out.
+  pdf_jwt_secret:
+    x-template: "${PDF_JWT_SECRET}"
+  pdf_refresh_secret:
+    x-template: "${PDF_REFRESH_SECRET}"
 
 services:
   backend:
@@ -100,7 +114,8 @@ services:
       GOVTOOL_BLOCKFROST_NETWORK: ${BLOCKFROST_NETWORK:-preview}
       GOVTOOL_BLOCKFROST_BASE_URL: ${BLOCKFROST_BASE_URL:-}
       GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
-      GOVTOOL_PDF_API_URL: ${PDF_API_URL:-}
+      # The governance action route linking an action to its discussion.
+      GOVTOOL_PDF_API_URL: http://pdf:1337/api
       GOVTOOL_SENTRY_DSN: ${SENTRY_DSN_BACKEND:-}
       GOVTOOL_SENTRY_ENV: ${APP_ENV:-preview}
       IPFS_GATEWAY: ${IPFS_GATEWAY:-}
@@ -146,7 +161,9 @@ services:
       VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND:-}
       VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${PROPOSAL_DISCUSSION_FORUM_ENABLED:-true}
       VITE_IS_CIP179_ENABLED: ${CIP179_ENABLED:-true}
-      VITE_PDF_API_URL: ${PDF_API_URL:-}
+      # Same origin as the frontend, so no CORS and the refresh cookie is
+      # first-party.
+      VITE_PDF_API_URL: https://${BASE_DOMAIN}/pdf
       VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-}
       VITE_IPFS_PROJECT_ID: ${IPFS_PROJECT_ID:-}
       VITE_CHATWOOT_URL: ${CHATWOOT_URL:-}
@@ -181,6 +198,47 @@ services:
       - metadata-db
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    logging: *logging
+    deploy:
+      <<: *deploy
+      resources:
+        limits:
+          memory: 512M
+
+  # The proposal discussion forum backend. Its image migrates and seeds the
+  # lookup tables on start, then serves the Strapi v4 compatible /api/...
+  pdf:
+    image: ${IMAGE_REGISTRY:-ghcr.io/intersectmbo}/govtool-pdf-backend:${GOVTOOL_TAG:-dev}
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "1337"
+      CORS_ORIGINS: https://${BASE_DOMAIN}
+      REFRESH_COOKIE_SAMESITE: lax
+      REFRESH_COOKIE_SECURE: "true"
+      # 0 testnet, 1 mainnet: wallets of the other network cannot sign in.
+      CARDANO_NETWORK_ID: ${NETWORK_FLAG:-0}
+      # GET /api/proxy/govtool/<path> forwards here.
+      GOVTOOL_API_BASE_URL: http://backend:9999
+      IPFS_GATEWAY_URL: ${IPFS_GATEWAY:-https://ipfs.io/ipfs}
+      VIRTUAL_HOST: https://${BASE_DOMAIN}/pdf/ -> :1337/
+    secrets:
+      - source: pdf_database_url
+        target: database_url
+      - source: pdf_jwt_secret
+        target: jwt_secret
+      - source: pdf_refresh_secret
+        target: refresh_secret
+    networks:
+      - gateway
+      - internal
+      - metadata-db
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:1337/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 15s
       timeout: 5s
       retries: 5

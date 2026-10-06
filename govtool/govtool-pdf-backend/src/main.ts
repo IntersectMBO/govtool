@@ -2,8 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
 import { AppConfig, ConfigError, loadConfig } from './config/config';
+import { loadSecretsIntoEnv } from './config/secrets';
 
-async function bootstrap() {
+export async function bootstrap(): Promise<void> {
+  loadSecretsIntoEnv();
   let config: AppConfig;
   try {
     config = loadConfig();
@@ -18,4 +20,8 @@ async function bootstrap() {
   configureApp(app, config);
   await app.listen(config.port, config.host);
 }
-void bootstrap();
+
+// Run directly (`npm run start`); dist/start.js imports it instead.
+if (require.main === module) {
+  void bootstrap();
+}

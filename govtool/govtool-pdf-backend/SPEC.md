@@ -1257,6 +1257,12 @@ body; auth:false).
 Read once at startup and validated; an invalid value stops the process with a
 message naming the variable. `.env.example` mirrors this list.
 
+`DATABASE_URL`, `JWT_SECRET` and `REFRESH_SECRET` may instead come from a
+file: when the variable is unset or blank, it is read from `<NAME>_FILE`,
+defaulting to the Swarm secret mount `/run/secrets/<lowercase name>`. A
+missing or whitespace-only file counts as unset. The image's command,
+`dist/start.js`, loads them before running the migration.
+
 | Variable | Default | Meaning |
 |---|---|---|
 | `DATABASE_URL` | required | Postgres URL. Local: `postgresql://pdf:pdf@127.0.0.1:5442/pdf?schema=public`. |

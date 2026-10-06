@@ -16,7 +16,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "test": "jest",
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
-    "verify": "npm run lint && npx tsc -p tsconfig.json --noEmit && npm run test && npm run build",
+    "verify": "npm run lint && tsc -p tsconfig.json --noEmit && npm run test && npm run build",
     "seed": "prisma db seed",
     "seed:demo": "ts-node --transpile-only src/seed/demo.ts"
   },
@@ -86,8 +86,5 @@
       "/node_modules/(?!@noble/)"
     ],
     "testEnvironment": "node"
-  },
-  "prisma": {
-    "seed": "ts-node --transpile-only src/seed/main.ts"
   }
 }

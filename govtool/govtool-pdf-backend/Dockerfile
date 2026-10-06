@@ -4,7 +4,8 @@ RUN apk add --no-cache openssl
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY prisma ./prisma
-RUN npx prisma generate
+COPY prisma.config.ts ./
+RUN npm run prisma:generate
 COPY tsconfig.json tsconfig.build.json nest-cli.json ./
 COPY src ./src
 RUN npm run build && npm prune --omit=dev
@@ -21,4 +22,7 @@ USER node
 EXPOSE 1337
 # Migrations and the idempotent lookup seed run on start, so
 # `docker compose up -d` yields a ready schema with its lookup rows.
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/seed/main.js && node dist/main"]
+# dist/start.js also reads DATABASE_URL, JWT_SECRET and REFRESH_SECRET from
+# Swarm secret files when they are unset. Exec form: node is PID 1 and
+# receives SIGTERM, so shutdown hooks run on `docker stop`.
+CMD ["node", "dist/start.js"]

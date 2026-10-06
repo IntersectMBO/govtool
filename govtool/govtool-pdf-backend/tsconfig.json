@@ -26,5 +26,6 @@
         "node_modules/libcardano/index.d.ts"
       ]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist", "prisma.config.ts"]
 }

@@ -25,11 +25,11 @@ USER node
 WORKDIR /api
 COPY --from=api_base --chown=node:node /app/node_modules node_modules
 COPY --from=builder --chown=node:node /app/prisma prisma
-COPY --from=builder --chown=node:node /app/prisma.config.ts prisma.config.ts
 COPY --from=builder --chown=node:node /app/dist ./
 
 # Expose the port the app runs on (if applicable)
 EXPOSE 3000
 
-# Command to run the application
-CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node /api/index.js"]
+# start.js applies migrations (with the compiled prisma.config.mjs), then
+# serves. Exec form: node is PID 1 and receives SIGTERM on `docker stop`.
+CMD ["node", "start.js"]

@@ -1,17 +1,20 @@
 # GovTool Swarm stack
 
 A Docker Swarm stack for running GovTool on a server, from the images CI
-publishes to GHCR. It runs three services:
+publishes to GHCR. It runs four services:
 
 | Service    | Image                                         | Reached at                       |
 | ---------- | --------------------------------------------- | -------------------------------- |
 | `frontend` | `ghcr.io/intersectmbo/govtool-frontend`         | `https://${BASE_DOMAIN}/`        |
 | `backend`  | `ghcr.io/intersectmbo/govtool-backend`          | `https://${BASE_DOMAIN}/api/`, `/swagger-ui` |
 | `metadata` | `ghcr.io/intersectmbo/govtool-metadata-service` | internal only, from the backend  |
+| `pdf`      | `ghcr.io/intersectmbo/govtool-pdf-backend`      | `https://${BASE_DOMAIN}/pdf/`    |
 
 The backend also serves governance action records (`/api/governance-actions`)
 and metadata validation (`/api/metadata`), so the separate metadata-validation
-and outcomes services are no longer needed.
+and outcomes services are no longer needed. `pdf` is the proposal
+discussion forum backend that replaces Strapi; the frontend calls it on its
+own origin, so it needs no CORS setup or extra DNS name.
 
 Deployment is done with
 [docker-stack](https://github.com/mesudip/docker-stack)
@@ -25,9 +28,9 @@ It assumes what is already on the server:
 - an nginx-proxy gateway (`mesudip/nginx-proxy`, as in
   `tests/test-infrastructure`) on a swarm network, `frontend` by default. It
   routes by the services' `VIRTUAL_HOST` labels and handles TLS.
-- the proposal discussion stack's Postgres on an attachable network,
-  `preview-proposal_postgres` by default. The metadata service keeps its own
-  `metadata` database and role there.
+- a Postgres on an attachable network, `preview-proposal_postgres` by
+  default. The metadata service and the pdf backend each keep their own
+  database and role there (`metadata`, `pdf`).
 - a chain data source for the backend, chosen by `CHAIN_DATA_PROVIDER`: a
   db-sync Postgres the backend container can reach at `DBSYNC_POSTGRES_HOST`
   (`dbsync`, the default), or a Koios or Blockfrost API (`koios`,
@@ -85,28 +88,48 @@ set in `BLOCKFROST_BASE_URL` usually needs none.
 The Pinata JWT is optional with any provider: export `PINATA_API_JWT` the
 same way, or leave it unset to run without `/ipfs/upload`.
 
-Create the `metadata` role and database once on the proposal stack's
-Postgres, with a generated password. Run this on the node where that
-Postgres runs:
+Create the `metadata` and `pdf` roles and databases once on that Postgres,
+each with a generated password. Run this on the node where that Postgres
+runs:
 
 ```bash
 export METADATA_DB_PASSWORD="$(openssl rand -hex 32)"
+export PDF_DB_PASSWORD="$(openssl rand -hex 32)"
 container=$(docker ps -q \
   --filter "label=com.docker.swarm.service.name=${METADATA_DB_SERVICE:-preview-proposal_postgres}" | head -n 1)
-docker exec -i "$container" psql -v ON_ERROR_STOP=1 -q \
-  -U "${METADATA_DB_SUPERUSER:-postgres}" -d postgres <<SQL
-\set pw '$METADATA_DB_PASSWORD'
-SELECT 'CREATE ROLE metadata LOGIN'
-  WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'metadata') \gexec
-ALTER ROLE metadata LOGIN PASSWORD :'pw';
-SELECT 'CREATE DATABASE metadata OWNER metadata'
-  WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'metadata') \gexec
+create_db() {
+  docker exec -i "$container" psql -v ON_ERROR_STOP=1 -q \
+    -U "${METADATA_DB_SUPERUSER:-postgres}" -d postgres <<SQL
+\set pw '$2'
+SELECT 'CREATE ROLE $1 LOGIN'
+  WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '$1') \gexec
+ALTER ROLE $1 LOGIN PASSWORD :'pw';
+SELECT 'CREATE DATABASE $1 OWNER $1'
+  WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = '$1') \gexec
 SQL
+}
+create_db metadata "$METADATA_DB_PASSWORD"
+create_db pdf "$PDF_DB_PASSWORD"
 ```
 
-Hex keeps the password URL-safe inside the connection string the stack
-assembles. Keep this shell: the exported password is reused by the deploy
-below. The metadata service applies its migrations on start.
+Rerunning it for a role that exists only resets that role's password, so
+on a server where `metadata` is already set up, run just
+`create_db pdf "$PDF_DB_PASSWORD"` and export the metadata password you
+already have.
+
+Hex keeps the passwords URL-safe inside the connection strings the stack
+assembles. Keep this shell: the exported passwords are reused by the deploy
+below. The metadata service and the pdf backend apply their migrations on
+start; the pdf backend also seeds its lookup tables.
+
+The forum signs its access and refresh tokens with two keys, at least 32
+characters each and different. Generate them once and keep them: a new
+value signs every forum user out.
+
+```bash
+export PDF_JWT_SECRET="$(openssl rand -hex 32)"
+export PDF_REFRESH_SECRET="$(openssl rand -hex 32)"
+```
 
 Deploy:
 
@@ -125,7 +148,7 @@ docker stack ps "$STACK_NAME" --no-trunc --filter desired-state=running
 ## Replacing the old preview-govtool stack
 
 The old stack ran the Haskell backend from `config.json`, plus
-`metadata-validation`. With `STACK_NAME=preview-govtool`, deploy over it and
+`metadata-validation`, with the forum on a separate Strapi stack. With `STACK_NAME=preview-govtool`, deploy over it and
 drop the services this file no longer defines:
 
 ```bash
@@ -154,14 +177,16 @@ be removed by hand. `docker-stack versions "$STACK_NAME"` lists the history.
 ## Secrets
 
 Only true secrets are Swarm secrets: the db-sync password, the Koios token,
-the Blockfrost project id, the Pinata JWT and the metadata `DATABASE_URL`.
+the Blockfrost project id, the Pinata JWT, the metadata and pdf
+`DATABASE_URL`s and the forum's two token signing keys.
 Hostnames, database names, users and urls stay in `environment:`, where
 they help debugging and expose nothing sensitive.
 
 All of them are created on every deploy, whichever provider is chosen. An
 unset optional one is stored as a single space, which every app reads as
-unset. Only `METADATA_DB_PASSWORD` is checked at deploy time: without it
-the deploy fails before creating anything.
+unset. `METADATA_DB_PASSWORD`, `PDF_DB_PASSWORD`, `PDF_JWT_SECRET` and
+`PDF_REFRESH_SECRET` have no default: without them the deploy fails before
+creating anything.
 
 Each app reads a secret from its environment variable first and falls back
 to the file at `<NAME>_FILE`, defaulting to the Swarm mount

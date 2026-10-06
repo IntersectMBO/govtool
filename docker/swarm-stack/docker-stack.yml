@@ -184,8 +184,7 @@ services:
   # gateways and refuses private addresses. Never on the gateway network.
   metadata:
     image: ${IMAGE_REGISTRY:-ghcr.io/intersectmbo}/govtool-metadata-service:${GOVTOOL_TAG:-dev}
-    # The image's own command: migrate, then serve.
-    command: ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node /api/index.js"]
+    # The image's own command migrates, then serves.
     environment:
       NODE_ENV: production
       PORT: "3000"

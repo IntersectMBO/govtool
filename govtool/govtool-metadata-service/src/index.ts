@@ -24,7 +24,7 @@ import {Response, Request} from 'express'
 import path from 'path';
 import setupSwaggerUi from './swagger-loader';
 import fs from 'fs'
-import {prisma} from './config/db';
+import {prisma, disconnectPrisma} from './config/db';
 import { privateAddressesAllowed } from "./helpers/addressGuard";
 
 const app = express();
@@ -96,6 +96,18 @@ if (process.env.NODE_ENV !== 'test') {
     }).catch(e => {
         console.error("Database conn failed", e)
     })
+
+    // Stop accepting requests, let in-flight ones finish, then exit, so
+    // `docker stop` does not wait for its SIGKILL.
+    const shutdown = (signal: string) => {
+        console.log(`${signal} received: closing HTTP server`);
+        server.close(() => {
+            console.log('Disconnecting Prisma Client');
+            disconnectPrisma().finally(() => process.exit(0));
+        });
+    };
+    process.once('SIGTERM', () => shutdown('SIGTERM'));
+    process.once('SIGINT', () => shutdown('SIGINT'));
 }
 
 export { app, server };

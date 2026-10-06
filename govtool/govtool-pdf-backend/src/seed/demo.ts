@@ -1,9 +1,11 @@
 // `npm run seed:demo` (host) or `node dist/seed/demo.js` (container).
 import { PrismaClient } from '@prisma/client';
+import { loadSecretsIntoEnv } from '../config/secrets';
 import { seedLookups } from './seed-lookups';
 import { seedDemo } from './seed-demo';
 
 async function main() {
+  loadSecretsIntoEnv();
   const prisma = new PrismaClient();
   try {
     await seedLookups(prisma);

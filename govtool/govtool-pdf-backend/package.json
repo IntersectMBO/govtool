@@ -86,8 +86,5 @@
       "/node_modules/(?!@noble/)"
     ],
     "testEnvironment": "node"
-  },
-  "prisma": {
-    "seed": "ts-node --transpile-only src/seed/main.ts"
   }
 }

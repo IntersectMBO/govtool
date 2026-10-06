@@ -1,8 +1,10 @@
 // `prisma db seed` and the container start (after `prisma migrate deploy`).
 import { PrismaClient } from '@prisma/client';
+import { loadSecretsIntoEnv } from '../config/secrets';
 import { seedLookups } from './seed-lookups';
 
 async function main() {
+  loadSecretsIntoEnv();
   const prisma = new PrismaClient();
   try {
     await seedLookups(prisma);

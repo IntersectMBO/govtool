@@ -5658,21 +5658,14 @@ review"), and OPEN-48.
   on all three, and a public response submitted with a vote on preview. A Koios instance without CBOR
   retention, or a Blockfrost endpoint without the route, keeps that deployment's gate closed.
 
-## D165 — The Swarm stack runs the pdf backend same-origin under /pdf
+## D165 — The Swarm stack runs the pdf backend under /pdf
 
 **Date:** 2026-10-06
-**Amends:** none. Strapi is no longer deployed alongside GovTool; existing Strapi data is not
-migrated by this decision (govtool-pdf-backend SPEC: no importer yet).
+**Amends:** none. Strapi is no longer deployed alongside GovTool
 
-- `docker/swarm-stack` runs `govtool-pdf-backend` as the `pdf` service, reached at
-  `https://${BASE_DOMAIN}/pdf/` with the prefix stripped by the gateway. The frontend's
-  `VITE_PDF_API_URL` is that same-origin base, so the forum needs no CORS list beyond the
-  frontend's own origin, no extra DNS name, and its refresh cookie is first-party (`lax`, secure).
-- The backend's `GOVTOOL_PDF_API_URL` and the pdf backend's `GOVTOOL_API_BASE_URL` use the
-  stack's internal network (`http://pdf:1337/api`, `http://backend:9999`), never the public url.
-- Its database is a `pdf` role and database on the same Postgres as `metadata`, created by hand
-  once, like `metadata`'s.
-- The image reads `DATABASE_URL`, `JWT_SECRET` and `REFRESH_SECRET` from `<NAME>_FILE` or
-  `/run/secrets/<lowercase name>` when unset, as govtool-backend and govtool-metadata-service do. It
-  does so in a shell entrypoint rather than in `loadConfig`, because the Prisma CLI and the seed
-  read `DATABASE_URL` from the environment before the app starts.
+- `docker/swarm-stack` runs `govtool-pdf-backend` as `pdf`, at `https://${BASE_DOMAIN}/pdf/`, on
+  the frontend's origin. It replaces the Strapi stack; the existing Strapi data is copied in
+  separately.
+- Its database is a `pdf` database and role on the Postgres that `metadata` uses.
+- `DATABASE_URL`, `JWT_SECRET` and `REFRESH_SECRET` are Swarm secrets, read from
+  `/run/secrets/<lowercase name>` when unset, as in govtool-backend and govtool-metadata-service.

@@ -4,6 +4,7 @@ RUN apk add --no-cache openssl
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY prisma ./prisma
+COPY prisma.config.ts ./
 RUN npx prisma generate
 COPY tsconfig.json tsconfig.build.json nest-cli.json ./
 COPY src ./src
@@ -16,12 +17,10 @@ ENV NODE_ENV=production
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/prisma.config.ts ./
 COPY package.json ./
-COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 USER node
 EXPOSE 1337
 # Migrations and the idempotent lookup seed run on start, so
-# `docker compose up -d` yields a ready schema with its lookup rows. The
-# entrypoint first reads DATABASE_URL, JWT_SECRET and REFRESH_SECRET from
-# Swarm secret files when they are not set in the environment.
-ENTRYPOINT ["docker-entrypoint.sh"]
+# `docker compose up -d` yields a ready schema with its lookup rows.
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/seed/main.js && node dist/main"]

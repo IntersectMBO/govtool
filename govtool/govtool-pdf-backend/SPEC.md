@@ -1257,11 +1257,11 @@ body; auth:false).
 Read once at startup and validated; an invalid value stops the process with a
 message naming the variable. `.env.example` mirrors this list.
 
-In the image, `DATABASE_URL`, `JWT_SECRET` and `REFRESH_SECRET` may instead
-come from a file: when the variable is unset or blank, `docker-entrypoint.sh`
-reads `<NAME>_FILE`, defaulting to the Swarm secret mount
-`/run/secrets/<lowercase name>`, before migrating, seeding and starting. A
-missing or whitespace-only file counts as unset.
+`DATABASE_URL`, `JWT_SECRET` and `REFRESH_SECRET` may instead come from a
+file: when the variable is unset or blank, it is read from `<NAME>_FILE`,
+defaulting to the Swarm secret mount `/run/secrets/<lowercase name>`. A
+missing or whitespace-only file counts as unset. `prisma.config.ts` does the
+same for `DATABASE_URL` in the Prisma CLI.
 
 | Variable | Default | Meaning |
 |---|---|---|

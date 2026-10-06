@@ -2,8 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { configureApp } from './app.setup';
 import { AppConfig, ConfigError, loadConfig } from './config/config';
+import { loadSecretsIntoEnv } from './config/secrets';
 
 async function bootstrap() {
+  loadSecretsIntoEnv();
   let config: AppConfig;
   try {
     config = loadConfig();

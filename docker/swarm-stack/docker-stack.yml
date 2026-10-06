@@ -87,9 +87,9 @@ secrets:
   # Signing keys of the forum's access and refresh tokens: at least 32
   # characters each, and different. Changing one signs every user out.
   pdf_jwt_secret:
-    x-template: "${PDF_JWT_SECRET}"
+    environment: PDF_JWT_SECRET
   pdf_refresh_secret:
-    x-template: "${PDF_REFRESH_SECRET}"
+    environment: PDF_REFRESH_SECRET
 
 services:
   backend:

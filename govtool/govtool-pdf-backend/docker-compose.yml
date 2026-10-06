@@ -13,7 +13,7 @@
 # the test bucket on the host); see its header.
 #
 # Postgres is published on 127.0.0.1:5442 so `npm run start:dev`,
-# `npx prisma migrate dev` and `npm run test:e2e` (database pdf_test) on the
+# `npm run prisma:migrate` and `npm run test:e2e` (database pdf_test) on the
 # host can use .env.example as-is.
 #
 # JWT_SECRET and REFRESH_SECRET below are DEVELOPMENT VALUES, public in this

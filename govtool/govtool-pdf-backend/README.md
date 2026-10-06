@@ -26,7 +26,7 @@ frontend at it with `VITE_PDF_API_URL=http://127.0.0.1:1337/` in
 of the whole local stack.
 
 On the host instead: `cp .env.example .env`, `docker compose up -d db`, then
-`npm install && npx prisma migrate deploy && npm run start:dev`.
+`npm install && npm run prisma:deploy && npm run start:dev`.
 
 ## Test
 

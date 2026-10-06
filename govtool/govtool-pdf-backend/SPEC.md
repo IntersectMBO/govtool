@@ -1260,8 +1260,8 @@ message naming the variable. `.env.example` mirrors this list.
 `DATABASE_URL`, `JWT_SECRET` and `REFRESH_SECRET` may instead come from a
 file: when the variable is unset or blank, it is read from `<NAME>_FILE`,
 defaulting to the Swarm secret mount `/run/secrets/<lowercase name>`. A
-missing or whitespace-only file counts as unset. `prisma.config.ts` does the
-same for `DATABASE_URL` in the Prisma CLI.
+missing or whitespace-only file counts as unset. The image's command,
+`dist/start.js`, loads them before running the migration.
 
 | Variable | Default | Meaning |
 |---|---|---|

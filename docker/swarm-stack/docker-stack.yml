@@ -161,25 +161,27 @@ services:
   frontend:
     image: ${IMAGE_REGISTRY:-ghcr.io/intersectmbo}/govtool-frontend:${GOVTOOL_TAG:-dev}
     # Read at container start into window.__ENV__ (docker-entrypoint.sh), so
-    # the published image serves any network and domain.
+    # the published image serves any network and domain. A list, not a map:
+    # docker-stack substitutes variables into the text, so a map value of
+    # true or false would reach docker as a boolean, which it rejects.
     environment:
-      VITE_APP_ENV: ${APP_ENV:-preview}
-      VITE_BASE_URL: https://${BASE_DOMAIN}/api
+      - VITE_APP_ENV=${APP_ENV:-preview}
+      - VITE_BASE_URL=https://${BASE_DOMAIN}/api
       # 0 testnet, 1 mainnet; a mismatch shows as a wallet refusing to connect.
-      VITE_NETWORK_FLAG: ${NETWORK_FLAG:-0}
-      VITE_SENTRY_DSN: ${SENTRY_DSN_FRONTEND:-}
-      VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ${PROPOSAL_DISCUSSION_FORUM_ENABLED:-true}
-      VITE_IS_CIP179_ENABLED: ${CIP179_ENABLED:-true}
+      - VITE_NETWORK_FLAG=${NETWORK_FLAG:-0}
+      - VITE_SENTRY_DSN=${SENTRY_DSN_FRONTEND:-}
+      - VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED=${PROPOSAL_DISCUSSION_FORUM_ENABLED:-true}
+      - VITE_IS_CIP179_ENABLED=${CIP179_ENABLED:-true}
       # Same origin as the frontend, so no CORS and the refresh cookie is
       # first-party.
-      VITE_PDF_API_URL: https://${BASE_DOMAIN}/pdf
-      VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-}
-      VITE_IPFS_PROJECT_ID: ${IPFS_PROJECT_ID:-}
-      VITE_CHATWOOT_URL: ${CHATWOOT_URL:-}
-      VITE_CHATWOOT_WEBSITE_TOKEN: ${CHATWOOT_WEBSITE_TOKEN:-}
-      UMAMI_URL: ${UMAMI_URL:-}
-      UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID:-}
-      VIRTUAL_HOST: https://${BASE_DOMAIN}
+      - VITE_PDF_API_URL=https://${BASE_DOMAIN}/pdf
+      - VITE_IPFS_GATEWAY=${IPFS_GATEWAY:-}
+      - VITE_IPFS_PROJECT_ID=${IPFS_PROJECT_ID:-}
+      - VITE_CHATWOOT_URL=${CHATWOOT_URL:-}
+      - VITE_CHATWOOT_WEBSITE_TOKEN=${CHATWOOT_WEBSITE_TOKEN:-}
+      - UMAMI_URL=${UMAMI_URL:-}
+      - UMAMI_WEBSITE_ID=${UMAMI_WEBSITE_ID:-}
+      - VIRTUAL_HOST=https://${BASE_DOMAIN}
     networks:
       - gateway
     logging: *logging

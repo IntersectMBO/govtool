@@ -48,14 +48,19 @@ networks:
   gateway:
     external: true
     name: ${GATEWAY_NETWORK:-frontend}
-  # The network of the Postgres holding the metadata and pdf databases.
-  metadata-db:
-    external: true
-    name: ${METADATA_DB_NETWORK:-preview-proposal_postgres}
-  # Between backend, metadata service and pdf backend. Not internal: the
-  # metadata service and the pdf proxy fetch from the internet.
+  # Between backend, metadata service, pdf backend and postgres. Not
+  # internal: the metadata service and the pdf proxy fetch from the internet.
   internal:
     driver: overlay
+
+volumes:
+  # The stack's own Postgres data: the metadata and pdf databases.
+  postgres:
+
+configs:
+  # Creates the metadata and pdf roles and databases on an empty volume.
+  postgres_init:
+    file: ./postgres-init.sh
 
 secrets:
   # Required with CHAIN_DATA_PROVIDER=dbsync: the backend refuses to start
@@ -74,16 +79,20 @@ secrets:
   # /ipfs/upload (the single space counts as unset for the app).
   pinata_api_jwt:
     x-template: "${PINATA_API_JWT:- }"
-  # Assembled from the metadata db password; the role and database
-  # themselves are created once by hand, see README. Unset or empty
-  # METADATA_DB_PASSWORD fails the deploy before creating anything.
+  # The stack's Postgres: its superuser, and the passwords of the metadata
+  # and pdf roles, which postgres-init.sh creates on an empty volume. Unset
+  # or empty, the deploy fails before creating anything. The roles keep the
+  # password they were created with: changing one later needs ALTER ROLE.
+  postgres_password:
+    environment: POSTGRES_PASSWORD
+  metadata_db_password:
+    environment: METADATA_DB_PASSWORD
+  pdf_db_password:
+    environment: PDF_DB_PASSWORD
   metadata_database_url:
-    x-template: "postgresql://metadata:${METADATA_DB_PASSWORD}@${METADATA_DB_HOST:-postgres}:5432/metadata"
-  # The pdf backend's database, on the same Postgres as metadata; its role and
-  # database are created once by hand like metadata's, see README. Unset or
-  # empty PDF_DB_PASSWORD fails the deploy before creating anything.
+    x-template: "postgresql://metadata:${METADATA_DB_PASSWORD}@postgres:5432/metadata"
   pdf_database_url:
-    x-template: "postgresql://pdf:${PDF_DB_PASSWORD}@${METADATA_DB_HOST:-postgres}:5432/pdf?schema=public"
+    x-template: "postgresql://pdf:${PDF_DB_PASSWORD}@postgres:5432/pdf?schema=public"
   # Signing keys of the forum's access and refresh tokens: at least 32
   # characters each, and different. Changing one signs every user out.
   pdf_jwt_secret:
@@ -194,7 +203,6 @@ services:
         target: database_url
     networks:
       - internal
-      - metadata-db
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 15s
@@ -235,7 +243,6 @@ services:
     networks:
       - gateway
       - internal
-      - metadata-db
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:1337/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 15s
@@ -248,3 +255,43 @@ services:
       resources:
         limits:
           memory: 512M
+
+  # The metadata and pdf databases. Internal only. Its data lives in a local
+  # volume, so it must keep running on one node: POSTGRES_NODE_CONSTRAINT
+  # pins it when more than one node is labelled govtool.
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+      - metadata_db_password
+      - pdf_db_password
+    configs:
+      - source: postgres_init
+        target: /docker-entrypoint-initdb.d/10-app-databases.sh
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging: *logging
+    deploy:
+      <<: *deploy
+      placement:
+        constraints:
+          - ${POSTGRES_NODE_CONSTRAINT:-node.labels.govtool == true}
+      # Never two Postgres processes on one data directory.
+      update_config:
+        order: stop-first
+        failure_action: rollback
+      rollback_config:
+        order: stop-first
+      resources:
+        limits:
+          memory: 1G

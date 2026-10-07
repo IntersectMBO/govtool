@@ -25,7 +25,6 @@ export const DrawerMobile = ({
   const { screenWidth } = useScreenDimension();
   const { openModal } = useModal();
   const { t } = useTranslation();
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
 
   const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
 
@@ -85,11 +84,7 @@ export const DrawerMobile = ({
           ) : null}
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
             <Grid container direction="column" mt={6} rowGap={4}>
-              {NAV_ITEMS.filter(
-                (navItem) =>
-                  isProposalDiscussionForumEnabled ||
-                  navItem.dataTestId !== "budget-discussion-link",
-              ).map((navItem) => {
+              {NAV_ITEMS.map((navItem) => {
                 if (isNavMenuItem(navItem)) {
                   return (
                     <MenuNavItem

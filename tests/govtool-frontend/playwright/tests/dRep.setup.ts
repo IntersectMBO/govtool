@@ -4,7 +4,7 @@ import { skipIfBalanceIsInsufficient, skipIfMainnet } from "@helpers/cardano";
 import { test as setup } from "@fixtures/walletExtension";
 import { SharedDRepName, sharedDRep } from "lib/wallet/sharedDReps";
 
-const SHARED_DREPS: SharedDRepName[] = ["dRep01", "dRep02", "dRep03"];
+const SHARED_DREPS: SharedDRepName[] = ["dRep01", "dRep02"];
 
 setup.beforeEach(async () => {
   await setAllureEpic("Setup");

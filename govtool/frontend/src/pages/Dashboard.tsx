@@ -36,13 +36,9 @@ export const Dashboard = () => {
       return governanceActionHistoryNavItem ?? "";
     }
 
+    // Linked from Useful links, not the sidebar.
     if (path.startsWith(BUDGET_DISCUSSION_PATHS.budgetDiscussion)) {
-      const budgetNavItem = findNavItem(
-        CONNECTED_NAV_ITEMS,
-        BUDGET_DISCUSSION_PATHS.budgetDiscussion,
-      );
-
-      return budgetNavItem ?? "";
+      return t("budgetProposalsArchive.navLabel");
     }
 
     if (path.startsWith(PDF_PATHS.proposalDiscussion)) {

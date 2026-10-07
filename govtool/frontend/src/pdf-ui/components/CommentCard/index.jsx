@@ -39,7 +39,11 @@ const CommentCard = ({
     setRefetchProposal,
     checkShowComments,
     drepCheck,
+    // Read-only: the comment's replies, given rather than fetched, and no
+    // reply form (the 2025 budget proposals archive).
+    archivedReplies,
 }) => {
+    const readOnly = archivedReplies !== undefined;
     const {
         setLoading,
         walletAPI,
@@ -117,7 +121,6 @@ const CommentCard = ({
         try {
             const newComment = await createComment({
                 proposal_id: comment?.attributes?.proposal_id?.toString(),
-                bd_proposal_id: comment?.attributes?.bd_proposal_id?.toString(),
                 comment_parent_id: comment?.id?.toString(),
                 comment_text: subcommentText,
             });
@@ -206,11 +209,15 @@ const CommentCard = ({
     };
 
     useEffect(() => {
+        if (readOnly) {
+            setSubcommnetsList(showSubcomments ? archivedReplies : []);
+            return;
+        }
         if (showSubcomments) {
             loadSubComments(1);
             setCommentHasReplays(false);
         }
-    }, [showSubcomments, comment]);
+    }, [showSubcomments, comment, archivedReplies]);
     useEffect(() => {
         if (window) {
             setWindowWidth(window?.innerWidth);
@@ -523,7 +530,8 @@ const CommentCard = ({
                                               ?.subcommens_number || 0}
                                 </Typography>
                             </Box>
-                            {proposal?.attributes?.content?.attributes
+                            {readOnly ||
+                            proposal?.attributes?.content?.attributes
                                 ?.prop_submitted ? null : (
                                 <Box display='flex' gap={2}>
                                     {checkShowValidation(
@@ -577,7 +585,7 @@ const CommentCard = ({
                             )}
                         </Box>
 
-                        {showReply ? (
+                        {showReply && !readOnly ? (
                             <Box>
                                 <PdfTextArea
                                     layoutStyles={{

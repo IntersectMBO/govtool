@@ -1,55 +1,35 @@
-import { useTheme } from '@emotion/react';
-import {
-    IconChatAlt,
-    IconReply,
-} from '@intersect.mbo/intersectmbo.org-icons-set';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { IconChatAlt } from '@intersect.mbo/intersectmbo.org-icons-set';
 import { ICONS } from '@/consts/icons';
 import {
     Badge,
     Box,
+    CircularProgress,
     IconButton,
     Menu,
-    MenuItem,
-    Stack,
     Link,
 } from '@mui/material';
 import { Button, Tooltip, Typography } from '@atoms';
-import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router';
-import {
-    CommentCard,
-    BudgetDiscussionPoll,
-    DeleteProposalModal,
-    CreateBudgetDiscussionDialog,
-} from '../../../components';
-import { useAppContext } from '../../../context/context';
-import {
-    createComment,
-    deleteBudgetDiscussion,
-    getComments,
-    getBudgetDiscussion,
-    getBudgetDiscussionPoll,
-    getCountryList,
-} from '../../../lib/api';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
+import CommentCard from '../../../components/CommentCard';
+import BudgetDiscussionPoll from '../../../components/BudgetDiscussionPoll';
 import {
     correctVoteAdaFormat,
-    decodeJWT,
     formatIsoDate,
     openInNewTab,
 } from '../../../lib/utils';
-import ProposalOwnModal from '../../../components/ProposalOwnModal';
 import BudgetDiscussionReviewVersions from '../../../components/BudgetDiscussionReviewVersions';
 import MarkdownTypography from '../../../lib/markdownRenderer';
 import { useScrollToHashSection } from '../../../lib/hooks';
-import UserValidation from '../../../components/UserValidation/UserValidation';
-import { PdfTextArea } from '../../../components/PdfFields';
 import {
-    checkIfDrepIsSignedIn,
-    checkShowValidation,
-} from '../../../lib/helpers';
-import { gray } from '@/consts/colors';
+    activeVersion,
+    commentThreads,
+    displayedPoll,
+    getArchiveDiscussion,
+} from '../../../lib/budgetArchive';
+
+const LIST_PATH = '/budget_discussion';
+const COMMENTS_PAGE_SIZE = 25;
 
 // GovernanceActionDetailsCard shell: radius 20, boxShadow2, translucent body.
 const detailsCardSx = {
@@ -59,14 +39,6 @@ const detailsCardSx = {
     p: { xxs: '40px 24px', md: '40px' },
     overflow: 'hidden',
     width: '100%',
-};
-
-// The comment composer panel, like the GovernanceActionDetailsCardVotes column.
-const composerCardSx = {
-    borderRadius: '20px',
-    boxShadow: '2px 2px 20px 0px rgba(47, 98, 220, 0.20)',
-    bgcolor: 'rgba(255, 255, 255, 0.60)',
-    p: { xxs: '32px 24px', md: '40px' },
 };
 
 // Round icon button in the Share molecule style.
@@ -124,39 +96,59 @@ const SECTIONS = [
 
 const VISIBLE_SECTIONS = ['problem-ownership']; // Visible on start, without expanding text
 
+// An archived 2025 budget proposal, read-only: the final version with every
+// section, the version history, the poll totals and the comment thread, all
+// from the archive's file for this master id.
 const SingleBudgetDiscussion = ({ id }) => {
-    const MAX_COMMENT_LENGTH = 15000;
     const navigate = useNavigate();
     const openLink = (link) => openInNewTab(link);
 
-    const {
-        user,
-        setLoading,
-        setOpenUsernameModal,
-        walletAPI,
-        addErrorAlert,
-        addSuccessAlert,
-    } = useAppContext();
-
-    const theme = useTheme();
-    const [proposal, setProposal] = useState(null);
-    const [mounted, setMounted] = useState(false);
-    const [commentsList, setCommentsList] = useState([]);
-    const [newCommentText, setNewCommentText] = useState('');
-    const [openDeleteModal, setOpenDeleteModal] = useState(false);
-    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [discussion, setDiscussion] = useState(null);
+    const [loadError, setLoadError] = useState(false);
     const [reviewVersionsOpen, setReviewVersionsOpen] = useState(false);
-    const [commentsPageCount, setCommentsPageCount] = useState(0);
-    const [commentsCurrentPage, setCommentsCurrentPage] = useState(1);
     const [commentsSortType, setCommentsSortType] = useState('desc');
-    const [proposalLink, setProposalLink] = useState('');
+    const [commentsShown, setCommentsShown] = useState(COMMENTS_PAGE_SIZE);
     const [disableShare, setDisableShare] = useState(false);
-    const [ownProposalModal, setOwnProposalModal] = useState(false);
-    const [activePoll, setActivePoll] = useState(null);
-    const [showCreateBDDialog, setShowCreateBDDialog] = useState(false);
-    const [refetchProposal, setRefetchProposal] = useState(false);
-    const [allCountries, setAllCountries] = useState([]);
     const [hoveredSection, setHoveredSection] = useState(null);
+    const [shareAnchorEl, setShareAnchorEl] = useState(null);
+    const openShare = Boolean(shareAnchorEl);
+    const proposalLink = `${window.location.origin}${LIST_PATH}/`;
+
+    useEffect(() => {
+        let cancelled = false;
+        setDiscussion(null);
+        setLoadError(false);
+        setCommentsShown(COMMENTS_PAGE_SIZE);
+        getArchiveDiscussion(id)
+            .then((data) => {
+                if (!cancelled) setDiscussion(data);
+            })
+            .catch((error) => {
+                if (cancelled) return;
+                // A master id the archive does not hold goes to the list, as
+                // the forum did for a deleted proposal.
+                if (error?.status === 404) {
+                    navigate(LIST_PATH, { replace: true });
+                } else {
+                    console.error(error);
+                    setLoadError(true);
+                }
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [id, navigate]);
+
+    const proposal = useMemo(
+        () => activeVersion(discussion?.versions),
+        [discussion]
+    );
+    const poll = useMemo(() => displayedPoll(discussion?.polls), [discussion]);
+    const threads = useMemo(
+        () => commentThreads(discussion?.comments, commentsSortType),
+        [discussion, commentsSortType]
+    );
+    const commentsCount = discussion?.comments?.length ?? 0;
 
     function copyToClipboard(value) {
         navigator.clipboard.writeText(value);
@@ -185,28 +177,6 @@ const SingleBudgetDiscussion = ({ id }) => {
         }
     }, [shouldExpand]);
 
-    const targetRef = useRef();
-    const menuRef = useRef();
-
-    useEffect(() => {
-        let domain = new URL(window.location.href);
-        let origin = domain.origin;
-        setProposalLink(`${origin}/budget_discussion/`);
-    }, [proposalLink]);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                if (!allCountries.length) {
-                    const countriesResponse = await getCountryList();
-                    setAllCountries(countriesResponse?.data || []);
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
     const disableShareClick = () => {
         setDisableShare(true);
         setTimeout(() => {
@@ -214,22 +184,6 @@ const SingleBudgetDiscussion = ({ id }) => {
         }, 2000);
     };
 
-    function copyToClipboard(value) {
-        navigator.clipboard.writeText(value);
-    }
-
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
-    const handleClick = () => {
-        setAnchorEl(menuRef?.current);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const [shareAnchorEl, setShareAnchorEl] = useState(null);
-    const openShare = Boolean(shareAnchorEl);
     const handleShareClick = (event) => {
         setShareAnchorEl(event.currentTarget);
     };
@@ -238,181 +192,8 @@ const SingleBudgetDiscussion = ({ id }) => {
         setShareAnchorEl(null);
     };
 
-    const handleEditProposal = () => {
-        setOpenEditDialog(true);
-        setAnchorEl(null);
-    };
-
-    const handleCloseEditDialog = () => {
-        setOpenEditDialog(false);
-        setAnchorEl(null);
-    };
-
-    const handleOpenDeleteModal = () => {
-        setOpenDeleteModal(true);
-        handleClose();
-    };
-
-    const handleCloseDeleteModal = () => {
-        setOpenDeleteModal(false);
-    };
-
     const handleOpenReviewVersions = () => setReviewVersionsOpen(true);
     const handleCloseReviewVersions = () => setReviewVersionsOpen(false);
-
-    const handleDeleteProposal = async () => {
-        setLoading(true);
-        try {
-            const response = await deleteBudgetDiscussion(proposal?.id);
-            if (!response) return;
-
-            handleCloseDeleteModal();
-            navigate('/budget_discussion');
-            addSuccessAlert('Proposal deleted successfully');
-        } catch (error) {
-            let errorMessage = 'Failed to delete proposal';
-            if (error?.response?.data?.error?.message) {
-                errorMessage = error?.response?.data?.error?.message;
-            }
-            console.error('Failed to delete proposal:', error);
-            addErrorAlert(errorMessage);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchProposal = async (id) => {
-        setLoading(true);
-        let query = `populate[0]=creator&populate[1]=bd_costing.preferred_currency&populate[2]=bd_proposal_detail.contract_type_name&populate[3]=bd_further_information.proposal_links&populate[4]=bd_psapb.type_name&populate[5]=bd_psapb.roadmap_name&populate[6]=bd_psapb.committee_name&populate[7]=bd_proposal_ownership.be_country`;
-        try {
-            const response = await getBudgetDiscussion({
-                id: id,
-                query: query,
-            });
-            if (!response) return;
-
-            setProposal(response);
-        } catch (error) {
-            if (error?.response?.data?.error?.message === 'Not Found') {
-                return navigate('/budget_discussion');
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchComments = async (page = 1) => {
-        setLoading(true);
-        try {
-            const query = `filters[$and][0][bd_proposal_id]=${id}&filters[$and][1][comment_parent_id][$null]=true&sort[createdAt]=${commentsSortType}&pagination[page]=${page}&pagination[pageSize]=25&populate[comments_reports][populate][reporter][fields][0]=username&populate[comments_reports][populate][maintainer][fields][0]=username`;
-            const { comments, pgCount } = await getComments(query);
-            if (!comments) return;
-            setCommentsPageCount(pgCount);
-
-            if (page > commentsCurrentPage) {
-                setCommentsList((prev) => [...prev, ...comments]);
-            } else {
-                if (page === 1) {
-                    setCommentsCurrentPage(1);
-                }
-                setCommentsList(comments);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleCreateComment = async () => {
-        setLoading(true);
-        try {
-            const newComment = await createComment({
-                bd_proposal_id: id,
-                comment_text: newCommentText,
-                drep_id: walletAPI?.voter?.isRegisteredAsDRep
-                    ? walletAPI?.dRepID || ''
-                    : '',
-            });
-
-            if (!newComment) return;
-            setNewCommentText('');
-            fetchProposal(id);
-            fetchComments(1);
-            addSuccessAlert('Commented successfully');
-        } catch (error) {
-            addErrorAlert('Failed to comment');
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            //  event.preventDefault();
-        }
-    };
-    const handleBlur = (event) => {
-        const cleanedValue = event.target.value
-            .replace(/[^\S\n]+/g, ' ')
-            .trim();
-        setNewCommentText(cleanedValue);
-    };
-    const handleChange = (event) => {
-        let value = event.target.value;
-
-        if (value.startsWith(' ')) {
-            value = value.trimStart();
-        }
-
-        // value = value.replace(/  +/g, ' ');
-
-        if (value.length <= MAX_COMMENT_LENGTH) {
-            setNewCommentText(value);
-        }
-    };
-
-    const fetchActivePoll = async () => {
-        try {
-            const query = `filters[$and][0][bd_proposal_id][$eq]=${id}&filters[$and][1][is_poll_active]=true&pagination[page]=1&pagination[pageSize]=1&sort[createdAt]=desc`;
-            const { polls, pgCount, total } = await getBudgetDiscussionPoll({
-                query: query,
-            });
-            if (!polls?.length === 0) return;
-            setActivePoll(polls[0]);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    useEffect(() => {
-        if (!mounted) {
-            setMounted(true);
-        } else {
-            fetchProposal(id);
-            fetchComments(1);
-        }
-    }, [id, mounted, openEditDialog]);
-
-    useEffect(() => {
-        if (mounted && refetchProposal) {
-            fetchProposal(id);
-            setRefetchProposal(false);
-        }
-    }, [mounted, refetchProposal, id]);
-
-    useEffect(() => {
-        if (mounted) {
-            fetchComments(1);
-        }
-    }, [commentsSortType]);
-    useEffect(() => {
-        if (!proposal?.id) return;
-        fetchActivePoll();
-    }, [proposal]);
-
-    const location = useLocation();
 
     const renderSectionTitle = (sectionId, title) => (
         <Typography
@@ -449,17 +230,34 @@ const SingleBudgetDiscussion = ({ id }) => {
         </Typography>
     );
 
-    return !proposal ? null : proposal?.attributes?.content?.attributes
-          ?.is_draft ? null : (
-        <>
-            <Typography variant='body1' fontWeight={400}>
-                {openEditDialog ? (
-                    <CreateBudgetDiscussionDialog
-                        open={openEditDialog}
-                        onClose={() => setOpenEditDialog(false)}
-                        current_bd_id={proposal?.attributes?.master_id}
-                    />
-                ) : (
+    if (loadError) {
+        return (
+            <Box mt={6} textAlign='center'>
+                <Typography variant='title2' component='h2'>
+                    This budget proposal could not be loaded
+                </Typography>
+                <Button
+                    variant='text'
+                    size='medium'
+                    sx={{ mt: 2 }}
+                    onClick={() => navigate(LIST_PATH)}
+                >
+                    Back to Budget Proposals
+                </Button>
+            </Box>
+        );
+    }
+
+    if (!proposal) {
+        return (
+            <Box display='flex' justifyContent='center' mt={10}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    return (
+        <Typography variant='body1' fontWeight={400} component='div'>
                     <Box>
                         {/* Back link, as on GovernanceActionDetails */}
                         <Box mt={3}>
@@ -473,7 +271,7 @@ const SingleBudgetDiscussion = ({ id }) => {
                                         style={{ transform: 'rotate(180deg)' }}
                                     />
                                 }
-                                onClick={() => navigate(`/budget_discussion`)}
+                                onClick={() => navigate(LIST_PATH)}
                                 sx={{
                                     px: 0,
                                     fontWeight: 400,
@@ -527,10 +325,8 @@ const SingleBudgetDiscussion = ({ id }) => {
                                             textWrap: 'balance',
                                         }}
                                     >
-                                        Editing and Voting options have been
-                                        disabled for this proposal because it
-                                        is included in the Intersect Budget
-                                        info action
+                                        This proposal was included in the
+                                        Intersect Budget info action
                                     </Typography>
                                 </Box>
                             )}
@@ -721,145 +517,6 @@ const SingleBudgetDiscussion = ({ id }) => {
                                             </Box>
                                         </Menu>
 
-                                        {user &&
-                                            user?.user?.id?.toString() ===
-                                                proposal?.attributes?.creator?.data?.id?.toString() &&
-                                            proposal?.attributes
-                                                ?.submitted_for_vote ==
-                                                null && (
-                                                <Box
-                                                    display='flex'
-                                                    justifyContent='flex-end'
-                                                >
-                                                    <IconButton
-                                                        id='menu-button'
-                                                        sx={roundIconButtonSx(
-                                                            open
-                                                        )}
-                                                        aria-controls={
-                                                            open
-                                                                ? 'proposal-menu'
-                                                                : undefined
-                                                        }
-                                                        aria-haspopup='true'
-                                                        aria-expanded={
-                                                            open
-                                                                ? 'true'
-                                                                : undefined
-                                                        }
-                                                        ref={menuRef}
-                                                        onClick={() => {
-                                                            handleClick();
-                                                        }}
-                                                        data-testid='menu-button'
-                                                    >
-                                                        <MoreVertIcon
-                                                            sx={{
-                                                                fontSize: 24,
-                                                                color: open
-                                                                    ? 'primary.main'
-                                                                    : 'textBlack',
-                                                            }}
-                                                        />
-                                                    </IconButton>
-                                                    <Menu
-                                                        id='proposal-menu'
-                                                        anchorEl={anchorEl}
-                                                        open={open}
-                                                        onClose={handleClose}
-                                                        MenuListProps={{
-                                                            'aria-labelledby':
-                                                                'menu-button',
-                                                        }}
-                                                        slotProps={{
-                                                            paper: {
-                                                                elevation: 4,
-                                                                sx: {
-                                                                    overflow:
-                                                                        'visible',
-                                                                    mt: 1,
-                                                                },
-                                                            },
-                                                        }}
-                                                        transformOrigin={{
-                                                            horizontal: 'right',
-                                                            vertical: 'top',
-                                                        }}
-                                                        anchorOrigin={{
-                                                            horizontal: 'right',
-                                                            vertical: 'bottom',
-                                                        }}
-                                                        data-testid='proposal-menu'
-                                                    >
-                                                        <MenuItem
-                                                            onClick={() =>
-                                                                handleEditProposal()
-                                                            }
-                                                            data-testid='edit-proposal'
-                                                        >
-                                                            <Stack
-                                                                direction={
-                                                                    'row'
-                                                                }
-                                                                spacing={2}
-                                                                alignItems={
-                                                                    'center'
-                                                                }
-                                                            >
-                                                                <img
-                                                                    src={
-                                                                        ICONS.editIcon
-                                                                    }
-                                                                    alt=''
-                                                                    width={24}
-                                                                    height={24}
-                                                                />
-                                                                <Typography
-                                                                    variant='body1'
-                                                                    fontWeight={
-                                                                        400
-                                                                    }
-                                                                >
-                                                                    Edit
-                                                                    Proposal
-                                                                </Typography>
-                                                            </Stack>
-                                                        </MenuItem>
-                                                        <MenuItem
-                                                            onClick={() =>
-                                                                handleOpenDeleteModal()
-                                                            }
-                                                            data-testid='delete-proposal'
-                                                        >
-                                                            <Stack
-                                                                direction={
-                                                                    'row'
-                                                                }
-                                                                spacing={2}
-                                                                alignItems={
-                                                                    'center'
-                                                                }
-                                                            >
-                                                                <DeleteOutlineIcon
-                                                                    sx={{
-                                                                        fontSize: 24,
-                                                                        color: 'textBlack',
-                                                                    }}
-                                                                />
-                                                                <Typography
-                                                                    variant='body1'
-                                                                    fontWeight={
-                                                                        400
-                                                                    }
-                                                                >
-                                                                    Delete
-                                                                    Proposal
-                                                                </Typography>
-                                                            </Stack>
-                                                        </MenuItem>
-                                                    </Menu>
-                                                </Box>
-                                            )}
                                     </Box>
                                 </Box>
 
@@ -943,7 +600,7 @@ const SingleBudgetDiscussion = ({ id }) => {
                                         <BudgetDiscussionReviewVersions
                                             open={reviewVersionsOpen}
                                             onClose={handleCloseReviewVersions}
-                                            id={proposal?.attributes?.master_id}
+                                            versions={discussion?.versions}
                                         />
                                     </Box>
                                 </Box>
@@ -996,18 +653,12 @@ const SingleBudgetDiscussion = ({ id }) => {
                                             <DetailRow
                                                 question='Country of Incorporation'
                                                 answer={
-                                                    allCountries.find(
-                                                        (country) =>
-                                                            country.id ===
-                                                            proposal
-                                                                ?.attributes
-                                                                .bd_proposal_ownership
-                                                                .data.attributes
-                                                                .be_country.data
-                                                                .id
-                                                    )?.attributes
-                                                        ?.country_name ||
-                                                    'Error'
+                                                    proposal?.attributes
+                                                        ?.bd_proposal_ownership
+                                                        ?.data?.attributes
+                                                        ?.be_country?.data
+                                                        ?.attributes
+                                                        ?.country_name || ''
                                                 }
                                                 answerTestId='country-of-incorporation-content'
                                             />
@@ -1561,9 +1212,7 @@ const SingleBudgetDiscussion = ({ id }) => {
                                                             },
                                                         }}
                                                         badgeContent={
-                                                            proposal?.attributes
-                                                                ?.prop_comments_number ||
-                                                            0
+                                                            commentsCount
                                                         }
                                                         aria-label='proposal comments'
                                                         showZero
@@ -1592,15 +1241,9 @@ const SingleBudgetDiscussion = ({ id }) => {
                                 </Box>
                             </Box>
                         </Box>
-                        {activePoll &&
-                            proposal?.attributes?.submitted_for_vote ===
-                                null && (
-                                <Box
-                                    mt={5}
-                                    display='flex'
-                                    alignItems='center'
-                                    justifyContent='space-between'
-                                >
+                        {poll && (
+                            <>
+                                <Box mt={5}>
                                     <Typography
                                         variant='title1'
                                         component='h3'
@@ -1608,26 +1251,11 @@ const SingleBudgetDiscussion = ({ id }) => {
                                         Poll of DRep sentiment
                                     </Typography>
                                 </Box>
-                            )}
-
-                        {activePoll &&
-                            proposal?.attributes?.submitted_for_vote ===
-                                null && (
                                 <Box mt={3}>
-                                    <BudgetDiscussionPoll
-                                        proposalUserId={
-                                            proposal?.attributes?.creator?.data
-                                                ?.id
-                                        }
-                                        proposalAuthorUsername={
-                                            proposal?.attributes
-                                                ?.user_govtool_username
-                                        }
-                                        poll={activePoll}
-                                        fetchActivePoll={fetchActivePoll}
-                                    />
+                                    <BudgetDiscussionPoll poll={poll} />
                                 </Box>
-                            )}
+                            </>
+                        )}
                         <Box
                             mt={5}
                             display='flex'
@@ -1638,130 +1266,33 @@ const SingleBudgetDiscussion = ({ id }) => {
                                 Comments
                             </Typography>
 
-                            <IconButton
-                                sx={roundIconButtonSx(false)}
-                                onClick={() =>
-                                    proposal?.attributes
-                                        ?.prop_comments_number === 0
-                                        ? null
-                                        : setCommentsSortType((prev) =>
-                                              prev === 'desc' ? 'asc' : 'desc'
-                                          )
+                            <Tooltip
+                                paragraphOne={
+                                    commentsSortType === 'desc'
+                                        ? 'Newest first'
+                                        : 'Oldest first'
                                 }
-                                data-testid='sort-comments'
                             >
-                                <img
-                                    src={ICONS.sortIcon}
-                                    alt=''
-                                    width={24}
-                                    height={24}
-                                />
-                            </IconButton>
-                        </Box>
-                        {proposal?.attributes?.content?.attributes
-                            ?.prop_submitted ? null : (
-                            <Box mt={3}>
-                                {/* Comment composer, as VoteActionForm */}
-                                <Box sx={composerCardSx}>
-                                    <Typography
-                                        variant='body1'
-                                        fontWeight={400}
-                                        component='h6'
-                                    >
-                                        Submit a comment
-                                    </Typography>
-
-                                    <PdfTextArea
-                                        value={newCommentText || ''}
-                                        onChange={(e) => handleChange(e)}
-                                        onKeyDown={handleKeyDown}
-                                        onBlur={handleBlur}
-                                        maxLength={MAX_COMMENT_LENGTH}
-                                        spellCheck='false'
-                                        autoCorrect='off'
-                                        autoCapitalize='none'
-                                        autoComplete='off'
-                                        dataTestId='comment-input'
-                                        layoutStyles={{ mt: 2, mb: 1 }}
+                                <IconButton
+                                    sx={roundIconButtonSx(false)}
+                                    onClick={() =>
+                                        setCommentsSortType((prev) =>
+                                            prev === 'desc' ? 'asc' : 'desc'
+                                        )
+                                    }
+                                    disabled={commentsCount === 0}
+                                    data-testid='sort-comments'
+                                >
+                                    <img
+                                        src={ICONS.sortIcon}
+                                        alt=''
+                                        width={24}
+                                        height={24}
                                     />
-
-                                    <Box
-                                        mt={3}
-                                        display='flex'
-                                        justifyContent={
-                                            !checkShowValidation(
-                                                true,
-                                                walletAPI,
-                                                user
-                                            )
-                                                ? 'flex-end'
-                                                : 'space-between'
-                                        }
-                                        alignItems={{
-                                            xxs: 'stretch',
-                                            md: 'center',
-                                        }}
-                                        flexDirection={{
-                                            xxs: 'column',
-                                            md: 'row',
-                                        }}
-                                        gap={2}
-                                        ref={targetRef}
-                                    >
-                                        {checkShowValidation(
-                                            true,
-                                            walletAPI,
-                                            user
-                                        ) && (
-                                            <UserValidation
-                                                type='budget'
-                                                drepCheck={checkIfDrepIsSignedIn(
-                                                    walletAPI
-                                                )}
-                                                drepRequired={true}
-                                            />
-                                        )}
-                                        <Button
-                                            variant='contained'
-                                            size='extraLarge'
-                                            onClick={() =>
-                                                user?.user?.govtool_username
-                                                    ? handleCreateComment()
-                                                    : setOpenUsernameModal({
-                                                          open: true,
-                                                          callBackFn: () => {},
-                                                      })
-                                            }
-                                            disabled={
-                                                !newCommentText ||
-                                                checkShowValidation(
-                                                    true,
-                                                    walletAPI,
-                                                    user
-                                                )
-                                            }
-                                            endIcon={
-                                                <IconReply
-                                                    height={18}
-                                                    width={18}
-                                                    fill={
-                                                        !newCommentText ||
-                                                        !walletAPI?.address
-                                                            ? gray.c300
-                                                            : theme.palette
-                                                                  .neutralWhite
-                                                    }
-                                                />
-                                            }
-                                            data-testid='comment-button'
-                                        >
-                                            Comment
-                                        </Button>
-                                    </Box>
-                                </Box>
-                            </Box>
-                        )}
-                        {proposal?.attributes?.prop_comments_number === 0 ? (
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                        {commentsCount === 0 ? (
                             <Box
                                 sx={{
                                     my: 3,
@@ -1771,54 +1302,32 @@ const SingleBudgetDiscussion = ({ id }) => {
                                     border: '1px solid',
                                     borderColor: 'lightBlue',
                                     bgcolor: 'rgba(255, 255, 255, 0.30)',
+                                    textAlign: 'center',
                                 }}
                             >
-                                <Stack
-                                    display={'flex'}
-                                    direction={'column'}
-                                    alignItems={'center'}
-                                    justifyContent={'center'}
-                                    textAlign={'center'}
-                                    gap={1}
+                                <Typography
+                                    variant='title2'
+                                    component='h6'
+                                    color='textBlack'
+                                    fontWeight={600}
                                 >
-                                    <Typography
-                                        variant='title2'
-                                        component='h6'
-                                        color='textBlack'
-                                        fontWeight={600}
-                                    >
-                                        No Comments yet
-                                    </Typography>
-                                    <Typography
-                                        variant='body1'
-                                        fontWeight={400}
-                                        color='textBlack'
-                                    >
-                                        Be the first to share your thoughts on
-                                        this proposal.
-                                    </Typography>
-                                </Stack>
+                                    No comments
+                                </Typography>
                             </Box>
                         ) : null}
 
-                        {commentsList?.map((comment, index) => (
-                            <Box mt={3} key={index}>
-                                <CommentCard
-                                    comment={comment}
-                                    proposal={proposal}
-                                    fetchComments={fetchComments}
-                                    setRefetchProposal={setRefetchProposal}
-                                    checkShowComments={checkShowValidation(
-                                        false,
-                                        walletAPI,
-                                        user
-                                    )}
-                                    drepCheck={checkIfDrepIsSignedIn(walletAPI)}
-                                    user={user}
-                                />
-                            </Box>
-                        ))}
-                        {commentsCurrentPage < commentsPageCount && (
+                        {threads
+                            .slice(0, commentsShown)
+                            .map(({ comment, replies }) => (
+                                <Box mt={3} key={comment.id}>
+                                    <CommentCard
+                                        comment={comment}
+                                        proposal={proposal}
+                                        archivedReplies={replies}
+                                    />
+                                </Box>
+                            ))}
+                        {commentsShown < threads.length && (
                             <Box
                                 marginY={2}
                                 display={'flex'}
@@ -1827,32 +1336,19 @@ const SingleBudgetDiscussion = ({ id }) => {
                                 <Button
                                     variant='text'
                                     size='medium'
-                                    onClick={() => {
-                                        fetchComments(commentsCurrentPage + 1);
-                                        setCommentsCurrentPage(
-                                            (prev) => prev + 1
-                                        );
-                                    }}
+                                    onClick={() =>
+                                        setCommentsShown(
+                                            (prev) => prev + COMMENTS_PAGE_SIZE
+                                        )
+                                    }
+                                    data-testid='load-more-comments'
                                 >
                                     Load more comments
                                 </Button>
                             </Box>
                         )}
-
-                        <DeleteProposalModal
-                            open={openDeleteModal}
-                            onClose={handleCloseDeleteModal}
-                            handleDeleteProposal={handleDeleteProposal}
-                        />
-
-                        <ProposalOwnModal
-                            open={ownProposalModal}
-                            onClose={() => setOwnProposalModal(false)}
-                        />
                     </Box>
-                )}
-            </Typography>
-        </>
+        </Typography>
     );
 };
 

@@ -9,12 +9,12 @@ import {
 import { runId, testWallet, TestWallet, withFileLock } from "./testWallets";
 
 /**
- * DReps that other tests delegate to or look up by name: dRep01 and dRep02,
- * and dRep03 for the budget discussion tests. Each is registered once per run
- * with CIP-119 metadata and a registered stake key; the given name in that
- * metadata is recorded here so tests can search the DRep directory for it.
+ * DReps that other tests delegate to or look up by name: dRep01 and dRep02.
+ * Each is registered once per run with CIP-119 metadata and a registered
+ * stake key; the given name in that metadata is recorded here so tests can
+ * search the DRep directory for it.
  */
-export type SharedDRepName = "dRep01" | "dRep02" | "dRep03";
+export type SharedDRepName = "dRep01" | "dRep02";
 
 const GIVEN_NAMES_FILE = path.resolve(__dirname, "../_mock/sharedDReps.json");
 const ROOT = path.resolve(__dirname, "../..");

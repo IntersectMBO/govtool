@@ -4,7 +4,7 @@ import {
   UNMATCHED_METADATA_HASH,
   validCip108Fixture,
 } from "@helpers/invalidMetadataFixtures";
-import { BudgetProposalFilterTypes, InvalidMetadataType } from "@types";
+import { InvalidMetadataType } from "@types";
 
 export const SECURITY_RELEVANT_PARAMS_MAP: Record<string, string> = {
   maxBlockBodySize: "max_block_size",
@@ -68,15 +68,3 @@ export const InvalidMetadata: InvalidMetadataType[] = [
     hash: UNMATCHED_METADATA_HASH,
   },
 ];
-
-export const budgetProposalfilterOptionNames: Array<BudgetProposalFilterTypes> =
-  [
-    "Newest",
-    "Oldest",
-    "Most comments",
-    "Least comments",
-    "Name A-Z",
-    "Name Z-A",
-    "Proposer A-Z",
-    "Proposer Z-A",
-  ];

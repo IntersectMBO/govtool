@@ -3,15 +3,14 @@
 import { IconChatAlt } from '@intersect.mbo/intersectmbo.org-icons-set';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { ICONS } from '@/consts/icons';
-import { Box, Chip, IconButton, Menu } from '@mui/material';
+import { Box, IconButton, Menu } from '@mui/material';
 import { Button, Tooltip, Typography } from '@atoms';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { Link, useNavigate } from 'react-router';
-import { useAppContext } from '../../context/context';
+import { Link } from 'react-router';
 import { correctVoteAdaFormat, formatIsoDate } from '../../lib/utils';
-import CreateBudgetDiscussionDialog from '../CreateBudgetDiscussionDialog';
 import MarkdownTypography from '../../lib/markdownRenderer';
+import { categoryName, categorySlug } from '../../lib/budgetArchive';
 import {
     cardBodySx,
     cardDatesBoxSx,
@@ -31,84 +30,90 @@ import {
     shareContentSx,
     shareCopyButtonSx,
     sharePaperSx,
-    statusChipColors,
-    statusChipSx,
 } from '../ProposalCard/cardStyles';
 
 // Layout follows GovTool's GovernanceActionCard (see ProposalCard): a
 // radius-20 shell, label/value elements, the dates box, and a white footer
 // holding one full-width button. The share menu follows the Share molecule.
+// Read-only: an archived 2025 budget proposal from the static list.
 
-const BudgetDiscussionCard = ({
-    budgetDiscussion,
-    isDraft = false,
-    startEdittinButtonClick = false,
-    setShouldRefresh = false,
-    startEdittingDraft,
-}) => {
-    const { user } = useAppContext();
-    const navigate = useNavigate();
+const ShareMenu = ({ masterId }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [copied, setCopied] = useState(false);
+    const open = Boolean(anchorEl);
+    const link = `${window.location.origin}/budget_discussion/${masterId}`;
 
-    const [openEditDialog, setOpenEditDialog] = useState(false);
+    return (
+        <>
+            <Tooltip paragraphOne='Share'>
+                <IconButton
+                    sx={shareButtonSx(open)}
+                    aria-haspopup='true'
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={(event) => setAnchorEl(event.currentTarget)}
+                    data-testid={`budget-discussion-${masterId}-share-button`}
+                >
+                    <img alt='' src={ICONS.share} width={24} height={24} />
+                </IconButton>
+            </Tooltip>
+            <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={() => setAnchorEl(null)}
+                MenuListProps={{ sx: { p: 0 } }}
+                slotProps={{ paper: { elevation: 2, sx: sharePaperSx } }}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+                <Box sx={shareContentSx}>
+                    <Typography
+                        component={'p'}
+                        sx={{ alignSelf: 'flex-start' }}
+                    >
+                        Share
+                    </Typography>
+                    <IconButton
+                        onClick={() => {
+                            navigator.clipboard.writeText(link);
+                            setCopied(true);
+                            setTimeout(() => setCopied(false), 2000);
+                        }}
+                        color='primary'
+                        disabled={copied}
+                        data-testid='copy-link'
+                        sx={shareCopyButtonSx(!copied)}
+                    >
+                        <img alt='' src={ICONS.link} width={24} height={24} />
+                    </IconButton>
+                    <Typography
+                        variant='caption'
+                        component={'p'}
+                        sx={{ color: 'textBlack' }}
+                        data-testid='copy-link-text'
+                    >
+                        {copied ? 'Link copied' : 'Click to copy link'}
+                    </Typography>
+                </Box>
+            </Menu>
+        </>
+    );
+};
 
-    const [budgetDiscussionLink, setBudgetDiscussionLink] = useState('');
+const BudgetDiscussionCard = ({ budgetDiscussion }) => {
+    const attributes = budgetDiscussion?.attributes;
+    const masterId = attributes?.master_id;
+    const slug = categorySlug(categoryName(budgetDiscussion));
+    const costing = attributes?.bd_costing?.data?.attributes;
+    const currency =
+        costing?.preferred_currency?.data?.attributes?.currency_letter_code;
+    const poll = budgetDiscussion?.archive?.poll;
+    const username = attributes?.creator?.data?.attributes?.govtool_username;
 
-    useEffect(() => {
-        let domain = new URL(window.location.href);
-        let origin = domain.origin;
-        setBudgetDiscussionLink(`${origin}/budget_discussion/`);
-    }, [budgetDiscussionLink]);
-
-    const handleEditProposal = () => {
-        // Open edit modal
-        setOpenEditDialog(true);
-    };
-
-    const handleCloseEditDialog = () => {
-        // Close edit modal
-        setOpenEditDialog(false);
-    };
-
-    const CardContentComponent = ({ budgetDiscussion }) => {
-        const disableShareClick = () => {
-            setDisableShare(true);
-            setTimeout(() => {
-                setDisableShare(false);
-            }, 2000);
-        };
-
-        function copyToClipboard(value) {
-            navigator.clipboard.writeText(value);
-        }
-
-        const [shareAnchorEl, setShareAnchorEl] = useState(null);
-        const [disableShare, setDisableShare] = useState(false);
-        const openShare = Boolean(shareAnchorEl);
-        const handleShareClick = (event) => {
-            setShareAnchorEl(event.currentTarget);
-        };
-
-        const handleShareClose = () => {
-            setShareAnchorEl(null);
-        };
-        return (
+    return (
+        <Box sx={{ position: 'relative', height: '100%' }}>
             <Box
                 sx={cardShellSx}
-                data-testid={
-                    isDraft
-                        ? `draft-` +
-                          `${budgetDiscussion?.attributes?.master_id}` +
-                          `-proposal`
-                        : `budget-discussion-` +
-                          (budgetDiscussion?.attributes?.bd_psapb?.data
-                              ?.attributes?.type_name?.data?.attributes
-                              ?.type_name == 'None of these'
-                              ? 'no-category'
-                              : budgetDiscussion?.attributes?.bd_psapb?.data?.attributes?.type_name?.data?.attributes?.type_name
-                                    .replace(/\s+/g, '-')
-                                    .toLowerCase()) +
-                          `-card`
-                }
+                data-testid={`budget-discussion-${slug}-card`}
             >
                 <Box sx={cardBodySx}>
                     <Box
@@ -124,131 +129,27 @@ const BudgetDiscussionCard = ({
                             <Typography
                                 component='h3'
                                 sx={cardTitleSx}
-                                data-testid={
-                                    isDraft
-                                        ? `draft-title`
-                                        : `budget-discussion-title`
-                                }
+                                data-testid='budget-discussion-title'
                             >
-                                {isDraft
-                                    ? budgetDiscussion?.attributes?.draft_data
-                                          ?.bd_proposal_detail?.proposal_name
-                                    : budgetDiscussion?.attributes
-                                          ?.bd_proposal_detail?.data?.attributes
-                                          ?.proposal_name}
+                                {
+                                    attributes?.bd_proposal_detail?.data
+                                        ?.attributes?.proposal_name
+                                }
                             </Typography>
-                            {budgetDiscussion?.attributes?.creator?.data
-                                ?.attributes?.govtool_username ? (
+                            {username ? (
                                 <Typography
                                     variant='body2'
                                     fontWeight={400}
                                     component={'h5'}
                                     sx={{ color: 'neutralGray' }}
                                     mt={0.5}
-                                    data-testid={
-                                        isDraft
-                                            ? `draft-creator`
-                                            : `budget-discussion-creator`
-                                    }
+                                    data-testid='budget-discussion-creator'
                                 >
-                                    @
-                                    {budgetDiscussion?.attributes?.creator?.data
-                                        ?.attributes?.govtool_username || ''}
+                                    @{username}
                                 </Typography>
                             ) : null}
                         </Box>
-                        {isDraft ? null : (
-                            <>
-                                <Tooltip paragraphOne='Share'>
-                                    <IconButton
-                                        id='share-button-card'
-                                        sx={shareButtonSx(openShare)}
-                                        aria-controls={
-                                            openShare
-                                                ? 'share-menu-card'
-                                                : undefined
-                                        }
-                                        aria-haspopup='true'
-                                        aria-expanded={
-                                            openShare ? 'true' : undefined
-                                        }
-                                        onClick={handleShareClick}
-                                        data-testid={`budget-discussion-${budgetDiscussion.id}-share-button`}
-                                    >
-                                        <img
-                                            alt=''
-                                            src={ICONS.share}
-                                            width={24}
-                                            height={24}
-                                        />
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu
-                                    id='share-menu-card'
-                                    anchorEl={shareAnchorEl}
-                                    open={openShare}
-                                    onClose={handleShareClose}
-                                    MenuListProps={{
-                                        'aria-labelledby': 'share-button-card',
-                                        sx: { p: 0 },
-                                    }}
-                                    slotProps={{
-                                        paper: {
-                                            elevation: 2,
-                                            sx: sharePaperSx,
-                                        },
-                                    }}
-                                    transformOrigin={{
-                                        horizontal: 'right',
-                                        vertical: 'top',
-                                    }}
-                                    anchorOrigin={{
-                                        horizontal: 'right',
-                                        vertical: 'bottom',
-                                    }}
-                                >
-                                    <Box sx={shareContentSx}>
-                                        <Typography
-                                            component={'p'}
-                                            sx={{ alignSelf: 'flex-start' }}
-                                        >
-                                            Share
-                                        </Typography>
-                                        <IconButton
-                                            onClick={() => {
-                                                copyToClipboard(
-                                                    `${budgetDiscussionLink}${budgetDiscussion?.attributes?.master_id}`
-                                                ),
-                                                    disableShareClick();
-                                            }}
-                                            color='primary'
-                                            disabled={disableShare}
-                                            data-testid='copy-link'
-                                            sx={shareCopyButtonSx(
-                                                !disableShare
-                                            )}
-                                        >
-                                            <img
-                                                alt=''
-                                                src={ICONS.link}
-                                                width={24}
-                                                height={24}
-                                            />
-                                        </IconButton>
-                                        <Typography
-                                            variant='caption'
-                                            component={'p'}
-                                            sx={{ color: 'textBlack' }}
-                                            data-testid='copy-link-text'
-                                        >
-                                            {disableShare
-                                                ? 'Link copied'
-                                                : 'Click to copy link'}
-                                        </Typography>
-                                    </Box>
-                                </Menu>
-                            </>
-                        )}
+                        <ShareMenu masterId={masterId} />
                     </Box>
                     <Box sx={cardElementSx}>
                         <Typography component={'p'} sx={cardLabelSx}>
@@ -261,9 +162,7 @@ const BudgetDiscussionCard = ({
                                 sx={cardPillTextSx}
                                 data-testid='budget-discussion-type'
                             >
-                                {budgetDiscussion?.attributes?.bd_psapb?.data
-                                    ?.attributes?.type_name?.data?.attributes
-                                    ?.type_name || ''}
+                                {categoryName(budgetDiscussion)}
                             </Typography>
                         </Box>
                     </Box>
@@ -272,11 +171,7 @@ const BudgetDiscussionCard = ({
                             Proposal benefit
                         </Typography>
                         <Box
-                            data-testid={
-                                isDraft
-                                    ? `draft-proposal-benefit`
-                                    : 'proposal-benefit'
-                            }
+                            data-testid='proposal-benefit'
                             sx={{
                                 display: '-webkit-box',
                                 WebkitBoxOrient: 'vertical',
@@ -295,13 +190,8 @@ const BudgetDiscussionCard = ({
                         >
                             <MarkdownTypography
                                 content={
-                                    isDraft
-                                        ? budgetDiscussion?.attributes
-                                              ?.draft_data?.bd_psapb
-                                              ?.proposal_benefit
-                                        : budgetDiscussion?.attributes
-                                              ?.bd_psapb?.data?.attributes
-                                              ?.proposal_benefit
+                                    attributes?.bd_psapb?.data?.attributes
+                                        ?.proposal_benefit
                                 }
                             />
                         </Box>
@@ -313,21 +203,22 @@ const BudgetDiscussionCard = ({
                         <Typography
                             component='p'
                             sx={{ ...cardValueSx, fontWeight: 600 }}
-                            data-testid={
-                                isDraft
-                                    ? 'draft-budget-requested'
-                                    : 'budget-requested-amount'
-                            }
+                            data-testid='budget-requested-amount'
                         >
-                            ₳{' '}
-                            {correctVoteAdaFormat(
-                                isDraft
-                                    ? budgetDiscussion?.attributes?.draft_data
-                                          ?.bd_costing?.ada_amount
-                                    : budgetDiscussion?.attributes?.bd_costing
-                                          ?.data?.attributes?.ada_amount || 0
-                            )}
+                            ₳ {correctVoteAdaFormat(costing?.ada_amount || 0)}
                         </Typography>
+                        {currency && currency !== 'ADA' ? (
+                            <Typography
+                                component='p'
+                                sx={{ ...cardValueSx, color: 'neutralGray' }}
+                                data-testid='budget-requested-preferred-currency'
+                            >
+                                {correctVoteAdaFormat(
+                                    costing?.amount_in_preferred_currency || 0
+                                )}{' '}
+                                {currency}
+                            </Typography>
+                        ) : null}
                     </Box>
                     <Box sx={cardDatesBoxSx}>
                         <Box sx={cardDatesRowSx}>
@@ -335,24 +226,17 @@ const BudgetDiscussionCard = ({
                                 variant='caption'
                                 component='p'
                                 sx={cardDatesTextSx}
-                                data-testid={
-                                    isDraft
-                                        ? 'not-submitted-text'
-                                        : 'proposed-date-wrapper'
-                                }
+                                data-testid='proposed-date-wrapper'
                             >
-                                {isDraft ? 'Not submitted' : `Proposed on: `}
-                                {!isDraft && (
-                                    <span
-                                        data-testid='proposed-date'
-                                        style={{ fontWeight: 600 }}
-                                    >
-                                        {formatIsoDate(
-                                            budgetDiscussion?.attributes
-                                                ?.master_proposal_created_at
-                                        )}
-                                    </span>
-                                )}
+                                {`Proposed on: `}
+                                <span
+                                    data-testid='proposed-date'
+                                    style={{ fontWeight: 600 }}
+                                >
+                                    {formatIsoDate(
+                                        attributes?.master_proposal_created_at
+                                    )}
+                                </span>
                             </Typography>
                             <Tooltip paragraphOne={'Proposal Date'}>
                                 <Box display={'flex'} alignItems={'center'}>
@@ -361,157 +245,75 @@ const BudgetDiscussionCard = ({
                             </Tooltip>
                         </Box>
                     </Box>
-                    {isDraft ? null : (
-                        <Box
-                            display={'flex'}
-                            alignItems={'center'}
-                            gap={1}
-                            mt={'auto'}
-                            mb={2}
-                        >
-                            <Tooltip paragraphOne={'Comments Number'}>
-                                <Box display={'flex'} alignItems={'center'}>
-                                    <IconButton
-                                        disabled={true}
-                                        sx={{
-                                            borderRadius: 50,
-                                            px: 1,
-                                            '&.Mui-disabled': {
-                                                color: 'textBlack',
-                                            },
-                                        }}
+                    <Box
+                        display={'flex'}
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                        gap={1}
+                        mt={'auto'}
+                        mb={2}
+                    >
+                        <Tooltip paragraphOne={'Comments Number'}>
+                            <Box display={'flex'} alignItems={'center'}>
+                                <IconButton
+                                    disabled={true}
+                                    sx={{
+                                        borderRadius: 50,
+                                        px: 1,
+                                        '&.Mui-disabled': {
+                                            color: 'textBlack',
+                                        },
+                                    }}
+                                >
+                                    <IconChatAlt width={20} height={20} />
+                                    <Box
+                                        component='span'
+                                        aria-label='comments'
+                                        sx={commentCountSx}
+                                        data-testid={`budget-discussion-${masterId}-comment-count`}
                                     >
-                                        <IconChatAlt width={20} height={20} />
-                                        <Box
-                                            component='span'
-                                            aria-label='comments'
-                                            sx={commentCountSx}
-                                            data-testid={`budget-discussion-${budgetDiscussion?.id}-comment-count`}
-                                        >
-                                            {budgetDiscussion?.attributes
-                                                ?.prop_comments_number || 0}
-                                        </Box>
-                                    </IconButton>
-                                </Box>
+                                        {attributes?.prop_comments_number || 0}
+                                    </Box>
+                                </IconButton>
+                            </Box>
+                        </Tooltip>
+                        {poll ? (
+                            <Tooltip paragraphOne='Final DRep poll totals'>
+                                <Typography
+                                    variant='caption'
+                                    component='p'
+                                    sx={{ color: 'neutralGray' }}
+                                    data-testid={`budget-discussion-${masterId}-poll-totals`}
+                                >
+                                    Poll: Yes {poll.yes} · No {poll.no}
+                                </Typography>
                             </Tooltip>
-                            {user &&
-                                user?.user?.id?.toString() ===
-                                    budgetDiscussion?.attributes?.creator?.data?.id?.toString() &&
-                                budgetDiscussion?.attributes
-                                    ?.submitted_for_vote == null && (
-                                    <Tooltip paragraphOne='Edit'>
-                                        <IconButton
-                                            aria-label='edit'
-                                            onClick={handleEditProposal}
-                                            data-testid={`budget-proposals-${budgetDiscussion?.attributes?.master_id}-edit-button`}
-                                        >
-                                            <img
-                                                src={ICONS.editIcon}
-                                                alt=''
-                                                width={24}
-                                                height={24}
-                                            />
-                                        </IconButton>
-                                    </Tooltip>
-                                )}
-                        </Box>
-                    )}
+                        ) : null}
+                    </Box>
                 </Box>
                 <Box sx={cardFooterSx}>
-                    {isDraft ? (
+                    <Link
+                        to={`/budget_discussion/${masterId}`}
+                        data-testid={`budget-discussion-${slug}-view-details-link-wrapper`}
+                        style={{ display: 'block', textDecoration: 'none' }}
+                    >
                         <Button
                             variant='contained'
                             size='large'
+                            data-testid={`budget-discussion-${slug}-view-details`}
                             fullWidth
                             sx={{
                                 whiteSpace: 'normal',
                                 height: 'auto',
                                 minHeight: 40,
                             }}
-                            onClick={() => startEdittingDraft(budgetDiscussion)}
-                            data-testid={`draft-start-editing`}
-                            //`draft-`+budgetDiscussion?.id+`-start-editing`
                         >
-                            Start Editing
+                            View Details
                         </Button>
-                    ) : (
-                        <Link
-                            to={`/budget_discussion/${budgetDiscussion?.attributes?.master_id}`}
-                            data-testid={
-                                `budget-discussion-` +
-                                (budgetDiscussion?.attributes?.bd_psapb?.data
-                                    ?.attributes?.type_name?.data?.attributes
-                                    ?.type_name == 'None of these'
-                                    ? 'no-category'
-                                    : budgetDiscussion?.attributes?.bd_psapb?.data?.attributes?.type_name?.data?.attributes?.type_name
-                                          .replace(/\s+/g, '-')
-                                          .toLowerCase()) +
-                                `-view-details-link-wrapper`
-                            }
-                            style={{ display: 'block', textDecoration: 'none' }}
-                        >
-                            <Button
-                                variant='contained'
-                                size='large'
-                                data-testid={
-                                    `budget-discussion-` +
-                                    (budgetDiscussion?.attributes?.bd_psapb
-                                        ?.data?.attributes?.type_name?.data
-                                        ?.attributes?.type_name ==
-                                    'None of these'
-                                        ? 'no-category'
-                                        : budgetDiscussion?.attributes?.bd_psapb?.data?.attributes?.type_name?.data?.attributes?.type_name
-                                              .replace(/\s+/g, '-')
-                                              .toLowerCase()) +
-                                    `-view-details`
-                                }
-                                fullWidth
-                                sx={{
-                                    whiteSpace: 'normal',
-                                    height: 'auto',
-                                    minHeight: 40,
-                                }}
-                            >
-                                View Details
-                            </Button>
-                        </Link>
-                    )}
+                    </Link>
                 </Box>
             </Box>
-        );
-    };
-
-    return isDraft ? (
-        <div
-            style={{
-                position: 'relative',
-                height: '100%',
-            }}
-        >
-            <Chip
-                label='Draft'
-                aria-label='draft-status-badge'
-                sx={{ ...statusChipSx, ...statusChipColors.draft }}
-            />
-            <CardContentComponent budgetDiscussion={budgetDiscussion} />
-        </div>
-    ) : (
-        <div
-            style={{
-                position: 'relative',
-                height: '100%',
-            }}
-        >
-            <CardContentComponent budgetDiscussion={budgetDiscussion} />
-
-            {openEditDialog ? (
-                <CreateBudgetDiscussionDialog
-                    open={openEditDialog}
-                    onClose={handleCloseEditDialog}
-                    current_bd_id={budgetDiscussion?.attributes?.master_id}
-                />
-            ) : null}
-        </div>
+        </Box>
     );
 };
 

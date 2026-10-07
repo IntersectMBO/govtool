@@ -8,7 +8,6 @@ import {
   PATHS,
   PDF_PATHS,
   GOV_ACTION_HISTORY_PATHS,
-  BUDGET_DISCUSSION_PATHS,
   // USER_PATHS
 } from "./paths";
 
@@ -34,12 +33,6 @@ export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
     dataTestId: "drep-directory-link",
     navTo: PATHS.dRepDirectory,
     label: i18n.t("dRepDirectory.title"),
-    newTabLink: null,
-  },
-  {
-    dataTestId: "budget-discussion-link",
-    navTo: BUDGET_DISCUSSION_PATHS.budgetDiscussion,
-    label: i18n.t("budgetDiscussion.title"),
     newTabLink: null,
   },
   {
@@ -93,14 +86,6 @@ export const CONNECTED_NAV_ITEMS = [
     dataTestId: "drep-directory-link",
     label: i18n.t("dRepDirectory.title"),
     navTo: PATHS.dashboardDRepDirectory,
-    activeIcon: ICONS.dRepDirectoryActiveIcon,
-    icon: ICONS.dRepDirectoryIcon,
-    newTabLink: null,
-  },
-  {
-    dataTestId: "budget-discussion-link",
-    label: i18n.t("budgetDiscussion.title"),
-    navTo: BUDGET_DISCUSSION_PATHS.budgetDiscussion,
     activeIcon: ICONS.dRepDirectoryActiveIcon,
     icon: ICONS.dRepDirectoryIcon,
     newTabLink: null,

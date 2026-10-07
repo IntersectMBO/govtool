@@ -34,6 +34,7 @@ import {
   RetireAsDirectVoter,
   EditDRepMetadata,
   ProposalDiscussionPillar,
+  BudgetProposalsArchive,
 } from "@pages";
 import { SetupInterceptors } from "@services";
 import {
@@ -131,19 +132,17 @@ export default () => {
           element={<GovernanceActionDetails />}
         />
         {isProposalDiscussionForumEnabled && !isEnabled && (
-          <>
-            <Route
-              path={`${PDF_PATHS.proposalDiscussion}/*`}
-              element={<ProposalDiscussionPillar />}
-            />
-            <Route
-              path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
-              element={<ProposalDiscussionPillar />}
-            />
-          </>
+          <Route
+            path={`${PDF_PATHS.proposalDiscussion}/*`}
+            element={<ProposalDiscussionPillar />}
+          />
         )}
         {!isEnabled && (
           <>
+            <Route
+              path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+              element={<BudgetProposalsArchive />}
+            />
             <Route
               path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
               element={<GovernanceActionHistoryPage />}
@@ -157,17 +156,15 @@ export default () => {
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardHome />} />
           {isProposalDiscussionForumEnabled && (
-            <>
-              <Route
-                path={`${PDF_PATHS.proposalDiscussion}/*`}
-                element={<ProposalDiscussionPillar />}
-              />
-              <Route
-                path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
-                element={<ProposalDiscussionPillar />}
-              />
-            </>
+            <Route
+              path={`${PDF_PATHS.proposalDiscussion}/*`}
+              element={<ProposalDiscussionPillar />}
+            />
           )}
+          <Route
+            path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+            element={<BudgetProposalsArchive />}
+          />
           <Route
             path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
             element={<GovernanceActionHistoryPage />}

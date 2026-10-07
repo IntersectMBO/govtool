@@ -23,7 +23,6 @@ export const TopNav = ({ isConnectButton = true }) => {
   const { isEnabled, disconnectWallet, stakeKey } = useCardano();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
 
   useEffect(() => {
     const onScroll = () => {
@@ -59,11 +58,7 @@ export const TopNav = ({ isConnectButton = true }) => {
         columns={5}
         columnSpacing={screenWidth < 1024 ? 2 : 4}
       >
-        {NAV_ITEMS.filter(
-          (navItem) =>
-            isProposalDiscussionForumEnabled ||
-            navItem.dataTestId !== "budget-discussion-link",
-        ).map((navItem) => {
+        {NAV_ITEMS.map((navItem) => {
           if (isNavMenuItem(navItem)) {
             return (
               <Grid item key={navItem.label}>

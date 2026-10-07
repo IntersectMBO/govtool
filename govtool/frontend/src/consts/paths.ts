@@ -32,11 +32,12 @@ export const PDF_PATHS = {
   proposalDiscussionPropose: "/proposal_discussion/propose",
 };
 
+// The read-only 2025 budget proposals archive keeps the budget discussion
+// paths, so old links resolve; /propose redirects to the list.
 export const BUDGET_DISCUSSION_PATHS = {
   budgetDiscussion: "/budget_discussion",
   budgetDiscussionProposal: "/budget_discussion/:id",
   budgetDiscussionPropose: "/budget_discussion/propose",
-  budgetDiscussionAction: "/budget_discussion/:proposalId",
   budgetDiscussionCategory: "/budget_discussion/category/:category",
   budgetDiscussionCategoryAction:
     "/budget_discussion/category/:category/:proposalId",

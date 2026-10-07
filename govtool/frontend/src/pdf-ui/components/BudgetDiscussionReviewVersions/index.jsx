@@ -26,7 +26,6 @@ import {
     openInNewTab,
 } from '../../lib/utils';
 import { useEffect, useState } from 'react';
-import { getBudgetDiscussionVersions, getCountryList } from '../../lib/api';
 import BudgetDiscussionInfoSegment from '../BudgetDiscussionInfoSegment';
 import { primaryBlue } from '@/consts/colors';
 
@@ -55,14 +54,14 @@ const backArrow = (
     />
 );
 
-const BudgetDiscussionReviewVersions = ({ open, onClose, id }) => {
+// Every version of an archived budget proposal, newest first, as the
+// archive file holds them.
+const BudgetDiscussionReviewVersions = ({ open, onClose, versions = [] }) => {
     const theme = useTheme();
     const openLink = (link) => openInNewTab(link);
 
-    const [versions, setVersions] = useState(null);
     const [selectedVersion, setSelectedVersion] = useState(null);
     const [openVersionsList, setOpenVersionsList] = useState(false);
-    const [allCountries, setAllCountries] = useState([]);
 
     const isSmallScreen = useMediaQuery((theme) =>
         theme.breakpoints.down('lg')
@@ -71,35 +70,9 @@ const BudgetDiscussionReviewVersions = ({ open, onClose, id }) => {
     const handleOpenVersionsList = () => setOpenVersionsList(true);
     const handleCloseVersionsList = () => setOpenVersionsList(false);
 
-    const fetchVersions = async () => {
-        try {
-            const proposals = await getBudgetDiscussionVersions(id);
-            if (!proposals) return;
-
-            setVersions(proposals);
-            setSelectedVersion(proposals[0]);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                if (!allCountries.length) {
-                    const countriesResponse = await getCountryList();
-                    setAllCountries(countriesResponse?.data || []);
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        if (open) {
-            fetchVersions();
-            fetchData();
-        }
-    }, [open]);
+        if (open) setSelectedVersion(versions[0] ?? null);
+    }, [open, versions]);
 
     return (
         <Typography variant='body1' fontWeight={400}>
@@ -159,7 +132,7 @@ const BudgetDiscussionReviewVersions = ({ open, onClose, id }) => {
                                                     )} ${
                                                         version?.attributes
                                                             ?.is_active
-                                                            ? ' (Live)'
+                                                            ? ' (Final)'
                                                             : ''
                                                     }`}
                                                 </Box>
@@ -288,7 +261,7 @@ const BudgetDiscussionReviewVersions = ({ open, onClose, id }) => {
                                                                                         version
                                                                                             ?.attributes
                                                                                             ?.is_active
-                                                                                            ? ' (Live)'
+                                                                                            ? ' (Final)'
                                                                                             : ''
                                                                                     }`}
                                                                                 </div>
@@ -371,7 +344,7 @@ const BudgetDiscussionReviewVersions = ({ open, onClose, id }) => {
                                                                         ?.content
                                                                         ?.attributes
                                                                         ?.prop_rev_active
-                                                                        ? ' (Live)'
+                                                                        ? ' (Final)'
                                                                         : ''
                                                                 }`}
                                                             </Typography>
@@ -482,23 +455,16 @@ const BudgetDiscussionReviewVersions = ({ open, onClose, id }) => {
                                                                     <BudgetDiscussionInfoSegment
                                                                         question='Country of Incorporation'
                                                                         answer={
-                                                                            allCountries?.find(
-                                                                                (
-                                                                                    country
-                                                                                ) =>
-                                                                                    country?.id ===
-                                                                                    selectedVersion
-                                                                                        ?.attributes
-                                                                                        ?.bd_proposal_ownership
-                                                                                        ?.data
-                                                                                        ?.attributes
-                                                                                        ?.be_country
-                                                                                        ?.data
-                                                                                        ?.id
-                                                                            )
+                                                                            selectedVersion
+                                                                                ?.attributes
+                                                                                ?.bd_proposal_ownership
+                                                                                ?.data
+                                                                                ?.attributes
+                                                                                ?.be_country
+                                                                                ?.data
                                                                                 ?.attributes
                                                                                 ?.country_name ||
-                                                                            'Error'
+                                                                            ''
                                                                         }
                                                                         answerTestId='country-of-incorporation-content'
                                                                     />

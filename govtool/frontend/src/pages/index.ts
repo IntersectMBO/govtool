@@ -1,3 +1,4 @@
+export * from "./BudgetProposalsArchive";
 export * from "./ChooseStakeKey";
 export * from "./CreateGovernanceAction";
 export * from "./DRepDetails";

@@ -74,8 +74,6 @@ const UserValidation = ({
                 return 'To submit a comment, you need to';
             case 'comment':
                 return 'To submit a reply, you need to';
-            case 'budget-proposal':
-                return 'To submit a budget proposal, you need to';
             case 'proposal':
                 return 'To submit a proposal, you need to';
             case 'governance':

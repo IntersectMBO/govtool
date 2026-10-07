@@ -184,6 +184,44 @@ export function AppContextProvider({ children, govtoolProps = {} }) {
     );
 }
 
+// For read-only pages, such as the 2025 budget proposals archive: no user, no
+// wallet and no session sync, so mounting one never logs a forum user out or
+// calls the forum backend.
+export function ReadOnlyAppContextProvider({ children, govtoolProps = {} }) {
+    const [loading, setLoading] = useState(false);
+    return (
+        <AppContext.Provider
+            value={{
+                user: null,
+                setUser: noop,
+                loading,
+                setLoading,
+                walletStatus: 'disconnected',
+                walletAPI: null,
+                locale: govtoolProps.locale ?? 'en',
+                openUsernameModal: { open: false, callBackFn: noop },
+                setOpenUsernameModal: noop,
+                validateMetadata: null,
+                clearStates: noop,
+                fetchDRepVotingPowerList:
+                    govtoolProps.fetchDRepVotingPowerList ?? null,
+                getEnactedProposalDetails: null,
+                addSuccessAlert: noop,
+                addErrorAlert: noop,
+                addWarningAlert: noop,
+                addChangesSavedAlert: noop,
+                showIdentificationPage: false,
+                setShowIdentificationPage: noop,
+                identificationType: 'wallet',
+                setIdentificationType: noop,
+                epochParams: govtoolProps.epochParams,
+            }}
+        >
+            {children}
+        </AppContext.Provider>
+    );
+}
+
 export function useAppContext() {
     const context = useContext(AppContext);
     if (context === undefined) {

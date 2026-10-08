@@ -15,6 +15,8 @@ type LinkProps = {
   navTo: string;
   onClick?: (event: MouseEvent<HTMLElement>) => void;
   size?: "small" | "big";
+  /** Overrides the router's prefix match, for links in a group. */
+  isActive?: boolean;
 };
 
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
@@ -26,6 +28,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
       navTo,
       size = "small",
       onClick,
+      isActive: isActiveOverride,
     } = props;
     const { disconnectWallet } = useCardano();
 
@@ -44,17 +47,20 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
         }}
         ref={ref}
       >
-        {({ isActive }) => (
-          <Typography
-            sx={{
-              fontSize,
-              fontWeight: isActive && navTo !== "" ? 600 : 500,
-              color: isActive && navTo !== "" ? "#FF640A" : "textBlack",
-            }}
-          >
-            {label}
-          </Typography>
-        )}
+        {({ isActive: isRouteActive }) => {
+          const isActive = (isActiveOverride ?? isRouteActive) && navTo !== "";
+          return (
+            <Typography
+              sx={{
+                fontSize,
+                fontWeight: isActive ? 600 : 500,
+                color: isActive ? "#FF640A" : "textBlack",
+              }}
+            >
+              {label}
+            </Typography>
+          );
+        }}
       </NavLink>
     );
   },

@@ -1,12 +1,12 @@
 import { FC } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
 
 import { Background, Button, Link, Typography } from "@atoms";
 import { ICONS, IMAGES, NAV_ITEMS, NavMenuItem, NavItem, PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { useFeatureFlag, useModal } from "@context";
-import { openInNewTab } from "@utils";
+import { findActiveNavTo, openInNewTab } from "@utils";
 
 import { DrawerMobileProps } from "./types";
 import { LINKS } from "@/consts/links";
@@ -145,6 +145,12 @@ const MenuNavItem: FC<{
     }
     return navItem.childNavItems;
   };
+  const { pathname } = useLocation();
+  const childNavItems = filterChildNavItems();
+  const activeNavTo = findActiveNavTo(
+    pathname,
+    (childNavItems ?? []).map((item) => item.navTo),
+  );
   return (
     <>
       <Grid item key={navItem.label}>
@@ -155,10 +161,11 @@ const MenuNavItem: FC<{
           size="big"
         />
       </Grid>
-      {filterChildNavItems()?.map((childNavItem) => (
+      {childNavItems?.map((childNavItem) => (
         <Grid item key={childNavItem.label} ml={3}>
           <Link
             {...childNavItem}
+            isActive={childNavItem.navTo === activeNavTo}
             data-testid={childNavItem.dataTestId}
             onClick={() => {
               if (childNavItem.newTabLink) {

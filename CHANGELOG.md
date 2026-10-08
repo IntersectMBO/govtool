@@ -25,6 +25,7 @@ changes.
 ### Removed
 
 - The Matomo analytics snippet (analytics.gov.tools) in the frontend; Umami is the only analytics
+- The unused analytics dashboard (`govtool/analytics-dashboard`), a Next.js internal dashboard outside the core deployment
 - The Constitutional Committee Portal card in Useful links, replaced by the budget proposals archive card
 - Creating, editing, drafting and deleting budget proposals, voting in budget proposal polls, the DRep voters list of a poll, and commenting on or replying to budget proposals in the frontend
 

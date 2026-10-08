@@ -38,9 +38,10 @@ describe('type[] query parameter', () => {
   let nest: INestApplication<App>;
   const list = jest.fn().mockResolvedValue({ elements: [] });
   const getVotes = jest.fn().mockResolvedValue([]);
+  const getVotingPowerList = jest.fn().mockResolvedValue([]);
 
   beforeAll(async () => {
-    nest = await app({ list }, { getVotes });
+    nest = await app({ list }, { getVotes, getVotingPowerList });
   });
   afterAll(() => nest.close());
   beforeEach(() => jest.clearAllMocks());
@@ -82,5 +83,17 @@ describe('type[] query parameter', () => {
       undefined,
       undefined,
     );
+  });
+
+  it('reads /drep/voting-power-list identifiers in either form', async () => {
+    await request(nest.getHttpServer())
+      .get('/drep/voting-power-list?identifiers=a&identifiers=b')
+      .expect(200);
+    expect(getVotingPowerList).toHaveBeenLastCalledWith(['a', 'b']);
+
+    await request(nest.getHttpServer())
+      .get('/drep/voting-power-list?identifiers%5B%5D=c&identifiers%5B%5D=d')
+      .expect(200);
+    expect(getVotingPowerList).toHaveBeenLastCalledWith(['c', 'd']);
   });
 });

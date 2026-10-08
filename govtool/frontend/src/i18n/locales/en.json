@@ -1205,12 +1205,12 @@
     "title": "Useful links",
     "intersectWebsite": {
       "title": "Intersect website",
-      "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development",
-      "link": "Intersect website"
+      "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development.",
+      "link": "Visit intersectmbo.org"
     },
     "budgetProposalsArchive": {
-      "title": "2025 Budget Proposals (archived)",
-      "description": "Read-only record of the 2025 budget process.",
+      "title": "2025 Budget Proposals",
+      "description": "Archived. Read the 2025 budget proposals, their versions, DRep poll results and comments.",
       "link": "View the archive"
     }
   },

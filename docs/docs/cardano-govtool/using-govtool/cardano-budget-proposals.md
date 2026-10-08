@@ -8,7 +8,7 @@ description: >-
 
 ## Overview
 
-The 2025 budget process is closed. GovTool keeps the proposals that the Cardano community submitted for the 2025 Cardano budget as a read-only archive, linked from the **2025 Budget Proposals (archived)** card under **Useful links** on the home page and the dashboard.
+The 2025 budget process is closed. GovTool keeps the proposals that the Cardano community submitted for the 2025 Cardano budget as a read-only archive, linked from the **2025 Budget Proposals** card under **Useful links** on the home page and the dashboard.
 
 ## How to use this section
 

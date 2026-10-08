@@ -66,7 +66,7 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
             <Link
               data-testid={`useful-link-${key}`}
               {...(external
-                ? { href: url, target: "_blank" }
+                ? { href: url, target: "_blank", rel: "noopener noreferrer" }
                 : { component: RouterLink, to: url })}
               sx={{
                 alignSelf: "flex-start",
@@ -84,7 +84,7 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
               </Typography>
               {external && (
                 <img
-                  alt="link"
+                  alt="Opens in a new tab"
                   height={16}
                   src={ICONS.externalLinkIcon}
                   width={16}

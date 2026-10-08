@@ -32,6 +32,7 @@ import {
 import {
   DocumentSummaryCache,
   RESOLVED_TTL_MS,
+  UNRESOLVED_MAX_TTL_MS,
   UNRESOLVED_TTL_MS,
 } from '../src/metadata/text-cache';
 import { ProposalService } from '../src/proposal/proposal.service';
@@ -527,6 +528,45 @@ describe('DocumentSummaryCache stale-while-revalidate', () => {
     await expect(
       cache.get(HASH_A, 'u', () => Promise.resolve(T2)),
     ).resolves.toEqual(T1);
+  });
+
+  it('backs off a key that stays unresolved, up to the cap, and resets once it resolves', async () => {
+    let now = 0;
+    const cache = new DocumentSummaryCache(10, () => now);
+    let fetches = 0;
+    const missing = () => {
+      fetches += 1;
+      return Promise.resolve(undefined);
+    };
+    const warm = (resolve: () => Promise<typeof T1 | undefined>) =>
+      cache.get(HASH_B, 'u', resolve, { awaitRefresh: true });
+    await warm(missing);
+    expect(fetches).toBe(1);
+
+    // Each unresolved answer doubles the wait: 5, 10, 20, 40, then 60 min.
+    const waits: number[] = [];
+    let last = now;
+    while (waits.length < 6) {
+      now += 60_000;
+      await warm(missing);
+      if (fetches > waits.length + 1) {
+        waits.push(now - last);
+        last = now;
+      }
+    }
+    const minute = 60_000;
+    expect(waits).toEqual([5, 10, 20, 40, 60, 60].map((m) => m * minute));
+    expect(UNRESOLVED_MAX_TTL_MS).toBe(60 * minute);
+
+    // A resolved answer ends the backoff; the next miss starts over.
+    now += UNRESOLVED_MAX_TTL_MS;
+    await warm(() => Promise.resolve(T1));
+    now += RESOLVED_TTL_MS + 1;
+    await warm(missing);
+    const before = fetches;
+    now += UNRESOLVED_TTL_MS + 1;
+    await warm(missing);
+    expect(fetches).toBe(before + 1);
   });
 
   it('lets the warmer await a refresh that a search does not', async () => {

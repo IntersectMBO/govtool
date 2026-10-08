@@ -10,9 +10,12 @@
  * revalidate: a resolved document is keyed by its content hash, so it is
  * revalidated rarely; an unresolved one (not fetched yet, unreachable, hash
  * mismatch, over the time budget) soon, so a document the metadata service
- * fetches later is picked up. A refresh that fails or comes back unresolved
- * keeps a summary already held. Bounded, least recently used out first;
- * values are a few short strings, not the documents.
+ * fetches later is picked up. A key that keeps coming back unresolved waits
+ * twice as long each time, up to UNRESOLVED_MAX_TTL_MS: the warmer walks
+ * every DRep and action, and without the backoff each dead anchor is fetched
+ * again every UNRESOLVED_TTL_MS for good. A refresh that fails or comes back
+ * unresolved keeps a summary already held. Bounded, least recently used out
+ * first; values are a few short strings, not the documents.
  */
 
 export type DocumentSummary = { title: string | null; abstract: string | null };
@@ -25,15 +28,23 @@ type Entry<T> = {
   /** Set once the first fetch has settled. */
   settled?: { summary: T | undefined };
   refresh?: Promise<void>;
+  /** Fetches in a row that came back unresolved. */
+  misses: number;
 };
 
 export const RESOLVED_TTL_MS = 24 * 60 * 60 * 1000;
 export const UNRESOLVED_TTL_MS = 5 * 60 * 1000;
+export const UNRESOLVED_MAX_TTL_MS = 60 * 60 * 1000;
 export const TEXT_CACHE_MAX_ENTRIES = 4096;
 export const REFRESH_CONCURRENCY = 8;
 
-const ttl = (summary: unknown) =>
-  summary === undefined ? UNRESOLVED_TTL_MS : RESOLVED_TTL_MS;
+const ttl = (summary: unknown, misses: number) =>
+  summary !== undefined
+    ? RESOLVED_TTL_MS
+    : Math.min(
+        UNRESOLVED_TTL_MS * 2 ** Math.max(0, misses - 1),
+        UNRESOLVED_MAX_TTL_MS,
+      );
 
 export class DocumentSummaryCache<T = DocumentSummary> {
   private readonly entries = new Map<string, Entry<T>>();
@@ -78,10 +89,12 @@ export class DocumentSummaryCache<T = DocumentSummary> {
       // Held while in flight, so a concurrent search waits on the same fetch.
       expiresAt: Number.POSITIVE_INFINITY,
       value: resolve().catch(() => undefined),
+      misses: 0,
     };
     void entry.value.then((summary) => {
       entry.settled = { summary };
-      entry.expiresAt = this.now() + ttl(summary);
+      entry.misses = summary === undefined ? 1 : 0;
+      entry.expiresAt = this.now() + ttl(summary, entry.misses);
     });
     this.entries.set(key, entry);
     while (this.entries.size > this.maxEntries) {
@@ -115,7 +128,8 @@ export class DocumentSummaryCache<T = DocumentSummary> {
         entry.settled = { summary };
         entry.value = Promise.resolve(summary);
       }
-      entry.expiresAt = this.now() + ttl(summary);
+      entry.misses = summary === undefined ? entry.misses + 1 : 0;
+      entry.expiresAt = this.now() + ttl(summary, entry.misses);
     } finally {
       entry.refresh = undefined;
     }

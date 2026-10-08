@@ -61,16 +61,19 @@ packages and metadata-http; providers never depend on each other.
 
 ## Frontend and backend
 
-On any 500 the frontend's API client (govtool/frontend/src/services/API.ts, with
-the interceptor App.tsx installs) navigates to the error page, which throws the
+On any 500 the frontend's shared API instance (govtool/frontend/src/services/API.ts,
+with the interceptor App.tsx installs) navigates to the error page, which throws the
 user out of a vote or a form. The backend never answers 500 for an expected
 condition.
 
-govtool/frontend/src/models/featureSet.ts is a hand-kept copy of the feature set
-and the FeatureId union in govtool/govtool-backend/src/system/capabilities.ts.
-CI builds the frontend from its own folder, so it cannot take a file: dependency
-on a sibling package, and nothing checks that the ids match. Anything else the
-frontend needs from the contract arrives published or vendored.
+govtool/frontend/src/models/featureSet.ts hand-keeps the feature set's shape,
+because CI builds the frontend from its own folder and it cannot take a file:
+dependency on a sibling package; anything else it needs from the contract
+arrives published or vendored. FeatureId is typed as string there, so every id
+the frontend checks must match the union in
+govtool/govtool-backend/src/system/capabilities.ts by hand, and nothing checks
+it: dashboard.committeeThreshold (VotesSubmitted.tsx) already matches nothing,
+so that gate never fires.
 
 VITE_NETWORK_FLAG (1 mainnet, 0 testnet) must match the network the backend
 serves (GOVTOOL_DBSYNC_NETWORK, GOVTOOL_KOIOS_NETWORK or
@@ -100,8 +103,8 @@ done
 
 ## Verify
 
-npm run verify in each package listed above chains what it has of format
-check, lint, typecheck, tests (jest in the backend and pinning, node --test in
+npm test is the fast inner loop. npm run verify in each package listed above
+chains what it has of format check, lint, typecheck, tests (jest in the backend and pinning, node --test in
 the providers) and build, offline. CI compiles the contract and providers but
 runs only the backend's tests, so a provider change is checked only by its own
 npm run verify. govtool-metadata-service has no verify script.
@@ -133,8 +136,8 @@ Cheapest first:
    fixture's 30 rows: the two predefined DReps have no CIP-129 id, and the
    directory rule hides 10 anonymous ones.
 2. Frontend against that backend: in govtool/frontend, put
-   VITE_BASE_URL=http://127.0.0.1:9999 in .env.local, which is gitignored and
-   overrides .env, then npm run dev. Metadata validation goes to the same
+   VITE_BASE_URL=http://127.0.0.1:9999 and VITE_NETWORK_FLAG=1 (the fixture is
+   mainnet) in .env.local, which is gitignored, then npm run dev. Metadata validation goes to the same
    backend under /metadata.
 3. The whole stack in Docker, with the metadata service, the forum backend and
    their Postgres: docker compose -f govtool/docker-compose.fixture.yml up -d
@@ -142,8 +145,9 @@ Cheapest first:
    govtool/frontend, so frontend edits show as saved; backend or metadata edits
    need up -d --build backend (or metadata).
 4. Live data: GOVTOOL_CHAIN_DATA_PROVIDER=koios in step 1, or docker compose -f
-   govtool/docker-compose.koios.yml up -d for the stack. Live totals and ids
-   move.
+   govtool/docker-compose.koios.yml up -d for the stack, which pulls the
+   published frontend (local frontend edits do not show) and has no forum
+   backend. Live totals and ids move.
 
 Traps:
 Under dbsync, GOVTOOL_DBSYNC_NETWORK must match the database: /network/info and
@@ -158,8 +162,7 @@ On a public provider the warmer sometimes logs a full stack trace and recovers
 on the next pass, because a failed refresh keeps serving the previous snapshot.
 Chase it only if it repeats or the live script fails the same call.
 The frontend's production build needs about 8 GB of memory and is OOM-killed
-with less, so the compose files here run the Vite dev server instead of
-building the frontend image.
+with less, so neither compose file here builds the frontend image.
 The backend image builds from govtool/, not govtool-backend/, because the file:
 paths cannot resolve from a narrower context.
 
@@ -175,8 +178,12 @@ Seven places, each failing differently when missed. In govtool/govtool-backend:
 Outside it:
 6. A ! line in govtool/.dockerignore, which ignores everything else.
 7. The dependency loop in .github/workflows/code_check_backend.yml.
-Missing 5 to 7 builds locally and fails in the image or in CI. Then write the
-package README: what it serves and omits.
+Missing 5 to 7 builds locally and fails in the image or in CI. A provider with
+settings also takes the environment variable steps in
+govtool/govtool-backend/AGENTS.md, and its name joins the provider lists in
+govtool/govtool-backend/.env.example, docker/swarm-stack/.env.example,
+docker/swarm-stack/README.md and README.md. Then write the package README: what
+it serves and omits.
 
 ## Load-bearing rules
 
@@ -186,9 +193,10 @@ row, and it does not generalize to names, bios or abstracts.
 
 Anchored documents are CIP-100 metadata, which CIP-108 extends for governance
 actions and CIP-119 for DRep profiles. POST /metadata/validate checks the hash
-and the body, then the fields of the standard the caller names or the document
-declares through its CIP108 or CIP119 namespace (src/metadata in
-govtool-backend); a document declaring neither gets no field checks.
+and the body, then the fields of the standard the caller names or, failing that, the
+one whose name appears anywhere in the document (CIP119 first, then CIP108;
+src/metadata in govtool-backend). A document naming neither gets no field
+checks.
 
 Availability is the interface: an absent optional method means not supported,
 and there is no availability boolean. The provider's declaration carries only

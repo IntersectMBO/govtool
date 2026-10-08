@@ -249,7 +249,7 @@ metadata gateway, the whole-collection reader and the cache. The e2e spec
 covers `/` and `/health` only; to exercise the rest, run the server against
 the fixture.
 
-For a read-only Governance action comparison, build the contract, providers and backend,
+For a read-only governance action comparison, build the contract, providers and backend,
 then run from this directory with the db-sync and Koios environment settings
 for the same network (`.env` supplies defaults):
 
@@ -258,7 +258,7 @@ GOVTOOL_AGGREGATES_REPORT=/tmp/govtool-governance-action-live.json node scripts/
 ```
 
 This samples current, enacted and expired actions, compares each supported
-voter group's complete tally and threshold, and checks the Governance action detail
+voter group's complete tally and threshold, and checks the governance action detail
 projection. Unsupported historical Koios SPO/committee groups are recorded
 separately. Any mismatch or read failure exits nonzero. Chain data changes, so
 the resulting report describes that run rather than a frozen release guarantee.

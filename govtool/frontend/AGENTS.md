@@ -15,7 +15,9 @@ npx vitest run        # add a test file's path to run only that file
 
 npm test is bare vitest: it exits in a non-interactive shell but watches in a
 terminal, so use npx vitest run. Every run rewrites junit-report.xml, which is
-tracked; git checkout -- junit-report.xml before committing.
+tracked; git checkout -- junit-report.xml before committing. A module that
+package.json lists but Vite or tsc cannot resolve means node_modules is stale:
+npm ci.
 
 prettier is not a dependency, so npm run format fails or runs whatever prettier
 is on PATH. Do not format src with it: pdf-ui and many other files are not
@@ -32,7 +34,7 @@ src/stories; give a new reusable component a story there.
 ## Imports and barrels
 
 tsconfig maps @atoms, @molecules, @organisms, @hooks, @consts, @context, @models,
-@services, @utils and @pages to that folder's index.ts, and Vite maps them to the
+@services, @utils, @pages and @mock to that folder's index.ts, and Vite maps them to the
 folder. So a new file must be exported from its barrel before it can be imported
 by alias, and a deep alias such as @hooks/mutations builds under Vite but fails
 tsc; use @/hooks/mutations. Paths without an alias (types, config, cip179,
@@ -70,7 +72,7 @@ refreshes data: every value a query depends on belongs in its queryKey.
 After a transaction, context/pendingTransaction/utils.tsx invalidates by key
 prefix [key, transactionHash]. A query that must refresh after a transaction
 keeps the pending transaction hash second in its key and its own arguments after
-it; see useGetVoterInfoQuery.
+it; see useGetVoterInfo in hooks/queries/useGetVoterInfoQuery.ts.
 
 At boot appContext.tsx reads /system/features; nothing reads
 /system/capabilities. Feature gates fail open: a misspelt id, a failed request
@@ -103,8 +105,8 @@ areDRepVoteTotalsDisplayed is.
 Values that trip people:
 VITE_IS_DEV: any non-empty value, "false" included, turns on dev behaviour and
 skips the maintenance check.
-VITE_IS_CIP179_ENABLED: defaults on; it also needs the backend's
-survey.linkedVoting.
+VITE_IS_CIP179_ENABLED: on when unset, off for any value other than true. The
+surveys also hide when the backend lists survey.linkedVoting as unavailable.
 VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: gates only the forum and needs a
 non-empty VITE_PDF_API_URL too. The budget archive uses neither.
 
@@ -159,7 +161,7 @@ usePendingTransaction.ts, pendingTransaction/utils.tsx (getDesiredResult,
 getQueryKey, refetchData) and the alerts.<type> strings in en.json.
 
 wallet.test.tsx covers vote and certificate submission, but not the guardrail
-script path or most governance action builders. Check those on tests/devnet.
+script path nor any governance action builder. Check those on tests/devnet.
 
 ## pdf-ui
 
@@ -174,8 +176,9 @@ Lint skips its .js and .jsx (--ext ts,tsx), and tsc compiles them without
 type-checking (allowJs, no checkJs). App.d.ts and BudgetArchiveApp.d.ts type
 their props by hand, and nothing checks them against the .jsx. pdf-ui imports
 GovTool internals: @atoms, @molecules, @consts, @/theme, @/consts/colors,
-@/consts/icons and others. Renaming any of those breaks it at runtime while tsc,
-lint and vitest stay green, so grep src/pdf-ui before renaming.
+@/consts/icons and others. Renaming any of those breaks it at runtime while tsc
+and lint stay green, and vitest catches only the few paths pdf-ui's tests
+import, so grep src/pdf-ui before renaming.
 components/ThemeProviderWrapper/theme.test.js fails when pdf-ui uses a palette
 path that src/theme.ts does not define.
 
@@ -185,7 +188,7 @@ built in lib/api.js and in components such as ProposalsList and CommentCard;
 changing a proposal, comment or poll query means changing all of them.
 
 The budget archive never calls the forum backend: its E2E spec fails on any
-such request, and the shared CommentCard stays off the forum API only while the
+budget-discussion API request, and the shared CommentCard stays off the forum API only while the
 caller passes archivedReplies. Its data, public/budget-proposals-2025, was
 written once by scripts/split-bd-archive.mjs from a forum export that is not in
 this repository; the script strips creators' credentials, so any new export goes

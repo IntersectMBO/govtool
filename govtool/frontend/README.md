@@ -53,7 +53,7 @@ The following integrations are optional and may remain blank:
 - `VITE_CHATWOOT_URL` and `VITE_CHATWOOT_WEBSITE_TOKEN`: Chatwoot feedback widget.
 - `VITE_PDF_API_URL`: Proposal discussion service API.
 - `VITE_IPFS_PROJECT_ID`: Project identifier for gateways that require it.
-- `VITE_IS_CIP179_ENABLED`: CIP-179 surveys on governance actions and votes. On unless set to `false`, and shown only when the backend reports that it serves survey definitions.
+- `VITE_IS_CIP179_ENABLED`: CIP-179 surveys on governance actions and votes. On when unset; any value other than `true` turns it off. The surveys are also hidden when the backend reports `survey.linkedVoting` unavailable.
 
 `VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` can remain `false` when the proposal discussion service is not running. Turning it on also needs `VITE_PDF_API_URL`, the forum backend's origin, such as `http://localhost:1337`.
 
@@ -63,7 +63,7 @@ For backend setup, see the [backend README](../govtool-backend/README.md). To ru
 
 ## Checks
 
-CI runs these on every push that touches the frontend:
+CI runs `npm run tsc`, `npm run lint` and `npm test` on pushes that change the frontend. Locally, run:
 
 ```bash
 npm run tsc

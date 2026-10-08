@@ -26,15 +26,15 @@ removed; a doc that names them as current is stale.
 
 Every chain write is a transaction the frontend builds
 (govtool/frontend/src/context/wallet.tsx) and the user's wallet signs; no
-backend submits one.
+GovTool backend submits one.
 
 docker/swarm-stack/docker-stack.yml runs GovTool on a Docker Swarm server from
 the published images; docker/docker-compose.yaml runs it locally against your
 own db-sync.
 
 docs is the Docusaurus site behind docs.gov.tools (pages in docs/docs). docs/api
-is not published: planned API documents and the numbered decision log,
-docs/api/decisions.md.
+is not published: the planned /api/v1 surface, the metadata service and forum
+backend specs, and the numbered decision log, docs/api/decisions.md.
 
 gov-action-loader (Vue + FastAPI, submits governance actions to a testnet) is
 not built or tested by CI. Touch it only when asked.
@@ -47,8 +47,8 @@ package's engines.
 ## Workflow
 
 Branch from develop and target it; main only takes releases and hotfixes. Name
-branches type/description, with the issue number when there is one
-(fix/123-short-description), and rebase on develop rather than merging it in.
+branches type/issue-description (fix/123-short-description), as CONTRIBUTING.md
+requires, and rebase on develop rather than merging it in.
 
 Add a CHANGELOG.md line under [Unreleased], in Added, Fixed, Changed or Removed,
 and fill .github/pull_request_template.md. Never bump versions by hand:
@@ -63,10 +63,12 @@ Update any doc, AGENTS.md included, that your change makes wrong.
 ## Verify before claiming
 
 No pull-request job runs the code's tests or lint. pr.yaml lints the
-Dockerfiles and builds and scans the images (the backend image build typechecks
-the backend and providers; the frontend's does not), and its lint.sh and
-unit-test.sh steps find no script and pass. The code checks run on push to a
-branch of this repository, for the paths they watch (code_check_frontend.yml,
-code_check_backend.yml, test_storybook.yml), so a pull request from a fork gets
-none of them, and nothing checks govtool-metadata-service or
-govtool-pdf-backend. Run the nested file's checks before saying a change works.
+Dockerfiles and builds and scans the backend and frontend images (the backend
+build typechecks the backend and providers; the frontend's does not), its
+lint.sh and unit-test.sh steps find no script and pass, and check-docs.yml
+builds the docs site when docs/ changes. The code checks run on push to a branch
+of this repository, for the paths they watch (code_check_frontend.yml,
+code_check_backend.yml, test_storybook.yml, frontend_sonar_scan.yml), so a pull
+request from a fork gets none of them. Nothing checks govtool-metadata-service
+or govtool-pdf-backend before merge. Run the nested file's checks before saying
+a change works.

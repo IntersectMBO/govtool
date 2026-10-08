@@ -34,7 +34,7 @@ The Cardano GovTool enables ada holders to use the governance features described
 
 Learn more; [docs.gov.tools](https://docs.gov.tools/cardano-govtool/using-govtool).
 
-Working on the code with an AI coding agent: [`AGENTS.md`](./AGENTS.md) at the root, and in each package, is written for it.
+Working on the code with an AI coding agent: [`AGENTS.md`](./AGENTS.md) at the root, and in `govtool`, `govtool/frontend`, `govtool/govtool-backend` and `tests`, is written for it.
 
 ## 📍 Navigation
 

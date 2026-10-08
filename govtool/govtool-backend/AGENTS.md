@@ -20,9 +20,10 @@ in docs/api/decisions.md walks one feature from provider to frontend gate.
    line of test/capabilities.spec.ts that expects the feature unavailable (its
    it.each row if it has one, and the LOWERS and committee checks). Then the same
    id in govtool/frontend/src/models/featureSet.ts.
-5. A service spec on the typed StubApi and chain() helper in
-   test/legacy-shape.spec.ts, and a supertest spec for parsing and status codes,
-   as test/governance-actions.routes.spec.ts does. survey.spec.ts casts its stub
+5. A service spec on a typed stub: copy StubApi and chain() from
+   test/legacy-shape.spec.ts (each spec keeps its own copy) and add the new
+   member. Then a supertest spec for parsing and status codes, as
+   test/governance-actions.routes.spec.ts does. survey.spec.ts casts its stub
    to the contract type instead; do not copy that, since the cast lets a stub
    return an invalid page.
 6. The frontend side: govtool/frontend/AGENTS.md, Reading from the backend.
@@ -44,7 +45,8 @@ CORS (src/main.ts) allows GET, HEAD, POST and OPTIONS and the request headers
 Authorization and Content-Type; any other method or request header fails the
 browser's preflight. Only Retry-After is exposed, so the page cannot read any
 other response header.
-There is no global ValidationPipe. Validate with src/common/query-enum.ts and
+There is no global ValidationPipe; only the /metadata controller uses one, on
+class-validator DTOs (D119). Elsewhere validate with src/common/query-enum.ts and
 pagination.ts, and throw BadRequestException({ errorType: 'ValidationError',
 message }) so the body keeps the legacy shape.
 Contract errors map to statuses in src/common/errors.ts, e.g.
@@ -86,9 +88,9 @@ starts calling a route that NO_ROUTE lists, update both by hand.
 5. docker/docker-compose.yaml and docker/.env.example.
 6. docker/swarm-stack/docker-stack.yml and its .env.example. The stack has no
    env_file, so every variable is listed. A secret also needs the top-level
-   secrets block, an entry in the backend's secrets list with target
-   govtool_ plus the variable name in lower case, and its export line in
-   .env.example.
+   secrets block, an entry in the backend's secrets list whose target is
+   the variable's full name in lower case (govtool_dbsync_password), and its
+   export line in .env.example.
 7. govtool/docker-compose.fixture.yml, govtool/docker-compose.koios.yml and
    tests/devnet/docker-compose.yml, when those stacks need a non-default value.
 

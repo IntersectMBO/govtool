@@ -16,7 +16,11 @@ changes.
 - `govtool-docs` Docker image, built by CI on `main`, `develop`, `test` and version tags; images from `main` and version tags always build for docs.gov.tools
 - A GitHub Pages preview of the documentation, deployed from `develop` and not indexed by search engines
 - Documentation checks on pull requests that touch `docs/`: the site build catches broken links and asset paths, and the Docker image is started and smoke-tested, before merge
-- Guides for AI coding agents: `AGENTS.md` files, each imported by a `CLAUDE.md`, at the root and in `govtool`, `govtool/frontend`, `govtool/govtool-backend` and `tests`, covering checks, couplings and traps. The guide to adding a governance action type now covers the data contract, providers, backend and forum ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
+- Guides for AI coding agents: `AGENTS.md` files, each imported by a `CLAUDE.md`, at the root and in `govtool/frontend`, `govtool/govtool-backend` and `tests`, and a rewritten `govtool/AGENTS.md`, covering checks, couplings and traps. The guide to adding a governance action type now covers the data contract, providers, backend and forum ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
+
+### Fixed
+
+- Developer documentation no longer describes the removed Haskell backend or claims that pull requests run unit tests; broken anchors, the backend and test suite setup docs and their `.env.example` files are corrected, and the README links support, security reporting and the license ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 
 ### Changed
 
@@ -29,10 +33,6 @@ changes.
 - The unused analytics dashboard (`govtool/analytics-dashboard`), a Next.js internal dashboard outside the core deployment
 - The Constitutional Committee Portal card in Useful links, replaced by the budget proposals archive card
 - Creating, editing, drafting and deleting budget proposals, voting in budget proposal polls, the DRep voters list of a poll, and commenting on or replying to budget proposals in the frontend
-
-### Fixed
-
-- Developer documentation no longer describes the removed Haskell backend or claims that pull requests run unit tests; broken anchors, the backend and test suite setup docs and their `.env.example` files are corrected, and the README links support, security reporting and the license ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 
 ## [v2.1.0-alpha.2](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.1...v2.1.0-alpha.2) 2026-10-02
 

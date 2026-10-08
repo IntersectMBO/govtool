@@ -77,7 +77,7 @@ Paths are relative to the repository root on `develop`. A step marked *silent* c
 
 1. `GovActionType` and `GovActionBody` in `src/chain-data/governance/proposals.ts`.
 2. `GovActionLineage` in `src/chain-data/refs.ts`, if the type has its own lineage, and the thresholds in `src/chain-data/network.ts`, if it has its own threshold parameter.
-3. `SPEC.md`, the governance action section.
+3. `SPEC.md`, §5.2 Proposals.
 4. The `bodies` array in `test/conformance.ts` (*silent*).
 
 Rebuild the contract before touching a provider (see `govtool/AGENTS.md`, "Build order").
@@ -86,10 +86,12 @@ Rebuild the contract before touching a provider (see `govtool/AGENTS.md`, "Build
 
 Each provider maps the type in both directions. The compiler catches the exhaustive half and misses the rest.
 
-- db-sync (`govtool/govtool-provider-dbsync/src/governance`): `DB_TO_TYPE` in `proposals/body.ts` throws for an unknown type, so every list that contains the new action answers 500. Also `TYPE_TO_DB` and `decodeBody` there, `LINEAGE_DB_TYPES` (*silent*), the thresholds in `proposals/aggregates.ts`, and the string comparisons and SQL literals in `proposals/aggregates.ts`, `proposals.ts`, `dreps/`, `pools.ts` and `committee/` (*silent*).
-- Koios (`govtool/govtool-provider-koios/src`): the union in `rows.ts`, both maps and the switch in `governance/proposals/body.ts`, its lineage list (*silent*), and `governance/proposals/aggregates.ts`.
-- Blockfrost (`govtool/govtool-provider-blockfrost/src/governance`): `proposals/body.ts` (snake_case names), its lineage list (*silent*), the `TYPES` list in `proposals.ts` (*silent*; without it, filtering by the type is rejected as invalid input), and `proposals/aggregates.ts`.
-- Fixture: `govtool/govtool-provider-fixture/src/chain-data.ts`.
+- db-sync (`govtool/govtool-provider-dbsync/src/governance`): `DB_TO_TYPE` in `proposals/body.ts` and the `ACTION_TYPES` maps in `dreps/map.ts` and `pools.ts` throw for an unknown type, so every list that contains the new action, and every DRep or pool vote on it, answers 500. Also `TYPE_TO_DB` and `decodeBody` in `proposals/body.ts`, `LINEAGE_DB_TYPES` (*silent*), the thresholds in `proposals/aggregates.ts`, and the string comparisons and SQL literals in `proposals/aggregates.ts`, `proposals.ts`, `dreps/`, `pools.ts` and `committee/` (*silent*).
+- Koios (`govtool/govtool-provider-koios/src`): the union in `rows.ts`, both maps and the switch in `governance/proposals/body.ts`, its lineage list and the lineage lists in `governance/committee.ts` (*silent*), the InfoAction bootstrap rule in `governance/dreps.ts`, and `governance/proposals/aggregates.ts`.
+- Blockfrost (`govtool/govtool-provider-blockfrost/src/governance`): `proposals/body.ts` (snake_case names), its lineage list and `committee.ts` (*silent*), the `TYPES` list in `proposals.ts` (*silent*; without it, filtering by the type is rejected as invalid input), the hard-fork and InfoAction bootstrap rules in `dreps/votes.ts`, and `proposals/aggregates.ts`.
+- Fixture: `govtool/govtool-provider-fixture/src/chain-data.ts`, and `scripts/capture.mjs`, which records an unknown type as `InfoAction` (*silent*).
+
+A type with its own threshold parameter also needs it in each provider's `src/network.ts`, in the backend's `epoch/epoch.service.ts` and `epoch/epoch.type.ts` (the legacy `/epoch/params` shape, pinned by `test/legacy-shape.spec.ts`; *silent*), and in the frontend's `models/api.ts`, `models/wallet.ts` and `consts/index.ts`.
 
 After changing a mapper, run `npm run verify` and the provider's live script against a real source.
 
@@ -111,8 +113,9 @@ After changing a mapper, run `npm run verify` and the provider's live script aga
 ### Proposal discussion forum
 
 - `govtool/frontend/src/pdf-ui/components/SubmissionGovernanceAction/Steps/InformationStorageStep.jsx` picks the wallet builder by forum type id in an `if` chain with no `else`, so an unknown type submits nothing (*silent*). The ids come from `govtool/govtool-pdf-backend/src/seed/lookups.data.ts`.
-- `govtool/frontend/src/pdf-ui/lib/api.js` asks for the previous hard fork by type name (`getHardForkData`), and the forum backend pins every query in that file. See `govtool/frontend/AGENTS.md`, "pdf-ui".
+- The forum also branches on the type id in `components/CreationGoveranceAction/Step2.jsx`, `Step3.jsx` and `HardForkManager.jsx`, `components/CreateGovernanceActionDialog/index.jsx`, `components/EditProposalDialog/index.jsx` and `pages/ProposedGovernanceActions/SingleGovernanceAction/index.jsx` (all under `govtool/frontend/src/pdf-ui`). The ids and names in `lookups.data.ts` also feed Playwright test ids.
+- `govtool/frontend/src/pdf-ui/lib/api.js` asks for the previous hard fork by type name (`getHardForkData`) through the forum backend's proxy. The proxy allows only listed paths but forwards any query string, so a new type needs no forum backend change.
 
 ### Tests and tools that list every type
 
-`tests/govtool-backend/test_cases/test_contract_core.py`, `tests/govtool-frontend/playwright/lib/helpers/featureFlag.ts` (a copy of the `featureFlag.tsx` rules), `tests/devnet/seed.sh` (seeds one action of every type), `gov-action-loader/backend/app/transaction.py`, and the user pages under `docs/docs/cardano-govtool/using-govtool/governance-actions/`.
+`tests/govtool-backend/test_cases/test_contract_core.py`, `tests/govtool-frontend/playwright/lib/helpers/featureFlag.ts` (a copy of the `featureFlag.tsx` rules), the four type enums in `tests/govtool-frontend/playwright/lib/types.ts`, `proposalTypes` in `tests/load-testing/src/test/java/org/cardano/govtool/feeders/PageVisits.java`, `DEVNET_SEED_ACTIONS` in `tests/devnet/.env.devnet` and its mapping in `tests/devnet/seed.sh` (adaup's devnet smoke `--actions` must support the type), `gov-action-loader/backend/app/transaction.py`, the builder list in `docs/docs/developers/governance-action-submission.md`, and the user pages under `docs/docs/cardano-govtool/using-govtool/governance-actions/`.

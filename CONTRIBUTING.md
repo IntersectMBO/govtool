@@ -108,7 +108,7 @@ Welcome to contributing to `GovTool`! Whether you're fixing a bug, adding a feat
 1. **Set Up Your Environment**:
    - Follow the [frontend's local development instructions](./govtool/frontend/README.md#local-development) to clone the repository, select the required Node.js version, create the environment file, install dependencies, and start the frontend.
    - For another component, use its setup guide: [backend](./govtool/govtool-backend/README.md) or [Docker Compose](./docker/README.md).
-   - If you work with an AI coding agent, point it at the repository root: `AGENTS.md` there and in each package (with `CLAUDE.md` importing it) gives it the conventions, checks and traps.
+   - If you work with an AI coding agent, point it at the repository root: `AGENTS.md` there and in `govtool`, `govtool/frontend`, `govtool/govtool-backend` and `tests` (with `CLAUDE.md` importing it) gives it the conventions, checks and traps.
    - Make sure you're using the latest version of the project to avoid potential conflicts.
 
 2. **Find an Issue to Work On**:
@@ -245,7 +245,7 @@ Releases that aren't stable will be released as pre-releases and will append a -
 During development, on every PR;
 
 - Make sure `CHANGELOG.md` is kept up-to-date with high-level, technical, but user-focused list of changes according to [keepachangelog](https://keepachangelog.com/en/1.0.0/).
-- Bump `UNRELEASED` version in `CHANGELOG.md` according to [semver](https://semver.org/).
+- Do not bump versions by hand: the `update-govtool-version.yml` workflow sets them and turns `[Unreleased]` into a release section, following [semver](https://semver.org/).
 
 ### Style Guides
 
@@ -274,7 +274,7 @@ The backend and its packages use Prettier and ESLint. In `govtool/govtool-backen
 - If the changes are not ready for review then feel free to create a draft PR, and link this to the ticket/issue.
 - When the PR is ready for review move the ticket from `in progress` to `in review`. Remember to change the state of the PR from draft to actual PR.
 - Developers should review each other's pull requests, and should be requested via [CODEOWNERS](./CODEOWNERS).
-- Unit tests, lint and type checks run on every push to a branch of this repository; pull requests to `develop` build and scan the Docker images. Run the checks locally before asking for review.
+- Frontend and backend tests, lint and type checks run on pushes to a branch of this repository that touch their paths, not for pull requests from forks. Pull requests build and scan the backend and frontend images. Run the checks locally before asking for review.
 - After a review remember to address all the requests of changes since they are blocking PR from being merged.
 - Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually).
 - The ticket status can then be moved to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.

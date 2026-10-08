@@ -95,7 +95,7 @@ Test wallets are HD accounts of `TEST_WALLET_MNEMONIC`, picked by name (`lib/wal
 
 > **Note:**
 >
-> - The dRep and delegation projects depend on the `dRep setup` project (`tests/dRep.setup.ts`) only when `CI` is set. Without `CI`, run that setup first.
+> - The dRep and delegation projects depend on the `dRep setup` project (`tests/dRep.setup.ts`) only when `CI` is set. Without `CI`, tests register the shared DReps on first use; run `--project='dRep setup'` to do it up front.
 > - To run tests _with wallet dependency_ and generate **Allure reports**, **do not** remove the `CI` environment variable.
 
 ---

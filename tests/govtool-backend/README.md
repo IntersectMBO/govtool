@@ -27,7 +27,7 @@ export KUBER_URL="..."     # default: https://<NETWORK>.kuber.cardanoapi.io
 export KUBER_API_KEY="..." # if not self hosting.
 python3 ./setup.py
 ```
-It registers and funds the DReps and ADA holders listed in the committed `test_data.json`, which the tests read; it does not write that file.
+Using the main wallet, topped up from the faucet, it registers the DReps and the ADA holders' stake keys, delegates the holders to the DReps and submits a no-confidence proposal. These are the wallets in the committed `test_data.json`, which the tests read; `setup.py` does not read or write that file.
 
 
 ## Run tests

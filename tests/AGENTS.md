@@ -2,10 +2,11 @@
 
 No suite here gates a pull request. pytest and the full Playwright suite run
 against deployed environments, nightly or on dispatch (test_backend.yml, which
-also runs after a test-stack deploy, and test_integration_playwright.yml). The
-devnet run is started by hand (test_integration_devnet.yml), and
-tests/load-testing runs in no workflow. Only test:cip179 and
-test:governance-action-aggregates run on push, from code_check_frontend.yml.
+also runs after a test-stack deploy, and test_integration_playwright.yml).
+test_integration_devnet.yml runs on dispatch and on push to the branches it
+lists, and tests/load-testing runs in no workflow. test:cip179 and
+test:governance-action-aggregates run on every push that touches the frontend or
+the Playwright suite (code_check_frontend.yml).
 
 ## tests/devnet
 
@@ -21,8 +22,9 @@ suite's own .env because dotenv never replaces a set variable. Anything they do
 not set, such as METRICS_URL, still comes from the suite's .env.
 .env.devnet.local is read before .env.devnet and the first value set wins, so
 values derived in .env.devnet follow a local override.
-Setting DEVNET_PLAYWRIGHT_FILES replaces the default filter, which also drops
-the chatwoot exclusion.
+run-tests.sh does not read .env.devnet, so its DEVNET_PLAYWRIGHT_* settings take
+effect only from the shell. Setting DEVNET_PLAYWRIGHT_FILES replaces the default
+filter, which also drops the chatwoot exclusion.
 A frontend image build that dies with a bare SIGKILL ran out of memory; the
 README's prebuilt.Dockerfile route builds on the host instead.
 Specs that open external links still need internet.
@@ -69,8 +71,9 @@ existing suffix and the page objects in lib/pages.
 
 retries is 0, so a failure is real unless the faucet is empty. CI=true, set in
 .env.example, turns on forbidOnly, TEST_WORKERS, the allure reporter and the
-dRep setup dependency; without it, run the dRep setup project (dRep.setup.ts)
-first.
+dRep setup dependency. Without it, tests register the shared DReps on first use
+(lib/wallet/sharedDReps.ts, under a file lock); --project='dRep setup' does it
+up front.
 
 ## tests/test-metadata-api
 

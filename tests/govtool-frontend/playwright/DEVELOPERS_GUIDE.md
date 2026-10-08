@@ -12,12 +12,12 @@ Contains the utility logic, helpers, mock datas and shared services, including:
 
 - \_mock (mock data)
 - constants
-- datafactory
 - fixtures
 - forms
 - Pages
 - helpers
 - Services
+- wallet (the in-repo CIP-30/CIP-95 test wallet, test-wallet derivation and faucet funding)
 
 ---
 
@@ -95,7 +95,7 @@ Test wallets are HD accounts of `TEST_WALLET_MNEMONIC`, picked by name (`lib/wal
 
 > **Note:**
 >
-> - To run tests _without wallet dependency_, make sure the required wallet/auth setup has already been completed beforehand.
+> - The dRep and delegation projects depend on the `dRep setup` project (`tests/dRep.setup.ts`) only when `CI` is set. Without `CI`, run that setup first.
 > - To run tests _with wallet dependency_ and generate **Allure reports**, **do not** remove the `CI` environment variable.
 
 ---

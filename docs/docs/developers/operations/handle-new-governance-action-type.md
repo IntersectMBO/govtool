@@ -6,7 +6,7 @@ Line references on this page point to commit `6522bd4` of the `develop` branch. 
 
 ## Overview
 
-This document describes the process of adding a new governance action type to the frontend application.
+This document describes the process of adding a new governance action type. The steps below cover the frontend's create form. A new type also has to be known to the data contract, every chain-data provider, the backend, the frontend's display and voting rules, and the proposal discussion forum. [Beyond the create form](#beyond-the-create-form) lists those places.
 
 ## Prerequisites
 
@@ -14,9 +14,9 @@ Every governance action should follow the [CIP-100](https://github.com/cardano-f
 
 Person to contact: @mesudip
 
-## Package
+## Packages
 
-All the related changes are to be made under the `govtool/frontend` directory.
+The create form is in `govtool/frontend`. The rest of the change spans `govtool/govtool-data-providers`, `govtool/govtool-provider-dbsync`, `govtool/govtool-provider-koios`, `govtool/govtool-provider-blockfrost`, `govtool/govtool-provider-fixture`, `govtool/govtool-backend`, the forum UI in `govtool/frontend/src/pdf-ui` and its backend in `govtool/govtool-pdf-backend`.
 
 ## Steps
 
@@ -27,7 +27,7 @@ All the related changes are to be made under the `govtool/frontend` directory.
 3. Create a new governance action field schema. Every governance action schema should extend from the [SharedGovernanceActionFieldSchema](https://github.com/IntersectMBO/govtool/blob/6522bd43ee52c5de9fe5f9ab0fb14f56858ff0ef/govtool/frontend/src/types/governanceAction.ts#L31).
 4. Add the new governance action schema below the [SharedGovernanceActionFieldSchema](https://github.com/IntersectMBO/govtool/blob/6522bd43ee52c5de9fe5f9ab0fb14f56858ff0ef/govtool/frontend/src/types/governanceAction.ts#L31).
 5. Add a new governance action schema to the union type of [GovernanceActionFieldSchemas](https://github.com/IntersectMBO/govtool/blob/6522bd43ee52c5de9fe5f9ab0fb14f56858ff0ef/govtool/frontend/src/types/governanceAction.ts#L70).
-6. Add the new type to the [GovernanceActionFields](https://github.com/IntersectMBO/govtool/blob/6522bd43ee52c5de9fe5f9ab0fb14f56858ff0ef/govtool/frontend/src/types/governanceAction.ts#L78) record.
+6. Add the new type to the [GovernanceActionFields](https://github.com/IntersectMBO/govtool/blob/6522bd43ee52c5de9fe5f9ab0fb14f56858ff0ef/govtool/frontend/src/types/governanceAction.ts#L78) record, and to the matching type casts in `CreateGovernanceActionForm.tsx`. The record lists its types explicitly, so the compiler does not require it: a missed type compiles, shows up as a choice in the form, and crashes on the form's fields step.
 7. Add a builder for the new type in `CardanoProvider` ([`context/wallet.tsx`](https://github.com/IntersectMBO/govtool/blob/6522bd43ee52c5de9fe5f9ab0fb14f56858ff0ef/govtool/frontend/src/context/wallet.tsx)) and wire it into [`useCreateGovernanceActionForm.ts`](https://github.com/IntersectMBO/govtool/blob/6522bd43ee52c5de9fe5f9ab0fb14f56858ff0ef/govtool/frontend/src/hooks/forms/useCreateGovernanceActionForm.ts).
 8. Update this page (`docs/docs/developers/operations/handle-new-governance-action-type.md`) with all the new declarations provided (eg.: line numbers, new types configurations).
 
@@ -68,3 +68,51 @@ They both are used in the [CreateGovernanceActionForm](https://github.com/Inters
 After defining a new governance action type and field, it is important to test the new governance action type and field in the [CreateGovernanceActionForm](https://github.com/IntersectMBO/govtool/blob/develop/govtool/frontend/src/components/organisms/CreateGovernanceActionSteps/CreateGovernanceActionForm.tsx) component.
 
 On the application it is approachable under `/create_governance_action` route.
+
+## Beyond the create form
+
+Paths are relative to the repository root on `develop`. A step marked *silent* compiles and passes the unit tests when it is missed, so check each one by hand.
+
+### Data contract (`govtool/govtool-data-providers`)
+
+1. `GovActionType` and `GovActionBody` in `src/chain-data/governance/proposals.ts`.
+2. `GovActionLineage` in `src/chain-data/refs.ts`, if the type has its own lineage, and the thresholds in `src/chain-data/network.ts`, if it has its own threshold parameter.
+3. `SPEC.md`, the governance action section.
+4. The `bodies` array in `test/conformance.ts` (*silent*).
+
+Rebuild the contract before touching a provider (see `govtool/AGENTS.md`, "Build order").
+
+### Chain-data providers
+
+Each provider maps the type in both directions. The compiler catches the exhaustive half and misses the rest.
+
+- db-sync (`govtool/govtool-provider-dbsync/src/governance`): `DB_TO_TYPE` in `proposals/body.ts` throws for an unknown type, so every list that contains the new action answers 500. Also `TYPE_TO_DB` and `decodeBody` there, `LINEAGE_DB_TYPES` (*silent*), the thresholds in `proposals/aggregates.ts`, and the string comparisons and SQL literals in `proposals/aggregates.ts`, `proposals.ts`, `dreps/`, `pools.ts` and `committee/` (*silent*).
+- Koios (`govtool/govtool-provider-koios/src`): the union in `rows.ts`, both maps and the switch in `governance/proposals/body.ts`, its lineage list (*silent*), and `governance/proposals/aggregates.ts`.
+- Blockfrost (`govtool/govtool-provider-blockfrost/src/governance`): `proposals/body.ts` (snake_case names), its lineage list (*silent*), the `TYPES` list in `proposals.ts` (*silent*; without it, filtering by the type is rejected as invalid input), and `proposals/aggregates.ts`.
+- Fixture: `govtool/govtool-provider-fixture/src/chain-data.ts`.
+
+After changing a mapper, run `npm run verify` and the provider's live script against a real source.
+
+### Backend (`govtool/govtool-backend/src`)
+
+1. `governanceActionTypes` in `proposal/proposal.type.ts`: the legacy wire names, which also validate the type filters on `/proposal/list`, the DRep votes route and `/governance-actions`.
+2. `LEGACY_TYPE` in `proposal/proposal.service.ts`, and `LINEAGE_OF` there (*silent*: it falls back to the hard-fork lineage, so `/proposal/enacted-details` returns the wrong previous action).
+3. `governance-actions/governance-actions.mapping.ts`. The value must also be in the wire list, or the filter never matches (*silent*).
+4. `common/legacy-description.ts`, plus a `test/legacy-shape.spec.ts` case for the new description shape.
+
+### Frontend display and voting (`govtool/frontend/src`)
+
+- `utils/getGovActionVotingThresholdKey.ts`.
+- `consts/governanceAction/filters.ts` and `consts/governanceActionHistory.ts`, the two filter lists (*silent*). The history list's `dataTestId`s are used by Playwright.
+- `context/featureFlag.tsx`: which voter groups vote on the type and which totals show, in bootstrap and full governance (*silent*).
+- `components/organisms/GovernanceActionVoting.tsx`, `components/organisms/GovernanceActionDetailsCardData.tsx`, `components/organisms/GovernanceActionHistoryDetails.tsx` and `components/molecules/VotesSubmitted.tsx` (*silent*).
+- `i18n/locales/en.json`: the type label, tooltips, errors and history filter labels.
+
+### Proposal discussion forum
+
+- `govtool/frontend/src/pdf-ui/components/SubmissionGovernanceAction/Steps/InformationStorageStep.jsx` picks the wallet builder by forum type id in an `if` chain with no `else`, so an unknown type submits nothing (*silent*). The ids come from `govtool/govtool-pdf-backend/src/seed/lookups.data.ts`.
+- `govtool/frontend/src/pdf-ui/lib/api.js` asks for the previous hard fork by type name (`getHardForkData`), and the forum backend pins every query in that file. See `govtool/frontend/AGENTS.md`, "pdf-ui".
+
+### Tests and tools that list every type
+
+`tests/govtool-backend/test_cases/test_contract_core.py`, `tests/govtool-frontend/playwright/lib/helpers/featureFlag.ts` (a copy of the `featureFlag.tsx` rules), `tests/devnet/seed.sh` (seeds one action of every type), `gov-action-loader/backend/app/transaction.py`, and the user pages under `docs/docs/cardano-govtool/using-govtool/governance-actions/`.

@@ -105,7 +105,7 @@ values through and expose nothing about caching (D119):
 | Route                                | Response                                                                                    |
 | ------------------------------------ | ------------------------------------------------------------------------------------------- |
 | `GET /metadata/resolve?hash=&url=`   | always `200` with a `MetadataResult`; a failure carries `code`, `category` and `reportId`   |
-| `POST /metadata/retry` `{hash, url}` | always `200` with a `MetadataRefreshGovernance action`; `Retry-After` is set with `retryAfterSeconds` |
+| `POST /metadata/retry` `{hash, url}` | always `200` with a `MetadataRefreshOutcome`; `Retry-After` is set with `retryAfterSeconds` |
 | `GET /metadata/reports/:id`          | `200` with a `MetadataReport`, or `404`                                                     |
 | `GET /metadata/reports?hash=&url=`   | `200` with `MetadataReportSummary[]`, newest first                                          |
 
@@ -254,7 +254,7 @@ then run from this directory with the db-sync and Koios environment settings
 for the same network (`.env` supplies defaults):
 
 ```bash
-GOVTOOL_AGGREGATES_REPORT=/tmp/govtool-governance action-live.json node scripts/live-governanceAction-aggregates.mjs
+GOVTOOL_AGGREGATES_REPORT=/tmp/govtool-governance-action-live.json node scripts/live-governance-action-aggregates.mjs
 ```
 
 This samples current, enacted and expired actions, compares each supported
@@ -267,7 +267,7 @@ To check desktop and mobile rendering with those sampled tallies, run from
 `../../tests/govtool-frontend/playwright`:
 
 ```bash
-GOVTOOL_AGGREGATES_REPORT=/tmp/govtool-governance action-live.json npm run test:governance action-aggregates
+GOVTOOL_AGGREGATES_REPORT=/tmp/govtool-governance-action-live.json npm run test:governance-action-aggregates
 ```
 
 These browser checks replay the captured aggregate data through mocked HTTP

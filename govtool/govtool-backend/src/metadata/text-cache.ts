@@ -13,7 +13,9 @@
  * fetches later is picked up. A key that keeps coming back unresolved waits
  * twice as long each time, up to UNRESOLVED_MAX_TTL_MS: the warmer walks
  * every DRep and action, and without the backoff each dead anchor is fetched
- * again every UNRESOLVED_TTL_MS for good. A refresh that fails or comes back
+ * again every UNRESOLVED_TTL_MS for good. Those longer waits are spread by
+ * UNRESOLVED_JITTER either way, so anchors that failed together (all of them,
+ * after a restart) do not all come due in the same minute. A refresh that fails or comes back
  * unresolved keeps a summary already held. Bounded, least recently used out
  * first; values are a few short strings, not the documents.
  */
@@ -35,16 +37,21 @@ type Entry<T> = {
 export const RESOLVED_TTL_MS = 24 * 60 * 60 * 1000;
 export const UNRESOLVED_TTL_MS = 5 * 60 * 1000;
 export const UNRESOLVED_MAX_TTL_MS = 60 * 60 * 1000;
+export const UNRESOLVED_JITTER = 0.25;
 export const TEXT_CACHE_MAX_ENTRIES = 4096;
 export const REFRESH_CONCURRENCY = 8;
 
-const ttl = (summary: unknown, misses: number) =>
-  summary !== undefined
-    ? RESOLVED_TTL_MS
-    : Math.min(
-        UNRESOLVED_TTL_MS * 2 ** Math.max(0, misses - 1),
-        UNRESOLVED_MAX_TTL_MS,
-      );
+/** `random` is in [0, 1): 0.5 leaves a backed-off wait as it is. */
+const ttl = (summary: unknown, misses: number, random: () => number) => {
+  if (summary !== undefined) return RESOLVED_TTL_MS;
+  const wait = Math.min(
+    UNRESOLVED_TTL_MS * 2 ** Math.max(0, misses - 1),
+    UNRESOLVED_MAX_TTL_MS,
+  );
+  return misses > 1
+    ? wait * (1 - UNRESOLVED_JITTER + 2 * UNRESOLVED_JITTER * random())
+    : wait;
+};
 
 export class DocumentSummaryCache<T = DocumentSummary> {
   private readonly entries = new Map<string, Entry<T>>();
@@ -55,6 +62,7 @@ export class DocumentSummaryCache<T = DocumentSummary> {
     private readonly maxEntries = TEXT_CACHE_MAX_ENTRIES,
     private readonly now: () => number = Date.now,
     private readonly refreshConcurrency = REFRESH_CONCURRENCY,
+    private readonly random: () => number = Math.random,
   ) {}
 
   get size(): number {
@@ -94,7 +102,7 @@ export class DocumentSummaryCache<T = DocumentSummary> {
     void entry.value.then((summary) => {
       entry.settled = { summary };
       entry.misses = summary === undefined ? 1 : 0;
-      entry.expiresAt = this.now() + ttl(summary, entry.misses);
+      entry.expiresAt = this.now() + ttl(summary, entry.misses, this.random);
     });
     this.entries.set(key, entry);
     while (this.entries.size > this.maxEntries) {
@@ -129,7 +137,7 @@ export class DocumentSummaryCache<T = DocumentSummary> {
         entry.value = Promise.resolve(summary);
       }
       entry.misses = summary === undefined ? entry.misses + 1 : 0;
-      entry.expiresAt = this.now() + ttl(summary, entry.misses);
+      entry.expiresAt = this.now() + ttl(summary, entry.misses, this.random);
     } finally {
       entry.refresh = undefined;
     }

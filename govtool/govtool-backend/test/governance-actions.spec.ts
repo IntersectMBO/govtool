@@ -532,7 +532,13 @@ describe('DocumentSummaryCache stale-while-revalidate', () => {
 
   it('backs off a key that stays unresolved, up to the cap, and resets once it resolves', async () => {
     let now = 0;
-    const cache = new DocumentSummaryCache(10, () => now);
+    // 0.5 leaves each backed-off wait unspread.
+    const cache = new DocumentSummaryCache(
+      10,
+      () => now,
+      8,
+      () => 0.5,
+    );
     let fetches = 0;
     const missing = () => {
       fetches += 1;
@@ -567,6 +573,37 @@ describe('DocumentSummaryCache stale-while-revalidate', () => {
     now += UNRESOLVED_TTL_MS + 1;
     await warm(missing);
     expect(fetches).toBe(before + 1);
+  });
+
+  it('spreads backed-off retries so keys that failed together come due apart', async () => {
+    let now = 0;
+    const draws = [0, 0.999];
+    let i = 0;
+    const cache = new DocumentSummaryCache(
+      10,
+      () => now,
+      8,
+      () => draws[i++ % draws.length],
+    );
+    const fetched: string[] = [];
+    const missing = (key: string) => () => {
+      fetched.push(key);
+      return Promise.resolve(undefined);
+    };
+    const warm = (key: string) =>
+      cache.get(key, 'u', missing(key), { awaitRefresh: true });
+    await warm(HASH_A);
+    await warm(HASH_B);
+    // The first retry is not spread: both come due at 5 minutes.
+    now = UNRESOLVED_TTL_MS;
+    await warm(HASH_A);
+    await warm(HASH_B);
+    expect(fetched).toEqual([HASH_A, HASH_B, HASH_A, HASH_B]);
+    // The second wait is 10 minutes, drawn to 7.5 for A and about 12.5 for B.
+    now = UNRESOLVED_TTL_MS + 8 * 60_000;
+    await warm(HASH_A);
+    await warm(HASH_B);
+    expect(fetched).toEqual([HASH_A, HASH_B, HASH_A, HASH_B, HASH_A]);
   });
 
   it('lets the warmer await a refresh that a search does not', async () => {

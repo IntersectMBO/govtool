@@ -42,9 +42,10 @@ the gateway, which strips it. The /api/v1 surface in docs/api is planned, not
 built.
 Declare literal routes before :param routes in the same controller.
 CORS (src/main.ts) allows GET, HEAD, POST and OPTIONS and the request headers
-Authorization and Content-Type; any other method or request header fails the
-browser's preflight. Only Retry-After is exposed, so the page cannot read any
-other response header.
+Authorization and Content-Type; any other method, or a request header the CORS
+spec does not safelist, fails the browser's preflight. Beyond the safelisted
+response headers (Content-Type and the like), only Retry-After is readable by
+the page.
 There is no global ValidationPipe; only the /metadata controller uses one, on
 class-validator DTOs (D119). Elsewhere validate with src/common/query-enum.ts and
 pagination.ts, and throw BadRequestException({ errorType: 'ValidationError',

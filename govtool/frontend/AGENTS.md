@@ -92,8 +92,10 @@ in the local .env) all still have it.
 Container-only settings (TRUSTED_PROXY_CIDRS, REAL_IP_HEADER, UMAMI_*) are read
 by docker-entrypoint.sh for nginx and never go through env.ts.
 
-getEnv treats empty, blank and literal "$VITE_X" values as unset, and a runtime
-"" falls back to the build-time value. It passes non-strings through, so flags
+getEnv reads runtimeEnv[key] || import.meta.env[key], so any falsy runtime
+value ("", false, 0) falls back to the build-time value; only
+VITE_IS_CIP179_ENABLED honours a runtime false. It then treats blank and literal
+"$VITE_X" values as unset and passes other non-strings through, so flags
 compare === "true" || === true, as featureFlag.tsx does.
 
 A new flag goes in FeatureFlagContextType, the createContext default and the

@@ -107,7 +107,14 @@ npm test is the fast inner loop. npm run verify in each package listed above
 chains what it has of format check, lint, typecheck, tests (jest in the backend and pinning, node --test in
 the providers) and build, offline. CI compiles the contract and providers but
 runs only the backend's tests, so a provider change is checked only by its own
-npm run verify. govtool-metadata-service has no verify script.
+npm run verify.
+
+govtool-metadata-service is a yarn package with no verify script. Against a
+throwaway Postgres in DATABASE_URL (its .env.example still shows a SQLite URL;
+the schema is PostgreSQL): yarn install --frozen-lockfile, yarn prisma
+generate, yarn prisma migrate deploy, yarn build, yarn vitest run. Its tests
+delete every metadata, fetch_report, fetch_body and datastore row before each
+case, so never point them at data you need.
 
 Changing the contract: edit govtool-data-providers/src and SPEC.md together, npm
 run build there, then npm run verify in every provider, every client and the
@@ -161,8 +168,10 @@ allows 300 s for it.
 On a public provider the warmer sometimes logs a full stack trace and recovers
 on the next pass, because a failed refresh keeps serving the previous snapshot.
 Chase it only if it repeats or the live script fails the same call.
-The frontend's production build needs about 8 GB of memory and is OOM-killed
-with less, so neither compose file here builds the frontend image.
+Building the frontend image is OOM-killed at about 8 GB of Docker memory.
+docker-compose.fixture.yml runs the Vite dev server instead, and
+docker-compose.koios.yml pulls the published image, but up --build would build
+it there, so rebuild only named services (up -d --build backend).
 The backend image builds from govtool/, not govtool-backend/, because the file:
 paths cannot resolve from a narrower context.
 
@@ -240,8 +249,9 @@ committee lineage, and a per-type answer gives a prevGovActionId the ledger
 rejects.
 
 Committee membership is assembled from genesis plus every enacted
-UpdateCommittee delta plus hot-key auth and cold-key resignation certificates
-plus term expiry; it cannot be read off the latest action. The constitution is
+UpdateCommittee delta and NoConfidence (which dissolves the committee) plus
+hot-key auth and cold-key resignation certificates plus term expiry; it cannot
+be read off the latest action. The constitution is
 the opposite: getEnacted('constitution') then body.anchor.
 
 DRep inactivity is the ledger's expiry epoch, pushed by drepActivity on each

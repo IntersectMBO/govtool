@@ -114,7 +114,8 @@ After changing a mapper, run `npm run verify` and the provider's live script aga
 
 - `govtool/frontend/src/pdf-ui/components/SubmissionGovernanceAction/Steps/InformationStorageStep.jsx` picks the wallet builder by forum type id in an `if` chain with no `else`, so an unknown type submits nothing (*silent*). The ids come from `govtool/govtool-pdf-backend/src/seed/lookups.data.ts`.
 - The forum also branches on the type id in `components/CreationGoveranceAction/Step2.jsx`, `Step3.jsx` and `HardForkManager.jsx`, `components/CreateGovernanceActionDialog/index.jsx`, `components/EditProposalDialog/index.jsx` and `pages/ProposedGovernanceActions/SingleGovernanceAction/index.jsx` (all under `govtool/frontend/src/pdf-ui`). The ids and names in `lookups.data.ts` also feed Playwright test ids.
-- `govtool/frontend/src/pdf-ui/lib/api.js` asks for the previous hard fork by type name (`getHardForkData`) through the forum backend's proxy. The proxy allows only listed paths but forwards any query string, so a new type needs no forum backend change.
+- `govtool/frontend/src/pdf-ui/lib/api.js` asks for the previous hard fork by type name (`getHardForkData`) through the forum backend's proxy. The proxy allows only listed paths but forwards any query string, so a new type name needs no proxy change.
+- The forum backend (`govtool/govtool-pdf-backend`) rejects a proposal whose type id is not seeded, so add the type to `src/seed/lookups.data.ts`. A type with its own fields also needs parsing and validation in `src/proposals/proposal-input.ts`, which branches on the type ids, persistence in `proposals.service.ts`, serialization in `proposal-item.ts` and `proposal.resources.ts`, a model and migration in `prisma/schema.prisma`, its populate paths in `proposal.allowlists.ts`, and `SPEC.md`; without them the fields are not stored.
 
 ### Tests and tools that list every type
 

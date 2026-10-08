@@ -44,7 +44,7 @@ The values copied from `.env.example` are suitable for a local frontend connecte
 
 - `VITE_BASE_URL`: GovTool backend API URL. The local Docker setup uses `http://localhost:9999`.
 - `VITE_NETWORK_FLAG`: Cardano network selector; use `0` for a test network and `1` for mainnet.
-- `VITE_IS_DEV`: Keep this `true` locally to enable development behavior and skip the production maintenance check. Any non-empty value, `false` included, turns it on; leave it empty to turn it off.
+- `VITE_IS_DEV`: Keep this `true` locally to enable development behavior and skip the production maintenance check. Any non-empty value, `false` included, turns it on; leave it empty, at build time as well as at runtime, to turn it off.
 - `VITE_IPFS_GATEWAY`: Gateway used to load `ipfs://` content.
 
 The following integrations are optional and may remain blank:

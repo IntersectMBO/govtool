@@ -8,7 +8,7 @@ import { scalarPaths, ResourceDef } from '../query/resource';
 import { QueryAllowlist } from '../query/types';
 import { LOOKUP_ROUTES } from './lookups.resources';
 
-/** Scalars only, default sort `id asc`, no populate (§8.1, §8.9). */
+/** Scalars only, default sort `id asc`, no populate (§8.1). */
 export function lookupAllowlist(resource: ResourceDef): QueryAllowlist {
   return { resource, filterable: scalarPaths(resource), sortable: scalarPaths(resource) };
 }
@@ -35,35 +35,5 @@ export class LookupsController {
   @Get('governance-action-types')
   governanceActionTypes(@RawQuery() q: Record<string, unknown>) {
     return this.list('governance-action-types', q);
-  }
-
-  @Get('bd-types')
-  bdTypes(@RawQuery() q: Record<string, unknown>) {
-    return this.list('bd-types', q);
-  }
-
-  @Get('bd-road-maps')
-  bdRoadMaps(@RawQuery() q: Record<string, unknown>) {
-    return this.list('bd-road-maps', q);
-  }
-
-  @Get('bd-intersect-committees')
-  bdIntersectCommittees(@RawQuery() q: Record<string, unknown>) {
-    return this.list('bd-intersect-committees', q);
-  }
-
-  @Get('bd-contract-types')
-  bdContractTypes(@RawQuery() q: Record<string, unknown>) {
-    return this.list('bd-contract-types', q);
-  }
-
-  @Get('bd-currency-lists')
-  bdCurrencyLists(@RawQuery() q: Record<string, unknown>) {
-    return this.list('bd-currency-lists', q);
-  }
-
-  @Get('country-lists')
-  countryLists(@RawQuery() q: Record<string, unknown>) {
-    return this.list('country-lists', q);
   }
 }

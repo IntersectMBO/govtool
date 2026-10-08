@@ -36,33 +36,19 @@ except `/health`. Responses are Strapi v4 envelopes unless marked **raw**.
 | POST | `/api/poll-votes` | auth | Vote on an active poll | 8.6 |
 | PUT | `/api/poll-votes/:id` | owner | Flip the vote | 8.6 |
 | GET | `/api/comments` | public | Comments and replies, with computed author fields | 8.7 |
-| POST | `/api/comments` | auth | Comment or reply on a proposal or BD | 8.7 |
+| POST | `/api/comments` | auth | Comment or reply on a proposal | 8.7 |
 | POST | `/api/comments-reports` | auth | Report a comment | 8.12 |
 | DELETE | `/api/comments-reports/:id` | owner (reporter) | Withdraw a report | 8.12 |
-| GET | `/api/bds` | public | BD versions list | 8.8 |
-| GET | `/api/bds/:masterId` | public | Active version of a BD | 8.8 |
-| POST | `/api/bds` | auth | Create a BD (auto-creates its poll) or a new version, **raw** | 8.8 |
-| DELETE | `/api/bds/:rowId` | owner | Delete the whole BD chain | 8.8 |
-| GET | `/api/bd/versions/:masterId` | public | Every version, newest first | 8.8 |
-| GET | `/api/bd-types` | public | Lookup | 8.9 |
-| GET | `/api/bd-road-maps` | public | Lookup | 8.9 |
-| GET | `/api/bd-intersect-committees` | public | Lookup | 8.9 |
-| GET | `/api/bd-contract-types` | public | Lookup | 8.9 |
-| GET | `/api/bd-currency-lists` | public | Lookup | 8.9 |
-| GET | `/api/country-lists` | public | Lookup | 8.9 |
-| GET | `/api/bd-drafts` | auth | Caller's BD drafts | 8.10 |
-| POST | `/api/bd-drafts` | auth | Save a draft | 8.10 |
-| PUT | `/api/bd-drafts/:id` | owner | Update a draft (foreign = 404) | 8.10 |
-| DELETE | `/api/bd-drafts/:id` | owner | Delete a draft (foreign = 404) | 8.10 |
-| GET | `/api/bd-polls` | public | BD polls | 8.11 |
-| GET | `/api/bd-poll-votes` | public | BD poll votes (DRep votes are public) | 8.11 |
-| POST | `/api/bd-poll-votes` | auth, DRep token | Vote on a BD poll | 8.11 |
-| PUT | `/api/bd-poll-votes/:id` | owner | Flip the vote | 8.11 |
 | GET | `/api/proxy/govtool/<path>` | public | Allowlisted GET to `GOVTOOL_API_BASE_URL`, raw `{status, data}` | 9.1 |
 | POST | `/api/proxy` | auth | Safe public-URL GET fetcher, raw `{status, data}` | 9.2 |
 
 Not provided (pdf-ui does not call them, or calls them broken): the Strapi
 admin, GraphQL and generic content API; `/report/*`, `/migration/*`,
-`/govtool-proxy`, `POST /proxy/govtool/*`; BD section and contact-information
-routes; `GET`/`PUT /api/comments-reports/` without an id; `PUT /proposals/:id`.
-SPEC.md §1 has the full list.
+`/govtool-proxy`, `POST /proxy/govtool/*`; `GET`/`PUT /api/comments-reports/`
+without an id; `PUT /proposals/:id`. SPEC.md §1 has the full list.
+
+Budget discussions are not served (D167): `/api/bds`, `/api/bd/versions/:id`,
+`/api/bd-drafts`, `/api/bd-polls`, `/api/bd-poll-votes`, the `bd-*` lookups
+and `/api/country-lists` answer 404, and comments take `proposal_id` only. The
+2025 budget proposals are a read-only static archive in the frontend, under
+`/budget-proposals-2025/`.

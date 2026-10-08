@@ -26,16 +26,7 @@ export function maintenanceUrl(url: string = TEST_DATABASE_URL): string {
 }
 
 /** Every table the seed does not own; truncated between test files. */
-export const LOOKUP_TABLES = new Set([
-  'governance_action_types',
-  'bd_types',
-  'bd_road_maps',
-  'bd_intersect_committees',
-  'bd_contract_types',
-  'bd_currency_lists',
-  'country_lists',
-  '_prisma_migrations',
-]);
+export const LOOKUP_TABLES = new Set(['governance_action_types', '_prisma_migrations']);
 
 export async function truncateAll(prisma?: PrismaClient): Promise<void> {
   assertTestDatabase();

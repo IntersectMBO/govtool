@@ -37,7 +37,6 @@ export const CommentResource = defineResource({
   name: 'comment',
   scalars: {
     proposal_id: col.legacyId('proposalId', true),
-    bd_proposal_id: col.legacyId('bdMasterId', true),
     comment_parent_id: col.legacyId('parentId', true),
     user_id: col.legacyId('userId'),
     comment_text: col.str('text', false),

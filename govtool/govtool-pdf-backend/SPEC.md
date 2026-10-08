@@ -1,6 +1,6 @@
 # GovTool PDF backend — Specification
 
-**Version 1 draft · 2026-09-26 · scope: decision D138**
+**Version 1 draft · 2026-09-26 · scope: decision D138, amended by D167**
 
 The proposal discussion forum ("PDF", proposal pillar) backend, rebuilt on
 NestJS 11, Prisma 6 and Postgres 16. It replaces the Strapi backend of
@@ -21,24 +21,31 @@ listed in [§13](#13-deviation-index). Everything unmarked is Strapi v4
 ## 1. Scope
 
 In scope: every call pdf-ui makes (`pdf-ui/src/lib/api.js`, 1.0.17/1.0.18-beta,
-byte-identical), the behaviour the GovTool Playwright suite relies on through
-the UI, and the demo data those tests need ([§11.5](#115-demo-data)).
+byte-identical) for the proposal discussion forum, the behaviour the GovTool
+Playwright suite relies on through the UI, and the demo data those tests need
+([§11.5](#115-demo-data)).
+
+**Budget discussions are not served (D167).** The 2025 budget proposals are a
+read-only archive of static files in the frontend (`/budget-proposals-2025/`),
+which makes no budget discussion request. This backend has no budget
+discussion table or route: `/api/bds`, `/api/bd/versions/:id`, `/api/bd-*` and
+`/api/country-lists` answer 404, and comments target proposals only. The
+section numbers of the removed parts (§5.4, §8.8–§8.11) and their Δ numbers are
+kept, empty, so references elsewhere stay valid.
 
 Not in scope:
 
 - No Strapi admin panel, content manager, GraphQL, generic content-type CRUD,
   users-permissions roles/permissions API, `/documentation`, or upload plugin.
-- No moderation: nothing sets `comments_reports.moderation_status` or
-  `bds.submitted_for_vote`. They are set in the database by an operator or by
-  tests.
+- No moderation: nothing sets `comments_reports.moderation_status`. It is set
+  in the database by an operator or by tests.
 - No email (Strapi's SES "report limit" mail), no Sentry, no cron.
 - Not ported: `/report/generateSnapShootReport`, `/migration/*`,
   `/govtool-proxy?endpoint=`, `POST /proxy/govtool/*`, `wallet-types`,
-  `proposal-submitions`, `proposal-update-committee-content`, any route for the
-  BD section types (`bd-costings`, `bd-psapbs`, …) or `bd-contact-informations`,
-  `GET /users`, `GET /users/:id`, `/auth/local/register` and the password
+  `proposal-submitions`, `proposal-update-committee-content`, any budget
+  discussion route (above), `GET /users`, `GET /users/:id`, `/auth/local/register` and the password
   flows, `PUT /proposals/:id`, `GET /proposal-contents`, `findOne` routes of the
-  lookup tables. pdf-ui calls none of them.
+  governance action types. pdf-ui calls none of them.
 - No data migration from a Strapi database. The schema is new; a one-off
   importer, if wanted, is separate work.
 
@@ -64,8 +71,7 @@ Unknown routes answer 404 `NotFoundError` ([§3.6](#36-errors)).
 
 Suggested module split (one Nest module each): `query` (parser, allowlist,
 Prisma translation, envelope serializer), `auth`, `users`, `proposals`,
-`proposal-votes`, `polls`, `comments`, `bds`, `bd-drafts`, `bd-polls`,
-`lookups`, `proxy`.
+`proposal-votes`, `polls`, `comments`, `lookups`, `proxy`.
 
 ---
 
@@ -79,30 +85,28 @@ Prisma translation, envelope serializer), `auth`, `users`, `proposals`,
   `pagination[limit]` the pagination object is `{"start", "limit", "total"}`.
   `pageCount = ceil(total / pageSize)` (0 when total is 0).
 - Ids are integers. There is no `documentId`.
-- The odd shapes are listed per endpoint: `/auth/*`, `/users/*`, `POST /bds`
-  and `/proxy*` are raw (not enveloped); `GET /proposal-votes` returns a single
+- The odd shapes are listed per endpoint: `/auth/*`, `/users/*` and `/proxy*`
+  are raw (not enveloped); `GET /proposal-votes` returns a single
   object from a list route; `POST /proposals` returns `data` with no `id`.
 
 ### 3.2 Attributes
 
 - `attributes` holds every public scalar of the resource ([§5](#5-data-model),
-  "wire" column), **including nulls** (pdf-ui tests `submitted_for_vote ===
+  "wire" column), **including nulls** (pdf-ui compares fields with `===
   null`), plus `createdAt` and `updatedAt`, plus `publishedAt` for the types
-  Strapi had as draft-and-publish: governance action types, the six lookup
-  tables and comments-reports. `publishedAt` equals `createdAt`.
+  Strapi had as draft-and-publish: governance action types and
+  comments-reports. `publishedAt` equals `createdAt`.
 - Order within `attributes` is not significant.
 - Timestamps are ISO 8601 UTC with milliseconds (`2026-09-26T10:00:00.000Z`).
   `date` fields (`prop_submission_date`) are `YYYY-MM-DD`.
 - **Legacy string references.** Strapi stored several references as strings.
   They are integer foreign keys in the database and are serialized as decimal
   strings on the wire: `proposal_id`, `gov_action_type_id`, `user_id`,
-  `poll_id`, `comment_parent_id`, `bd_proposal_id`, `bd_poll_id`, `master_id`.
-  `null` stays `null`. Filter values on them are coerced to integers
+  `poll_id`, `comment_parent_id`. `null` stays `null`. Filter values on them are coerced to integers
   ([§4.3](#43-filters)). Exception: `POST /proposals` returns `proposal_id` and
   `proposal_content_id` as numbers.
 - Computed attributes (not stored) are named per endpoint:
-  `user_govtool_username`, `user_is_validated`, `subcommens_number` (sic),
-  `master_proposal_created_at`.
+  `user_govtool_username`, `user_is_validated`, `subcommens_number` (sic).
 
 ### 3.3 Relations and components
 
@@ -110,8 +114,8 @@ Prisma translation, envelope serializer), `auth`, `users`, `proposals`,
   `{"data": {id, attributes} | null}`. To-many: `{"data": [...]}`. Nested
   relations follow the same rule inside `attributes`.
 - Components (repeatable) are inline arrays of plain objects that carry their
-  own `id`: `proposal_links`, `proposal_withdrawals`, and
-  `bd_further_information.proposal_links`. They are **always** included when
+  own `id`: `proposal_links` and `proposal_withdrawals`. They are **always**
+  included when
   their owner is serialized (Strapi needed a populate). Order is insertion
   order.
 - Exceptions inside `/proposals` items: `content` is `{id, attributes}` with no
@@ -214,8 +218,8 @@ exposes, with the abbreviation used in this document:
 
 Implemented once: a parser from the `qs` object to a query AST, a per-resource
 **allowlist**, a translator from the AST to Prisma `where` / `orderBy` /
-`include` / `select`, and the envelope serializer. Every list route and the
-`GET /bds/:id` single route accept it.
+`include` / `select`, and the envelope serializer. Every list route accepts
+it.
 
 ### 4.1 Input
 
@@ -254,12 +258,11 @@ depth ≤3, `$in`/`$notIn` ≤100 values. Over a limit gives V `Query too comple
   `filters[$and][i][...]` and `filters[$or][i][...]` take arrays (or
   index-keyed objects, as `qs` produces) of filter objects. Sibling keys in one
   object combine with AND.
-- Relation paths nest: `filters[bd_psapb][type_name][id]=3`,
-  `filters[comments_reports][hash][$eq]=h`,
-  `filters[bd_proposal_detail][proposal_name][$containsi]=x`. A to-many
-  relation filter matches when **some** related row matches.
+- Relation paths nest: `filters[comments_reports][hash][$eq]=h`,
+  `filters[comments_reports][moderation_status]=true`. A to-many relation
+  filter matches when **some** related row matches.
 - A scalar value (or operator object) directly on a relation compares the
-  related `id`: `filters[creator]=5` is `creator.id = 5`.
+  related `id`: `filters[<relation>]=5` is `<relation>.id = 5`.
 - Operators: `$eq $ne $lt $lte $gt $gte $in $notIn $null $notNull $contains
   $notContains $containsi $notContainsi $startsWith $endsWith`. Anything else
   gives V `Invalid operator <op>`. `$contains*`, `$startsWith`, `$endsWith`
@@ -432,15 +435,12 @@ autoincrement use at runtime
 ### 5.3 Comments
 
 **Comment** `comments`
-- `proposalId` FK→Proposal? cascade — `proposal_id` (string);
-  `bdMasterId` FK→Bd? cascade (the master row) — `bd_proposal_id` (string);
-  exactly one of the two is set (CHECK constraint in raw SQL).
+- `proposalId` FK→Proposal cascade — `proposal_id` (string), required.
 - `parentId` FK→Comment? cascade — `comment_parent_id` (string).
 - `userId` FK→User — `user_id` (string); `text` text — `comment_text`
   (1..15000); `drepId` char(56)? — `drep_id`.
 - Relation `comments_reports` (to-many).
-- Index `(proposalId, parentId, createdAt)`, `(bdMasterId, parentId,
-  createdAt)`, `(parentId)`.
+- Index `(proposalId, parentId, createdAt)`, `(parentId)`.
 
 **CommentsReport** `comments_reports`
 - `commentId` FK→Comment cascade — relation `comment`; `reporterId` FK→User —
@@ -453,106 +453,15 @@ autoincrement use at runtime
 
 ### 5.4 Budget discussions
 
-A budget discussion (BD) is a chain of **versions** (rows of `bds`). The first
-version's `id` is the chain's `master_id`, stored on every version. Exactly one
-version per chain has `is_active = true`: the live one. Comments and the poll
-hang off the master id.
-
-**Bd** `bds`
-- `creatorId` FK→User — relation `creator` (public projection).
-- `masterId` FK→Bd? (self; set in the create transaction; null only
-  mid-transaction) — `master_id` (string).
-- `isActive` Boolean default true — `is_active`.
-- `privacyPolicy` Boolean — `privacy_policy`;
-  `intersectNamedAdministrator` Boolean default false —
-  `intersect_named_administrator`; `intersectAdminFurtherText` text? —
-  `intersect_admin_further_text`.
-- `commentsNumber` Int default 0 — `prop_comments_number` (server-maintained on
-  the active version; copied onto a new version).
-- `submittedForVote` timestamptz? — `submitted_for_vote` (operator-set; locks
-  the chain, [§8.8](#88-budget-discussions)).
-- Section FKs, each unique, `onDelete: SetNull`: `costingId` → relation
-  `bd_costing`, `proposalDetailId` → `bd_proposal_detail`, `psapbId` →
-  `bd_psapb`, `proposalOwnershipId` → `bd_proposal_ownership`,
-  `furtherInformationId` → `bd_further_information`, `contactInformationId` →
-  `bd_contact_information` (stored, **never serialized or populatable** **Δ11**).
-- Partial unique index `(masterId) WHERE is_active` (raw SQL). Index `(masterId,
-  createdAt)`, `(isActive, createdAt)`, `(creatorId)`.
-- Strapi's `old_ver` is dropped.
-
-**BdCosting** `bd_costings`
-- `costBreakdown` text? — `cost_breakdown` (≤15000); `preferredCurrencyId`
-  FK→BdCurrency? — relation `preferred_currency`.
-- `adaAmount` str? — `ada_amount`; `amountInPreferredCurrency` str? —
-  `amount_in_preferred_currency`; `usdToAdaConversionRate` str? —
-  `usd_to_ada_conversion_rate`. **Strings on the wire**: pdf-ui validation
-  requires `typeof === 'string'`.
-- `adaAmountClone`, `amountInPreferredCurrencyClone`,
-  `usdToAdaConversionRateClone` Float default 0 — wire `*_clone`: server-computed
-  from the strings (`,` → `.`, `parseFloat`, 0 when not finite).
-
-**BdProposalDetail** `bd_proposal_details`
-- text? (≤15000): `proposal_name`, `proposal_description`, `key_dependencies`,
-  `maintain_and_support`, `key_proposal_deliverables`,
-  `resourcing_duration_estimates`, `experience`, `other_contract_type`.
-- `contractTypeId` FK→BdContractType? — relation `contract_type_name`.
-
-**BdPsapb** `bd_psapbs`
-- text? (≤15000): `problem_statement`, `proposal_benefit`,
-  `supplementary_endorsement`, `explain_proposal_roadmap`.
-- `typeId` FK→BdType? — relation `type_name`; `roadmapId` FK→BdRoadMap? —
-  relation `roadmap_name`; `committeeId` FK→BdIntersectCommittee? — relation
-  `committee_name`.
-
-**BdProposalOwnership** `bd_proposal_ownerships`
-- `agreed` Boolean?; str?: `group_name`, `company_name`, `type_of_group`,
-  `social_handles`, `submited_on_behalf` (sic), `company_domain_name`,
-  `proposal_public_champion`; text?: `key_info_to_identify_group`.
-- `beCountryId` FK→CountryList? — relation `be_country`.
-
-**BdFurtherInformation** `bd_further_informations` — no scalars; component
-`proposal_links`.
-
-**BdLink** `bd_links` (component; no timestamps)
-- `furtherInformationId` FK cascade; `position` Int; `link` varchar(2048) —
-  `prop_link`; `text` str? — `prop_link_text`.
-
-**BdContactInformation** `bd_contact_informations`
-- str?: `be_full_name`, `be_email`, `submission_lead_full_name`,
-  `submission_lead_email`, `other_contract_type`; `beCountryOfResId`,
-  `beNationalityId` FK→CountryList?.
-
-**BdPoll** `bd_polls`
-- `bdMasterId` FK→Bd cascade — `bd_proposal_id` (string); `yes` Int default 0
-  — `poll_yes`; `no` Int default 0 — `poll_no`; `isActive` Boolean default
-  true — `is_poll_active`.
-- Partial unique index `(bdMasterId) WHERE is_active`.
-
-**BdPollVote** `bd_poll_votes`
-- `bdPollId` FK→BdPoll cascade — `bd_poll_id` (string); `userId` FK→User —
-  `user_id` (string); `voteResult` Boolean — `vote_result`; `drepId` char(56) —
-  `drep_id`; `drepVotingPower` str — `drep_voting_power` (client-supplied, not
-  verified).
-- Unique `(bdPollId, userId)` and unique `(bdPollId, drepId)` **Δ12** (a DRep
-  logged in under two stake keys could vote twice).
-
-**BdDraft** `bd_drafts`
-- `creatorId` FK→User cascade — relation `creator`; `draftData` Json —
-  `draft_data` (round-trips exactly). Strapi's `test` field is dropped.
+Removed (D167). Migration `20261008000000_remove_budget_discussions` deletes
+the budget discussion comments (their replies and reports cascade), drops
+`comments.bd_master_id`, makes `comments.proposal_id` NOT NULL, and drops the
+`bds`, `bd_*` and `country_lists` tables.
 
 ### 5.5 Lookup tables
 
-All carry `publishedAt` timestamptz, are seeded by migration, and are read-only
-over the API.
-
-- **BdType** `bd_types`: `type_name` str.
-- **BdRoadMap** `bd_road_maps`: `roadmap_name` str.
-- **BdIntersectCommittee** `bd_intersect_committees`: `committee_name` str.
-- **BdContractType** `bd_contract_types`: `contract_type_name` str.
-- **BdCurrency** `bd_currency_lists`: `currency_name`, `currency_letter_code`,
-  `currency_number_code` str.
-- **CountryList** `country_lists`: `country_name`, `alfa_2_code` (sic),
-  `alfa_3_code` str.
+The only lookup table is **GovernanceActionType** `governance_action_types`
+([§5.2](#52-proposals)): seeded, carries `publishedAt`, read-only over the API.
 
 ---
 
@@ -562,43 +471,12 @@ One migration (`<ts>_seed_lookups`) inserts these rows with explicit ids, `ON
 CONFLICT (id) DO NOTHING`, then `setval`s each sequence to `max(id)`. Names are
 exact: Playwright test ids and expected texts derive from them
 (`tests/govtool-frontend/playwright/lib/types.ts`), and pdf-ui has magic
-values (`None of these`, `It supports the product roadmap`, `Other`).
+values (the type ids below).
 
 **governance_action_types** (ids are semantic in pdf-ui: 2 = withdrawals, 3 =
 constitution, 6 = hard fork; 5 is a UI stub and is not seeded):
 1 `Info Action` · 2 `Treasury requests` · 3 `Updates to the Constitution` ·
 4 `Motion of No Confidence` · 6 `Hard fork`.
-
-**bd_types**: 1 `Core` · 2 `Research` · 3 `Governance Support` ·
-4 `Marketing & Innovation` · 5 `None of these`.
-
-**bd_road_maps**: 1 `Scaling the L1 Engine` · 2 `Architectural Excellence` ·
-3 `Leios` · 4 `Incoming Liquidity` · 5 `L2 Expansion` · 6 `Programmable Assets`
-· 7 `Multiple Node Implementations` · 8 `SPO Incentive Improvements` ·
-9 `It doesn't align` · 10 `It supports the product roadmap` ·
-11 `Developer / User Experience`.
-
-**bd_intersect_committees**: 1 `Technical Steering Committee` ·
-2 `Product Committee` · 3 `Open Source Committee` · 4 `Civics Committee` ·
-5 `Membership & Community Committee` · 6 `Budget Committee` ·
-7 `Marketing Committee` · 8 `Unsure` · 9 `None`.
-
-**bd_contract_types**: 1 `Milestone Based Fixed Price` · 2 `Time and Materials`
-· 3 `Service Level Agreement` · 4 `Other` · 5 `Reimbursement` ·
-6 `Intersect Procurement Process`.
-
-**bd_currency_lists** (name, letter, number): 1 `United States Dollar` USD 840 ·
-2 `Euro` EUR 978 · 3 `Japanese Yen` JPY 392 · 4 `Australian Dollar` AUD 036 ·
-5 `Nepalese Rupee` NPR 524. `currency_number_code` is a string; `036` keeps its
-leading zero.
-
-**country_lists** (name, alfa-2, alfa-3): 1 `Nepal` NP NPL · 2 `Netherlands` NL
-NLD · 3 `United States` US USA · 4 `United Kingdom` GB GBR · 5 `Canada` CA CAN ·
-6 `Australia` AU AUS · 7 `Germany` DE DEU · 8 `France` FR FRA · 9 `Japan` JP
-JPN · 10 `South Korea` KR KOR.
-
-A production deployment that needs the full ISO country and currency lists
-adds a later migration; ids above stay fixed.
 
 ---
 
@@ -987,7 +865,7 @@ Response: single envelope.
 
 ### 8.7 Comments
 
-**Comment attributes**: `proposal_id`, `bd_proposal_id`, `comment_parent_id`,
+**Comment attributes**: `proposal_id`, `comment_parent_id`,
 `user_id`, `comment_text`, `drep_id`, `createdAt`, `updatedAt`, plus computed
 `user_govtool_username` (author's, `?? "Anonymous"`), `user_is_validated`
 (author's `is_validated`), `subcommens_number` (count of direct replies).
@@ -1007,169 +885,35 @@ appears.
 
 **`POST /api/comments`** · authenticated.
 - Writable: `comment_text` (1..15000, else 400 BD `Comment text is required`),
-  exactly one of `proposal_id` / `bd_proposal_id` (neither or both: 400 BD
-  `Proposal ID is required`), `comment_parent_id` (optional).
+  `proposal_id` (missing: 400 BD `Proposal ID is required`; a
+  `bd_proposal_id` is ignored like any other unknown key, D167),
+  `comment_parent_id` (optional).
 - Forced: `user_id` = caller; `drep_id` = the token's `dRepID` or null (the
   client's `drep_id` is ignored; pdf-ui sends `''` or the id).
-- Target: `proposal_id` must be an existing proposal; `bd_proposal_id` must be
-  a master id with an active version. Missing: 400 BD `Proposal not found`.
-  `comment_parent_id`, when given, must be a comment on the same target: else
+- Target: `proposal_id` must be an existing proposal, else 400 BD `Proposal
+  not found`. `comment_parent_id`, when given, must be a comment on the same
+  proposal: else
   400 BD `Parent comment not found` **Δ34** (Strapi stored any string).
-- Effect: insert; `prop_comments_number` +1 on the proposal, or on the BD's
-  active version (replies count too).
+- Effect: insert; `prop_comments_number` +1 on the proposal (replies count
+  too).
 - Response 200: single envelope of the comment (with `comment_parent_id`, which
   pdf-ui reads). Computed attributes are omitted here.
 
 ### 8.8 Budget discussions
 
-**BD attributes**: `privacy_policy`, `intersect_named_administrator`,
-`intersect_admin_further_text`, `prop_comments_number`, `is_active`,
-`master_id`, `submitted_for_vote` (explicit null), `createdAt`, `updatedAt`,
-plus computed `master_proposal_created_at` (the master row's `createdAt`) and
-`user_govtool_username` (creator's `?? "Anonymous"`; new, pdf-ui passes it as
-the poll author label).
-
-**BD populatable paths** (all routes below): `creator`, `bd_costing`,
-`bd_costing.preferred_currency`, `bd_proposal_detail`,
-`bd_proposal_detail.contract_type_name`, `bd_psapb`, `bd_psapb.type_name`,
-`bd_psapb.roadmap_name`, `bd_psapb.committee_name`, `bd_proposal_ownership`,
-`bd_proposal_ownership.be_country`, `bd_further_information`,
-`bd_further_information.proposal_links` (a component path: accepted, no
-effect). `bd_contact_information` gives V.
-
-**Submission lock**: once any version of a chain has `submitted_for_vote`,
-the chain cannot get a new version (400 V `Update is not allowed because this
-entry has already been submitted for voting.`), cannot be deleted (400 V
-`Deletion is not allowed because this entry has already been submitted for
-voting.`), and its poll cannot take or change votes (400 V `Creating poll votes
-is not allowed after the proposal has been submitted for voting.` /
-`Modifying poll votes …`). Comments stay open and the counter keeps moving.
-
-**`GET /api/bds`** · public · list of versions.
-- Filterable: BD scalars, `creator` (id), `creator.govtool_username`,
-  `bd_psapb.type_name.id`, `bd_proposal_detail.proposal_name`. Sortable: BD
-  scalars, `bd_proposal_detail.proposal_name`, `creator.govtool_username`.
-- pdf-ui always sends `is_active=true`; the server does not add it.
-
-**`GET /api/bds/:id`** · public · single. `:id` is a **master id**. Returns the
-active version, with the populate asked for.
-- No active version: 404 N `Not Found` **Δ35** (Strapi answered 200 `{data:
-  null}`; pdf-ui redirects only on `error.message === 'Not Found'`).
-
-**`GET /api/bd/versions/:id`** · public. `:id` is a master id. All versions,
-`createdAt desc`, fixed populate: `creator`, `bd_costing.preferred_currency`,
-`bd_proposal_detail.contract_type_name`, `bd_further_information`,
-`bd_psapb.type_name`, `bd_psapb.roadmap_name`, `bd_psapb.committee_name`,
-`bd_proposal_ownership.be_country`. No query parameters. Response 200 `{"data":
-[...], "meta": {}}` (no pagination), `data: []` for an unknown id. **Δ36**:
-creator is the public projection (Strapi leaked the full user row, auth:false).
-
-**`POST /api/bds`** · authenticated. Creates a BD or, with `master_id`, a new
-version.
-- Writable top level: `privacy_policy` (must be `true`, else 400 B `Privacy
-  policy must be accepted`), `intersect_named_administrator` (boolean),
-  `intersect_admin_further_text`, `master_id`, and the sections:
-  - `bd_proposal_ownership`: its scalars; `be_country` (country id or null).
-  - `bd_psapb`: its scalars; `type_name`, `roadmap_name`, `committee_name`
-    (lookup ids).
-  - `bd_proposal_detail`: its scalars; `contract_type_name` (id).
-  - `bd_costing`: `cost_breakdown`; `ada_amount`,
-    `usd_to_ada_conversion_rate`, `amount_in_preferred_currency` (string or
-    number, stored as string); `preferred_currency` (id).
-  - `bd_further_information`: `proposal_links` (≤25; entries with an empty
-    `prop_link` are dropped, since pdf-ui seeds two blank links; any other
-    `prop_link` must parse as a URL with scheme `http:`, `https:` or `ipfs:`,
-    else 400 V `prop_link is invalid` **Δ46**).
-  - `bd_contact_information` (legacy drafts only): its scalars,
-    `be_country_of_res`, `be_nationality`. Stored, never returned.
-- The five sections other than contact information are required objects: else
-  400 V `<section> is required` **Δ37** (pdf-ui's detail and edit pages
-  dereference them without optional chaining). `bd_further_information` is
-  always created, possibly with no links, so it is never null.
-- A lookup id that does not exist: 400 V `<field> is invalid`.
-- Forced: `creator` = caller; `is_active` true; `prop_comments_number` 0 (new)
-  or copied; `submitted_for_vote` null. Echoed attributes, `creator`, section
-  `id`s and `createdAt` from pdf-ui's edit flow are ignored.
-- **New BD** (no `master_id`), one transaction: sections, the row, `master_id` =
-  its own id, and a `bd_polls` row `{bd_proposal_id: master, is_poll_active:
-  true}` (Playwright 11K relies on this; pdf-ui never creates BD polls).
-- **New version** (`master_id` given), one transaction with the chain's active
-  row locked (`SELECT … FOR UPDATE`): chain missing: 404 N `Not Found`; caller
-  not the creator: F `Unauthorized`; submission lock ([above](#88-budget-discussions));
-  then sections, the new row with the chain's `master_id` and the active row's
-  `prop_comments_number`, and `is_active = false` on the previous active row.
-  The poll and comments stay on the master id. No orphans on failure **Δ38**.
-- Response 200, **raw, not enveloped**: `{id, master_id, privacy_policy,
-  intersect_named_administrator, intersect_admin_further_text,
-  prop_comments_number, is_active, submitted_for_vote, createdAt, updatedAt,
-  bd_proposal_ownership: {id, ...scalars}, bd_psapb: {...}, bd_proposal_detail:
-  {...}, bd_costing: {...}, bd_further_information: {id, proposal_links: [...]},
-  creator: {id, govtool_username}}`. Sections are plain objects of their
-  scalars; lookup relations are not included. pdf-ui reads top-level
-  `master_id`. **Δ39**: creator is the public projection (Strapi returned the
-  raw user row).
-
-**`DELETE /api/bds/:id`** · owner. `:id` is a **row id** (pdf-ui sends the
-active version's id). Row missing: 404 N `Not Found`; not the creator: F `You
-can't delete this proposal.`; submission lock.
-- Effect, one transaction: delete the whole chain — every version, their
-  sections and links, the poll and its votes, comments and reports **Δ40**
-  (Strapi deleted only the row, leaving the discussion's other versions,
-  comments and poll behind a master id that no longer resolved).
-- Response 200: single envelope of the deleted row, scalars only (pdf-ui needs
-  a truthy `data`).
+Removed (D167): 404, as any unknown route.
 
 ### 8.9 BD lookups
 
-`GET /api/bd-types`, `GET /api/bd-road-maps`, `GET /api/bd-intersect-committees`,
-`GET /api/bd-contract-types`, `GET /api/bd-currency-lists`,
-`GET /api/country-lists` · public · lists over the scalars of [§5.5](#55-lookup-tables),
-default sort `id asc`, no populate. pdf-ui sends `pagination[pageSize]=1000`
-except for bd-types (5 rows fit the default 25).
+Removed (D167).
 
 ### 8.10 BD drafts
 
-All authenticated and scoped to the caller: another user's draft is
-indistinguishable from a missing one (Strapi's 404 wording kept).
-
-- **`GET /api/bd-drafts`** · list; `creator` forced to the caller. Populate:
-  `creator`. Filterable/sortable: scalars. pdf-ui reads `meta.pagination.total`.
-- **`POST /api/bd-drafts`** · writable `draft_data` (a JSON object, else V
-  `draft_data is invalid`); forced `creator` **Δ41** (Strapi let
-  `data.creator` override it). Response 200 single envelope `{data: {id,
-  attributes: {draft_data, createdAt, updatedAt}}}`; pdf-ui reads `data.id`.
-- **`PUT /api/bd-drafts/:id`** · writable `draft_data`. Missing or not the
-  caller's: 404 N `Resource not found or you don't have permission to update
-  it`. Response: single envelope.
-- **`DELETE /api/bd-drafts/:id`** · missing or not the caller's: 404 N
-  `Resource not found or you don't have permission to delete it`. Response:
-  single envelope of the deleted draft.
+Removed (D167).
 
 ### 8.11 BD polls and votes
 
-**`GET /api/bd-polls`** · public · list. Filterable/sortable: scalars. There is
-no create or update route: polls are created with the BD and closed by an
-operator.
-
-**`GET /api/bd-poll-votes`** · public · list (DRep votes are public by design;
-pdf-ui lists voters). Filterable: `bd_poll_id`, `user_id`, `vote_result`,
-`drep_id`. `fields` allowed (pdf-ui sends `fields[0]=drep_id&fields[1]=createdAt`).
-
-**`POST /api/bd-poll-votes`** · authenticated and the token must carry
-`dRepID`: else 400 B `Missing dRepID`.
-- Writable `bd_poll_id`, `vote_result`, `drep_voting_power` (string or number,
-  stored as string, `''` → `'0'`). Forced `user_id`, `drep_id` = token
-  `dRepID`.
-- 400 B `Vote result is required` · 400 B `Poll ID is required` · 400 B `Poll
-  not found` · 400 B `Poll is not active` **Δ32** · submission lock · 400 B
-  `Poll vote for this user already exist` (either unique index).
-- Effect: insert; `poll_yes` or `poll_no` +1. Response: single envelope.
-- `drep_voting_power` is not verified against the chain (inherited; it is
-  display-only in pdf-ui).
-
-**`PUT /api/bd-poll-votes/:id`** · owner; F `You can't access this entry`.
-Writable `vote_result`. Errors as poll votes plus the submission lock. Effect:
-flip counters. Response: single envelope.
+Removed (D167).
 
 ### 8.12 Comment reports
 
@@ -1305,8 +1049,8 @@ servers.
   failures; the limits; unknown top-level key, path, operator → the exact V
   message; `+` → space; `%`/`_` literal in `$containsi`.
 - **Allowlist**: each resource rejects a private user path
-  (`filters[creator][username]`, `sort[creator][email]`,
-  `populate=bd_contact_information`) and accepts every path in [Appendix
+  (`filters[comments_reports][reporter][username]`,
+  `populate[comments_reports][populate][moderator]`) and accepts every path in [Appendix
   A](#appendix-a--pdf-ui-query-corpus).
 - **Serializer**: nulls kept; legacy string references; relation wrapping;
   components inline; the `/proposals` `content`/`gov_action_type` exceptions;
@@ -1360,36 +1104,29 @@ Required cases:
    `/users/edit` valid, invalid, duplicate (exact messages).
 3. **Ownership** (users A and B): B gets F on A's proposal delete,
    proposal-content create and update, poll create and close, vote and poll-vote
-   updates, BD delete and BD new version, report delete; B's bd-draft GET list
-   omits A's drafts and PUT/DELETE on them 404; B's `GET /proposals` with
+   updates, report delete; B's `GET /proposals` with
    `is_draft=true&user_id=<A>` returns only B's drafts; B's `GET
    /proposal-votes?filters[user_id]=<A>` returns B's own vote or null.
 4. **Envelope and query compatibility**: every string in [Appendix
    A](#appendix-a--pdf-ui-query-corpus), sent **unencoded** exactly as pdf-ui
    builds it, returns 200 with the fields pdf-ui reads; each list sort option is
-   checked for order (the Playwright 8B_2 and 11B_3 checks); search with
+   checked for order (the Playwright 8B_2 check); search with
    `$containsi` is case-insensitive; `pageCount`/`total`; `pageSize=1000` and
    `pageSize=5000` (clamped).
 5. **Shapes**: `/proposals` item shape including wrapped relations and
    unwrapped `content`/`gov_action_type`; `GET /proposals/:id` by id and by tx
    hash; draft-only proposal gives the BD draft error; `POST /proposals` body
    `{data: {attributes: {proposal_id, proposal_content_id}}}` with no `id`;
-   `GET /proposal-votes` single-or-null; `POST /bds` raw with top-level
-   `master_id`; `GET /bds/:unknown` 404 `Not Found`; `submitted_for_vote: null`
-   present; costing amounts are strings; no `hash`, `email` or
-   `bd_contact_information` anywhere.
-6. **Counters**: like, dislike, flip (−1/+1, never negative); poll and BD-poll
-   yes/no and flips; comment and reply increments on proposals and on the BD
-   active version; a new BD version copies the count; 20 concurrent comments
+   `GET /proposal-votes` single-or-null; no `hash` or `email` anywhere; every
+   budget discussion route of D167 answers 404.
+6. **Counters**: like, dislike, flip (−1/+1, never negative); poll yes/no and
+   flips; comment and reply increments on proposals; 20 concurrent comments
    yield exactly 20; 10 concurrent likes by 10 users yield 10.
 7. **Side effects**: proposal create is atomic (a failing link rolls back the
    proposal); non-draft revision deactivates the others, draft revision does
    not; poll create rejects a second active poll and forces its fields; closing
-   works, reopening is rejected; BD create auto-creates an active bd-poll; BD
-   version flips `is_active` and keeps one active row under concurrent version
-   posts; BD delete removes the chain, poll, votes and comments; proposal delete
-   removes everything including hard-fork rows; submission lock on version,
-   delete and BD-poll votes (set `submitted_for_vote` through Prisma).
+   works, reopening is rejected; proposal delete removes everything including
+   hard-fork rows.
 8. **Proxies**: govtool proxy against a local stub (allowlisted path, query
    passthrough, `{status, data}`, non-allowlisted 404, `..` rejected, upstream
    500 and timeout); `POST /api/proxy` against a local stub with the switch on
@@ -1402,24 +1139,23 @@ Required cases:
 
 The GovTool Playwright suite runs against a frontend built with
 `VITE_PDF_API_URL` pointing at this backend. It must pass the PDF projects
-(`proposal discussion`, `proposal discussion (loggedin)`, `budget proposal`,
-`budget proposal dRep`, `proposal submission`) with the proposal-discussion
+(`proposal discussion`, `proposal discussion (loggedin)`, `proposal
+submission`) with the proposal-discussion
 exclusions the suite already uses. Run the frontend and backend on the same
 host name ([§7.5](#75-tokens)).
 
 ### 11.4 Fixtures
 
 Tests create their data through the API (plus Prisma for
-`submitted_for_vote` and `moderation_status`). Lookup rows come from the seed
-migration and are never truncated.
+`moderation_status`). Lookup rows come from the seed migration and are never
+truncated.
 
 ### 11.5 Demo data
 
 `npm run seed:demo` (never run automatically) inserts, idempotently (a marker
 row), the data the Playwright specs expect to find already there: two users
 with `govtool_username`s, one live proposal of each seeded type with comments,
-one proposal submitted as a GA (with a tx hash), one BD per bd-type with
-comments and a poll, and one BD with `submitted_for_vote` set.
+and one proposal submitted as a GA (with a tx hash).
 
 ---
 
@@ -1451,8 +1187,8 @@ For the frontend work (D138: pdf-ui moves into `govtool/frontend`).
    `isCommentRestricted` never matches.
 9. `CommentCard` reply: on a falsy response it calls `setRefetchProposal`,
    which the detail pages do not pass.
-10. `/budget_discussion/propose` renders the governance-action list page
-    (`pathname.includes('propose')` is checked first).
+10. Gone with D167: the frontend's budget discussion pages are a read-only
+    archive and `/budget_discussion/propose` redirects to it.
 11. `utf8ToHex` encodes per UTF-16 code unit; it only works because the
     challenge is ASCII.
 12. The JWT is decoded without verification and 401 is handled nowhere; the
@@ -1460,11 +1196,8 @@ For the frontend work (D138: pdf-ui moves into `govtool/frontend`).
     never sets one keeps sending an expired token (401 from authenticated
     routes, anonymous on public ones after Δ5). The interval is duplicated in
     `GlobalWrapper` and `UserValidation`.
-13. `SingleBudgetDiscussion` and the edit dialog read `bd_psapb.data`,
-    `bd_costing.data.attributes` and, for companies, `be_country.data.id`
-    without optional chaining.
-14. `SingleBudgetDiscussion` renders the literal test id
-    `'link-${index}-text-content'` on the outer link button.
+13. Gone with D167 (the budget discussion edit dialog).
+14. Gone with D167 (the budget discussion detail page).
 15. The client username rule (`^(?=.*[a-z])[a-z0-9._]{1,30}$`, no leading
     `.`/`_`) differs from the server's; purely numeric names pass the server.
 16. `rehype-raw` renders raw HTML from user markdown; sanitisation needs review.
@@ -1492,8 +1225,8 @@ user-side assertion runs on a never-navigated page and 8P/8R do not await
 | 8 | §5.2 | Hard-fork rows deleted with their proposal | Orphans |
 | 9 | §5.2 | One like/dislike per user | Counter inflation |
 | 10 | §5.3 | Report `hash` never serialized | It is the review-link secret |
-| 11 | §5.4 | Contact information never returned | PII |
-| 12 | §5.4 | One BD-poll vote per DRep | Double voting |
+| 11 | §5.4 | Removed with budget discussions (D167) | — |
+| 12 | §5.4 | Removed with budget discussions (D167) | — |
 | 13 | §7.1 | Identifier form picks the login flow | Stale Bearer turned stake logins into DRep logins |
 | 14 | §7.2 | Expired challenges purged; live ones never evicted | Unbounded table; eviction let anyone cancel a victim's login |
 | 15 | §7.3 | Payload must be the challenge | Signature replay |
@@ -1513,21 +1246,21 @@ user-side assertion runs on a never-navigated page and 8P/8R do not await
 | 29 | §8.4 | Vote lookup always the caller's | Filter override |
 | 30 | §8.5 | Poll fields server-set | Client could open pre-counted polls |
 | 31 | §8.5 | Polls can only be closed | Two active polls |
-| 32 | §8.6, §8.11 | Votes only on active polls | Votes on closed polls |
+| 32 | §8.6 | Votes only on active polls | Votes on closed polls |
 | 33 | §8.7 | Comments list without filters works | Strapi 500 |
 | 34 | §8.7 | Parent comment must exist on the same target | Dangling replies |
-| 35 | §8.8 | Unknown BD master id is 404 | pdf-ui redirects on `Not Found` |
-| 36 | §8.8 | Versions route uses the public projection | Full user row leaked, auth:false |
-| 37 | §8.8 | Five BD sections required | pdf-ui dereferences them |
-| 38 | §8.8 | BD create/version atomic, row-locked | Orphans, two active versions |
-| 39 | §8.8 | `POST /bds` creator is the public projection | User row leak |
-| 40 | §8.8 | BD delete removes the whole chain | Strapi left a broken discussion |
-| 41 | §8.10 | Draft creator forced | Owner override |
+| 35 | §8.8 | Removed with budget discussions (D167) | — |
+| 36 | §8.8 | Removed with budget discussions (D167) | — |
+| 37 | §8.8 | Removed with budget discussions (D167) | — |
+| 38 | §8.8 | Removed with budget discussions (D167) | — |
+| 39 | §8.8 | Removed with budget discussions (D167) | — |
+| 40 | §8.8 | Removed with budget discussions (D167) | — |
+| 41 | §8.10 | Removed with budget discussions (D167) | — |
 | 42 | §8.12 | Reporter forced | Spoofed reporter |
 | 43 | §8.12 | Only the reporter deletes a report | Anyone could delete |
 | 44 | §9.1 | GovTool proxy path allowlist | Path traversal, open forwarding |
 | 45 | §9.2 | Safe fetcher, authenticated | Open SSRF relay |
-| 46 | §8.8 | BD links http/https/ipfs only | `javascript:` links |
+| 46 | §8.8 | Removed with budget discussions (D167) | — |
 | 47 | §8.2, §8.3 | Proposal links http/https/ipfs only, blank ones dropped | `javascript:` links |
 
 ---
@@ -1553,21 +1286,9 @@ values. §11.2 case 4 sends each one unencoded.
 
 **Comments** (`GET /api/comments?`):
 - `filters[$and][0][proposal_id]=${id}&filters[$and][1][comment_parent_id][$null]=true&sort[createdAt]=${desc|asc}&pagination[page]=${page}&pagination[pageSize]=25&populate[comments_reports][populate][reporter][fields][0]=username&populate[comments_reports][populate][maintainer][fields][0]=username`
-- the same with `filters[$and][0][bd_proposal_id]=${masterId}`
 - `filters[comment_parent_id]=${commentId}&pagination[page]=${page}&pagination[pageSize]=3&sort[createdAt]=desc&populate[comments_reports][populate][reporter][fields][0]=username&populate[comments_reports][populate][maintainer][fields][0]=username`
 - `filters[comments_reports][hash][$eq]=${hash}&populate[comments_reports][populate][reporter]=*`
 
-**BDs**:
-- `GET /api/bds?filters[$and][0][is_active]=true&filters[$and][1][bd_psapb][type_name][id]=${typeId}&filters[$and][2][bd_proposal_detail][proposal_name][$containsi]=${search}[&filters[$and][3][creator]=${userId}]&pagination[page]=${page}&pagination[pageSize]=25&sort[${fieldId}]=${DIR}&populate[0]=bd_costing&populate[1]=bd_psapb.type_name&populate[2]=bd_proposal_detail&populate[3]=creator`
-- `sort[${fieldId}]=${DIR}` ∈ `sort[createdAt]=DESC|ASC`, `sort[prop_comments_number]=DESC|ASC`, `sort[bd_proposal_detail][proposal_name]=ASC|DESC`, `sort[creator][govtool_username]=ASC|DESC`.
-- `GET /api/bds/${masterId}?populate[0]=creator&populate[1]=bd_costing.preferred_currency&populate[2]=bd_proposal_detail.contract_type_name&populate[3]=bd_further_information.proposal_links&populate[4]=bd_psapb.type_name&populate[5]=bd_psapb.roadmap_name&populate[6]=bd_psapb.committee_name&populate[7]=bd_proposal_ownership.be_country`
-- `GET /api/bd-polls?filters[$and][0][bd_proposal_id][$eq]=${masterId}&filters[$and][1][is_poll_active]=true&pagination[page]=1&pagination[pageSize]=1&sort[createdAt]=desc`
-- `GET /api/bd-poll-votes?filters[$and][0][bd_poll_id][$eq]=${pollId}&filters[$and][1][user_id][$eq]=${userId}&pagination[page]=1&pagination[pageSize]=1&sort[createdAt]=desc`
-- `GET /api/bd-poll-votes?fields[0]=drep_id&fields[1]=createdAt&filters[$and][0][vote_result][$eq]=${true|false}&filters[$and][1][bd_poll_id][$eq]=${pollId}&pagination[page]=1&pagination[pageSize]=1000`
-- `GET /api/bd-drafts?pagination[pageSize]=1000&populate=creator`
-- `GET /api/bd-types` (no query); `GET /api/{country-lists,bd-currency-lists,bd-road-maps,bd-intersect-committees,bd-contract-types}?pagination[pageSize]=1000`
-
 **Other**: `GET /api/auth/challenge?identifier=${hex}`;
 `GET /api/proxy/govtool/proposal/enacted-details?type=HardForkInitiation`;
-`GET /api/governance-action-types`, `GET /api/proposals/${id}`,
-`GET /api/bd/versions/${masterId}` (no query).
+`GET /api/governance-action-types`, `GET /api/proposals/${id}` (no query).

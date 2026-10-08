@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
-import { BudgetModule } from './budget/budget.module';
 import { CommentsModule } from './comments/comments.module';
 import { ConfigModule } from './config/config.module';
 import { HealthController } from './health/health.controller';
@@ -19,7 +18,6 @@ import { ProxyModule } from './proxy/proxy.module';
     ProposalsModule,
     CommentsModule,
     PollsModule,
-    BudgetModule,
     ProxyModule,
   ],
   controllers: [HealthController],

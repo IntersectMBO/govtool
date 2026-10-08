@@ -29,20 +29,6 @@ export const PROPOSAL_SORTS = [
   'sort[prop_name]=DESC',
 ];
 
-export const BD_SORTS = [
-  'sort[createdAt]=DESC',
-  'sort[createdAt]=ASC',
-  'sort[prop_comments_number]=DESC',
-  'sort[prop_comments_number]=ASC',
-  'sort[bd_proposal_detail][proposal_name]=ASC',
-  'sort[bd_proposal_detail][proposal_name]=DESC',
-  'sort[creator][govtool_username]=ASC',
-  'sort[creator][govtool_username]=DESC',
-];
-
-const bdsList = (sort: string, creator = '') =>
-  `filters[$and][0][is_active]=true&filters[$and][1][bd_psapb][type_name][id]=${TYPE_ID}&filters[$and][2][bd_proposal_detail][proposal_name][$containsi]=${SEARCH}${creator}&pagination[page]=1&pagination[pageSize]=25&${sort}&populate[0]=bd_costing&populate[1]=bd_psapb.type_name&populate[2]=bd_proposal_detail&populate[3]=creator`;
-
 const commentsPopulate =
   'populate[comments_reports][populate][reporter][fields][0]=username&populate[comments_reports][populate][maintainer][fields][0]=username';
 
@@ -94,10 +80,6 @@ export const CORPUS: CorpusEntry[] = [
       route: 'comments',
       query: `filters[$and][0][proposal_id]=${ID}&filters[$and][1][comment_parent_id][$null]=true&sort[createdAt]=${dir}&pagination[page]=1&pagination[pageSize]=25&${commentsPopulate}`,
     },
-    {
-      route: 'comments',
-      query: `filters[$and][0][bd_proposal_id]=${ID}&filters[$and][1][comment_parent_id][$null]=true&sort[createdAt]=${dir}&pagination[page]=1&pagination[pageSize]=25&${commentsPopulate}`,
-    },
   ]),
   {
     route: 'comments',
@@ -108,34 +90,5 @@ export const CORPUS: CorpusEntry[] = [
     query: `filters[comments_reports][hash][$eq]=${'a'.repeat(89)}&populate[comments_reports][populate][reporter]=*`,
   },
 
-  // BDs
-  ...BD_SORTS.map((s) => ({ route: 'bds', query: bdsList(s) })),
-  { route: 'bds', query: bdsList('sort[createdAt]=DESC', `&filters[$and][3][creator]=${ID}`) },
-  {
-    route: `bds/${ID}`,
-    query:
-      'populate[0]=creator&populate[1]=bd_costing.preferred_currency&populate[2]=bd_proposal_detail.contract_type_name&populate[3]=bd_further_information.proposal_links&populate[4]=bd_psapb.type_name&populate[5]=bd_psapb.roadmap_name&populate[6]=bd_psapb.committee_name&populate[7]=bd_proposal_ownership.be_country',
-  },
-  {
-    route: 'bd-polls',
-    query: `filters[$and][0][bd_proposal_id][$eq]=${ID}&filters[$and][1][is_poll_active]=true&pagination[page]=1&pagination[pageSize]=1&sort[createdAt]=desc`,
-  },
-  {
-    route: 'bd-poll-votes',
-    query: `filters[$and][0][bd_poll_id][$eq]=${ID}&filters[$and][1][user_id][$eq]=${ID}&pagination[page]=1&pagination[pageSize]=1&sort[createdAt]=desc`,
-  },
-  ...['true', 'false'].map((v) => ({
-    route: 'bd-poll-votes',
-    query: `fields[0]=drep_id&fields[1]=createdAt&filters[$and][0][vote_result][$eq]=${v}&filters[$and][1][bd_poll_id][$eq]=${ID}&pagination[page]=1&pagination[pageSize]=1000`,
-  })),
-  { route: 'bd-drafts', query: 'pagination[pageSize]=1000&populate=creator' },
-  { route: 'bd-types', query: '' },
-  ...[
-    'country-lists',
-    'bd-currency-lists',
-    'bd-road-maps',
-    'bd-intersect-committees',
-    'bd-contract-types',
-  ].map((route) => ({ route, query: 'pagination[pageSize]=1000' })),
   { route: 'governance-action-types', query: '' },
 ];

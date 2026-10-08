@@ -1,5 +1,5 @@
 // Text sorts linguistically and case-insensitively (SPEC §4.4, und-x-icu), so
-// the Playwright 8B_2 / 11B_3 `localeCompare` checks hold on mixed case.
+// the Playwright 8B_2 `localeCompare` check holds on mixed case.
 
 import { createTestApp, TestApp } from './helpers/app';
 import { loginStake } from './helpers/auth';
@@ -27,7 +27,6 @@ describe('text collation (e2e)', () => {
     expect(rows.map((r) => r.c)).toEqual(
       expect.arrayContaining([
         'proposal_contents.name',
-        'bd_proposal_details.proposal_name',
         'users.govtool_username',
         'comments.text',
         'governance_action_types.name',
@@ -52,29 +51,6 @@ describe('text collation (e2e)', () => {
           .get(`/api/proposals?filters[gov_action_type_id]=1&sort[prop_name]=${dir.toUpperCase()}`),
       );
       expect(data.map((d) => (d.attributes.content as any).attributes.prop_name)).toEqual(expected(dir));
-    }
-  });
-
-  it('BDs: sort[bd_proposal_detail][proposal_name] ASC/DESC matches localeCompare', async () => {
-    const s = await loginStake(t);
-    for (const name of NAMES) {
-      const detail = await t.prisma.bdProposalDetail.create({ data: { proposalName: name } });
-      const bd = await t.prisma.bd.create({
-        data: { creatorId: s.user.id, privacyPolicy: true, isActive: true, proposalDetailId: detail.id },
-      });
-      await t.prisma.bd.update({ where: { id: bd.id }, data: { masterId: bd.id } });
-    }
-    for (const dir of ['ASC', 'DESC'] as const) {
-      const data = expectList(
-        await t
-          .api()
-          .get(
-            `/api/bds?filters[$and][0][is_active]=true&sort[bd_proposal_detail][proposal_name]=${dir}&populate[0]=bd_proposal_detail`,
-          ),
-      );
-      expect(data.map((d) => (d.attributes.bd_proposal_detail as any).data.attributes.proposal_name)).toEqual(
-        expected(dir === 'ASC' ? 'asc' : 'desc'),
-      );
     }
   });
 

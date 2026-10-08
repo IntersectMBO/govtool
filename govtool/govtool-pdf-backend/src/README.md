@@ -18,7 +18,7 @@ SPEC.md (package root) is the decided state; this file only says where things ar
   - `prisma.ts`: `toPrismaWhere`, `toPrismaOrderBy` (adds `id asc`), `toPrismaInclude` (always includes components), `toPrismaPaging`.
   - `serialize.ts`: `serializeEntity(row, resource, {populate, fields, extra})`, `serializeScalars`, `single`, `list`, `paginationMeta`.
   - `list.ts`: `findList` / `listEnvelope(delegate(prisma.model), resource, q, {where, defaultSort, extra})` for a whole list route.
-- Descriptors and allowlists already written per module: `users/user.resource.ts` (public projection), `lookups/`, `proposals/proposal.{resources,allowlists}.ts`, `polls/`, `comments/`, `budget/`. The owning module may change its own.
+- Descriptors and allowlists already written per module: `users/user.resource.ts` (public projection), `lookups/`, `proposals/proposal.{resources,allowlists}.ts`, `polls/`, `comments/`. The owning module may change its own.
 - `seed/`: `lookups.data.ts` (§6 rows), `seed-lookups.ts` (run on container start and by `prisma db seed`), `seed-demo.ts` (§11.5, `npm run seed:demo`; extend it from your module's needs).
 
 ## A resource module

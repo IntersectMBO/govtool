@@ -5669,3 +5669,14 @@ review"), and OPEN-48.
 - Its database is a `pdf` database and role on the Postgres that `metadata` uses.
 - `DATABASE_URL`, `JWT_SECRET` and `REFRESH_SECRET` are Swarm secrets, read from
   `/run/secrets/<lowercase name>` when unset, as in govtool-backend and govtool-metadata-service.
+
+## D166 — The Swarm stack runs its own Postgres
+
+**Date:** 2026-10-07
+**Amends:** D165 (where the pdf database lives).
+
+- `docker/swarm-stack` runs a `postgres` service holding the `metadata` and `pdf` databases, so
+  no environment depends on another stack's Postgres. `postgres-init.sh` creates one role per app
+  on an empty volume.
+- The same `docker-stack.yml` serves every environment; only `.env` and the exported secrets
+  differ.

@@ -8,6 +8,7 @@ import {
   PRIVACY_POLICY,
   REGISTER_DREP_DOC_URL,
   TERMS_AND_CONDITIONS,
+  docsPage,
 } from "@constants/docsUrl";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -72,7 +73,7 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
       context.waitForEvent("page"),
       page.getByTestId(link.testId).click(),
     ]);
-    await expect(newPage).toHaveURL(link.url);
+    await expect(newPage).toHaveURL(docsPage(link.url));
   }
 });
 
@@ -86,19 +87,23 @@ test("6D. Should open Sanchonet docs in a new tab when clicking `Learn More` on 
     context.waitForEvent("page"),
     page.getByTestId("delegate-learn-more-button").click(),
   ]);
-  await expect(delegationLearnMorepage).toHaveURL(DELEGATION_DOC_URL);
+  await expect(delegationLearnMorepage).toHaveURL(docsPage(DELEGATION_DOC_URL));
 
   const [registerLearnMorepage] = await Promise.all([
     context.waitForEvent("page"),
     page.getByTestId("d-rep-learn-more-button").click(),
   ]);
-  await expect(registerLearnMorepage).toHaveURL(REGISTER_DREP_DOC_URL);
+  await expect(registerLearnMorepage).toHaveURL(
+    docsPage(REGISTER_DREP_DOC_URL)
+  );
 
   const [directVoterLearnMorepage] = await Promise.all([
     context.waitForEvent("page"),
     page.getByTestId("direct-voter-learn-more-button").click(),
   ]);
-  await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
+  await expect(directVoterLearnMorepage).toHaveURL(
+    docsPage(DIRECT_VOTER_DOC_URL)
+  );
 });
 
 test("6M. Should navigate between footer links", async ({ page, context }) => {
@@ -108,19 +113,19 @@ test("6M. Should navigate between footer links", async ({ page, context }) => {
     context.waitForEvent("page"),
     page.getByTestId("privacy-policy-footer-link").click(),
   ]);
-  await expect(privacyPolicy).toHaveURL(PRIVACY_POLICY);
+  await expect(privacyPolicy).toHaveURL(docsPage(PRIVACY_POLICY));
 
   const [termsAndConditions] = await Promise.all([
     context.waitForEvent("page"),
     page.getByTestId("terms-of-use-footer-link").click(),
   ]);
-  await expect(termsAndConditions).toHaveURL(TERMS_AND_CONDITIONS);
+  await expect(termsAndConditions).toHaveURL(docsPage(TERMS_AND_CONDITIONS));
 
   const [helpUrl] = await Promise.all([
     context.waitForEvent("page"),
     page.getByTestId("help-footer-button").click(),
   ]);
-  await expect(helpUrl).toHaveURL(HELP_DOC_URL);
+  await expect(helpUrl).toHaveURL(docsPage(HELP_DOC_URL));
 });
 
 test("6O. Should display proper network name", async ({ page }) => {

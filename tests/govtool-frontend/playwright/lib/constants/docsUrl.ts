@@ -13,3 +13,10 @@ export const PRIVACY_POLICY = `${new URL(environments.docsUrl).origin}/legal/pri
 export const TERMS_AND_CONDITIONS = `${new URL(environments.docsUrl).origin}/legal/terms-of-use`;
 export const HELP_DOC_URL = `${environments.docsUrl}/support`;
 export const BOOTSTRAP_DOC_URL = `${environments.docsUrl}/faqs/bootstrapping-phase`;
+
+/**
+ * The docs site redirects every page to its trailing-slash form, so a page
+ * opened from GovTool lands on `<url>/`. Matches the page with or without it.
+ */
+export const docsPage = (url: string): RegExp =>
+  new RegExp(`^${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/?(?:[?#].*)?$`);

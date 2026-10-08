@@ -1977,6 +1977,34 @@ describe('GET /proposal/get/:proposalId', () => {
       },
     });
   });
+
+  it.each(['ratified', 'enacted', 'expired', 'dropped'] as const)(
+    '404s with the legacy message when the action is %s, so the frontend opens its history page',
+    async (status) => {
+      const service = proposalService({
+        governance: {
+          proposals: {
+            get: () =>
+              Promise.resolve(
+                env(
+                  govAction({
+                    lifecycle: { ...govAction().lifecycle, status },
+                  }),
+                ),
+              ),
+          },
+        },
+      });
+
+      await expect(service.get(`${TX}#0`)).rejects.toMatchObject({
+        status: 404,
+        response: {
+          errorType: 'NotFoundError',
+          message: `Proposal with id: ${TX}#0 not found`,
+        },
+      });
+    },
+  );
 });
 
 describe('GET /proposal/enacted-details', () => {

@@ -207,7 +207,11 @@ export class ProposalService {
       assertIdentifier(drepId);
     }
 
-    const proposals = await this.getProposals(id);
+    // Live actions only, as the legacy route answered: an ended action is not
+    // found, and the frontend turns that 404 into its history page.
+    const proposals = (await this.getProposalSnapshot(id))
+      .filter(({ status }) => status === 'live')
+      .map(({ proposal }) => proposal);
 
     if (proposals.length === 0) {
       throw new NotFoundException({

@@ -276,11 +276,14 @@ export const cleanObject = (obj) => {
     return obj;
 };
 
+// A comment without reports, such as one from the 2025 budget proposals
+// archive (which holds none), is not restricted.
 export const isCommentRestricted = (curComment) => {
-    let banned = curComment.attributes.comments_reports.data.some((report) => {
+    const reports = curComment?.attributes?.comments_reports?.data ?? [];
+    let banned = reports.some((report) => {
         return report.attributes.moderation_status === true;
     });
-    let x = curComment.attributes.comments_reports.data.filter((report) => {
+    let x = reports.filter((report) => {
         return report.attributes.moderation_status !== false;
     });
     if (banned || x.length >= 3) {

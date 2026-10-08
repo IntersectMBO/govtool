@@ -632,8 +632,9 @@
     "title": "Proposals",
     "proposeAGovernanceAction": "Propose a Governance Action"
   },
-  "budgetDiscussion": {
-    "title": "Budget Proposals"
+  "budgetProposalsArchive": {
+    "navLabel": "Archived: 2025 Budget Proposals",
+    "bannerText": "The 2025 budget process is closed. This is a read-only archive of the 2025 budget proposals, their versions, DRep poll results and comments."
   },
   "govActions": {
     "about": "About",
@@ -1202,15 +1203,15 @@
   },
   "usefulLinks": {
     "title": "Useful links",
-    "ccPortal": {
-      "title": "Check the Constitutional Committee Portal",
-      "description": "See Interim Cardano Constitution and Constitutional committee votes rationales",
-      "link": "CC Portal"
-    },
     "intersectWebsite": {
       "title": "Intersect website",
-      "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development",
-      "link": "Intersect website"
+      "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development.",
+      "link": "Visit intersectmbo.org"
+    },
+    "budgetProposalsArchive": {
+      "title": "2025 Budget Proposals",
+      "description": "Archived. Read the 2025 budget proposals, their versions, DRep poll results and comments.",
+      "link": "View the archive"
     }
   },
   "about": "About",

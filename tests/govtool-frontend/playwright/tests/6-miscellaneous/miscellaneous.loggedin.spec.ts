@@ -135,18 +135,3 @@ test.describe("Temporary user", () => {
     }
   });
 });
-
-test.describe("Temporary budget discussion user", () => {
-  test("6P. Should prompt for a username after clicking on budget discussion link if username is not set", async ({
-    page,
-  }) => {
-    await connectTestWallet(page, await randomWallet());
-
-    await page.goto("/");
-    await page.getByTestId("budget-discussion-link").click();
-    await page.getByTestId("verify-user-link").first().click();
-
-    await expect(page.getByTestId("setup-username-modal")).toBeVisible();
-    await expect(page.getByTestId("username-input")).toBeVisible();
-  });
-});

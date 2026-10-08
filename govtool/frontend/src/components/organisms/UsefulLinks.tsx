@@ -1,16 +1,21 @@
 import { Box, Link } from "@mui/material";
+import { Link as RouterLink } from "react-router";
 
 import { useTranslation } from "@hooks";
 import { Typography } from "../atoms";
-import { ICONS } from "@/consts";
+import { BUDGET_DISCUSSION_PATHS, ICONS } from "@/consts";
 import { Card } from "../molecules";
 
+// External links open in a new tab; internal ones (the read-only 2025 budget
+// proposals archive) stay in the app.
 const LINKS = {
-  ccPortal: {
-    url: "https://constitution.gov.tools",
-  },
   intersectWebsite: {
     url: "https://www.intersectmbo.org/",
+    external: true,
+  },
+  budgetProposalsArchive: {
+    url: BUDGET_DISCUSSION_PATHS.budgetDiscussion,
+    external: false,
   },
 } as const;
 
@@ -37,7 +42,7 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
           flexWrap: "wrap",
         }}
       >
-        {Object.entries(LINKS).map(([key, { url }]) => (
+        {Object.entries(LINKS).map(([key, { url, external }]) => (
           <Card
             key={key}
             sx={{
@@ -60,8 +65,9 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
             </Typography>
             <Link
               data-testid={`useful-link-${key}`}
-              href={url}
-              target="_blank"
+              {...(external
+                ? { href: url, target: "_blank", rel: "noopener noreferrer" }
+                : { component: RouterLink, to: url })}
               sx={{
                 alignSelf: "flex-start",
                 display: "flex",
@@ -76,12 +82,14 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
               <Typography color="primary" variant="body2">
                 {t(`usefulLinks.${key as keyof typeof LINKS}.link`)}
               </Typography>
-              <img
-                alt="link"
-                height={16}
-                src={ICONS.externalLinkIcon}
-                width={16}
-              />
+              {external && (
+                <img
+                  alt="Opens in a new tab"
+                  height={16}
+                  src={ICONS.externalLinkIcon}
+                  width={16}
+                />
+              )}
             </Link>
           </Card>
         ))}

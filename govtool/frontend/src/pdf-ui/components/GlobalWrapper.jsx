@@ -10,8 +10,6 @@ import {
     SingleGovernanceAction,
     IdentificationPage,
     CommentReviewPage,
-    ProposedBudgetDiscussion,
-    SingleBudgetDiscussion,
 } from '../pages';
 import { setAxiosBaseURL } from '../lib/axiosInstance'; // Import axiosInstance and setAxiosBaseURL
 import { ScrollToTop } from '../lib/hooks';
@@ -94,13 +92,6 @@ const GlobalWrapper = ({ ...props }) => {
                 getReviewHash(path)
             ) {
                 return <CommentReviewPage reportHash={getReviewHash(path)} />;
-            } else if (
-                path.includes('budget_discussion/') &&
-                getProposalID(path)
-            ) {
-                return <SingleBudgetDiscussion id={getProposalID(path)} />;
-            } else if (path.includes('budget_discussion')) {
-                return <ProposedBudgetDiscussion />;
             } else if (
                 path.includes('proposal_discussion/') &&
                 getProposalID(path)

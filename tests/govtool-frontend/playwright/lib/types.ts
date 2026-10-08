@@ -344,6 +344,7 @@ export interface InvalidMetadataType {
   hash: string;
 }
 
+// The categories of the 2025 budget proposals archive.
 export enum BudgetDiscussionEnum {
   Core = "Core",
   Research = "Research",
@@ -352,187 +353,33 @@ export enum BudgetDiscussionEnum {
   NoCategory = "No Category",
 }
 
-export interface BudgetProposalContactInformationProps {
-  beneficiaryFullName: string;
-  beneficiaryEmail: string;
-  beneficiaryCountry: string;
-  beneficiaryNationality: string;
-  submissionLeadFullName: string;
-  submissionLeadEmail: string;
+/** public/budget-proposals-2025/list.json in the frontend. */
+export interface BudgetArchiveListItem {
+  id: number;
+  attributes: {
+    master_id: string;
+    createdAt: string;
+    master_proposal_created_at: string;
+    prop_comments_number: number;
+    creator: { data: { attributes: { govtool_username: string } } | null };
+    bd_psapb: {
+      data: {
+        attributes: {
+          type_name: {
+            data: { id: number; attributes: { type_name: string } };
+          };
+        };
+      };
+    };
+    bd_proposal_detail: { data: { attributes: { proposal_name: string } } };
+  };
+  archive: { versions: number; poll: { yes: number; no: number } | null };
 }
 
-export type CompanyType = "Individual" | "Company" | "Group";
-export enum CompanyEnum {
-  Individual = "Individual",
-  Company = "Company",
-  Group = "Group",
-}
-
-export interface BudgetProposalOwnershipProps {
-  companyType: CompanyType;
-  contactDetails: string;
-  groupName?: string;
-  groupType?: string;
-  groupKeyIdentity?: string;
-  companyName?: string;
-  companyDomainName?: string;
-  countryOfIncorportation?: string;
-}
-
-export type RoadmapNameType =
-  | "Scaling the L1 Engine"
-  | "Architectural Excellence"
-  | "Leios"
-  | "Incoming Liquidity"
-  | "L2 Expansion"
-  | "Programmable Assets"
-  | "Multiple Node Implementations"
-  | "SPO Incentive Improvements"
-  | "It doesn't align"
-  | "It supports the product roadmap"
-  | "Developer / User Experience";
-
-export enum RoadmapNameEnum {
-  ScalingTheL1Engine = "Scaling the L1 Engine",
-  ArchitecturalExcellence = "Architectural Excellence",
-  Leios = "Leios",
-  IncomingLiquidity = "Incoming Liquidity",
-  L2Expansion = "L2 Expansion",
-  ProgrammableAssets = "Programmable Assets",
-  MultipleNodeImplementations = "Multiple Node Implementations",
-  SPOIncentiveImprovements = "SPO Incentive Improvements",
-  NoAlignment = "It doesn't align",
-  SupportsProductRoadmap = "It supports the product roadmap",
-  DeveloperUserExperience = "Developer / User Experience",
-}
-
-export type BudgetDiscussionType =
-  | "Core"
-  | "Research"
-  | "Governance Support"
-  | "Marketing & Innovation"
-  | "None of these";
-
-export enum CommitteeAlignmentEnum {
-  TechnicalSteeringCommittee = "Technical Steering Committee",
-  ProductCommittee = "Product Committee",
-  OpenSourceCommittee = "Open Source Committee",
-  CivicsCommittee = "Civics Committee",
-  MembershipAndCommunityCommittee = "Membership & Community Committee",
-  BudgetCommittee = "Budget Committee",
-  MarketingCommittee = "Marketing Committee",
-  Unsure = "Unsure",
-  None = "None",
-}
-
-export type CommitteeAlignmentType =
-  | "Technical Steering Committee"
-  | "Product Committee"
-  | "Open Source Committee"
-  | "Civics Committee"
-  | "Membership & Community Committee"
-  | "Budget Committee"
-  | "Marketing Committee"
-  | "Unsure"
-  | "None";
-
-export enum LocationEnum {
-  Nepal = "Nepal",
-  Netherlands = "Netherlands",
-  UnitedStates = "United States",
-  UnitedKingdom = "United Kingdom",
-  Canada = "Canada",
-  Australia = "Australia",
-  Germany = "Germany",
-  France = "France",
-  Japan = "Japan",
-  SouthKorea = "South Korea",
-}
-
-export interface BudgetProposalProblemStatementAndBenefitProps {
-  problemStatement: string;
-  proposalBenefits: string;
-  roadmapName: RoadmapNameType;
-  productRoadmapDescription?: string;
-  budgetDiscussionType: BudgetDiscussionType;
-  committeeAlignmentType: CommitteeAlignmentType;
-  suplimentaryEndorsement: string;
-}
-
-export type ProposalContractingType =
-  | "Milestone Based Fixed Price"
-  | "Time and Materials"
-  | "Service Level Agreement"
-  | "Other"
-  | "Reimbursement"
-  | "Intersect Procurement Process";
-
-export enum ProposalContractingEnum {
-  MilestoneBasedFixedPrice = "Milestone Based Fixed Price",
-  TimeAndMaterials = "Time and Materials",
-  ServiceLevelAgreement = "Service Level Agreement",
-  Other = "Other",
-  Reimbursement = "Reimbursement",
-  IntersectProcurementProcess = "Intersect Procurement Process",
-}
-
-export interface BudgetProposalDetailsProps {
-  proposalName: string;
-  proposalDescription: string;
-  proposalKeyDependencies: string;
-  proposalMaintainAndSupport: string;
-  milestones: string;
-  teamSizeAndDuration: string;
-  previousExperience: string;
-  contracting: ProposalContractingType;
-  otherDescription?: string;
-}
-
-export type preferredCurrencyType =
-  | "United States Dollar"
-  | "Euro"
-  | "Japanese Yen"
-  | "Australian Dollar"
-  | "Nepalese Rupee";
-
-export enum PreferredCurrencyEnum {
-  USD = "United States Dollar",
-  EUR = "Euro",
-  JPY = "Japanese Yen",
-  AUD = "Australian Dollar",
-  NPR = "Nepalese Rupee",
-}
-
-export interface BudgetCostingProps {
-  adaAmount: string | number;
-  usdToAdaConversionRate: string | number;
-  preferredCurrency: preferredCurrencyType;
-  AmountInPreferredCurrency: string | number;
-  costBreakdown: string;
-}
-
-export interface AdministrationAndAuditingProps {
-  intersectAdministration: boolean;
-  venderDetails: string;
-}
-
-export interface BudgetProposalProps {
-  proposalOwnership: BudgetProposalOwnershipProps;
-  problemStatementAndBenefits: BudgetProposalProblemStatementAndBenefitProps;
-  proposalDetails: BudgetProposalDetailsProps;
-  costing: BudgetCostingProps;
-  furtherInformation: Array<ProposalLink>;
-  administrationAndAuditing: AdministrationAndAuditingProps;
-}
-
-export enum BudgetProposalStageEnum {
-  ProposalOwnership = 1,
-  ProblemStatementAndBenefits = 2,
-  ProposalDetails = 3,
-  Costing = 4,
-  FurtherInformation = 5,
-  AdministrationAndAuditing = 6,
-  Review = 7,
+export interface BudgetArchiveList {
+  count: number;
+  categories: Array<{ id: number; attributes: { type_name: string } }>;
+  items: BudgetArchiveListItem[];
 }
 
 export type VoterType = "DReps" | "SPOs" | "CC";

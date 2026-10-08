@@ -12,6 +12,7 @@ export * from "./drepSearchPhraseProcessor";
 export * from "./ellipsizeText";
 export * from "./filterOutNullParams";
 export * from "./filterUpdatableProtocolParams";
+export * from "./findActiveNavTo";
 export * from "./formatDate";
 export * from "./generateAnchor";
 export * from "./generateJsonld";

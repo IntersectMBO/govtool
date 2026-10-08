@@ -268,7 +268,8 @@ const FeatureFlagProvider = ({ children }: PropsWithChildren) => {
   const value = useMemo(
     () => ({
       // pdf-ui cannot run without its API, so an unset URL disables the
-      // forum (proposal and budget discussion) rather than mounting it broken.
+      // proposal discussion forum rather than mounting it broken. The 2025
+      // budget proposals archive is static and is not behind this flag.
       isProposalDiscussionForumEnabled:
         (env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === "true" ||
           env.VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED === true) &&

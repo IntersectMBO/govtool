@@ -67,7 +67,7 @@ const PAGE_TITLES = [
   },
   {
     path: `${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`,
-    title: "Budget Discussion",
+    title: "Archived: 2025 Budget Proposals",
   },
   {
     path: `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`,

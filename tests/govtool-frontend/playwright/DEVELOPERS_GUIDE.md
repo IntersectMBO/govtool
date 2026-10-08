@@ -57,11 +57,8 @@ This directory contains all automated test cases, organized by feature area:
 10. **`10-feedback/`**  
     Chatwoot feedback widget test cases.
 
-11. **`11-proposal-budget/`**  
-    Tests for proposal budget functionality and associated forms.
-
-12. **`12-proposal-budget-submission/`**  
-    Proposal budget submission form validation, draft, visibility, and submission tests.
+11. **`11-budget-proposals-archive/`**  
+    The read-only 2025 budget proposals archive: list search, filter and sort, details, poll totals, versions, comments and old links, checked against the static files it serves.
 
 ---
 
@@ -69,8 +66,8 @@ This directory contains all automated test cases, organized by feature area:
 
 Test wallets are HD accounts of `TEST_WALLET_MNEMONIC`, picked by name (`lib/wallet/testWallets.ts`) and funded from the faucet on demand. Specs connect one with `test.use({ walletName: "adaHolder01" })`; `lib/wallet/transactions.ts` registers stake keys and DReps.
 
-13. **`dRep.setup.ts`**  
-    Registers the shared DReps (dRep01, dRep02, dRep03) with metadata; tests also register them on first use (`lib/wallet/sharedDReps.ts`).
+12. **`dRep.setup.ts`**  
+    Registers the shared DReps (dRep01, dRep02) with metadata; tests also register them on first use (`lib/wallet/sharedDReps.ts`).
 
 ---
 
@@ -133,11 +130,10 @@ Tracks creation, display, and participation in proposal discussions.
 
 ![Proposal Discussion](./docs/proposal-discussion.png)
 
-#### ii. Budget Proposal
+#### ii. Budget Proposals Archive
 
-Tracks creation, display, and participation in budget-related proposals.
-
-![Budget Proposal](./docs/budget-proposal.png)
+The 2025 budget proposals are a read-only archive; its tests check the list,
+details and old links against the static files the frontend serves.
 
 ---
 

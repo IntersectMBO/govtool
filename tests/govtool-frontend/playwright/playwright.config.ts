@@ -63,12 +63,6 @@ export default defineConfig({
       testMatch: "**/*.loggedin.pd.spec.ts",
     },
     {
-      name: "budget proposal",
-      use: { ...devices["Desktop Chrome"] },
-      testMatch: "**/*.pb.spec.ts",
-      testIgnore: ["**/*.dRep.pb.spec.ts"],
-    },
-    {
       name: "proposal submission",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.ga.spec.ts",
@@ -77,12 +71,6 @@ export default defineConfig({
       name: "loggedin (desktop)",
       use: { ...devices["Desktop Chrome"] },
       testMatch: "**/*.loggedin.spec.ts",
-    },
-    {
-      name: "budget proposal dRep",
-      use: { ...devices["Desktop Chrome"] },
-      testMatch: "**/*.dRep.pb.spec.ts",
-      dependencies: environments.ci ? ["dRep setup"] : [],
     },
     {
       name: "dRep",
@@ -129,7 +117,6 @@ export default defineConfig({
         "**/*.tx.spec.ts",
         "**/*.ga.spec.ts",
         "**/*.pd.spec.ts",
-        "**/*.pb.spec.ts",
       ],
     },
     {
@@ -145,7 +132,6 @@ export default defineConfig({
         "**/*.tx.spec.ts",
         "**/*.ga.spec.ts",
         "**/*.pd.spec.ts",
-        "**/*.pb.spec.ts",
         "**/walletConnect.spec.ts",
       ],
     },

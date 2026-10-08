@@ -233,7 +233,7 @@ comparison, set `GOVTOOL_AGGREGATES_REPORT=/path/to/report.json` for the same co
 
 #### 4. **Proposal Pillar**
 
-_Includes both Proposal Discussion and Budget Discussion_
+_Includes Proposal Discussion and the read-only 2025 Budget Proposals archive_
 
 - **Pre-requisite**: Ensure the faucet address holds at least **403,000 ADA**.
 
@@ -269,20 +269,21 @@ npm run test:headless:proposal-discussion
 
 ---
 
-#### 6. **Proposal Budget**
+#### 6. **Budget Proposals Archive**
 
-- **Pre-requisite**: Ensure the faucet address holds at least **1,000 ADA**.
+The 2025 budget proposals, read-only, served by the frontend as static files
+(no wallet, faucet or forum backend needed).
 
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:proposal-budget
+npm run test:budget-proposals-archive
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:proposal-budget
+npm run test:headless:budget-proposals-archive
 ```
 
 ---

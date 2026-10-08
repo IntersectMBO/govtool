@@ -1,30 +1,33 @@
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
 import { expect, Locator, Page } from "@playwright/test";
 import {
+  BudgetArchiveList,
   BudgetDiscussionEnum,
   BudgetProposalFilterTypes,
-  ProposedGovAction,
 } from "@types";
 import environments from "lib/constants/environments";
 import BudgetDiscussionDetailsPage from "./budgetDiscussionDetailsPage";
-import { setPdfUsername, setUsernameIfPrompted } from "./pdfUsername";
 
+export const BUDGET_ARCHIVE_PATH = "/budget-proposals-2025";
+
+// Requests the archive must never make: the forum's budget discussion API.
+export const BUDGET_DISCUSSION_API =
+  /\/api\/(bds|bd-|bd\/versions)|\/api\/comments\?.*bd_proposal_id/;
+
+const PROPOSAL_CARD_SELECTOR =
+  '[data-testid^="budget-discussion-"][data-testid$="-card"]';
+
+/** The read-only 2025 budget proposals archive list. */
 export default class BudgetDiscussionPage {
-  // Buttons
-  readonly drawerBtn = this.page.getByTestId("open-drawer-button");
-  readonly proposalBudgetDiscussionBtn = this.page.getByTestId(
-    "propose-a-budget-discussion-button"
-  );
-  readonly verifyUserLink = this.page.getByTestId("verify-user-link").first();
-  readonly verifyDRepLink = this.page.getByTestId("verify-drep-link").first();
   readonly filterBtn = this.page.getByTestId("filter-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
-  readonly myProposalBtn = this.page.getByTestId(
-    "My Proposals-owner-filter-option"
-  );
-
-  // input
   readonly searchInput = this.page.getByTestId("search-input");
+  readonly archiveBanner = this.page.getByTestId(
+    "budget-proposals-archive-banner"
+  );
+  readonly backToListBtn = this.page.getByTestId(
+    "back-to-budget-proposals-button"
+  );
 
   constructor(private readonly page: Page) {}
 
@@ -34,8 +37,16 @@ export default class BudgetDiscussionPage {
 
   async goto() {
     await this.page.goto(`${environments.frontendUrl}/budget_discussion`);
-    // wait for the proposal cards to load
-    await this.page.waitForTimeout(2_000);
+    await this.page.locator(PROPOSAL_CARD_SELECTOR).first().waitFor();
+  }
+
+  /** The archive's list file, as the page reads it. */
+  async fetchArchiveList(): Promise<BudgetArchiveList> {
+    const response = await this.page.request.get(
+      `${environments.frontendUrl}${BUDGET_ARCHIVE_PATH}/list.json`
+    );
+    expect(response.ok()).toBe(true);
+    return response.json();
   }
 
   async viewFirstProposal(): Promise<BudgetDiscussionDetailsPage> {
@@ -49,84 +60,72 @@ export default class BudgetDiscussionPage {
   }
 
   async getAllProposals() {
-    const proposalCardSelector =
-      '[data-testid^="budget-discussion-"][data-testid$="-card"]';
-
     await waitedLoop(async () => {
-      const count = await this.page.locator(proposalCardSelector).count();
+      const count = await this.page.locator(PROPOSAL_CARD_SELECTOR).count();
       return count > 0;
     });
-    const proposalCards = await this.page.locator(proposalCardSelector).all();
-
-    expect(
-      true,
-      proposalCards.length === 0 && "No budget proposals found."
-    ).toBeTruthy();
-
-    return proposalCards;
+    return this.page.locator(PROPOSAL_CARD_SELECTOR).all();
   }
 
-  async clickRadioButtonsByNames(names: string[]) {
+  async showAll(category: BudgetDiscussionEnum) {
+    const slug =
+      category === BudgetDiscussionEnum.NoCategory
+        ? "no-category"
+        : category.toLowerCase().replace(/ /g, "-");
+    await this.page.getByTestId(`${slug}-show-all-button`).click();
+  }
+
+  async clickCategoryCheckboxes(names: string[]) {
     for (const name of names) {
-      const budgetProposalValue = Object.values(BudgetDiscussionEnum).includes(
-        name as BudgetDiscussionEnum
-      );
-      if (budgetProposalValue) {
-        await this.page.getByLabel(name).click();
-      }
+      await this.page.getByLabel(name).click();
     }
-  }
-
-  async filterProposalByNames(names: string[]) {
-    await this.clickRadioButtonsByNames(names);
-  }
-
-  async unFilterProposalByNames(names: string[]) {
-    await this.clickRadioButtonsByNames(names);
   }
 
   async applyAndValidateFilters(
     filters: string[],
-    validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
+    validateFunction: (
+      proposalCard: Locator,
+      filters: string[]
+    ) => Promise<boolean>
   ) {
-    await this.page.waitForTimeout(4_000); // wait for the proposals to load
     // single filter
     for (const filter of filters) {
-      await this.filterProposalByNames([filter]);
+      await this.clickCategoryCheckboxes([filter]);
       await this.validateFilters([filter], validateFunction);
-      await this.unFilterProposalByNames([filter]);
+      await this.clickCategoryCheckboxes([filter]);
     }
 
-    // multiple filter
+    // multiple filters
     const multipleFilters = [...filters];
     while (multipleFilters.length > 1) {
-      await this.filterProposalByNames(multipleFilters);
+      await this.clickCategoryCheckboxes(multipleFilters);
       await this.validateFilters(multipleFilters, validateFunction);
-      await this.unFilterProposalByNames(multipleFilters);
+      await this.clickCategoryCheckboxes(multipleFilters);
       multipleFilters.pop();
     }
   }
 
   async validateFilters(
     filters: string[],
-    validateFunction: (proposalCard: any, filters: string[]) => Promise<boolean>
+    validateFunction: (
+      proposalCard: Locator,
+      filters: string[]
+    ) => Promise<boolean>
   ) {
     await functionWaitedAssert(async () => {
       const proposalCards = await this.getAllProposals();
 
       for (const proposalCard of proposalCards) {
-        if (await proposalCard.isVisible()) {
-          const type = await proposalCard
-            .getByTestId("budget-discussion-type")
-            .textContent();
-          const hasFilter = await validateFunction(proposalCard, filters);
+        const type = await proposalCard
+          .getByTestId("budget-discussion-type")
+          .textContent();
+        const hasFilter = await validateFunction(proposalCard, filters);
 
-          expect(
-            hasFilter,
-            !hasFilter &&
-              `A budget proposal type ${type} does not contain on ${filters}`
-          ).toBe(true);
-        }
+        expect(
+          hasFilter,
+          !hasFilter &&
+            `A budget proposal type ${type} does not contain on ${filters}`
+        ).toBe(true);
       }
     });
   }
@@ -135,62 +134,43 @@ export default class BudgetDiscussionPage {
     proposalCard: Locator,
     filters: string[]
   ): Promise<boolean> {
-    const govActionType = await proposalCard
+    const type = await proposalCard
       .getByTestId("budget-discussion-type")
       .textContent();
 
-    if (govActionType === "None of these") {
+    if (type === "None of these") {
       return filters.includes(BudgetDiscussionEnum.NoCategory);
     }
-    return filters.includes(govActionType);
+    return filters.includes(type);
   }
 
-  async sortAndValidate(
-    type: BudgetProposalFilterTypes,
-    validationFn: (p1: ProposedGovAction, p2: ProposedGovAction) => boolean
-  ) {
-    const sortMappings = {
-      "Proposer A-Z": "&sort[creator][govtool_username]=ASC",
-      "Proposer Z-A": "&sort[creator][govtool_username]=DESC",
-      "Name A-Z": "&sort[bd_proposal_detail][proposal_name]=ASC",
-      "Name Z-A": "&sort[bd_proposal_detail][proposal_name]=DESC",
-      "Most comments": "&sort[prop_comments_number]=DESC",
-      "Least comments": "&sort[prop_comments_number]=ASC",
-      Oldest: "&sort[createdAt]=ASC",
-      Newest: "&sort[createdAt]=DESC",
-    };
-
-    const urlParam = sortMappings[type];
-    const populateParam = "&populate[0]=bd_costing";
-
-    const responsePromise = this.page.waitForResponse((response) =>
-      response.url().includes(`${urlParam}${populateParam}`)
-    );
-
+  async sortBy(type: BudgetProposalFilterTypes) {
     await this.sortBtn.click();
     await this.page.getByTestId(`${type}-sort-option`).click();
-    const response = await responsePromise;
-
-    let proposals: ProposedGovAction[] = (await response.json()).data;
-
-    // API validation
-    for (let i = 0; i <= proposals.length - 2; i++) {
-      const isValid = validationFn(proposals[i], proposals[i + 1]);
-      expect(isValid, {
-        message:
-          !isValid &&
-          `Failed on sorting ${type} with proposals: ${proposals[i].id} and ${proposals[i + 1].id}`,
-      }).toBe(true);
-    }
+    await expect(this.sortBtn).toHaveText(`Sort: ${type}`);
   }
 
-  async setUsername(name: string) {
-    await setPdfUsername(this.page, name);
-  }
+  /**
+   * Sorts, then checks that every adjacent pair of cards on the page (one
+   * category shown in full) is in order by the value `read` takes from a card.
+   */
+  async sortAndValidate<T>(
+    type: BudgetProposalFilterTypes,
+    read: (proposalCard: Locator) => Promise<T>,
+    inOrder: (a: T, b: T) => boolean
+  ) {
+    await this.sortBy(type);
 
-  /** Signs in to pdf and sets a username if pdf-ui asks for one. */
-  async verifyIdentity() {
-    await this.verifyUserLink.click();
-    await setUsernameIfPrompted(this.page);
+    await functionWaitedAssert(async () => {
+      const values = await Promise.all(
+        (await this.getAllProposals()).map(read)
+      );
+      for (let i = 0; i < values.length - 1; i++) {
+        expect(
+          inOrder(values[i], values[i + 1]),
+          `Sorting ${type}: ${values[i]} before ${values[i + 1]}`
+        ).toBe(true);
+      }
+    });
   }
 }

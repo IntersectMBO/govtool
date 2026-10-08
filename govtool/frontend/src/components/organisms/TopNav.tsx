@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, FC } from "react";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { AppBar, Box, Grid, IconButton, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Button, Link, FakeLink } from "@atoms";
 import { ICONS, IMAGES, PATHS, NAV_ITEMS, NavMenuItem } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { openInNewTab } from "@utils";
+import { findActiveNavTo, openInNewTab } from "@utils";
 import { DrawerMobile } from "./DrawerMobile";
 
 const POSITION_TO_BLUR = 80;
@@ -23,7 +23,6 @@ export const TopNav = ({ isConnectButton = true }) => {
   const { isEnabled, disconnectWallet, stakeKey } = useCardano();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
 
   useEffect(() => {
     const onScroll = () => {
@@ -59,11 +58,7 @@ export const TopNav = ({ isConnectButton = true }) => {
         columns={5}
         columnSpacing={screenWidth < 1024 ? 2 : 4}
       >
-        {NAV_ITEMS.filter(
-          (navItem) =>
-            isProposalDiscussionForumEnabled ||
-            navItem.dataTestId !== "budget-discussion-link",
-        ).map((navItem) => {
+        {NAV_ITEMS.map((navItem) => {
           if (isNavMenuItem(navItem)) {
             return (
               <Grid item key={navItem.label}>
@@ -226,6 +221,12 @@ const MenuNavItem: FC<{
     }
     return navItem.childNavItems;
   };
+  const { pathname } = useLocation();
+  const childNavItems = filterChildNavItems();
+  const activeNavTo = findActiveNavTo(
+    pathname,
+    (childNavItems ?? []).map((item) => item.navTo),
+  );
   return (
     <>
       <FakeLink
@@ -273,7 +274,7 @@ const MenuNavItem: FC<{
           },
         }}
       >
-        {filterChildNavItems()?.map((childNavItem, idx) => (
+        {childNavItems?.map((childNavItem, idx) => (
           <MenuItem
             key={childNavItem.label}
             sx={{ minWidth: 160 }}
@@ -284,6 +285,7 @@ const MenuNavItem: FC<{
             <Link
               dataTestId={childNavItem.dataTestId}
               navTo={childNavItem.navTo}
+              isActive={childNavItem.navTo === activeNavTo}
               ref={(el) => {
                 linkRefs.current[idx] = el;
               }}

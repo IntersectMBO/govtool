@@ -17,9 +17,17 @@ changes.
 - A GitHub Pages preview of the documentation, deployed from `develop` and not indexed by search engines
 - Documentation checks on pull requests that touch `docs/`: the site build catches broken links and asset paths, and the Docker image is started and smoke-tested, before merge
 
+### Changed
+
+- Budget discussions are now a read-only archive of the 2025 budget proposals (linked from a "2025 Budget Proposals" card in Useful links, with a read-only notice on its pages). The list, details, version history, final DRep poll totals and comments are served as static files under `/budget-proposals-2025/`, split from a mainnet export by `govtool/frontend/scripts/split-bd-archive.mjs`; the frontend makes no budget discussion requests. Old `/budget_discussion` links still resolve, `/budget_discussion/propose` redirects to the archive, and the archive is shown whether or not the proposal discussion forum is enabled
+- The frontend image compresses JSON and caches the archive files for 30 days
+
 ### Removed
 
 - The Matomo analytics snippet (analytics.gov.tools) in the frontend; Umami is the only analytics
+- The unused analytics dashboard (`govtool/analytics-dashboard`), a Next.js internal dashboard outside the core deployment
+- The Constitutional Committee Portal card in Useful links, replaced by the budget proposals archive card
+- Creating, editing, drafting and deleting budget proposals, voting in budget proposal polls, the DRep voters list of a poll, and commenting on or replying to budget proposals in the frontend
 
 ## [v2.1.0-alpha.2](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.1...v2.1.0-alpha.2) 2026-10-02
 

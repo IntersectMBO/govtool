@@ -1,25 +1,27 @@
 ---
 description: >-
-  This page provides a simple overview about the Budget Proposals section of
-  Govtool
+  This page provides a simple overview of the archived 2025 Budget Proposals
+  section of GovTool
 ---
 
 # Cardano Budget Proposals
 
 ## Overview
 
-The Budget Proposals section is a space for the Cardano community to submit proposals they want to be included in the next Cardano budget. By submitting them here proposers will be able to get comments and feedback from ada holders and DReps.
+The 2025 budget process is closed. GovTool keeps the proposals that the Cardano community submitted for the 2025 Cardano budget as a read-only archive, linked from the **2025 Budget Proposals** card under **Useful links** on the home page and the dashboard.
 
 ## How to use this section
 
-In the Budget Proposal section, you can:
+In the archive, you can:
 
-* Review and comment on existing proposals
-* Submit, edit, or delete your own proposals
-* If you are a DRep you can provide your sentiment about that proposal via a simple poll
-* Indicate, as a proposer, which Intersect Committee your proposal aligns with
+* Search, filter by budget category and sort the 2025 budget proposals
+* Read each proposal's final version and its earlier versions
+* See the final result of each proposal's DRep sentiment poll (totals only)
+* Read the comments and replies the proposal received
 
-Once a proposal has been included in the Intersect Budget Info Action, it can no longer be edited, and the DRep poll is closed.
+Proposals can no longer be submitted, edited, deleted, voted on or commented on. Links to individual proposals from the 2025 process still open the archived proposal.
+
+During the 2025 process, a proposal included in the Intersect Budget Info Action could no longer be edited, and its DRep poll was closed.
 
 ### Quick video guide
 

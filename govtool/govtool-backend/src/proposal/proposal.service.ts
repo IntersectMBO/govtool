@@ -128,12 +128,16 @@ export class ProposalService {
    * proposal to the frontend applies it: the list, the detail and a DRep's
    * vote history, whose rows the details page opens without asking again.
    */
-  async withDocument(proposal: ProposalResponse): Promise<ProposalResponse> {
+  async withDocument(
+    proposal: ProposalResponse,
+    timeoutMs?: number,
+  ): Promise<ProposalResponse> {
     const fields = proposalDocumentFields(
-      await resolveDocument(this.metadata, {
-        url: proposal.url,
-        hash: proposal.metadataHash,
-      }),
+      await resolveDocument(
+        this.metadata,
+        { url: proposal.url, hash: proposal.metadataHash },
+        timeoutMs,
+      ),
     );
     return fields ? { ...proposal, ...fields } : proposal;
   }

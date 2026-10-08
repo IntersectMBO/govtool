@@ -28,6 +28,7 @@ import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 import {
   drepFields,
   ENRICH_CONCURRENCY,
+  ENRICH_TIMEOUT_MS,
   mapLimit,
   resolveBody,
 } from 'src/metadata/enrich';
@@ -51,6 +52,13 @@ import {
   VoteParams,
   VoteResponse,
 } from './drep.type';
+
+/**
+ * The longest a DRep's vote history waits, in all, for its actions'
+ * documents, so the response stays well inside the frontend's 30 s timeout
+ * however many of them cannot be fetched.
+ */
+const VOTE_HISTORY_DOCUMENT_BUDGET_MS = 5_000;
 
 /** Contract casing → the legacy API's casing. */
 const LEGACY_STATUS = {
@@ -367,91 +375,116 @@ export class DRepService {
       { drepId, selectedTypes, sort, search },
       () =>
         asHttp(async () => {
-          const candidates = legacyDRepCandidates(drepId);
-
-          const dreps = withMethod(
-            this.chain.governance.dreps,
-            'listVotes',
-            'governance.dreps.listVotes',
-          );
-
-          // A bare hash names two possible credentials; which one is
-          // registered is settled by reading the DRep, since a vote listing
-          // for an unknown DRep is not an error on every provider.
-          const id =
-            candidates.length === 1
-              ? candidates[0]
-              : ((await this.findDRep(candidates))?.id ?? null);
-
-          // The legacy statement answered an unknown DRep with no rows.
-          if (id === null) {
-            return [];
-          }
-
-          // The listing carries voted AND not-voted rows, and it is paged like
-          // every other collection, so the whole of it is read rather than
-          // whichever prefix the first page happened to hold.
-          let rows: DRepVoteRow[];
-          try {
-            rows = await readAll(
-              (page) => dreps.listVotes(id, { ...page, voted: true }),
-              { label: 'drep vote listing' },
-            );
-          } catch (error) {
-            if (isNotFound(error)) {
-              return [];
-            }
-            throw error;
-          }
-
-          // A row names the action it is about; the legacy response carries
-          // the whole proposal, which the snapshot already holds.
-          const byId = new Map(
-            (await this.proposalService.getProposals('')).map((proposal) => [
-              proposal.id,
-              proposal,
-            ]),
-          );
-
-          // The legacy vote row named its DRep by the raw hex hash.
-          const legacyDRepId = drepIdToHex(id);
-          const pairs = rows.flatMap((row) =>
-            this.toLegacyVotePair(legacyDRepId, row, byId),
-          );
-
-          // Filter and sort on the proposal side, as the legacy service did.
-          const byGovActionId = new Map(
-            pairs.map((pair) => [
-              `${pair.proposal.txHash}#${pair.proposal.index}`,
-              pair,
-            ]),
-          );
-
-          let proposals = pairs.map((pair) => pair.proposal);
-          proposals = this.proposalService.filterByType(
-            proposals,
+          const ordered = await this.votePairs(
+            drepId,
             selectedTypes,
-          );
-          proposals = await this.proposalService.filterBySearch(
-            proposals,
+            sort,
             search,
           );
-          proposals = this.proposalService.sortProposals(proposals, sort);
-
-          const ordered = proposals.flatMap((proposal) => {
-            const pair = byGovActionId.get(
-              `${proposal.txHash}#${proposal.index}`,
-            );
-            return pair === undefined ? [] : [{ ...pair, proposal }];
-          });
           // The details page opens a row as it is, without reading the
-          // proposal again, so each carries its document and authors.
+          // proposal again, so each carries its document and authors. The
+          // documents share one budget: a history with many unreachable
+          // anchors would otherwise wait out ENRICH_TIMEOUT_MS on each, past
+          // the frontend's 30 s timeout. A row resolved after the budget is
+          // sent without its document; the fetch carries on and fills the
+          // metadata service's cache for the next read.
+          const deadline = Date.now() + VOTE_HISTORY_DOCUMENT_BUDGET_MS;
           return mapLimit(ordered, ENRICH_CONCURRENCY, async (pair) => ({
             ...pair,
-            proposal: await this.proposalService.withDocument(pair.proposal),
+            proposal: await this.proposalService.withDocument(
+              pair.proposal,
+              Math.min(ENRICH_TIMEOUT_MS, Math.max(0, deadline - Date.now())),
+            ),
           }));
         }),
     );
+  }
+
+  /**
+   * The DRep's votes without each action's document: enough for the routes
+   * that only ask which actions it voted on, and how.
+   */
+  async getVoteRows(drepId: string): Promise<VoteResponse[]> {
+    return this.cacheService.getOrSet('drepVoteRows', { drepId }, () =>
+      asHttp(() => this.votePairs(drepId)),
+    );
+  }
+
+  private async votePairs(
+    drepId: string,
+    selectedTypes: GovernanceActionType[] = [],
+    sort?: GovernanceActionSortMode,
+    search?: string,
+  ): Promise<VoteResponse[]> {
+    const candidates = legacyDRepCandidates(drepId);
+
+    const dreps = withMethod(
+      this.chain.governance.dreps,
+      'listVotes',
+      'governance.dreps.listVotes',
+    );
+
+    // A bare hash names two possible credentials; which one is
+    // registered is settled by reading the DRep, since a vote listing
+    // for an unknown DRep is not an error on every provider.
+    const id =
+      candidates.length === 1
+        ? candidates[0]
+        : ((await this.findDRep(candidates))?.id ?? null);
+
+    // The legacy statement answered an unknown DRep with no rows.
+    if (id === null) {
+      return [];
+    }
+
+    // The listing carries voted AND not-voted rows, and it is paged like
+    // every other collection, so the whole of it is read rather than
+    // whichever prefix the first page happened to hold.
+    let rows: DRepVoteRow[];
+    try {
+      rows = await readAll(
+        (page) => dreps.listVotes(id, { ...page, voted: true }),
+        { label: 'drep vote listing' },
+      );
+    } catch (error) {
+      if (isNotFound(error)) {
+        return [];
+      }
+      throw error;
+    }
+
+    // A row names the action it is about; the legacy response carries
+    // the whole proposal, which the snapshot already holds.
+    const byId = new Map(
+      (await this.proposalService.getProposals('')).map((proposal) => [
+        proposal.id,
+        proposal,
+      ]),
+    );
+
+    // The legacy vote row named its DRep by the raw hex hash.
+    const legacyDRepId = drepIdToHex(id);
+    const pairs = rows.flatMap((row) =>
+      this.toLegacyVotePair(legacyDRepId, row, byId),
+    );
+
+    // Filter and sort on the proposal side, as the legacy service did.
+    const byGovActionId = new Map(
+      pairs.map((pair) => [
+        `${pair.proposal.txHash}#${pair.proposal.index}`,
+        pair,
+      ]),
+    );
+
+    let proposals = pairs.map((pair) => pair.proposal);
+    proposals = this.proposalService.filterByType(proposals, selectedTypes);
+    proposals = await this.proposalService.filterBySearch(proposals, search);
+    proposals = this.proposalService.sortProposals(proposals, sort);
+
+    return proposals.flatMap((proposal) => {
+      const pair = byGovActionId.get(`${proposal.txHash}#${proposal.index}`);
+      return pair === undefined ? [] : [{ ...pair, proposal }];
+    });
   }
 
   /**

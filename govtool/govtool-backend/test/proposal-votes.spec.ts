@@ -36,13 +36,16 @@ function controller(votes: VoteResponse[]) {
     proposal: proposal(TX_A, 0),
     vote: null,
   } satisfies GetProposalResponse);
+  const getVoteRows = jest.fn().mockResolvedValue(votes);
+  // The vote history with documents: these routes must not wait on it.
   const getVotes = jest.fn().mockResolvedValue(votes);
   return {
     list,
+    getVoteRows,
     getVotes,
     controller: new ProposalController(
       { list, get } as unknown as ProposalService,
-      { getVotes } as unknown as DRepService,
+      { getVoteRows, getVotes } as unknown as DRepService,
     ),
   };
 }
@@ -57,6 +60,13 @@ describe('GET /proposal/get with drepId', () => {
     });
   });
 
+  it("reads the DRep's votes without resolving their documents", async () => {
+    const { controller: c, getVoteRows, getVotes } = controller([]);
+    await c.get(`${TX_A}#0`, DREP_HEX);
+    expect(getVoteRows).toHaveBeenCalledWith(DREP_HEX);
+    expect(getVotes).not.toHaveBeenCalled();
+  });
+
   it('returns null when the DRep voted on other actions only', async () => {
     const { controller: c } = controller([
       { vote, proposal: proposal(TX_B, 0) },
@@ -67,31 +77,34 @@ describe('GET /proposal/get with drepId', () => {
   });
 
   it('reads no votes for the "undefined" a disconnected frontend sends', async () => {
-    const { controller: c, getVotes } = controller([]);
+    const { controller: c, getVoteRows } = controller([]);
     await expect(c.get(`${TX_A}#0`, 'undefined')).resolves.toMatchObject({
       vote: null,
     });
-    expect(getVotes).not.toHaveBeenCalled();
+    expect(getVoteRows).not.toHaveBeenCalled();
   });
 });
 
 describe('GET /proposal/list with drepId', () => {
   it('leaves out the actions the DRep has voted on', async () => {
-    const { controller: c, list } = controller([
-      { vote, proposal: proposal(TX_B, 3) },
-    ]);
+    const {
+      controller: c,
+      list,
+      getVotes,
+    } = controller([{ vote, proposal: proposal(TX_B, 3) }]);
     await c.list(undefined, undefined, undefined, '0', '10', DREP_HEX);
     expect(list).toHaveBeenCalledWith(
       expect.objectContaining({ excludedIds: new Set([`${TX_B}#3`]) }),
     );
+    expect(getVotes).not.toHaveBeenCalled();
   });
 
   it('excludes nothing without a DRep', async () => {
-    const { controller: c, list, getVotes } = controller([]);
+    const { controller: c, list, getVoteRows } = controller([]);
     await c.list();
     expect(list).toHaveBeenCalledWith(
       expect.objectContaining({ excludedIds: new Set() }),
     );
-    expect(getVotes).not.toHaveBeenCalled();
+    expect(getVoteRows).not.toHaveBeenCalled();
   });
 });

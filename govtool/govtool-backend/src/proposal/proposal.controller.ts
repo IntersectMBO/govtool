@@ -66,13 +66,14 @@ export class ProposalController {
 
   /**
    * The DRep's votes, or none when `drepId` names no DRep: a disconnected
-   * frontend sends the literal text "undefined".
+   * frontend sends the literal text "undefined". Only the voted actions and
+   * the votes are read here, so the rows come without their documents.
    */
   private async votesOf(drepId?: string): Promise<VoteResponse[]> {
     if (!drepId || tryLegacyDRepCandidates(drepId) === undefined) {
       return [];
     }
-    return this.drepService.getVotes(drepId);
+    return this.drepService.getVoteRows(drepId);
   }
 
   @Get('enacted-details')

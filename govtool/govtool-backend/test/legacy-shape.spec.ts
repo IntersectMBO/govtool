@@ -2202,6 +2202,63 @@ describe('GET /drep/getVotes/:drepId', () => {
     });
   });
 
+  it('stops waiting for documents once the shared budget is spent', async () => {
+    // A history full of unreachable anchors must not wait out the
+    // per-document timeout on each of them, past the frontend's 30 s timeout.
+    jest.useFakeTimers();
+    try {
+      const txs = Array.from({ length: 24 }, (_, i) =>
+        i.toString(16).padStart(2, '0').repeat(32),
+      );
+      const service = drepService(
+        {
+          governance: {
+            dreps: {
+              listVotes: () =>
+                voteRows(
+                  txs.map((tx) => ({
+                    voted: true,
+                    action: { id: actionId(tx, 0), type: 'InfoAction' },
+                    choice: 'yes',
+                    anchor: null,
+                    txRef: { txHash: '9'.repeat(64) },
+                  })),
+                ),
+            },
+            proposals: {
+              list: () =>
+                Promise.resolve(
+                  page(
+                    txs.map((tx) =>
+                      govAction({ id: actionId(tx, 0), txHash: tx }),
+                    ),
+                  ),
+                ),
+            },
+          },
+        },
+        {
+          getMetadata: () => new Promise(() => {}),
+          getCipMetadata: () => Promise.reject(new Error('unused')),
+          refresh: () => Promise.reject(new Error('unused')),
+          getReport: () => Promise.resolve(null),
+          listReports: () => Promise.resolve([]),
+        },
+      );
+
+      let settled = false;
+      const votes = service.getVotes(DREP_ID).finally(() => {
+        settled = true;
+      });
+      // Three rounds of eight at 4 s each would take 12 s.
+      await jest.advanceTimersByTimeAsync(5_100);
+      expect(settled).toBe(true);
+      await expect(votes).resolves.toHaveLength(24);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('drops the not-voted rows the listing also carries', async () => {
     // The contract's listing covers actions voted AND not voted, so the
     // participation denominator matches the list. The legacy endpoint returns

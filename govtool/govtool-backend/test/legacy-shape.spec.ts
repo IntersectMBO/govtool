@@ -2007,6 +2007,49 @@ describe('GET /proposal/get/:proposalId', () => {
   );
 });
 
+describe('GET /proposal/get/:proposalId caching', () => {
+  it('reads an action again once its entry expires, rather than serving it stale', async () => {
+    jest.useFakeTimers();
+    try {
+      let yes = '1000000';
+      const drepYes = () =>
+        govAction().voteAggregates!.map((aggregate) =>
+          aggregate.role === 'drep' ? { ...aggregate, yes } : aggregate,
+        );
+      const cache = new CacheService({
+        get: () => ({
+          cacheDurationSeconds: 20,
+          drepListCacheDurationSeconds: 600,
+          cacheMaxEntries: 1_000,
+        }),
+      } as unknown as ConfigService);
+      const service = new ProposalService(
+        chain({
+          governance: {
+            proposals: {
+              get: () =>
+                Promise.resolve(env(govAction({ voteAggregates: drepYes() }))),
+            },
+          },
+        }),
+        cache,
+        null,
+      );
+
+      const first = await service.get(`${TX}#0`);
+      // A new epoch's snapshot moves the tally while the entry sits idle.
+      yes = '7000000';
+      jest.advanceTimersByTime(60_000);
+      const second = await service.get(`${TX}#0`);
+
+      expect(first.proposal.dRepYesVotes).toBe(1000000);
+      expect(second.proposal.dRepYesVotes).toBe(7000000);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+});
+
 describe('GET /proposal/enacted-details', () => {
   it('returns the five legacy keys, with null row ids', async () => {
     const service = proposalService({

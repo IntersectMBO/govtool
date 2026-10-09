@@ -301,11 +301,21 @@ export class ProposalService {
   private getProposalSnapshot(
     search: string,
   ): Promise<ProposalSnapshotEntry[]> {
-    return this.cacheService.getOrSetStaleWhileRevalidate(
-      this.proposalListSnapshotNamespace,
-      search,
-      () => this.fetchProposals(search),
-    );
+    // The full snapshot is refreshed by the warmer after every block, so
+    // serving it stale while it refreshes costs one block at most. A single
+    // action is only read on request: served stale, the first view after a
+    // quiet spell would show tallies from whenever it was last asked for.
+    return search === ''
+      ? this.cacheService.getOrSetStaleWhileRevalidate(
+          this.proposalListSnapshotNamespace,
+          search,
+          () => this.fetchProposals(search),
+        )
+      : this.cacheService.getOrSet(
+          this.proposalListSnapshotNamespace,
+          search,
+          () => this.fetchProposals(search),
+        );
   }
 
   async warmActiveProposalSnapshot(): Promise<void> {

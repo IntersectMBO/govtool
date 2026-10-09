@@ -130,9 +130,15 @@ const attemptOne = (
     headers: { "user-agent": "drep-metadata-api", accept: "application/json, */*" },
     agent: false,
     // Connect to the address that was checked, never a fresh DNS answer.
+    // Answered on the next tick, as a real lookup is: answered at once, a
+    // connect that fails at once (ENETUNREACH to an IPv6 address on a host
+    // without IPv6) destroys the socket before TLS sets its server name, and
+    // https.request throws instead of emitting the error.
     lookup: ((_host: string, opts: dns.LookupOptions, cb: any) => {
-      if (opts && opts.all) cb(null, [{ address, family }]);
-      else cb(null, address, family);
+      process.nextTick(() => {
+        if (opts && opts.all) cb(null, [{ address, family }]);
+        else cb(null, address, family);
+      });
     }) as any,
   };
   if (isHttps && !net.isIP(hostname)) options.servername = hostname;

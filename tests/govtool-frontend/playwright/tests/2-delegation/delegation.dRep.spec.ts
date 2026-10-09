@@ -66,9 +66,12 @@ test("2N. Should show DRep information on details page", async ({
   await dRepRegistrationPage.confirmBtn.click();
 
   // Add an assertion to prevent clicking on "View Your dRep Details".
+  // The card shows once the registration is on chain and the frontend's
+  // 15 s status check has read it back, which on preview takes longer than
+  // a minute.
   await expect(
     dRepPage.getByTestId("dRep-id-display-card-dashboard")
-  ).toContainText(wallet.dRepId, { timeout: 60_000 });
+  ).toContainText(wallet.dRepId, { timeout: environments.txTimeOut });
   await dRepPage.getByTestId("view-drep-details-button").click();
 
   // Verification

@@ -128,7 +128,9 @@ test("3P. Should reject invalid edit dRep metadata", async ({ page }) => {
   await editDRepPage.metadataUrlInput.fill(invalidMetadataAnchor);
   await editDRepPage.submitBtn.click();
 
+  // A web page is not a CIP-119 document: GovTool says so with its own
+  // "not in the expected format" dialog, as the old validator classified it.
   await expect(page.getByTestId("modal")).toHaveText(
-    /your external data does not/i
+    /your external data (does not|is not in the expected format)/i
   );
 });

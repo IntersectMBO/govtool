@@ -43,11 +43,26 @@ export class CacheService {
   constructor(private readonly configService: ConfigService) {}
 
   /**
-   * Drops the wallet-state namespaces the first time a block is seen. The
-   * warmer reports the tip, and `/transaction/status` the block a confirmed
-   * transaction landed in, which can be ahead of the warmer's last tick.
-   * Anyone can ask for a transaction's status, so only a newer block clears:
-   * at most once per block, as the warmer alone would.
+   * Drops the wallet-state namespaces when the warmer reads a tip it has not
+   * seen. A tip below the last one is a rollback, or a chain reset under a
+   * running backend (a devnet restart, a db-sync restore): it clears too, and
+   * becomes the mark, so later blocks clear again instead of waiting for the
+   * chain to pass its old height.
+   */
+  noteTip(blockNo: number): void {
+    if (blockNo === this.latestBlockNo) {
+      return;
+    }
+
+    this.latestBlockNo = blockNo;
+    this.clearWalletState();
+  }
+
+  /**
+   * Drops the wallet-state namespaces for the block a confirmed transaction
+   * landed in, which can be ahead of the warmer's last tick. Anyone can ask
+   * for a transaction's status, so only a newer block clears: at most once
+   * per block, and an old transaction cannot move the mark back.
    */
   noteBlock(blockNo: number): void {
     if (this.latestBlockNo !== null && blockNo <= this.latestBlockNo) {
@@ -55,10 +70,7 @@ export class CacheService {
     }
 
     this.latestBlockNo = blockNo;
-
-    for (const namespace of WALLET_STATE_NAMESPACES) {
-      this.caches.delete(namespace);
-    }
+    this.clearWalletState();
   }
 
   getOrSet<T>(
@@ -200,6 +212,12 @@ export class CacheService {
 
   drepListTtlSeconds(): number {
     return this.configService.get().drepListCacheDurationSeconds;
+  }
+
+  private clearWalletState(): void {
+    for (const namespace of WALLET_STATE_NAMESPACES) {
+      this.caches.delete(namespace);
+    }
   }
 
   private getNamespaceCache(namespace: string): NamespaceCache {

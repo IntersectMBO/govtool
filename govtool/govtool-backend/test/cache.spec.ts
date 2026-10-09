@@ -113,3 +113,60 @@ describe('CacheService.noteBlock', () => {
     await expect(read(cache, 'drepVotes', 'drep1')).resolves.toBe('cached');
   });
 });
+
+describe('CacheService.noteTip', () => {
+  const read = (cache: CacheService, namespace: string, key: string) =>
+    cache.getOrSet(namespace, key, () => Promise.resolve('fresh'));
+
+  it('clears once per tip, however often the warmer reads it', async () => {
+    const cache = new CacheService(configWith(10));
+    cache.noteTip(100);
+    cache.set('drepVotes', 'drep1', 'cached');
+
+    cache.noteTip(100);
+
+    await expect(read(cache, 'drepVotes', 'drep1')).resolves.toBe('cached');
+  });
+
+  it('clears on a rollback, and on each block after it', async () => {
+    const cache = new CacheService(configWith(10));
+    cache.noteTip(100);
+    cache.set('drepVotes', 'drep1', 'from the dropped block');
+
+    cache.noteTip(99);
+
+    await expect(read(cache, 'drepVotes', 'drep1')).resolves.toBe('fresh');
+
+    // The chain grows back over a height it already reported once.
+    cache.set('drepVotes', 'drep1', 'before block 100 again');
+    cache.noteTip(100);
+
+    await expect(read(cache, 'drepVotes', 'drep1')).resolves.toBe('fresh');
+  });
+
+  it('clears again after a chain reset, long before the old height', async () => {
+    const cache = new CacheService(configWith(10));
+    cache.noteTip(50_000);
+
+    cache.noteTip(3);
+    cache.set('drepInfo', 'drep1', 'before the registration');
+    cache.noteTip(4);
+
+    await expect(read(cache, 'drepInfo', 'drep1')).resolves.toBe('fresh');
+  });
+
+  it('lets a transaction move the mark forward but never back', async () => {
+    const cache = new CacheService(configWith(10));
+    cache.noteTip(100);
+    cache.noteBlock(101);
+    cache.set('drepVotes', 'drep1', 'after the vote');
+
+    // An old transaction cannot lower the mark, so 101 does not clear twice.
+    cache.noteBlock(5);
+    cache.noteBlock(101);
+
+    await expect(read(cache, 'drepVotes', 'drep1')).resolves.toBe(
+      'after the vote',
+    );
+  });
+});

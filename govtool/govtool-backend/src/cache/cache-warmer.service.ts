@@ -59,7 +59,7 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
       const latestBlockNo = await this.getLatestBlockNo();
 
       if (latestBlockNo !== null) {
-        this.cacheService.noteBlock(latestBlockNo);
+        this.cacheService.noteTip(latestBlockNo);
       }
 
       if (

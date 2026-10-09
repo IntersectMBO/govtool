@@ -20,6 +20,8 @@ type GovernanceActionDetailsCardProps = {
   metadataIssues?: MetadataIssue[];
   isInProgress?: boolean;
   isValidating?: boolean;
+  /** The action's document is being read for its authors. */
+  isDocumentLoading?: boolean;
   isVoter?: boolean;
   onMetadataRecovered?: () => void;
   vote?: ProposalVote | null;
@@ -33,6 +35,7 @@ export const GovernanceActionDetailsCard = ({
   isInProgress,
   isVoter,
   isValidating,
+  isDocumentLoading,
   onMetadataRecovered,
   vote,
   proposal,
@@ -76,6 +79,7 @@ export const GovernanceActionDetailsCard = ({
         isSubmitted={isVoteSubmitted}
         proposal={proposal}
         isValidating={isValidating}
+        isDocumentLoading={isDocumentLoading}
         onMetadataRecovered={onMetadataRecovered}
       />
       <GovernanceActionDetailsCardVotes

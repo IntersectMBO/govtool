@@ -33,7 +33,7 @@ export function createSystemApi(ctx: Ctx): SystemApi {
         const block = tip.block_height ?? tip.block_no;
         health = {
           status: lag > STALE_AFTER_SECONDS ? 'degraded' : 'healthy',
-          tip: { epoch: tip.epoch_no, slot: tip.abs_slot, ...(block == null ? {} : { block }), time: at },
+          tip: { epoch: tip.epoch_no, slot: tip.abs_slot, ...(block == null ? {} : { block }), hash: tip.hash, time: at },
           lastSuccessfulSyncAt: at,
           secondsSinceLastUpdate: lag,
           ...(lag > STALE_AFTER_SECONDS ? { message: `tip is ${lag} s old` } : {}),

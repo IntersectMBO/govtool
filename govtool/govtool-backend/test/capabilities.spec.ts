@@ -584,6 +584,8 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
     const search = (term: string) =>
       service.list({ type: [], page: 0, pageSize: 10, search: term });
 
+    await service.warmDocuments();
+
     expect((await search('bridge')).elements.map((e) => e.index)).toEqual([0]);
     expect((await search('BECAUSE')).total).toBe(1);
     expect((await search('nowhere')).total).toBe(0);
@@ -620,49 +622,65 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
       });
       expect(body.elements.map((e) => e.index)).toEqual([1]);
     }
-    // Only the matched row's own document, to fill the page: the search
-    // itself never asked for one.
-    expect(getMetadata.mock.calls.map(([, url]) => url)).toEqual([
-      'https://x/1.jsonld',
-      'https://x/1.jsonld',
-    ]);
+    // Neither the search nor the page asked for a document, and an id search
+    // does not wait for the warmer.
+    expect(getMetadata).not.toHaveBeenCalled();
   });
 
-  it('answers a text search within its wait, however many documents are slow', async () => {
-    jest.useFakeTimers();
-    try {
-      // Forty documents that never resolve: on demand, eight at a time and
-      // four seconds each, they would take twenty seconds.
-      const actions = Array.from({ length: 40 }, (_, index) =>
-        govAction({
-          id: actionId(TX, index),
-          index,
-          anchor: anchor(`https://x/${index}.jsonld`),
-        }),
-      );
-      const service = new ProposalService(
-        chain({
-          governance: {
-            proposals: { list: () => Promise.resolve(page(actions)) },
-          },
-        }),
-        passthroughCache(),
-        { ...metadataService({}), getMetadata: () => new Promise(() => {}) },
-      );
-      let answered = false;
-      const pending = service
-        .list({ type: [], page: 0, pageSize: 10, search: 'bridge' })
-        .then((body) => {
-          answered = true;
-          return body;
-        });
+  it('refuses a text search until every document has had an answer', async () => {
+    let serviceUp = false;
+    const actions = [
+      govAction({ anchor: anchor('https://x/bridge.jsonld') }),
+      govAction({
+        id: actionId(TX, 1),
+        index: 1,
+        anchor: anchor('https://x/gone.jsonld'),
+      }),
+    ];
+    const service = new ProposalService(
+      chain({
+        governance: {
+          proposals: { list: () => Promise.resolve(page(actions)) },
+        },
+      }),
+      passthroughCache(),
+      {
+        ...metadataService({}),
+        getMetadata: (hash, url) => {
+          if (!serviceUp) return Promise.reject(new Error('unreachable'));
+          return Promise.resolve(
+            url === 'https://x/bridge.jsonld'
+              ? {
+                  ok: true,
+                  hash,
+                  body: { body: { title: 'Fund the Bridge' } },
+                  fetchedAt: '2026-10-02T00:00:00Z',
+                }
+              : {
+                  ok: false,
+                  code: 'FETCH_ERROR',
+                  category: 'NETWORK',
+                  message: 'getaddrinfo ENOTFOUND x',
+                  checkedAt: '2026-10-02T00:00:00Z',
+                },
+          );
+        },
+      },
+    );
+    const search = (term: string) =>
+      service.list({ type: [], page: 0, pageSize: 10, search: term });
 
-      await jest.advanceTimersByTimeAsync(5_000);
-      expect(answered).toBe(true);
-      expect((await pending).total).toBe(0);
-    } finally {
-      jest.useRealTimers();
-    }
+    // Nothing asked yet, then the metadata service unreachable: no answer.
+    await expect(search('bridge')).rejects.toMatchObject({ status: 503 });
+    await service.warmDocuments();
+    await expect(search('bridge')).rejects.toMatchObject({ status: 503 });
+    // An id needs no document.
+    expect((await search(`${TX}#1`)).total).toBe(1);
+
+    // Every anchor answered, one of them with a failure: the search runs.
+    serviceUp = true;
+    await service.warmDocuments();
+    expect((await search('bridge')).elements.map((e) => e.index)).toEqual([0]);
   });
 
   it('finds a DRep by its name once the warmer has resolved it', async () => {
@@ -691,10 +709,11 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
     const search = (term: string) =>
       service.list({ status: [], page: 0, pageSize: 10, search: term });
 
-    // Names are document text: none is known before the warmer runs.
-    expect((await search('alice')).total).toBe(0);
+    // Names are document text: before the warmer has fetched them a name
+    // search would miss every DRep, so it refuses.
+    await expect(search('alice')).rejects.toMatchObject({ status: 503 });
 
-    await service.warmSearchNames();
+    await service.warmDocuments();
 
     const found = await search('ALICE ex');
     expect(found.total).toBe(1);
@@ -715,6 +734,41 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
     expect(sorted.elements.every((row) => !('votesLastYear' in row))).toBe(
       true,
     );
+  });
+
+  it('carries the reason a DRep document failed in metadataError', async () => {
+    const gone = drep({ anchor: anchor('https://x/gone.jsonld') });
+    const cache = passthroughCache();
+    const api = chain({
+      governance: { dreps: { list: () => Promise.resolve(page([gone])) } },
+      system: { getCapabilities: () => Promise.resolve(env(PROVIDER)) },
+    });
+    const service = new DRepService(
+      api,
+      new ProposalService(api, cache, null),
+      cache,
+      {
+        ...metadataService({}),
+        getMetadata: () =>
+          Promise.resolve({
+            ok: false,
+            code: 'HASH_MISMATCH',
+            category: 'INVALID_CONTENT',
+            message: 'Hash of fetched data does not match',
+            servedHash: 'f'.repeat(64),
+            checkedAt: '2026-10-09T00:00:00Z',
+          }),
+      },
+    );
+
+    await service.warmDocuments();
+    const [row] = (await service.list({ status: [], page: 0, pageSize: 10 }))
+      .elements;
+
+    expect(row.metadataError).toBe(
+      'HASH_MISMATCH: Hash of fetched data does not match',
+    );
+    expect(row.givenName).toBeNull();
   });
 });
 

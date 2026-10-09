@@ -32,8 +32,8 @@ export function createSystemApi(ctx: Ctx): SystemApi {
     getHealth: async () => {
       let health: ProviderHealth;
       try {
-        const [tip] = await ctx.db.query<{ epoch_no: number; slot_no: string; block_no: string; time: Date }>(
-          `SELECT epoch_no, slot_no, block_no, time FROM block
+        const [tip] = await ctx.db.query<{ epoch_no: number; slot_no: string; block_no: string; hash: string; time: Date }>(
+          `SELECT epoch_no, slot_no, block_no, encode(hash, 'hex') AS hash, time FROM block
             WHERE block_no IS NOT NULL ORDER BY id DESC LIMIT 1`,
         );
         if (!tip) {
@@ -43,7 +43,7 @@ export function createSystemApi(ctx: Ctx): SystemApi {
           const lag = Math.max(0, Math.round((Date.now() - new Date(at).getTime()) / 1000));
           health = {
             status: lag > STALE_AFTER_SECONDS ? 'degraded' : 'healthy',
-            tip: { epoch: tip.epoch_no, slot: toInt(tip.slot_no), block: toInt(tip.block_no), time: at },
+            tip: { epoch: tip.epoch_no, slot: toInt(tip.slot_no), block: toInt(tip.block_no), hash: tip.hash, time: at },
             lastSuccessfulSyncAt: at,
             secondsSinceLastUpdate: lag,
             ...(lag > STALE_AFTER_SECONDS ? { message: `tip is ${lag} s old` } : {}),

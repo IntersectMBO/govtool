@@ -7,6 +7,7 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { SearchNotReady } from "@molecules";
 import { ValidatedGovernanceVotedOnCard } from "@organisms";
 
 type DashboardGovernanceActionsVotedOnProps = {
@@ -24,7 +25,8 @@ export const DashboardGovernanceActionsVotedOn = ({
 
   const {
     data: votes,
-    areDRepVotesLoading
+    areDRepVotesLoading,
+    isSearchNotReady,
   } = useGetDRepVotesQuery(chosenFilters, chosenSorting, searchPhrase);
 
   const proposals = useMemo(() =>
@@ -35,6 +37,8 @@ export const DashboardGovernanceActionsVotedOn = ({
     <Box py={4} display="flex" justifyContent="center">
       <CircularProgress />
     </Box>
+  ) : isSearchNotReady ? (
+    <SearchNotReady />
   ) : (
     <>
       {!votes.length ? (

@@ -34,15 +34,19 @@ const text = (object: unknown, key: string): string | null => {
   return typeof value === 'string' && value.trim() !== '' ? value : null;
 };
 
+/** A document's `body`, when it has one. */
+export function documentBody(document: Json | undefined): Json | undefined {
+  const body = document?.['body'];
+  return isObject(body) ? body : undefined;
+}
+
 /** The document's `body`, or undefined when it cannot be had in time. */
 export async function resolveBody(
   service: MetadataServiceV1 | null,
   anchor: Anchor,
   timeoutMs = ENRICH_TIMEOUT_MS,
 ): Promise<Json | undefined> {
-  const document = await resolveDocument(service, anchor, timeoutMs);
-  const body = document?.['body'];
-  return isObject(body) ? body : undefined;
+  return documentBody(await resolveDocument(service, anchor, timeoutMs));
 }
 
 /** The whole anchored document, or undefined when it cannot be had in time. */

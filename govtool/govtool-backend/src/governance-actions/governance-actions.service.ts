@@ -21,15 +21,10 @@ import { legacyGovActionId } from 'src/common/legacy-ids';
 import { LegacyNetwork } from 'src/common/legacy-network';
 import { toLegacyEpochParams } from 'src/epoch/epoch.service';
 import type { LegacyEpochParams } from 'src/epoch/epoch.type';
-import {
-  ENRICH_CONCURRENCY,
-  mapLimit,
-  proposalFields,
-  resolveDocument,
-} from 'src/metadata/enrich';
+import { proposalFields, resolveDocument } from 'src/metadata/enrich';
 import { MetadataService } from 'src/metadata/metadata.service';
 import { MetadataStandard } from 'src/metadata/metadata.type';
-import { ProposalService } from 'src/proposal/proposal.service';
+import { ProposalService, isActionIdTerm } from 'src/proposal/proposal.service';
 import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
 import { SystemService } from 'src/system/system.service';
 import {
@@ -49,7 +44,6 @@ import type {
   GovernanceActionSort,
   SignatureVerificationResult,
 } from './governance-actions.type';
-import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { verifyAuthorWitness, type AuthorWitnessInput } from './signature';
 
 const PDF_TIMEOUT_MS = 10_000;
@@ -76,10 +70,6 @@ const bodyOf = (
  */
 @Injectable()
 export class GovernanceActionsService {
-  /** Title and abstract per (hash, url), for search and list rows. */
-  private readonly summaryCache = new DocumentSummaryCache();
-  private warming = false;
-
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
     @Inject(METADATA) private readonly metadata: MetadataServiceV1 | null,
@@ -108,35 +98,34 @@ export class GovernanceActionsService {
         let candidates = actions.filter((a) =>
           matchesGovernanceActionFilters(a, params.filters),
         );
-        let texts = new Map<string, GovernanceActionText>();
         if (params.search !== '') {
-          // Title and abstract are document text, so a search needs every
-          // candidate's; they are kept per (hash, url) between requests.
-          texts = await this.summaries(candidates);
+          // Title and abstract are document text, read from the documents
+          // the warmer fetched for every action. Until each has had an
+          // answer a search would leave some out, so it refuses instead.
+          if (
+            !isActionIdTerm(params.search) &&
+            !this.proposals.documentsReady
+          ) {
+            throw new ServiceUnavailableException({
+              errorType: 'ServiceUnavailableError',
+              message:
+                'Governance action documents are still being fetched, so a text search cannot cover them yet. Try again shortly.',
+            });
+          }
           candidates = candidates.filter((a) =>
-            matchesGovernanceActionSearch(
-              a,
-              texts.get(a.id) ?? NO_TEXT,
-              params.search,
-            ),
+            matchesGovernanceActionSearch(a, this.storedText(a), params.search),
           );
         }
         candidates.sort(compareGovernanceActions(params.sort));
         const start = (params.page - 1) * params.limit;
         const page = candidates.slice(start, start + params.limit);
-        if (params.search === '') texts = await this.summaries(page);
 
         const [schedule, committee] = await Promise.all([
           this.network.epochSchedule(),
           this.committeeFor(page),
         ]);
         return page.map((a) =>
-          toGovernanceActionListRow(
-            a,
-            schedule,
-            committee,
-            texts.get(a.id) ?? NO_TEXT,
-          ),
+          toGovernanceActionListRow(a, schedule, committee, this.storedText(a)),
         );
       }),
     );
@@ -157,18 +146,18 @@ export class GovernanceActionsService {
             message: `Governance action with ID '${txHash}#${index ?? '0'}' not found`,
           });
         }
-        const [schedule, committee, info, texts] = await Promise.all([
+        const [schedule, committee, info, text] = await Promise.all([
           this.network.epochSchedule(),
           this.committeeFor([action]),
           this.chain.network.getNetworkInfo(),
-          this.texts([action]),
+          this.text(action),
         ]);
         return toGovernanceActionDetailRow(
           action,
           schedule,
           committee,
           info.data.currentEpoch,
-          texts.get(action.id) ?? NO_TEXT,
+          text,
         );
       }),
     );
@@ -426,77 +415,35 @@ export class GovernanceActionsService {
   }
 
   /**
-   * Resolves every action's title and abstract into the summary cache, so
-   * the first search after a start or a new block does not wait on them.
-   * Expired entries are refreshed here and awaited by this run only; a
-   * search meanwhile is served the value already held. One run at a time;
-   * failures only leave entries unresolved or keep their previous value.
+   * An action's document text from the proposal routes' document store, or
+   * none when it is not stored: the list never fetches while a request waits.
    */
-  async warmSearchText(): Promise<void> {
-    if (this.metadata === null || this.warming) return;
-    this.warming = true;
-    try {
-      await this.summaries(await this.proposals.getActions(), true);
-    } finally {
-      this.warming = false;
-    }
+  private storedText(action: GovAction): GovernanceActionText {
+    const document = this.proposals.storedDocument({
+      url: action.anchor?.url ?? null,
+      hash: action.anchor?.dataHash ?? null,
+    });
+    return document === undefined ? NO_TEXT : this.textOf(document);
+  }
+
+  private textOf(document: Record<string, unknown>): GovernanceActionText {
+    return { ...(proposalFields(bodyOf(document)) ?? NO_TEXT), document };
   }
 
   /**
-   * Title and abstract only (what list rows and search read), through the
-   * summary cache. The detail route resolves the whole document instead.
+   * One action's document text for its detail page: the stored document, or
+   * fetched here when the store does not hold it, such as an action submitted
+   * since the last fill.
    */
-  private async summaries(
-    actions: GovAction[],
-    awaitRefresh = false,
-  ): Promise<Map<string, GovernanceActionText>> {
-    const out = new Map<string, GovernanceActionText>();
-    const metadata = this.metadata;
-    if (metadata === null) return out;
-    const summaries = await mapLimit(actions, ENRICH_CONCURRENCY, (a) => {
-      const url = a.anchor?.url ?? null;
-      const hash = a.anchor?.dataHash ?? null;
-      if (!url || !hash) return Promise.resolve(undefined);
-      return this.summaryCache.get(
-        hash,
-        url,
-        async () => {
-          const document = await resolveDocument(metadata, { url, hash });
-          if (document === undefined) return undefined;
-          const fields = proposalFields(bodyOf(document));
-          return {
-            title: fields?.title ?? null,
-            abstract: fields?.abstract ?? null,
-          };
-        },
-        { awaitRefresh },
-      );
-    });
-    actions.forEach((a, i) => {
-      const summary = summaries[i];
-      if (summary !== undefined) out.set(a.id, { ...NO_TEXT, ...summary });
-    });
-    return out;
-  }
-
-  private async texts(
-    actions: GovAction[],
-  ): Promise<Map<string, GovernanceActionText>> {
-    const out = new Map<string, GovernanceActionText>();
-    if (this.metadata === null) return out;
-    const docs = await mapLimit(actions, ENRICH_CONCURRENCY, (a) =>
-      resolveDocument(this.metadata, {
-        url: a.anchor?.url ?? null,
-        hash: a.anchor?.dataHash ?? null,
-      }),
-    );
-    actions.forEach((a, i) => {
-      const document = docs[i];
-      if (document === undefined) return;
-      const fields = proposalFields(bodyOf(document));
-      out.set(a.id, { ...(fields ?? NO_TEXT), document });
-    });
-    return out;
+  private async text(action: GovAction): Promise<GovernanceActionText> {
+    const anchor = {
+      url: action.anchor?.url ?? null,
+      hash: action.anchor?.dataHash ?? null,
+    };
+    const document =
+      this.proposals.storedDocument(anchor) ??
+      (await resolveDocument(this.metadata, anchor));
+    return document === undefined ? NO_TEXT : this.textOf(document);
   }
 
   /** GET against the operator-configured pdf API: bounded, no redirects. */

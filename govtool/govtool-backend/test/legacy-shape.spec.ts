@@ -658,12 +658,40 @@ describe('GET /transaction/status/:txId', () => {
           get: () => Promise.resolve(env({ txHash: TX, onChain: true })),
         },
       }),
+      passthroughCache(),
     );
     await expect(service.getTransactionStatus(TX)).resolves.toEqual({
       transactionConfirmed: true,
       // A vote is reachable only through its DRep or its action, so there is
       // no way to ask what a transaction hash voted on.
       votingProcedure: [],
+    });
+  });
+
+  it("drops the wallet's cached state once its transaction is confirmed", async () => {
+    const cache = passthroughCache();
+    const noteBlock = jest.spyOn(cache, 'noteBlock');
+    const service = new TransactionService(
+      chain({
+        transactions: {
+          get: () =>
+            Promise.resolve(
+              env({
+                txHash: TX,
+                onChain: true,
+                includedAt: { epoch: 1, slot: 98_123_456, block: 4_739_570 },
+              }),
+            ),
+        },
+      }),
+      cache,
+    );
+
+    await service.getTransactionStatus(TX);
+
+    expect(noteBlock).toHaveBeenCalledWith({
+      block: 4_739_570,
+      slot: 98_123_456,
     });
   });
 
@@ -674,6 +702,7 @@ describe('GET /transaction/status/:txId', () => {
           get: () => Promise.resolve(env({ txHash: TX, onChain: false })),
         },
       }),
+      passthroughCache(),
     );
     await expect(service.getTransactionStatus(TX)).resolves.toEqual({
       transactionConfirmed: false,
@@ -1846,6 +1875,7 @@ describe('GET /proposal/list', () => {
           listReports: () => Promise.resolve([]),
         },
       );
+      await service.warmDocuments();
       const body = await service.list({ type: [], page: 0, pageSize: 10 });
       expect(body.elements[0]).toMatchObject({
         title: 'Fund it',
@@ -1976,6 +2006,77 @@ describe('GET /proposal/get/:proposalId', () => {
         message: `Proposal with id: ${TX}#0 not found`,
       },
     });
+  });
+
+  it.each(['ratified', 'enacted', 'expired', 'dropped'] as const)(
+    '404s with the legacy message when the action is %s, so the frontend opens its history page',
+    async (status) => {
+      const service = proposalService({
+        governance: {
+          proposals: {
+            get: () =>
+              Promise.resolve(
+                env(
+                  govAction({
+                    lifecycle: { ...govAction().lifecycle, status },
+                  }),
+                ),
+              ),
+          },
+        },
+      });
+
+      await expect(service.get(`${TX}#0`)).rejects.toMatchObject({
+        status: 404,
+        response: {
+          errorType: 'NotFoundError',
+          message: `Proposal with id: ${TX}#0 not found`,
+        },
+      });
+    },
+  );
+});
+
+describe('GET /proposal/get/:proposalId caching', () => {
+  it('reads an action again once its entry expires, rather than serving it stale', async () => {
+    jest.useFakeTimers();
+    try {
+      let yes = '1000000';
+      const drepYes = () =>
+        govAction().voteAggregates!.map((aggregate) =>
+          aggregate.role === 'drep' ? { ...aggregate, yes } : aggregate,
+        );
+      const cache = new CacheService({
+        get: () => ({
+          cacheDurationSeconds: 20,
+          drepListCacheDurationSeconds: 600,
+          cacheMaxEntries: 1_000,
+        }),
+      } as unknown as ConfigService);
+      const service = new ProposalService(
+        chain({
+          governance: {
+            proposals: {
+              get: () =>
+                Promise.resolve(env(govAction({ voteAggregates: drepYes() }))),
+            },
+          },
+        }),
+        cache,
+        null,
+      );
+
+      const first = await service.get(`${TX}#0`);
+      // A new epoch's snapshot moves the tally while the entry sits idle.
+      yes = '7000000';
+      jest.advanceTimersByTime(60_000);
+      const second = await service.get(`${TX}#0`);
+
+      expect(first.proposal.dRepYesVotes).toBe(1000000);
+      expect(second.proposal.dRepYesVotes).toBe(7000000);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
 
@@ -2159,6 +2260,7 @@ describe('GET /drep/getVotes/:drepId', () => {
       },
     );
 
+    await service['proposalService'].warmDocuments();
     const [{ proposal }] = await service.getVotes(DREP_ID);
     expect(proposal).toMatchObject({
       title: 'Fund it',
@@ -2172,6 +2274,56 @@ describe('GET /drep/getVotes/:drepId', () => {
         },
       ],
     });
+  });
+
+  it('answers from the stored documents, without fetching any', async () => {
+    // A history full of unreachable anchors must not wait on them: the warmer
+    // fetches documents ahead, and the request reads only what it stored.
+    const txs = Array.from({ length: 24 }, (_, i) =>
+      i.toString(16).padStart(2, '0').repeat(32),
+    );
+    const getMetadata = jest.fn(() => new Promise<never>(() => {}));
+    const service = drepService(
+      {
+        governance: {
+          dreps: {
+            listVotes: () =>
+              voteRows(
+                txs.map((tx) => ({
+                  voted: true,
+                  action: { id: actionId(tx, 0), type: 'InfoAction' },
+                  choice: 'yes',
+                  anchor: null,
+                  txRef: { txHash: '9'.repeat(64) },
+                })),
+              ),
+          },
+          proposals: {
+            list: () =>
+              Promise.resolve(
+                page(
+                  txs.map((tx) =>
+                    govAction({ id: actionId(tx, 0), txHash: tx }),
+                  ),
+                ),
+              ),
+          },
+        },
+      },
+      {
+        getMetadata,
+        getCipMetadata: () => Promise.reject(new Error('unused')),
+        refresh: () => Promise.reject(new Error('unused')),
+        getReport: () => Promise.resolve(null),
+        listReports: () => Promise.resolve([]),
+      },
+    );
+
+    const votes = await service.getVotes(DREP_ID);
+
+    expect(votes).toHaveLength(24);
+    expect(votes[0].proposal.json).toBeNull();
+    expect(getMetadata).not.toHaveBeenCalled();
   });
 
   it('drops the not-voted rows the listing also carries', async () => {

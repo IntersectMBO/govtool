@@ -4,6 +4,7 @@ import {
   removeItemFromLocalStorage,
   getItemFromLocalStorage,
   PENDING_TRANSACTION_KEY,
+  VOTER_TRANSACTION_EXPIRED_KEY,
   wait,
 } from "@utils";
 import { getTransactionStatus } from "@services";
@@ -18,6 +19,14 @@ const TIME_TO_EXPIRE_TRANSACTION = 3 * 60 * 1000; // 3 MINUTES
 const TRANSACTION_REFRESH_TIME = 15 * 1000; // 15 SECONDS
 const DB_SYNC_REFRESH_TIME = 3 * 1000; // 3 SECONDS
 const DB_SYNC_MAX_ATTEMPTS = 10;
+
+/** The transactions that change what the voter info reports. */
+const VOTER_TRANSACTION_TYPES: readonly TransactionState["type"][] = [
+  "registerAsDrep",
+  "registerAsDirectVoter",
+  "retireAsDrep",
+  "retireAsDirectVoter",
+];
 
 type UsePendingTransactionProps = {
   isEnabled: boolean;
@@ -120,6 +129,14 @@ export const usePendingTransaction = ({
         // Still unresolved: keep polling until the change shows up or the
         // transaction expires, so "in progress" never stays up for good.
         if (!isSettled && isTransactionExpired(transaction.time)) {
+          // It may still land after this: the voter info keeps reading for a
+          // while (see useGetVoterInfo) rather than wait for a reload.
+          if (VOTER_TRANSACTION_TYPES.includes(type)) {
+            setItemToLocalStorage(
+              `${VOTER_TRANSACTION_EXPIRED_KEY}_${stakeKey}`,
+              Date.now(),
+            );
+          }
           addErrorAlert(t(`alerts.${type}.failed`));
           resetTransaction();
         }

@@ -75,6 +75,8 @@ type GovernanceActionDetailsCardDataProps = {
   isOneColumn: boolean;
   isSubmitted?: boolean;
   isValidating?: boolean;
+  /** The action's document is being read for its authors. */
+  isDocumentLoading?: boolean;
   /** Called when a retry makes the anchored metadata resolve. */
   onMetadataRecovered?: () => void;
   proposal: ProposalData;
@@ -88,6 +90,7 @@ export const GovernanceActionDetailsCardData = ({
   isOneColumn,
   isSubmitted,
   isValidating,
+  isDocumentLoading,
   onMetadataRecovered,
   proposal: {
     abstract,
@@ -409,10 +412,18 @@ export const GovernanceActionDetailsCardData = ({
         label={t("govActions.authors.title")}
         textVariant="longText"
         dataTestId="authors"
+        isValidating={isValidating || isDocumentLoading}
       >
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {/* With none to list, a document that did not load leaves the
+              authors unknown, which is not the same as a document that
+              lists none. */}
           {(authors ?? []).length <= 0
-            ? t("govActions.authors.noDataAvailable")
+            ? t(
+                jsonContent == null
+                  ? "govActions.authors.notLoaded"
+                  : "govActions.authors.noDataAvailable",
+              )
             : (authors ?? []).map((author) => (
               <Box
                 key={author.publicKey}

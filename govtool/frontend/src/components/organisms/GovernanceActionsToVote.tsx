@@ -9,6 +9,7 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
+import { SearchNotReady } from "@molecules";
 import { removeDuplicatedProposals } from "@utils";
 import { ValidatedGovernanceActionCard } from "@organisms";
 import { useMemo, useRef } from "react";
@@ -30,6 +31,7 @@ export const GovernanceActionsToVote = ({
     isProposalsFetching,
     isProposalsFetchingNextPage,
     isProposalsLoading,
+    isSearchNotReady,
     proposals,
     proposalsfetchNextPage,
     proposalsHaveNextPage,
@@ -58,9 +60,9 @@ export const GovernanceActionsToVote = ({
 
   return (
     <>
-      {!mappedProposals ||
-      isEnableLoading ||
-      isProposalsLoading ? (
+      {isSearchNotReady ? (
+        <SearchNotReady />
+      ) : !mappedProposals || isEnableLoading || isProposalsLoading ? (
         <Box
           sx={{
             alignItems: "center",

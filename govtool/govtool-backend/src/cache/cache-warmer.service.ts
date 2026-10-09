@@ -4,12 +4,11 @@ import {
   Logger,
   OnModuleDestroy,
   OnModuleInit,
-  Optional,
 } from '@nestjs/common';
 import type { ChainDataApiV1 } from '@govtool/data-providers/chain-data';
 
+import { BlockMark, CacheService, isSameBlock } from 'src/cache/cache.service';
 import { DRepService } from 'src/drep/drep.service';
-import { GovernanceActionsService } from 'src/governance-actions/governance-actions.service';
 import { ProposalService } from 'src/proposal/proposal.service';
 import { CHAIN_DATA } from 'src/providers/providers.module';
 
@@ -20,13 +19,13 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
   private readonly logger = new Logger(CacheWarmerService.name);
   private timer?: NodeJS.Timeout;
   private refreshing = false;
-  private lastBlockNo: number | null = null;
+  private lastTip: BlockMark | null = null;
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
+    private readonly cacheService: CacheService,
     private readonly drepService: DRepService,
     private readonly proposalService: ProposalService,
-    @Optional() private readonly governanceActions?: GovernanceActionsService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -54,12 +53,19 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
     const startedAt = Date.now();
 
     try {
-      const latestBlockNo = await this.getLatestBlockNo();
+      const tip = await this.getTip();
 
+      if (tip !== null) {
+        this.cacheService.noteTip(tip);
+      }
+
+      // The same block skips the refresh; a fork switch at the same height
+      // is another block, with its own tallies.
       if (
         !force &&
-        latestBlockNo !== null &&
-        latestBlockNo === this.lastBlockNo
+        tip !== null &&
+        this.lastTip !== null &&
+        isSameBlock(tip, this.lastTip)
       ) {
         return;
       }
@@ -87,7 +93,7 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
       if (failures.length === 0) {
         // Only a complete refresh marks the block done; otherwise the next
         // tick retries even if no new block has arrived.
-        this.lastBlockNo = latestBlockNo;
+        this.lastTip = tip;
         this.logger.log(
           `Snapshot caches refreshed in ${Date.now() - startedAt}ms`,
         );
@@ -99,15 +105,10 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
               `Could not warm ${what}: ${error instanceof Error ? error.message : String(error)}`,
             );
           });
-        warmText('governanceActions search text', () =>
-          this.governanceActions
-            ? this.governanceActions.warmSearchText()
-            : Promise.resolve(),
+        warmText('governance action documents', () =>
+          this.proposalService.warmDocuments(),
         );
-        warmText('proposal search text', () =>
-          this.proposalService.warmSearchText(),
-        );
-        warmText('DRep names', () => this.drepService.warmSearchNames());
+        warmText('DRep documents', () => this.drepService.warmDocuments());
       }
     } finally {
       this.refreshing = false;
@@ -119,10 +120,13 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
    * `SELECT MAX(block_no)` issued from here — the backend no longer holds a
    * database handle.
    */
-  private async getLatestBlockNo(): Promise<number | null> {
+  private async getTip(): Promise<BlockMark | null> {
     try {
       const { data } = await this.chain.system.getHealth();
-      return data.tip?.block ?? null;
+      const tip = data.tip;
+      return tip?.block === undefined
+        ? null
+        : { block: tip.block, slot: tip.slot, hash: tip.hash };
     } catch (error) {
       this.logger.warn(
         `Could not read the chain tip: ${error instanceof Error ? error.message : String(error)}`,

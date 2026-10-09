@@ -4,7 +4,11 @@ import { useSearchParams } from "react-router";
 import { Button } from "@atoms";
 import { GOV_ACTION_HISTORY_ITEMS_PER_PAGE } from "@consts";
 import { useGetGovernanceActionHistoryQuery, useTranslation } from "@hooks";
-import { GovernanceActionHistoryCard, GovernanceActionHistoryEmptyState } from "@molecules";
+import {
+  GovernanceActionHistoryCard,
+  GovernanceActionHistoryEmptyState,
+  SearchNotReady,
+} from "@molecules";
 
 import "./governanceActionHistory.css";
 
@@ -22,6 +26,7 @@ export const GovernanceActionHistoryList = () => {
   const {
     govActions,
     isGovActionsLoading,
+    isSearchNotReady,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -59,7 +64,9 @@ export const GovernanceActionHistoryList = () => {
         </Box>
       )}
 
-      {!isGovActionsLoading && !actions.length && (
+      {isSearchNotReady && <SearchNotReady />}
+
+      {!isGovActionsLoading && !isSearchNotReady && !actions.length && (
         <Box sx={{ paddingY: 3 }}>
           <GovernanceActionHistoryEmptyState
             title={t("governanceActionHistoryList.noResults.title")}

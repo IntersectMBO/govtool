@@ -3,6 +3,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getDRepVotes } from "@services";
+import { isSearchNotReady } from "@utils";
 import { VotedProposal } from "@/models";
 
 export const useGetDRepVotesQuery = (
@@ -12,7 +13,7 @@ export const useGetDRepVotesQuery = (
 ) => {
   const { dRepID, pendingTransaction } = useCardano();
 
-  const { data, isLoading, refetch, isFetching } = useQuery({
+  const { data, error, isLoading, refetch, isFetching } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepVotesKey,
       pendingTransaction.vote?.transactionHash,
@@ -57,6 +58,7 @@ export const useGetDRepVotesQuery = (
       actions: VotedProposal[];
     }[],
     areDRepVotesLoading: isLoading,
+    isSearchNotReady: isSearchNotReady(error),
     refetch,
     isFetching,
   };

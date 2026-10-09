@@ -6,6 +6,7 @@ import {
   PROPOSE_GOVERNANCE_ACTION_DOC_URL,
   REGISTER_DREP_DOC_URL,
   SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL,
+  docsPage,
 } from "@constants/docsUrl";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
@@ -33,32 +34,40 @@ test.describe("Logged in user", () => {
       context.waitForEvent("page"),
       page.getByTestId("delegate-learn-more-button").click(),
     ]);
-    await expect(delegationLearnMorepage).toHaveURL(DELEGATION_DOC_URL);
+    await expect(delegationLearnMorepage).toHaveURL(
+      docsPage(DELEGATION_DOC_URL)
+    );
 
     const [registerLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("d-rep-learn-more-button").click(),
     ]);
-    await expect(registerLearnMorepage).toHaveURL(REGISTER_DREP_DOC_URL);
+    await expect(registerLearnMorepage).toHaveURL(
+      docsPage(REGISTER_DREP_DOC_URL)
+    );
 
     const [directVoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("direct-voter-learn-more-button").first().click(),
     ]);
-    await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
+    await expect(directVoterLearnMorepage).toHaveURL(
+      docsPage(DIRECT_VOTER_DOC_URL)
+    );
 
     const [GA_LearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("list-gov-actions-learn-more-button").click(),
     ]);
-    await expect(GA_LearnMorepage).toHaveURL(GOVERNANCE_ACTION_DOC_URL);
+    await expect(GA_LearnMorepage).toHaveURL(
+      docsPage(GOVERNANCE_ACTION_DOC_URL)
+    );
 
     const [proposed_GA_VoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("propose-gov-action-learn-more-button").click(),
     ]);
     await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
-      PROPOSE_GOVERNANCE_ACTION_DOC_URL
+      docsPage(PROPOSE_GOVERNANCE_ACTION_DOC_URL)
     );
   });
 
@@ -75,14 +84,14 @@ test.describe("Logged in user", () => {
       context.waitForEvent("page"),
       dRepDirectoryPage.abstainInfoButton.click(),
     ]);
-    await expect(abstain_Info_Page).toHaveURL(ABSTAIN_VOTE_DOC_URL);
+    await expect(abstain_Info_Page).toHaveURL(docsPage(ABSTAIN_VOTE_DOC_URL));
 
     const [signal_No_Confidence_Info_Page] = await Promise.all([
       context.waitForEvent("page"),
       dRepDirectoryPage.signalNoConfidenceInfoButton.click(),
     ]);
     await expect(signal_No_Confidence_Info_Page).toHaveURL(
-      SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL
+      docsPage(SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL)
     );
   });
 

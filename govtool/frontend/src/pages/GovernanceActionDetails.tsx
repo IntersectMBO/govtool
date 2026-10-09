@@ -52,9 +52,13 @@ export const GovernanceActionDetails = () => {
   const fullProposalId = txHash && getFullGovActionId(txHash, +index);
   const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, +index);
 
+  // A row opened from a list carries its document, and so its authors, only
+  // when the backend held it. Without one the action is read again for it,
+  // while the page shows the row it was given.
+  const needsDocument = !!state?.proposal && state.proposal.json == null;
   const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
-    !state?.proposal,
+    !state?.proposal || needsDocument,
   );
   // TODO: Refactor this mess with proposals and metadata validation
   // once authors are existing in all CIP-108 metadata
@@ -63,7 +67,17 @@ export const GovernanceActionDetails = () => {
   );
 
   useEffect(() => {
-    if (data?.proposal) {
+    if (!data?.proposal) return;
+    if (needsDocument) {
+      // Only the document and its authors: the text on the page is the one
+      // already checked against the anchor.
+      const { json, authors } = data.proposal;
+      setExtendedProposal((prevProposal) => ({
+        ...prevProposal,
+        json,
+        authors,
+      }));
+    } else {
       setExtendedProposal(data.proposal);
     }
   }, [data?.proposal]);
@@ -186,7 +200,7 @@ export const GovernanceActionDetails = () => {
                 {t("back")}
               </Typography>
             </Link>
-            {isLoading ? (
+            {isLoading && !state?.proposal ? (
               <Box
                 alignItems="center"
                 display="flex"
@@ -199,6 +213,7 @@ export const GovernanceActionDetails = () => {
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
                   isDataMissing={metadataStatus}
+                  isDocumentLoading={needsDocument && isLoading}
                   metadataIssues={metadataIssues}
                   onMetadataRecovered={() =>
                     setValidationRevision((value) => value + 1)

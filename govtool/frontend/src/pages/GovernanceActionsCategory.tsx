@@ -8,6 +8,7 @@ import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
+  SearchNotReady,
 } from "@molecules";
 import { Footer, TopNav, ValidatedGovernanceActionCard } from "@organisms";
 import {
@@ -40,6 +41,7 @@ export const GovernanceActionsCategory = () => {
     isProposalsFetching,
     isProposalsFetchingNextPage,
     isProposalsLoading,
+    isSearchNotReady,
     proposals,
     proposalsfetchNextPage,
     proposalsHaveNextPage,
@@ -124,7 +126,9 @@ export const GovernanceActionsCategory = () => {
               {getProposalTypeLabel(category ?? "")}
             </Typography>
             {!isProposalsLoading ? (
-              !mappedData?.length ? (
+              isSearchNotReady ? (
+                <SearchNotReady />
+              ) : !mappedData?.length ? (
                 <EmptyStateGovernanceActionsCategory
                   category={category}
                   isSearch={!!debouncedSearchText.length}

@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { getGovernanceActionHistory } from "@services";
-import { toGovernanceActionId } from "@utils";
+import { isSearchNotReady, toGovernanceActionId } from "@utils";
 
 export const useGetGovernanceActionHistoryQuery = (
   search: string,
@@ -44,6 +44,7 @@ export const useGetGovernanceActionHistoryQuery = (
     govActions: data,
     isGovActionsLoading: isLoading,
     govActionsError: error,
+    isSearchNotReady: isSearchNotReady(error),
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,

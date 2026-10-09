@@ -3,6 +3,8 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Optional,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import type {
   ChainDataApiV1,
@@ -23,18 +25,21 @@ import {
 } from 'src/common/legacy-network';
 import { compareFiguresDescending, voteFigure } from 'src/common/vote-figures';
 import { toLegacyNullableNumber } from 'src/common/legacy';
-import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
+import {
+  BACKGROUND_METADATA,
+  CHAIN_DATA,
+  METADATA,
+} from 'src/providers/providers.module';
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 import {
-  ENRICH_CONCURRENCY,
-  mapLimit,
+  documentBody,
   proposalDocumentFields,
   proposalFields,
-  resolveBody,
   resolveDocument,
 } from 'src/metadata/enrich';
+import { DocumentStore, type Json } from 'src/metadata/document-store';
+import type { Anchor } from 'src/metadata/enrich';
 import { toLegacyDescription } from 'src/common/legacy-description';
-import { DocumentSummaryCache } from 'src/metadata/text-cache';
 import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import { readAll } from 'src/common/snapshot';
 import {
@@ -86,40 +91,46 @@ type ProposalSnapshotEntry = {
 };
 
 /**
- * The longest a text search waits for document text it has not cached. The
- * rest is matched from what the cache already holds; the fetches carry on and
- * fill it for the next search. Well inside the frontend's 30 s timeout, and
- * independent of how many actions are searched (a DRep's whole vote history).
- */
-const SEARCH_TEXT_WAIT_MS = 5_000;
-
-/**
  * A term that can only be an action id, or a prefix of one: a CIP-129
  * `gov_action1…` id, or a transaction hash (eight or more hex digits) with
- * an optional `#index`. Matched against ids alone, with no metadata wait.
+ * an optional `#index`. Matched against ids alone, with no document read.
  */
 const ACTION_ID_TERM = /^(gov_action1[0-9a-z]*|[0-9a-f]{8,}(#\d*)?)$/i;
 
-/** The CIP-108 strings a search matches, as the Haskell backend's did. */
-type ProposalSearchText = Pick<
-  ProposalResponse,
-  'title' | 'abstract' | 'motivation' | 'rationale'
->;
+/** Whether a search term can only be an action id; see `ACTION_ID_TERM`. */
+export const isActionIdTerm = (term: string): boolean =>
+  ACTION_ID_TERM.test(term.trim());
 
 @Injectable()
 export class ProposalService {
   private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
-  /** Search text by (hash, url); see `DocumentSummaryCache`. */
-  private readonly searchTextCache =
-    new DocumentSummaryCache<ProposalSearchText>();
-  private warming = false;
+  /** Every action's document, fetched ahead; see `DocumentStore`. */
+  private readonly documents: DocumentStore;
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
     private readonly cacheService: CacheService,
     @Inject(METADATA) private readonly metadata: MetadataServiceV1 | null,
     private readonly network: LegacyNetwork = new LegacyNetwork(chain),
-  ) {}
+    @Optional()
+    @Inject(BACKGROUND_METADATA)
+    backgroundMetadata?: MetadataServiceV1 | null,
+  ) {
+    this.documents = new DocumentStore(backgroundMetadata ?? metadata);
+  }
+
+  /**
+   * An action's stored document, for the governance action history routes,
+   * which list the same actions; see `DocumentStore`.
+   */
+  storedDocument(anchor: Anchor): Json | undefined {
+    return this.documents.document(anchor);
+  }
+
+  /** Whether every action's document has had an answer; see `DocumentStore`. */
+  get documentsReady(): boolean {
+    return this.documents.ready;
+  }
 
   /**
    * A proposal with what the anchored document gives filled in: its CIP-108
@@ -129,8 +140,23 @@ export class ProposalService {
    * vote history, whose rows the details page opens without asking again.
    */
   async withDocument(proposal: ProposalResponse): Promise<ProposalResponse> {
+    const anchor = { url: proposal.url, hash: proposal.metadataHash };
     const fields = proposalDocumentFields(
-      await resolveDocument(this.metadata, {
+      this.documents.document(anchor) ??
+        (await resolveDocument(this.metadata, anchor)),
+    );
+    return fields ? { ...proposal, ...fields } : proposal;
+  }
+
+  /**
+   * As `withDocument`, from the stored document only: the lists and a DRep's
+   * vote history never fetch while a request waits. An action whose document
+   * is not stored goes out without its document fields, and its card checks
+   * the document itself.
+   */
+  withStoredDocument(proposal: ProposalResponse): ProposalResponse {
+    const fields = proposalDocumentFields(
+      this.documents.document({
         url: proposal.url,
         hash: proposal.metadataHash,
       }),
@@ -175,7 +201,7 @@ export class ProposalService {
             );
 
           let filtered = this.filterByType(proposals, params.type);
-          filtered = await this.filterBySearch(filtered, params.search);
+          filtered = this.filterBySearch(filtered, params.search);
           filtered = this.sortProposals(filtered, params.sort);
 
           const total = filtered.length;
@@ -185,11 +211,9 @@ export class ProposalService {
             page: params.page,
             pageSize: params.pageSize,
             total,
-            elements: await mapLimit(
-              filtered.slice(start, start + params.pageSize),
-              ENRICH_CONCURRENCY,
-              (proposal) => this.withDocument(proposal),
-            ),
+            elements: filtered
+              .slice(start, start + params.pageSize)
+              .map((proposal) => this.withStoredDocument(proposal)),
           };
         }),
     );
@@ -207,7 +231,11 @@ export class ProposalService {
       assertIdentifier(drepId);
     }
 
-    const proposals = await this.getProposals(id);
+    // Live actions only, as the legacy route answered: an ended action is not
+    // found, and the frontend turns that 404 into its history page.
+    const proposals = (await this.getProposalSnapshot(id))
+      .filter(({ status }) => status === 'live')
+      .map(({ proposal }) => proposal);
 
     if (proposals.length === 0) {
       throw new NotFoundException({
@@ -293,11 +321,21 @@ export class ProposalService {
   private getProposalSnapshot(
     search: string,
   ): Promise<ProposalSnapshotEntry[]> {
-    return this.cacheService.getOrSetStaleWhileRevalidate(
-      this.proposalListSnapshotNamespace,
-      search,
-      () => this.fetchProposals(search),
-    );
+    // The full snapshot is refreshed by the warmer after every block, so
+    // serving it stale while it refreshes costs one block at most. A single
+    // action is only read on request: served stale, the first view after a
+    // quiet spell would show tallies from whenever it was last asked for.
+    return search === ''
+      ? this.cacheService.getOrSetStaleWhileRevalidate(
+          this.proposalListSnapshotNamespace,
+          search,
+          () => this.fetchProposals(search),
+        )
+      : this.cacheService.getOrSet(
+          this.proposalListSnapshotNamespace,
+          search,
+          () => this.fetchProposals(search),
+        );
   }
 
   async warmActiveProposalSnapshot(): Promise<void> {
@@ -484,34 +522,48 @@ export class ProposalService {
   /**
    * The action id in either form, or the title, abstract, motivation or
    * rationale, as the Haskell backend searched them. The four strings are
-   * document text, which the snapshot does not carry, so every candidate's
-   * is read through the search text cache before filtering and paging.
+   * document text, read from the stored documents. Until every document has
+   * had an answer the search would leave out the ones not asked for yet, so
+   * it refuses rather than answer with part of the results.
    */
-  async filterBySearch(
+  filterBySearch(
     proposals: ProposalResponse[],
     search?: string,
-  ): Promise<ProposalResponse[]> {
+  ): ProposalResponse[] {
     if (!search) {
       return proposals;
     }
 
     const searchLower = search.toLowerCase();
-    const texts = ACTION_ID_TERM.test(search.trim())
-      ? new Map<string, ProposalSearchText>()
-      : await this.searchTexts(proposals, { waitMs: SEARCH_TEXT_WAIT_MS });
+    const byId = isActionIdTerm(search);
+    if (!byId && !this.documents.ready) {
+      throw new ServiceUnavailableException({
+        errorType: 'ServiceUnavailableError',
+        message:
+          'Governance action documents are still being fetched, so a text search cannot cover them yet. Try again shortly.',
+      });
+    }
 
     return proposals.filter((proposal) => {
-      const govActionId = `${proposal.txHash}#${proposal.index}`;
-      const text = texts.get(proposal.id) ?? proposal;
+      const text = byId
+        ? undefined
+        : proposalFields(
+            documentBody(
+              this.documents.document({
+                url: proposal.url,
+                hash: proposal.metadataHash,
+              }),
+            ),
+          );
       const values = [
-        govActionId,
+        `${proposal.txHash}#${proposal.index}`,
         // The CIP-129 action id, which is what `id` carries now and what a
         // provider's own `exactId` search matches.
         proposal.id,
-        text.title,
-        text.abstract,
-        text.motivation,
-        text.rationale,
+        text?.title ?? null,
+        text?.abstract ?? null,
+        text?.motivation ?? null,
+        text?.rationale ?? null,
       ].filter((value): value is string => value !== null);
 
       return values.some((value) => value.toLowerCase().includes(searchLower));
@@ -519,70 +571,15 @@ export class ProposalService {
   }
 
   /**
-   * Resolves every live action's search text into the cache, so the first
-   * search after a start or a new block does not wait on the documents. One
-   * run at a time; failures only leave entries unresolved.
+   * Fetches every action's document into the store, whatever its status: the
+   * list shows live ones, a DRep's vote history ended ones too.
    */
-  async warmSearchText(): Promise<void> {
-    if (this.metadata === null || this.warming) return;
-    this.warming = true;
-    try {
-      const live = (await this.getProposalSnapshot(''))
-        .filter(({ status }) => status === 'live')
-        .map(({ proposal }) => proposal);
-      await this.searchTexts(live, { awaitRefresh: true });
-    } finally {
-      this.warming = false;
-    }
-  }
-
-  /**
-   * Each action's search text through the cache. With `waitMs`, waits at most
-   * that long in all and then takes whatever the cache holds, so a search
-   * does not slow down with the number of uncached documents; the warmer
-   * passes `awaitRefresh` and waits for every document instead.
-   */
-  private async searchTexts(
-    proposals: ProposalResponse[],
-    options: { awaitRefresh?: boolean; waitMs?: number } = {},
-  ): Promise<Map<string, ProposalSearchText>> {
-    const out = new Map<string, ProposalSearchText>();
-    const metadata = this.metadata;
-    if (metadata === null) return out;
-    // Never rejects: the cache treats a failed resolution as unresolved.
-    const all = mapLimit(proposals, ENRICH_CONCURRENCY, (p) => {
-      const { url, metadataHash: hash } = p;
-      if (!url || !hash) return Promise.resolve(undefined);
-      return this.searchTextCache.get(
-        hash,
-        url,
-        async () => proposalFields(await resolveBody(metadata, { url, hash })),
-        { awaitRefresh: options.awaitRefresh },
-      );
-    });
-    let texts: (ProposalSearchText | undefined)[];
-    if (options.waitMs === undefined) {
-      texts = await all;
-    } else {
-      let timer: NodeJS.Timeout | undefined;
-      const timeout = new Promise<undefined>((resolve) => {
-        timer = setTimeout(() => resolve(undefined), options.waitMs);
-      });
-      texts =
-        (await Promise.race([all, timeout]).finally(() =>
-          clearTimeout(timer),
-        )) ??
-        proposals.map(({ url, metadataHash }) =>
-          url && metadataHash
-            ? this.searchTextCache.peek(metadataHash, url)
-            : undefined,
-        );
-    }
-    proposals.forEach((p, i) => {
-      const text = texts[i];
-      if (text !== undefined) out.set(p.id, text);
-    });
-    return out;
+  async warmDocuments(): Promise<void> {
+    if (this.metadata === null) return;
+    const proposals = await this.getProposals('');
+    await this.documents.fill(
+      proposals.map(({ url, metadataHash }) => ({ url, hash: metadataHash })),
+    );
   }
 
   sortProposals(

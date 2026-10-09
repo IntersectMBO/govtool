@@ -126,16 +126,31 @@ const DIRECTORY = `
 export const LIST_ORDER = {
   votingPower: 'power DESC NULLS LAST, id ASC',
   registrationDate: 'reg_tx DESC, reg_cert DESC, id ASC',
+  activity: 'COALESCE(voted, 0) DESC, id ASC',
   random: 'random()',
 } as const;
 export type ListOrderKey = keyof typeof LIST_ORDER;
 
+/**
+ * Actions each DRep has voted on, counted as `activity.voted` counts them
+ * (see VOTE_ROWS): one per action, whatever the vote, invalidated votes left
+ * out. Joined only for the activity order; voting_procedure has no index on
+ * drep_voter, so it is aggregated once rather than probed per DRep.
+ */
+const VOTED = `
+  voted AS (
+    SELECT drep_voter AS id, count(DISTINCT gov_action_proposal_id) AS voted
+      FROM voting_procedure
+     WHERE drep_voter IS NOT NULL AND invalid IS NULL
+     GROUP BY drep_voter
+  )`;
+
 /** $5 limit, $6 offset. */
 export const listSql = (order: ListOrderKey) => `/* dreps:list */
-WITH ${DIRECTORY}
+WITH ${DIRECTORY}${order === 'activity' ? `,${VOTED}` : ''}
 SELECT id, encode(raw, 'hex') AS hash, has_script, status, expiry_known, active_until,
        power AS amount, snap_epoch, count(*) OVER () AS total_count
-  FROM filtered
+  FROM filtered${order === 'activity' ? ' LEFT JOIN voted USING (id)' : ''}
  ORDER BY ${LIST_ORDER[order]}
  LIMIT $5 OFFSET $6`;
 

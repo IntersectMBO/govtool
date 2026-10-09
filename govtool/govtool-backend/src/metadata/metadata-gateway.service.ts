@@ -8,6 +8,7 @@ import type {
 } from '@govtool/data-providers/metadata';
 
 import { METADATA } from '../providers/providers.module';
+import { forgetDocumentFailure } from './document-store';
 
 /**
  * The backend's public door to the private metadata service (D119).
@@ -28,8 +29,13 @@ export class MetadataGatewayService {
     return this.call('resolve', (m) => m.getMetadata(hash.toLowerCase(), url));
   }
 
-  retry(hash: string, url: string): Promise<MetadataRefreshOutcome> {
-    return this.call('retry', (m) => m.refresh(hash.toLowerCase(), url));
+  async retry(hash: string, url: string): Promise<MetadataRefreshOutcome> {
+    const outcome = await this.call('retry', (m) =>
+      m.refresh(hash.toLowerCase(), url),
+    );
+    // A publisher fixed the url: the stored failure must not outlive it.
+    if (outcome.result.ok) forgetDocumentFailure(hash, url);
+    return outcome;
   }
 
   async getReport(id: string): Promise<MetadataReport> {

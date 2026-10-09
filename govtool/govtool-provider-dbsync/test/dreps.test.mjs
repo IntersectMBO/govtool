@@ -81,7 +81,7 @@ async function rejects(promise, code) {
 }
 
 test('declares exactly what list honours, and system.ts carries it', () => {
-  assert.deepEqual(DREP_SORTS, ['votingPower', 'registrationDate', 'random']);
+  assert.deepEqual(DREP_SORTS, ['votingPower', 'registrationDate', 'activity', 'random']);
   assert.deepEqual(DREP_FILTERS, ['status', 'kind']);
   assert.deepEqual(DREP_SEARCH, ['exactId']);
   const caps = capabilities();
@@ -164,9 +164,22 @@ test('filters and sort are bound or whitelisted, never spliced from input', asyn
   assert.match(call.sql, /ORDER BY reg_tx DESC, reg_cert DESC, id ASC/);
 });
 
+test('activity orders by actions voted on, joined only for that order', async () => {
+  const { db, dreps } = provider(hydrated([listRow()]));
+  await dreps.list({ page: 1, size: 5, sort: 'activity' });
+  const activity = db.calls.find((c) => c.tag === 'dreps:list').sql;
+  assert.match(activity, /voted AS \(/);
+  assert.match(activity, /invalid IS NULL/);
+  assert.match(activity, /FROM filtered LEFT JOIN voted USING \(id\)/);
+  assert.match(activity, /ORDER BY COALESCE\(voted, 0\) DESC, id ASC/);
+
+  const { db: other, dreps: d } = provider(hydrated([listRow()]));
+  await d.list({ page: 1, size: 5, sort: 'votingPower' });
+  assert.doesNotMatch(other.calls.find((c) => c.tag === 'dreps:list').sql, /voted/);
+});
+
 test('list refuses what it does not honour', async () => {
   const { dreps } = provider({});
-  await rejects(dreps.list({ page: 1, size: 5, sort: 'activity' }), 'CAPABILITY_UNSUPPORTED');
   await rejects(dreps.list({ page: 1, size: 5, sort: "votingPower; DROP TABLE tx" }), 'INVALID_INPUT');
   await rejects(dreps.list({ page: 1, size: 5, status: ["active' OR 1=1 --"] }), 'INVALID_INPUT');
   await rejects(dreps.list({ page: 1, size: 5, kind: 'drep' }), 'INVALID_INPUT');

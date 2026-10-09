@@ -46,7 +46,7 @@ import {
 } from './dreps/sql';
 
 /** What `list` honours. The capability declaration is assembled from these. */
-export const DREP_SORTS: DRepSort[] = ['votingPower', 'registrationDate', 'random'];
+export const DREP_SORTS: DRepSort[] = ['votingPower', 'registrationDate', 'activity', 'random'];
 export const DREP_FILTERS: DRepFilter[] = ['status', 'kind'];
 /** `exactId` is always supported. Name-based search needs metadata: the index provider's job. */
 export const DREP_SEARCH: SearchMode[] = ['exactId'];

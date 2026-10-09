@@ -4,6 +4,7 @@ import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-quer
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { GetDRepListArguments, getDRepList } from "@services";
+import { isSearchNotReady } from "@utils";
 import { DRepData, Infinite } from "@/models";
 
 const makeStatusKey = (status?: string[] | undefined) =>
@@ -16,6 +17,8 @@ type PaginatedResult = {
   isPreviousData: boolean;
   total: number | undefined;
   baselineTotalForStatus: number | undefined;
+  /** The backend cannot run this name search yet; see `isSearchNotReady`. */
+  isSearchNotReady: boolean;
 };
 
 type Args = GetDRepListArguments & {
@@ -55,7 +58,7 @@ export function useGetDRepListPaginatedQuery(
     [statusKey],
   );
 
-  const { data, isLoading, isFetching, isPlaceholderData } = useQuery({
+  const { data, error, isLoading, isFetching, isPlaceholderData } = useQuery({
     queryKey: listKey,
     queryFn: async () => {
       const response = await getDRepList({
@@ -104,5 +107,6 @@ export function useGetDRepListPaginatedQuery(
     isPreviousData: isPlaceholderData,
     total: data?.total,
     baselineTotalForStatus: baselineResp?.total,
+    isSearchNotReady: isSearchNotReady(error),
   };
 }

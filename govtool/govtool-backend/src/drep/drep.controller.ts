@@ -31,10 +31,13 @@ export class DRepController {
   @Get('voting-power-list')
   getVotingPowerList(
     @Query('identifiers') identifiers?: string | string[],
+    // The bracketed form an axios client sends, which the legacy API took too.
+    @Query('identifiers[]') identifiersArray?: string | string[],
   ): Promise<DRepVotingPowerListResponse[]> {
-    return this.drepService.getVotingPowerList(
-      this.normalizeQueryArray(identifiers),
-    );
+    return this.drepService.getVotingPowerList([
+      ...this.normalizeQueryArray(identifiers),
+      ...this.normalizeQueryArray(identifiersArray),
+    ]);
   }
 
   @Get('info/:drepId')

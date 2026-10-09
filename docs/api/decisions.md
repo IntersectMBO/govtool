@@ -5680,3 +5680,34 @@ review"), and OPEN-48.
   on an empty volume.
 - The same `docker-stack.yml` serves every environment; only `.env` and the exported secrets
   differ.
+
+## D167 — The backend fetches DRep and action documents ahead, and reads them from a store
+
+**Date:** 2026-10-09
+**Amends:** D155 (search waits at most 5 s for text it has not cached), the per-request document reads
+behind D154, and the metadata-service spec's §4 ("No caching; the service owns that") for the backend's
+own copy of the documents it lists.
+
+- `/drep/list`, `/proposal/list`, the governance action history list (`/outcomes/governance-actions`),
+  their searches and `/drep/getVotes` read anchored documents only from a store the cache warmer fills
+  after each snapshot refresh: every DRep's document and every governance action's, whatever its status.
+  A request never fetches, so none of them waits on the internet or needs a time limit. The history
+  routes read the proposal routes' store; their own summary cache is gone.
+- The warmer asks the metadata service for up to 30 documents at once, each anchor on its own under that
+  shared limit, so a slow document holds one slot rather than the next block's new anchors. Its client
+  waits 120 s, above the service's own fetch (a stalled http stage at 40 s, or every IPFS gateway at
+  15 s each), so a slow but valid anchor ends in the service's answer instead of the client giving up.
+  Request-time reads keep the 30 s client, inside the frontend's timeout. A resolved document is kept for
+  good, since the hash fixes its content. A failure the service reports is retried after 5, 10 and 20
+  minutes, then kept as the anchor's answer. A DRep row carries it as `metadataError`
+  (`CODE: message`), as the Haskell backend's rows carried db-sync's fetch error. When the service
+  itself gives no answer, the attempt is not counted and the next fill asks again.
+- A final failure is cleared when a retry through `POST /metadata/retry` resolves the anchor, so a
+  publisher who fixed the url is picked up on the next fill. An anchor no snapshot names any more is
+  dropped, so the store holds the current snapshots' documents and nothing else.
+- A name or text search answers `503` until every anchor has had an answer, instead of returning the
+  part of the results whose documents happen to be fetched. Searching by id never needs a document.
+  After that, an anchor first seen in a new block is searchable once the next fill reaches it.
+- `/proposal/get`, `/drep/info` and the history detail route read the store first and fetch the one
+  document themselves when it is not there.
+

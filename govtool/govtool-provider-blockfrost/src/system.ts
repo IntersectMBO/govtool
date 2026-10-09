@@ -34,7 +34,7 @@ export function createSystemApi(ctx: Ctx): SystemApi {
       try {
         const [status, tip] = await Promise.all([
           ctx.http.get<{ is_healthy: boolean }>('/health'),
-          ctx.http.get<{ time: number; height: number | null; slot: number | null; epoch: number | null }>('/blocks/latest'),
+          ctx.http.get<{ time: number; height: number | null; slot: number | null; epoch: number | null; hash: string }>('/blocks/latest'),
         ]);
         const at = isoFromUnix(tip.time);
         const lag = Math.max(0, Math.round(Date.now() / 1000 - tip.time));
@@ -48,6 +48,7 @@ export function createSystemApi(ctx: Ctx): SystemApi {
                   epoch: tip.epoch,
                   ...(tip.slot === null ? {} : { slot: tip.slot }),
                   ...(tip.height === null ? {} : { block: tip.height }),
+                  hash: tip.hash,
                   time: at,
                 },
               }),

@@ -13,6 +13,11 @@ import { theme } from "./theme.ts";
 import "./i18n";
 import pkg from "../package.json";
 import { env } from "./config/env.ts";
+import {
+  SEARCH_NOT_READY_RETRIES,
+  SEARCH_NOT_READY_RETRY_DELAY_MS,
+  isSearchNotReady,
+} from "./utils/searchNotReady.ts";
 
 const { version } = pkg;
 
@@ -21,6 +26,15 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
+      // A search the backend cannot run yet is asked again for about a
+      // minute; anything else keeps react-query's defaults.
+      retry: (failureCount, error) =>
+        failureCount <
+        (isSearchNotReady(error) ? SEARCH_NOT_READY_RETRIES : 3),
+      retryDelay: (failureCount, error) => {
+        if (isSearchNotReady(error)) return SEARCH_NOT_READY_RETRY_DELAY_MS;
+        return Math.min(1000 * 2 ** failureCount, 30_000);
+      },
     },
   },
 });

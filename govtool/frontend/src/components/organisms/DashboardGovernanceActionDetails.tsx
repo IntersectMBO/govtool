@@ -56,9 +56,14 @@ export const DashboardGovernanceActionDetails = () => {
   const shortenedGovActionId =
     txHash && getShortenedGovActionId(txHash, +index);
 
+  const needsProposal = !state?.proposal || !state?.vote;
+  // A row opened from a list carries its document, and so its authors, only
+  // when the backend held it. Without one the action is read again for it,
+  // while the page shows the row it was given.
+  const needsDocument = !needsProposal && state?.proposal?.json == null;
   const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
-    !state?.proposal || !state?.vote,
+    needsProposal || needsDocument,
   );
   // TODO: Refactor this mess with proposals and metadata validation
   // once authors are existing in all CIP-108 metadata
@@ -67,12 +72,24 @@ export const DashboardGovernanceActionDetails = () => {
   );
 
   useEffect(() => {
+    if (!data?.proposal) return;
     const extendedProposalIndex = extendedProposal ? extendedProposal.index : -1;
-    if (data?.proposal && data?.proposal.index !== extendedProposalIndex) {
+    if (data.proposal.index !== extendedProposalIndex) {
       setExtendedProposal(data.proposal);
+    } else if (needsDocument) {
+      // Only the document and its authors: the text on the page is the one
+      // already checked against the anchor.
+      const { json, authors } = data.proposal;
+      setExtendedProposal((prevProposal) => ({
+        ...prevProposal,
+        json,
+        authors,
+      }));
     }
   }, [data?.proposal, isMetadataValid]);
-  const vote = (data ?? state)?.vote;
+  // A row's own vote, which a read made only for its document must not
+  // replace: a vote just cast may not have reached the backend yet.
+  const vote = (needsProposal ? data ?? state : state)?.vote;
 
   const { validateMetadata } = useValidateMutation();
   // Bumped when a retry resolves the metadata, to validate it again.
@@ -170,7 +187,7 @@ export const DashboardGovernanceActionDetails = () => {
         </Typography>
       </Link>
       <Box display="flex" flex={1} justifyContent="center">
-        {isLoading || isEnableLoading ? (
+        {(isLoading && needsProposal) || isEnableLoading ? (
           <Box
             sx={{
               alignItems: "center",
@@ -196,6 +213,7 @@ export const DashboardGovernanceActionDetails = () => {
             }
             isDashboard
             isValidating={isValidating}
+            isDocumentLoading={needsDocument && isLoading}
             onMetadataRecovered={() =>
               setValidationRevision((value) => value + 1)
             }

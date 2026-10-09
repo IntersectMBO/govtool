@@ -136,7 +136,12 @@ export interface ConnectAttempt {
   /** For `timeout`: the stage that stalled. */
   timeoutStage?: 'connect' | 'tls' | 'first_byte' | 'body';
   /** Milliseconds from the start of this attempt. */
-  timings: { connectMs?: number; tlsMs?: number; firstByteMs?: number; endMs?: number };
+  timings: {
+    connectMs?: number;
+    tlsMs?: number;
+    firstByteMs?: number;
+    endMs?: number;
+  };
 }
 
 /**

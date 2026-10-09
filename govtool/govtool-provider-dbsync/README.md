@@ -56,7 +56,7 @@ Declared (`system.getCapabilities()`, `capabilities()`):
 
 ```json
 {
-  "sorts": { "dreps": ["votingPower", "registrationDate", "random"], "proposals": ["newest", "oldest", "soonestToExpire", "mostYesVotes", "highestParticipation"], "votes": ["newest", "oldest"] },
+  "sorts": { "dreps": ["votingPower", "registrationDate", "activity", "random"], "proposals": ["newest", "oldest", "soonestToExpire", "mostYesVotes", "highestParticipation"], "votes": ["newest", "oldest"] },
   "filters": { "dreps": ["status", "kind"], "proposals": ["type", "status"] },
   "search": ["exactId"],
   "voteAggregate": ["stake", "count"],

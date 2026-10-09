@@ -29,11 +29,6 @@ import {
   hashedBody,
   verifyAuthorWitness,
 } from '../src/governance-actions/signature';
-import {
-  DocumentSummaryCache,
-  RESOLVED_TTL_MS,
-  UNRESOLVED_TTL_MS,
-} from '../src/metadata/text-cache';
 import { ProposalService } from '../src/proposal/proposal.service';
 import { SystemService } from '../src/system/system.service';
 import { actionId } from './ids';
@@ -228,7 +223,12 @@ function service(
   return new GovernanceActionsService(
     api,
     options.documents ?? null,
-    new ProposalService(api, cache, null, new LegacyNetwork(api)),
+    new ProposalService(
+      api,
+      cache,
+      options.documents ?? null,
+      new LegacyNetwork(api),
+    ),
     cache,
     new LegacyNetwork(api),
     (options.metadata ?? {}) as MetadataService,
@@ -375,9 +375,11 @@ describe('governanceActions search over document text', () => {
     },
   };
 
-  it('matches title and abstract, and resolves each document once across searches', async () => {
+  it('matches title and abstract from the stored documents', async () => {
     const { calls, documents: docs } = documents();
     const svc = service(stub, { documents: docs });
+    await svc['proposals'].warmDocuments();
+
     const first = await svc.list({ ...LIST, search: 'treasury plan' });
     expect(first.map((r) => [r.id, r.title, r.abstract])).toEqual([
       [withTitle.id, 'Treasury Plan', 'Fund the tooling'],
@@ -386,195 +388,48 @@ describe('governanceActions search over document text', () => {
       (await svc.list({ ...LIST, search: 'TOOLING' })).map((r) => r.id),
     ).toEqual([withTitle.id]);
     expect(await svc.list({ ...LIST, search: 'nothing' })).toEqual([]);
-    // The plain list reads the same cache, and the unresolved document is
-    // held for its short TTL rather than asked for on every request.
+    // The plain list reads the same store; a failed document leaves its row
+    // without text, and nothing is fetched while a request waits.
     const rows = await svc.list(LIST);
     expect(rows.map((r) => r.title)).toEqual(['Treasury Plan', null]);
     expect(calls.sort()).toEqual([HASH_A, HASH_B]);
   });
 
-  it('warms every action so the next search asks for nothing', async () => {
+  it('refuses a text search until every document has had an answer', async () => {
     const { calls, documents: docs } = documents();
     const svc = service(stub, { documents: docs });
-    await svc.warmSearchText();
-    expect(calls).toHaveLength(2);
-    await svc.list({ ...LIST, search: 'treasury' });
-    expect(calls).toHaveLength(2);
-  });
 
-  it('keeps a resolved summary long, an unresolved one briefly, and bounds the entries', async () => {
-    let now = 0;
-    const cache = new DocumentSummaryCache(2, () => now);
-    let fetches = 0;
-    const resolved = () => {
-      fetches += 1;
-      return Promise.resolve({ title: 't', abstract: null });
-    };
-    const missing = () => {
-      fetches += 1;
-      return Promise.resolve(undefined);
-    };
-    const failing = () => {
-      fetches += 1;
-      return Promise.reject(new Error('down'));
-    };
-    // Concurrent callers share one fetch.
-    await Promise.all([
-      cache.get(HASH_A, 'u', resolved),
-      cache.get(HASH_A.toUpperCase(), 'u', resolved),
-    ]);
-    await expect(cache.get(HASH_B, 'u', missing)).resolves.toBeUndefined();
-    expect(fetches).toBe(2);
-
-    // Past the unresolved TTL only the unresolved entry is revalidated.
-    now = UNRESOLVED_TTL_MS + 1;
-    await cache.get(HASH_A, 'u', resolved);
-    await cache.get(HASH_B, 'u', missing);
-    expect(fetches).toBe(3);
-
-    // Past the resolved TTL too; a failing refresh keeps the summary.
-    now = RESOLVED_TTL_MS + 1;
-    await expect(cache.get(HASH_A, 'u', failing)).resolves.toEqual({
-      title: 't',
-      abstract: null,
-    });
-    expect(fetches).toBe(4);
-
-    await cache.get('c'.repeat(64), 'u', resolved);
-    await cache.get('d'.repeat(64), 'u', resolved);
-    expect(cache.size).toBe(2);
-  });
-});
-
-describe('DocumentSummaryCache stale-while-revalidate', () => {
-  const HASH_A = 'a'.repeat(64);
-  const HASH_B = 'b'.repeat(64);
-  const T1 = { title: 'one', abstract: null };
-  const T2 = { title: 'two', abstract: 'b' };
-  const deferred = <T>() => {
-    let resolve!: (value: T) => void;
-    let reject!: (error: unknown) => void;
-    const promise = new Promise<T>((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
-    return { promise, resolve, reject };
-  };
-  const flush = () => new Promise((r) => setImmediate(r));
-
-  it('awaits the first fetch', async () => {
-    const cache = new DocumentSummaryCache(10, () => 0);
-    const first = deferred<typeof T1>();
-    let settled = false;
-    const got = cache
-      .get(HASH_A, 'u', () => first.promise)
-      .then((v) => {
-        settled = true;
-        return v;
-      });
-    await flush();
-    expect(settled).toBe(false);
-    first.resolve(T1);
-    await expect(got).resolves.toEqual(T1);
-  });
-
-  it('serves an expired entry at once and refreshes it once in the background', async () => {
-    let now = 0;
-    const cache = new DocumentSummaryCache(10, () => now);
-    await cache.get(HASH_A, 'u', () => Promise.resolve(T1));
-    now = RESOLVED_TTL_MS + 1;
-    const refresh = deferred<typeof T2>();
-    let fetches = 0;
-    const slow = () => {
-      fetches += 1;
-      return refresh.promise;
-    };
-    // Both callers get the old value while the refresh is still pending.
-    await expect(cache.get(HASH_A, 'u', slow)).resolves.toEqual(T1);
-    await expect(cache.get(HASH_A, 'u', slow)).resolves.toEqual(T1);
-    expect(fetches).toBe(1);
-    refresh.resolve(T2);
-    await flush();
-    await expect(cache.get(HASH_A, 'u', slow)).resolves.toEqual(T2);
-    expect(fetches).toBe(1);
-  });
-
-  it('serves an expired unresolved entry at once too', async () => {
-    let now = 0;
-    const cache = new DocumentSummaryCache(10, () => now);
-    await cache.get(HASH_B, 'u', () => Promise.resolve(undefined));
-    now = UNRESOLVED_TTL_MS + 1;
-    const never = deferred<typeof T1>();
     await expect(
-      cache.get(HASH_B, 'u', () => never.promise),
-    ).resolves.toBeUndefined();
+      svc.list({ ...LIST, search: 'treasury' }),
+    ).rejects.toMatchObject({ status: 503 });
+    // An id needs no document.
+    expect(
+      (await svc.list({ ...LIST, search: `${TX2}#1` })).map((r) => r.id),
+    ).toEqual([unresolved.id]);
+    expect(calls).toEqual([]);
   });
 
-  it('keeps the value when a refresh fails or comes back unresolved', async () => {
-    let now = 0;
-    const cache = new DocumentSummaryCache(10, () => now);
-    await cache.get(HASH_A, 'u', () => Promise.resolve(T1));
-    now = RESOLVED_TTL_MS + 1;
-    await cache.get(HASH_A, 'u', () => Promise.reject(new Error('down')));
-    await flush();
-    await expect(
-      cache.get(HASH_A, 'u', () => Promise.resolve(T2)),
-    ).resolves.toEqual(T1);
-    // The failure is retried after the short TTL, not the long one.
-    now += UNRESOLVED_TTL_MS + 1;
-    await cache.get(HASH_A, 'u', () => Promise.resolve(undefined));
-    await flush();
-    await expect(
-      cache.get(HASH_A, 'u', () => Promise.resolve(T2)),
-    ).resolves.toEqual(T1);
-  });
+  it('reads the detail from the store, and fetches it only when not stored', async () => {
+    const { calls, documents: docs } = documents();
+    const svc = service(
+      {
+        governance: {
+          proposals: {
+            list: () => Promise.resolve(page([withTitle, unresolved])),
+            get: () => Promise.resolve(env(withTitle)),
+          },
+        },
+      },
+      { documents: docs },
+    );
 
-  it('lets the warmer await a refresh that a search does not', async () => {
-    let now = 0;
-    const cache = new DocumentSummaryCache(10, () => now);
-    await cache.get(HASH_A, 'u', () => Promise.resolve(T1));
-    now = RESOLVED_TTL_MS + 1;
-    const refresh = deferred<typeof T2>();
-    const warm = cache.get(HASH_A, 'u', () => refresh.promise, {
-      awaitRefresh: true,
-    });
-    await expect(
-      cache.get(HASH_A, 'u', () => refresh.promise),
-    ).resolves.toEqual(T1);
-    refresh.resolve(T2);
-    await expect(warm).resolves.toEqual(T2);
-  });
+    expect((await svc.get(TX, '0')).title).toBe('Treasury Plan');
+    expect(calls).toEqual([HASH_A]);
 
-  it('bounds concurrent background refreshes', async () => {
-    let now = 0;
-    const cache = new DocumentSummaryCache(10, () => now, 2);
-    const keys = ['a', 'b', 'c', 'd'].map((c) => c.repeat(64));
-    for (const k of keys) await cache.get(k, 'u', () => Promise.resolve(T1));
-    now = RESOLVED_TTL_MS + 1;
-    let running = 0;
-    let peak = 0;
-    const pending: Array<() => void> = [];
-    const slow = () => {
-      running += 1;
-      peak = Math.max(peak, running);
-      return new Promise<typeof T2>((res) =>
-        pending.push(() => {
-          running -= 1;
-          res(T2);
-        }),
-      );
-    };
-    for (const k of keys) await cache.get(k, 'u', slow);
-    await flush();
-    expect(pending).toHaveLength(2);
-    while (pending.length > 0) {
-      pending.shift()!();
-      await flush();
-    }
-    expect(peak).toBe(2);
-    for (const k of keys) {
-      await expect(cache.get(k, 'u', slow)).resolves.toEqual(T2);
-    }
+    await svc['proposals'].warmDocuments();
+    calls.length = 0;
+    expect((await svc.get(TX, '0')).title).toBe('Treasury Plan');
+    expect(calls).toEqual([]);
   });
 });
 

@@ -94,4 +94,38 @@ describe("usePendingTransaction", () => {
     await act(() => vi.advanceTimersByTimeAsync(60 * 1000));
     expect(mockStatus.mock.calls.length).toBe(checks);
   });
+
+  it("notes when a registration expires unconfirmed, so the voter info keeps reading", async () => {
+    // Not on chain within the 3 minutes.
+    mockStatus.mockResolvedValue({
+      transactionConfirmed: false,
+      votingProcedure: [],
+    } as never);
+
+    const hook = start({ type: "registerAsDrep", transactionHash: "ef".repeat(32) });
+    await act(() => vi.advanceTimersByTimeAsync(4 * 60 * 1000));
+
+    expect(hook.result.current.pendingTransaction.registerAsDrep).toBeNull();
+    expect(
+      JSON.parse(
+        localStorage.getItem("voter_transaction_expired_stake_test1") ?? "null",
+      ),
+    ).toEqual(expect.any(Number));
+  });
+
+  it("does not note an expired transaction that does not change the voter", async () => {
+    mockStatus.mockResolvedValue({
+      transactionConfirmed: false,
+      votingProcedure: [],
+    } as never);
+
+    start({
+      type: "vote",
+      transactionHash: "ab".repeat(32),
+      resourceId: "gov_action1example",
+    });
+    await act(() => vi.advanceTimersByTimeAsync(4 * 60 * 1000));
+
+    expect(localStorage.getItem("voter_transaction_expired_stake_test1")).toBeNull();
+  });
 });

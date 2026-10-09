@@ -20,6 +20,9 @@ export const useGetVoterInfo = (options?: { enabled?: boolean }) => {
     ],
     enabled: !!dRepID && (options?.enabled ?? true),
     queryFn: () => getVoterInfo(dRepID),
+    // A registration that lands after its pending transaction expired is
+    // read once on expiry; keep reading, as the votes and proposals do.
+    refetchInterval: 20000,
   });
 
   return { voter: data };

@@ -78,6 +78,17 @@ test.describe("Proposed as a governance action", async () => {
   let proposalSubmissionPage: ProposalSubmissionPage;
   let proposalDiscussionDetailPage: ProposalDiscussionDetailsPage | undefined;
   let proposalId: number | undefined;
+  let wallet: TestWallet;
+
+  // Once per worker: on a fresh run the wallet needs a faucet transfer, a
+  // stake registration and Blockfrost to index it, three waits of up to
+  // txTimeOut each, which overran a single test's budget (7J_1, 7J_2). None
+  // of these tests submits a transaction, so the funding lasts.
+  test.beforeAll(async () => {
+    test.setTimeout(3 * environments.txTimeOut + 120_000);
+    wallet = await proposalSubmissionWallet("7:gaProposer");
+    await logWalletDetails(wallet.address);
+  });
 
   test.beforeEach(async ({ browser }, testInfo) => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
@@ -85,9 +96,6 @@ test.describe("Proposed as a governance action", async () => {
     // rather than the previous test's proposal.
     proposalDiscussionDetailPage = undefined;
     proposalId = undefined;
-
-    const wallet = await proposalSubmissionWallet("7:gaProposer");
-    await logWalletDetails(wallet.address);
 
     const page = await createNewPageWithWallet(browser, { wallet });
 

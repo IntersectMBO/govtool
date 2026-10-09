@@ -415,12 +415,15 @@ export const GovernanceActionDetailsCardData = ({
         isValidating={isValidating || isDocumentLoading}
       >
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-          {/* Authors come only with the document: without it they are
-              unknown, which is not the same as a document that lists none. */}
-          {jsonContent == null
-            ? t("govActions.authors.notLoaded")
-            : (authors ?? []).length <= 0
-            ? t("govActions.authors.noDataAvailable")
+          {/* With none to list, a document that did not load leaves the
+              authors unknown, which is not the same as a document that
+              lists none. */}
+          {(authors ?? []).length <= 0
+            ? t(
+                jsonContent == null
+                  ? "govActions.authors.notLoaded"
+                  : "govActions.authors.noDataAvailable",
+              )
             : (authors ?? []).map((author) => (
               <Box
                 key={author.publicKey}

@@ -50,6 +50,22 @@ describe("GovernanceActionDetailsCardData authors", () => {
     ).toHaveTextContent("No data available");
   });
 
+  it("lists authors it has, whether or not the document came with them", () => {
+    expect(
+      authorsLine({
+        json: undefined,
+        authors: [
+          {
+            name: "Bob",
+            publicKey: "c".repeat(64),
+            signature: "d".repeat(128),
+            witnessAlgorithm: "ed25519",
+          },
+        ],
+      }),
+    ).toHaveTextContent("Bob");
+  });
+
   it("lists the authors of a loaded document", () => {
     expect(
       authorsLine({

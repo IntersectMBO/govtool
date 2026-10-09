@@ -72,16 +72,8 @@ const vitestConfig = defineVitestConfig({
     testTimeout: 10000,
     globals: true,
     pool: "forks",
-    poolOptions: {
-      threads: {
-        minThreads: 2,
-      },
-      // Each jsdom fork takes ~1.7 GB; uncapped, vitest starts one per core.
-      forks: {
-        minForks: 1,
-        maxForks: process.env.CI ? 4 : 2,
-      },
-    },
+    // Each jsdom fork takes ~1.7 GB; uncapped, vitest starts one per core.
+    maxWorkers: process.env.CI ? 4 : 2,
     maxConcurrency: 4,
     environment: "jsdom",
     reporters: ["default", "junit"],

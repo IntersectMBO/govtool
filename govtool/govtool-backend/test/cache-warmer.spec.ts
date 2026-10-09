@@ -101,6 +101,7 @@ describe('CacheWarmerService', () => {
     const proposals = new ProposalService(api, store, null);
     const warmer = new CacheWarmerService(
       api,
+      store,
       new DRepService(api, proposals, store, null),
       proposals,
     );

@@ -73,3 +73,43 @@ describe('CacheService eviction', () => {
     expect(size(cache)).toBe(2);
   });
 });
+
+describe('CacheService.noteBlock', () => {
+  const read = (cache: CacheService, namespace: string, key: string) =>
+    cache.getOrSet(namespace, key, () => Promise.resolve('fresh'));
+
+  it("drops a wallet's own chain state when a newer block arrives", async () => {
+    const cache = new CacheService(configWith(10));
+    cache.noteBlock(100);
+    cache.set('drepVotes', 'drep1', 'before the vote');
+    cache.set('drepInfo', 'drep1', 'before the registration');
+
+    cache.noteBlock(101);
+
+    await expect(read(cache, 'drepVotes', 'drep1')).resolves.toBe('fresh');
+    await expect(read(cache, 'drepInfo', 'drep1')).resolves.toBe('fresh');
+  });
+
+  it('keeps the shared snapshots, which the warmer refreshes itself', async () => {
+    const cache = new CacheService(configWith(10));
+    cache.noteBlock(100);
+    cache.set('drepListSnapshot', '', 'snapshot');
+
+    cache.noteBlock(101);
+
+    await expect(read(cache, 'drepListSnapshot', '')).resolves.toBe('snapshot');
+  });
+
+  it('clears once per block, however often the same block is reported', async () => {
+    // /transaction/status reports blocks for any caller, so a repeated or an
+    // older block must not flush the caches again.
+    const cache = new CacheService(configWith(10));
+    cache.noteBlock(101);
+    cache.set('drepVotes', 'drep1', 'cached');
+
+    cache.noteBlock(101);
+    cache.noteBlock(99);
+
+    await expect(read(cache, 'drepVotes', 'drep1')).resolves.toBe('cached');
+  });
+});

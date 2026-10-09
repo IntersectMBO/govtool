@@ -10,6 +10,24 @@ type CacheEntry<T> = {
 
 type NamespaceCache = Map<string, CacheEntry<unknown>>;
 
+/**
+ * The namespaces that hold one wallet's own chain state: what it registered,
+ * how it delegated, what it voted. Its own transaction changes them, and the
+ * frontend reads them again as soon as `/transaction/status` says it landed,
+ * so an entry read before that block must not answer the read after it.
+ * The shared snapshots are not here: the warmer refreshes those itself.
+ */
+const WALLET_STATE_NAMESPACES = [
+  'accountInfo',
+  'adaHolderCurrentDelegation',
+  'adaHolderVotingPower',
+  'drepInfo',
+  'drepVoteRows',
+  'drepVotes',
+  'drepVotingPower',
+  'proposalList',
+] as const;
+
 @Injectable()
 export class CacheService {
   private readonly logger = new Logger(CacheService.name);
@@ -20,7 +38,28 @@ export class CacheService {
    */
   private readonly caches = new Map<string, NamespaceCache>();
 
+  private latestBlockNo: number | null = null;
+
   constructor(private readonly configService: ConfigService) {}
+
+  /**
+   * Drops the wallet-state namespaces the first time a block is seen. The
+   * warmer reports the tip, and `/transaction/status` the block a confirmed
+   * transaction landed in, which can be ahead of the warmer's last tick.
+   * Anyone can ask for a transaction's status, so only a newer block clears:
+   * at most once per block, as the warmer alone would.
+   */
+  noteBlock(blockNo: number): void {
+    if (this.latestBlockNo !== null && blockNo <= this.latestBlockNo) {
+      return;
+    }
+
+    this.latestBlockNo = blockNo;
+
+    for (const namespace of WALLET_STATE_NAMESPACES) {
+      this.caches.delete(namespace);
+    }
+  }
 
   getOrSet<T>(
     namespace: string,

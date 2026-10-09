@@ -658,6 +658,7 @@ describe('GET /transaction/status/:txId', () => {
           get: () => Promise.resolve(env({ txHash: TX, onChain: true })),
         },
       }),
+      passthroughCache(),
     );
     await expect(service.getTransactionStatus(TX)).resolves.toEqual({
       transactionConfirmed: true,
@@ -667,6 +668,30 @@ describe('GET /transaction/status/:txId', () => {
     });
   });
 
+  it("drops the wallet's cached state once its transaction is confirmed", async () => {
+    const cache = passthroughCache();
+    const noteBlock = jest.spyOn(cache, 'noteBlock');
+    const service = new TransactionService(
+      chain({
+        transactions: {
+          get: () =>
+            Promise.resolve(
+              env({
+                txHash: TX,
+                onChain: true,
+                includedAt: { epoch: 1, block: 4_739_570 },
+              }),
+            ),
+        },
+      }),
+      cache,
+    );
+
+    await service.getTransactionStatus(TX);
+
+    expect(noteBlock).toHaveBeenCalledWith(4_739_570);
+  });
+
   it('reports an unindexed transaction as unconfirmed', async () => {
     const service = new TransactionService(
       chain({
@@ -674,6 +699,7 @@ describe('GET /transaction/status/:txId', () => {
           get: () => Promise.resolve(env({ txHash: TX, onChain: false })),
         },
       }),
+      passthroughCache(),
     );
     await expect(service.getTransactionStatus(TX)).resolves.toEqual({
       transactionConfirmed: false,

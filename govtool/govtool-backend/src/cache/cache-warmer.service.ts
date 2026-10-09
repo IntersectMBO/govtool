@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import type { ChainDataApiV1 } from '@govtool/data-providers/chain-data';
 
+import { CacheService } from 'src/cache/cache.service';
 import { DRepService } from 'src/drep/drep.service';
 import { GovernanceActionsService } from 'src/governance-actions/governance-actions.service';
 import { ProposalService } from 'src/proposal/proposal.service';
@@ -24,6 +25,7 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
+    private readonly cacheService: CacheService,
     private readonly drepService: DRepService,
     private readonly proposalService: ProposalService,
     @Optional() private readonly governanceActions?: GovernanceActionsService,
@@ -55,6 +57,10 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
 
     try {
       const latestBlockNo = await this.getLatestBlockNo();
+
+      if (latestBlockNo !== null) {
+        this.cacheService.noteBlock(latestBlockNo);
+      }
 
       if (
         !force &&

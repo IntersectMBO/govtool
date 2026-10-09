@@ -132,4 +132,53 @@ describe('CacheWarmerService', () => {
 
     warmer.onModuleDestroy();
   });
+
+  it('refreshes after a fork switch at the same height, not for the same block', async () => {
+    let tip = { epoch: 1, block: 100, slot: 4_000, hash: 'aa' };
+    let proposalCalls = 0;
+    const emptyPage = env<Page<GovAction>>({ elements: [], total: 0 });
+
+    const api = chain({
+      system: {
+        getHealth: () =>
+          Promise.resolve(env<ProviderHealth>({ status: 'healthy', tip })),
+        getCapabilities: () => Promise.resolve(env(CAPABILITIES)),
+      },
+      governance: {
+        dreps: { list: () => Promise.resolve(env({ elements: [], total: 0 })) },
+        proposals: {
+          list: () => {
+            proposalCalls += 1;
+            return Promise.resolve(emptyPage);
+          },
+        },
+      },
+    });
+    const store = cache();
+    const proposals = new ProposalService(api, store, null);
+    const warmer = new CacheWarmerService(
+      api,
+      store,
+      new DRepService(api, proposals, store, null),
+      proposals,
+    );
+    jest.spyOn(warmer['logger'], 'log').mockImplementation(() => undefined);
+    jest.spyOn(warmer['logger'], 'warn').mockImplementation(() => undefined);
+
+    await warmer.onModuleInit();
+    expect(proposalCalls).toBe(1);
+
+    // The same block again: nothing to refresh.
+    jest.advanceTimersByTime(20_000);
+    await settle();
+    expect(proposalCalls).toBe(1);
+
+    // A slot battle: same height and slot, another block.
+    tip = { ...tip, hash: 'bb' };
+    jest.advanceTimersByTime(20_000);
+    await settle();
+    expect(proposalCalls).toBe(2);
+
+    warmer.onModuleDestroy();
+  });
 });

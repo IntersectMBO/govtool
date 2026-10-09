@@ -66,6 +66,11 @@ export interface ChainPoint {
   epoch: EpochNo;
   slot?: SlotNo;
   block?: BlockNo;
+  /**
+   * The block's hash. Two blocks at the same height, even in the same slot,
+   * are told apart only by it: a fork switch at the tip.
+   */
+  hash?: Hex;
   time?: Timestamp;
 }
 

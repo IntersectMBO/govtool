@@ -679,7 +679,7 @@ describe('GET /transaction/status/:txId', () => {
               env({
                 txHash: TX,
                 onChain: true,
-                includedAt: { epoch: 1, block: 4_739_570 },
+                includedAt: { epoch: 1, slot: 98_123_456, block: 4_739_570 },
               }),
             ),
         },
@@ -689,7 +689,10 @@ describe('GET /transaction/status/:txId', () => {
 
     await service.getTransactionStatus(TX);
 
-    expect(noteBlock).toHaveBeenCalledWith(4_739_570);
+    expect(noteBlock).toHaveBeenCalledWith({
+      block: 4_739_570,
+      slot: 98_123_456,
+    });
   });
 
   it('reports an unindexed transaction as unconfirmed', async () => {

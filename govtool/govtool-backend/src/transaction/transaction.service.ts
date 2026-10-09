@@ -26,7 +26,10 @@ export class TransactionService {
       // The frontend reads the wallet's state again as soon as this says
       // confirmed, which can be before the warmer's next tick sees the block.
       if (data.onChain && data.includedAt?.block !== undefined) {
-        this.cacheService.noteBlock(data.includedAt.block);
+        this.cacheService.noteBlock({
+          block: data.includedAt.block,
+          slot: data.includedAt.slot,
+        });
       }
       return {
         transactionConfirmed: data.onChain,

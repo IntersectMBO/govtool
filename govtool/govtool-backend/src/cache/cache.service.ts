@@ -28,6 +28,22 @@ const WALLET_STATE_NAMESPACES = [
   'proposalList',
 ] as const;
 
+/** A block, with what tells it apart from another block at its height. */
+export type BlockMark = { block: number; slot?: number; hash?: string };
+
+/**
+ * Whether two marks name the same block. Height alone misses a fork switch
+ * at the tip, where the new block has the old one's height and, in a slot
+ * battle, its slot too, so the hash decides when both carry one, else the
+ * slot. A mark that carries neither is taken at its height.
+ */
+export function isSameBlock(a: BlockMark, b: BlockMark): boolean {
+  if (a.block !== b.block) return false;
+  if (a.hash !== undefined && b.hash !== undefined) return a.hash === b.hash;
+  if (a.slot !== undefined && b.slot !== undefined) return a.slot === b.slot;
+  return true;
+}
+
 @Injectable()
 export class CacheService {
   private readonly logger = new Logger(CacheService.name);
@@ -38,38 +54,42 @@ export class CacheService {
    */
   private readonly caches = new Map<string, NamespaceCache>();
 
-  private latestBlockNo: number | null = null;
+  /** The block the wallet state was last cleared for. */
+  private mark: BlockMark | null = null;
 
   constructor(private readonly configService: ConfigService) {}
 
   /**
    * Drops the wallet-state namespaces when the warmer reads a tip it has not
    * seen. A tip below the last one is a rollback, or a chain reset under a
-   * running backend (a devnet restart, a db-sync restore): it clears too, and
+   * running backend (a devnet restart, a db-sync restore), and one at the
+   * same height with another hash is a fork switch: each clears too, and
    * becomes the mark, so later blocks clear again instead of waiting for the
-   * chain to pass its old height.
+   * chain to pass its old height. The same block read again only fills in
+   * what the mark lacked, such as the hash a transaction's block came without.
    */
-  noteTip(blockNo: number): void {
-    if (blockNo === this.latestBlockNo) {
-      return;
-    }
+  noteTip(tip: BlockMark): void {
+    const seen = this.mark !== null && isSameBlock(tip, this.mark);
 
-    this.latestBlockNo = blockNo;
-    this.clearWalletState();
+    this.mark = tip;
+
+    if (!seen) {
+      this.clearWalletState();
+    }
   }
 
   /**
    * Drops the wallet-state namespaces for the block a confirmed transaction
    * landed in, which can be ahead of the warmer's last tick. Anyone can ask
-   * for a transaction's status, so only a newer block clears: at most once
+   * for a transaction's status, so only a higher block clears: at most once
    * per block, and an old transaction cannot move the mark back.
    */
-  noteBlock(blockNo: number): void {
-    if (this.latestBlockNo !== null && blockNo <= this.latestBlockNo) {
+  noteBlock(block: BlockMark): void {
+    if (this.mark !== null && block.block <= this.mark.block) {
       return;
     }
 
-    this.latestBlockNo = blockNo;
+    this.mark = block;
     this.clearWalletState();
   }
 

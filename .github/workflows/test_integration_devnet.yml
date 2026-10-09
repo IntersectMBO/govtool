@@ -10,7 +10,7 @@ name: Integration tests (devnet)
 
 on:
   push:
-    branches: [dev, draft/govtool-provider-layer]
+    branches: [develop]
   workflow_dispatch:
     inputs:
       suites:

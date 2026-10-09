@@ -17,7 +17,9 @@ import type { Anchor } from './enrich';
  * then kept as the anchor's answer with its reason, until the anchor changes
  * or a retry through the metadata routes resolves it (`forgetDocumentFailure`).
  * When the metadata service itself gives no answer, nothing is learned about
- * the document, so the attempt is not counted and the next fill asks again.
+ * the document and the next fill asks again; after DOCUMENT_MAX_UNANSWERED
+ * such attempts in a row it counts as a failure, so one anchor the service
+ * cannot answer does not keep the searches waiting for good.
  *
  * Only `fill` adds entries, and it drops those no snapshot names any more, so
  * the store holds the documents of the current snapshots and nothing else.
@@ -46,6 +48,8 @@ export const DOCUMENT_FETCH_CONCURRENCY = 30;
 export const DOCUMENT_FETCH_TIMEOUT_MS = 120_000;
 /** Retries after a first failure, before the failure is final. */
 export const DOCUMENT_MAX_RETRIES = 3;
+/** Attempts in a row the metadata service gave no answer to, before that counts as a failure. */
+export const DOCUMENT_MAX_UNANSWERED = 3;
 /** The wait before each retry. */
 export const DOCUMENT_RETRY_DELAYS_MS = [
   5 * 60_000,
@@ -60,6 +64,8 @@ type Entry = {
   failure?: DocumentFailure;
   /** Failures the metadata service reported, in a row. */
   failures: number;
+  /** Attempts in a row the metadata service gave no answer to. */
+  unanswered: number;
   /** When the next attempt may start. */
   retryAt: number;
   /** The attempt under way, which a fill named it again joins. */
@@ -156,6 +162,7 @@ export class DocumentStore {
           hash: hash.toLowerCase(),
           url,
           failures: 0,
+          unanswered: 0,
           retryAt: 0,
         },
       );
@@ -220,7 +227,8 @@ export class DocumentStore {
 
   /**
    * One fetch. When the metadata service gives no answer the entry is left as
-   * it was, so the next fill asks again.
+   * it was, so the next fill asks again, until DOCUMENT_MAX_UNANSWERED such
+   * attempts make it a failure like any other.
    */
   private async attempt(
     metadata: MetadataServiceV1,
@@ -233,6 +241,12 @@ export class DocumentStore {
     try {
       result = await metadata.getMetadata(entry.hash, entry.url);
     } catch {
+      entry.unanswered += 1;
+      if (entry.unanswered < DOCUMENT_MAX_UNANSWERED) return;
+      this.recordFailure(entry, {
+        code: 'METADATA_UNAVAILABLE',
+        message: 'The metadata service gave no answer for this document',
+      });
       return;
     }
 
@@ -240,14 +254,26 @@ export class DocumentStore {
       entry.document = result.body;
       entry.failure = undefined;
       entry.failures = 0;
+      entry.unanswered = 0;
       return;
     }
 
+    this.recordFailure(
+      entry,
+      result.ok
+        ? // Hash-correct, but no CIP-100 document is anything but an object.
+          {
+            code: 'SCHEMA_INVALID',
+            message: 'The document is not a JSON object',
+          }
+        : { code: result.code, message: result.message },
+    );
+  }
+
+  private recordFailure(entry: Entry, failure: DocumentFailure): void {
+    entry.unanswered = 0;
     entry.failures += 1;
-    entry.failure = result.ok
-      ? // Hash-correct, but no CIP-100 document is anything but an object.
-        { code: 'SCHEMA_INVALID', message: 'The document is not a JSON object' }
-      : { code: result.code, message: result.message };
+    entry.failure = failure;
     entry.retryAt =
       this.now() + (DOCUMENT_RETRY_DELAYS_MS[entry.failures - 1] ?? 0);
   }

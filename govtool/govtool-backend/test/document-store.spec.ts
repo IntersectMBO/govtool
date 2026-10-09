@@ -5,6 +5,7 @@ import type {
 
 import {
   DOCUMENT_FETCH_CONCURRENCY,
+  DOCUMENT_MAX_UNANSWERED,
   DocumentStore,
   forgetDocumentFailure,
 } from 'src/metadata/document-store';
@@ -134,6 +135,37 @@ describe('DocumentStore', () => {
       final: false,
     });
     expect(store.ready).toBe(true);
+  });
+
+  it(`counts ${DOCUMENT_MAX_UNANSWERED} unanswered attempts in a row as a failure`, async () => {
+    let now = 0;
+    const { metadata, getMetadata } = service(() =>
+      Promise.reject(new Error('unreachable')),
+    );
+    const store = new DocumentStore(metadata, () => now);
+    const fill = () => store.fill([anchor('https://x/a')]);
+
+    for (let i = 1; i < DOCUMENT_MAX_UNANSWERED; i++) await fill();
+    expect(store.ready).toBe(false);
+
+    await fill();
+    expect(getMetadata).toHaveBeenCalledTimes(DOCUMENT_MAX_UNANSWERED);
+    expect(store.get(anchor('https://x/a'))).toEqual({
+      status: 'failed',
+      failure: {
+        code: 'METADATA_UNAVAILABLE',
+        message: 'The metadata service gave no answer for this document',
+      },
+      final: false,
+    });
+    expect(store.ready).toBe(true);
+
+    // Retried on the usual schedule, not on every fill.
+    await fill();
+    expect(getMetadata).toHaveBeenCalledTimes(DOCUMENT_MAX_UNANSWERED);
+    now += 5 * MINUTE;
+    await fill();
+    expect(getMetadata).toHaveBeenCalledTimes(DOCUMENT_MAX_UNANSWERED + 1);
   });
 
   it('stays ready once every anchor has had an answer', async () => {

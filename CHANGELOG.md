@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The unused analytics dashboard (`govtool/analytics-dashboard`), a Next.js internal dashboard outside the core deployment
 - The Constitutional Committee Portal card in Useful links, replaced by the budget proposals archive card
 - Creating, editing, drafting and deleting budget proposals, voting in budget proposal polls, the DRep voters list of a poll, and commenting on or replying to budget proposals in the frontend
+- Budget discussions in `govtool-pdf-backend`: the `/api/bds`, `/api/bd/versions/:id`, `/api/bd-drafts`, `/api/bd-polls`, `/api/bd-poll-votes`, `bd-*` lookup and `/api/country-lists` routes, and `bd_proposal_id` on comments. A new migration deletes budget discussion comments and drops the budget discussion tables, so their data is not kept; the 2025 proposals live on in the frontend archive
 
 ## [v2.1.0-alpha.2](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.1...v2.1.0-alpha.2) 2026-10-02
 

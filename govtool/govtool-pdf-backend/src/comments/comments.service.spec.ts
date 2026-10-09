@@ -18,7 +18,7 @@ async function details(p: Promise<unknown>): Promise<unknown> {
 
 describe('CommentsService', () => {
   const setup = () => {
-    const prisma = prismaStub(['comment', 'proposal', 'bd', 'commentsReport']);
+    const prisma = prismaStub(['comment', 'proposal', 'commentsReport']);
     const service = new CommentsService(prisma as unknown as PrismaService);
     return { prisma, service };
   };
@@ -31,10 +31,11 @@ describe('CommentsService', () => {
       'Comment text is required',
     );
     expect(await details(service.create({ comment_text: 'x' }, me))).toBe('Proposal ID is required');
-    expect(
-      await details(service.create({ comment_text: 'x', proposal_id: '', bd_proposal_id: null }, me)),
-    ).toBe('Proposal ID is required');
-    expect(await details(service.create({ comment_text: 'x', proposal_id: 1, bd_proposal_id: 2 }, me))).toBe(
+    expect(await details(service.create({ comment_text: 'x', proposal_id: '' }, me))).toBe(
+      'Proposal ID is required',
+    );
+    // Budget discussions are gone (D167): a BD target is no target.
+    expect(await details(service.create({ comment_text: 'x', bd_proposal_id: 2 }, me))).toBe(
       'Proposal ID is required',
     );
     expect(prisma.proposal.findUnique).not.toHaveBeenCalled();
@@ -45,7 +46,7 @@ describe('CommentsService', () => {
     const { prisma, service } = setup();
     prisma.proposal.findUnique.mockResolvedValue({ id: 5 });
     prisma.comment.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
-      Promise.resolve({ id: 9, bdMasterId: null, createdAt: T0, updatedAt: T0, ...data }),
+      Promise.resolve({ id: 9, createdAt: T0, updatedAt: T0, ...data }),
     );
     const res = await service.create(
       { proposal_id: '5', comment_text: 'hi', user_id: 99, drep_id: 'client', comment_parent_id: '' },
@@ -60,33 +61,6 @@ describe('CommentsService', () => {
     });
     expect(res.data.attributes).toMatchObject({ user_id: '3', drep_id: 'd'.repeat(56), proposal_id: '5' });
     expect(res.data.attributes).not.toHaveProperty('user_govtool_username');
-  });
-
-  it('a BD comment locks the chain and moves the active version; a vanished chain rolls back', async () => {
-    const { prisma, service } = setup();
-    prisma.bd.findFirst.mockResolvedValue({ id: 12 });
-    prisma.comment.create.mockResolvedValue({
-      id: 1,
-      proposalId: null,
-      bdMasterId: 10,
-      parentId: null,
-      userId: 1,
-      text: 'x',
-      drepId: null,
-      createdAt: T0,
-      updatedAt: T0,
-    });
-    await service.create({ bd_proposal_id: 10, comment_text: 'x' }, caller(1));
-    expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
-    expect(prisma.$executeRaw).toHaveBeenCalledTimes(1);
-    expect(prisma.proposal.update).not.toHaveBeenCalled();
-
-    prisma.$queryRaw.mockResolvedValueOnce([]);
-    prisma.comment.create.mockClear();
-    expect(await details(service.create({ bd_proposal_id: 10, comment_text: 'x' }, caller(1)))).toBe(
-      'Proposal not found',
-    );
-    expect(prisma.comment.create).not.toHaveBeenCalled();
   });
 
   it('report forces the reporter and a fresh hash, whatever the body says', async () => {

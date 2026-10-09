@@ -1,4 +1,4 @@
-// SPEC §8.7 comments (proposals and budget discussions) and §8.12 reports.
+// SPEC §8.7 comments and §8.12 reports.
 
 import { randomInt } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
@@ -23,8 +23,6 @@ import {
 import { COMMENTS_ALLOWLIST } from './comment.allowlists';
 import { CommentResource, CommentsReportResource } from './comment.resources';
 
-type Tx = Prisma.TransactionClient;
-
 export const COMMENT_TEXT_MAX = 15000;
 export const REPORT_HASH_LENGTH = 89;
 const HASH_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -41,24 +39,6 @@ function readRef(d: DataPayload, field: string): number | undefined {
   const v = d[field];
   if (v === undefined || v === null || v === '') return undefined;
   return toIntRef(v, field);
-}
-
-type Target = { proposalId: number } | { bdMasterId: number };
-
-/**
- * `prop_comments_number` +1 on the BD chain's active version. The master row
- * is locked first, the order src/budget uses when posting a new version, so
- * an increment and a version copy of the counter cannot interleave. False
- * when the chain has no master row or no active version.
- */
-async function bumpBdComments(tx: Tx, masterId: number): Promise<boolean> {
-  const master = await tx.$queryRaw<Array<{ id: number }>>`
-    SELECT id FROM bds WHERE id = ${masterId} AND master_id = ${masterId} FOR UPDATE`;
-  if (master.length === 0) return false;
-  const n = await tx.$executeRaw`
-    UPDATE bds SET comments_number = comments_number + 1, updated_at = now()
-    WHERE master_id = ${masterId} AND is_active`;
-  return n > 0;
 }
 
 @Injectable()
@@ -107,40 +87,22 @@ export class CommentsService {
     }
     if (hasNul(text)) throw validationError('comment_text is invalid');
     const proposalId = readRef(d, 'proposal_id');
-    const bdMasterId = readRef(d, 'bd_proposal_id');
-    if ((proposalId === undefined) === (bdMasterId === undefined)) {
-      throw badRequestDetails('Proposal ID is required');
-    }
-    let target: Target;
-    if (proposalId !== undefined) {
-      const p = await this.prisma.proposal.findUnique({ where: { id: proposalId }, select: { id: true } });
-      if (!p) throw badRequestDetails('Proposal not found');
-      target = { proposalId };
-    } else {
-      const bd = await this.prisma.bd.findFirst({
-        where: { masterId: bdMasterId, isActive: true },
-        select: { id: true },
-      });
-      if (!bd) throw badRequestDetails('Proposal not found');
-      target = { bdMasterId: bdMasterId! };
-    }
+    if (proposalId === undefined) throw badRequestDetails('Proposal ID is required');
+    const p = await this.prisma.proposal.findUnique({ where: { id: proposalId }, select: { id: true } });
+    if (!p) throw badRequestDetails('Proposal not found');
     const parentId = readRef(d, 'comment_parent_id');
     if (parentId !== undefined) {
-      // The parent must sit on the same target (Δ34).
+      // The parent must sit on the same proposal (Δ34).
       const parent = await this.prisma.comment.findFirst({
-        where: { id: parentId, ...target },
+        where: { id: parentId, proposalId },
         select: { id: true },
       });
       if (!parent) throw badRequestDetails('Parent comment not found');
     }
     const comment = await this.prisma.$transaction(async (tx) => {
-      // The BD counter first: it takes the chain lock before the insert.
-      if ('bdMasterId' in target && !(await bumpBdComments(tx, target.bdMasterId))) {
-        throw badRequestDetails('Proposal not found');
-      }
       const comment = await tx.comment.create({
         data: {
-          ...target,
+          proposalId,
           parentId: parentId ?? null,
           userId: caller.id,
           text,
@@ -148,12 +110,10 @@ export class CommentsService {
           drepId: caller.dRepID ?? null,
         },
       });
-      if ('proposalId' in target) {
-        await tx.proposal.update({
-          where: { id: target.proposalId },
-          data: { commentsNumber: { increment: 1 } },
-        });
-      }
+      await tx.proposal.update({
+        where: { id: proposalId },
+        data: { commentsNumber: { increment: 1 } },
+      });
       return comment;
     });
     return single(serializeEntity(comment, CommentResource));

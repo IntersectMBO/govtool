@@ -1,10 +1,10 @@
 // SPEC §11.5 demo data for the Playwright specs that expect existing rows.
 // Never run automatically. Idempotent through a marker row: the first demo
 // user. The rows mirror what the API's own create paths write (proposal +
-// active content, BD with master_id = own id and an active poll).
+// active content).
 
 import { Prisma, PrismaClient } from '@prisma/client';
-import { BD_TYPES, GOVERNANCE_ACTION_TYPES } from './lookups.data';
+import { GOVERNANCE_ACTION_TYPES } from './lookups.data';
 
 /** Reward addresses nobody holds a key for (testnet header e0). */
 export const DEMO_USERS = [
@@ -17,20 +17,15 @@ export const DEMO_SUBMITTED_TX_HASH = 'de'.repeat(32);
 
 type Tx = Prisma.TransactionClient;
 
-async function comments(
-  tx: Tx,
-  target: { proposalId: number } | { bdMasterId: number },
-  authorIds: number[],
-  label: string,
-): Promise<number> {
+async function comments(tx: Tx, proposalId: number, authorIds: number[], label: string): Promise<number> {
   const top = await tx.comment.create({
-    data: { ...target, userId: authorIds[0], text: `Demo comment on ${label}` },
+    data: { proposalId, userId: authorIds[0], text: `Demo comment on ${label}` },
   });
   await tx.comment.create({
-    data: { ...target, userId: authorIds[1], parentId: top.id, text: `Demo reply on ${label}` },
+    data: { proposalId, userId: authorIds[1], parentId: top.id, text: `Demo reply on ${label}` },
   });
   await tx.comment.create({
-    data: { ...target, userId: authorIds[1], text: `Second demo comment on ${label}` },
+    data: { proposalId, userId: authorIds[1], text: `Second demo comment on ${label}` },
   });
   return 3;
 }
@@ -90,86 +85,8 @@ async function proposal(
       },
     });
   }
-  const n = await comments(tx, { proposalId: p.id }, authorIds, label);
+  const n = await comments(tx, p.id, authorIds, label);
   await tx.proposal.update({ where: { id: p.id }, data: { commentsNumber: n } });
-}
-
-async function bd(
-  tx: Tx,
-  creatorId: number,
-  typeId: number,
-  typeName: string,
-  authorIds: number[],
-  submittedForVote: Date | null,
-) {
-  const label = submittedForVote ? `Demo submitted BD (${typeName})` : `Demo BD (${typeName})`;
-  const [costing, detail, psapb, ownership, further] = await Promise.all([
-    tx.bdCosting.create({
-      data: {
-        costBreakdown: `Cost breakdown of ${label}.`,
-        preferredCurrencyId: 1,
-        adaAmount: '100000',
-        amountInPreferredCurrency: '50000',
-        usdToAdaConversionRate: '0.5',
-        adaAmountClone: 100000,
-        amountInPreferredCurrencyClone: 50000,
-        usdToAdaConversionRateClone: 0.5,
-      },
-    }),
-    tx.bdProposalDetail.create({
-      data: {
-        proposalName: label,
-        proposalDescription: `Description of ${label}.`,
-        keyDependencies: 'None',
-        maintainAndSupport: 'The proposer',
-        keyProposalDeliverables: 'A deliverable',
-        resourcingDurationEstimates: 'Three months',
-        experience: 'Some',
-        contractTypeId: 1,
-      },
-    }),
-    tx.bdPsapb.create({
-      data: {
-        problemStatement: `Problem of ${label}.`,
-        proposalBenefit: 'A benefit',
-        supplementaryEndorsement: '',
-        explainProposalRoadmap: '',
-        typeId,
-        roadmapId: 10,
-        committeeId: 1,
-      },
-    }),
-    tx.bdProposalOwnership.create({
-      data: {
-        agreed: true,
-        submitedOnBehalf: 'Individual',
-        proposalPublicChampion: 'demo_alice',
-        socialHandles: '@demo',
-        beCountryId: 1,
-      },
-    }),
-    tx.bdFurtherInformation.create({
-      data: { links: { create: [{ position: 0, link: 'https://example.com/bd', text: 'BD link' }] } },
-    }),
-  ]);
-  const row = await tx.bd.create({
-    data: {
-      creatorId,
-      isActive: true,
-      privacyPolicy: true,
-      intersectNamedAdministrator: false,
-      submittedForVote,
-      costingId: costing.id,
-      proposalDetailId: detail.id,
-      psapbId: psapb.id,
-      proposalOwnershipId: ownership.id,
-      furtherInformationId: further.id,
-    },
-  });
-  await tx.bd.update({ where: { id: row.id }, data: { masterId: row.id } });
-  await tx.bdPoll.create({ data: { bdMasterId: row.id, isActive: true } });
-  const n = await comments(tx, { bdMasterId: row.id }, authorIds, label);
-  await tx.bd.update({ where: { id: row.id }, data: { commentsNumber: n } });
 }
 
 /**
@@ -188,12 +105,6 @@ export async function seedDemo(prisma: PrismaClient): Promise<boolean> {
         await proposal(tx, ids[0], typeId, typeName, ids, false);
       }
       await proposal(tx, ids[1], 1, 'Info Action', ids, true);
-      // The submitted BD comes first, so it is the oldest: specs open the
-      // newest BD and need its editing and poll voting enabled.
-      await bd(tx, ids[1], 1, 'Core', ids, new Date());
-      for (const [typeId, typeName] of BD_TYPES) {
-        await bd(tx, ids[0], typeId, typeName, ids, null);
-      }
     },
     { timeout: 60000 },
   );

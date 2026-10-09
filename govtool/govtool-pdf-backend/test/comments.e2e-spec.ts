@@ -1,4 +1,4 @@
-// SPEC §8.7 comments (proposals and budget discussions) and §8.12 reports.
+// SPEC §8.7 comments and §8.12 reports.
 
 import { createTestApp, TestApp } from './helpers/app';
 import { loginDrep, loginStake, StakeSession } from './helpers/auth';
@@ -13,7 +13,7 @@ import {
   expectUnauthorized,
   expectValidation,
 } from './helpers/envelope';
-import { createBdMaster, createProposal } from './helpers/proposals';
+import { createProposal } from './helpers/proposals';
 
 const ISO_MS = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const REPORTS_POPULATE =
@@ -39,8 +39,8 @@ describe('comments (e2e)', () => {
 
   const comment = (s: StakeSession, data: Record<string, unknown>) =>
     t.api().post('/api/comments').set(s.auth).send({ data });
-  const topLevel = (field: 'proposal_id' | 'bd_proposal_id', id: number, dir = 'desc') =>
-    `/api/comments?filters[$and][0][${field}]=${id}&filters[$and][1][comment_parent_id][$null]=true&sort[createdAt]=${dir}&pagination[page]=1&pagination[pageSize]=25&${REPORTS_POPULATE}`;
+  const topLevel = (id: number, dir = 'desc') =>
+    `/api/comments?filters[$and][0][proposal_id]=${id}&filters[$and][1][comment_parent_id][$null]=true&sort[createdAt]=${dir}&pagination[page]=1&pagination[pageSize]=25&${REPORTS_POPULATE}`;
   const replies = (parentId: number) =>
     `/api/comments?filters[comment_parent_id]=${parentId}&pagination[page]=1&pagination[pageSize]=3&sort[createdAt]=desc&${REPORTS_POPULATE}`;
 
@@ -85,7 +85,6 @@ describe('comments (e2e)', () => {
       const c = expectSingle(res)!;
       expect(c.attributes).toEqual({
         proposal_id: String(proposalId),
-        bd_proposal_id: null,
         comment_parent_id: null,
         user_id: String(b.user.id),
         comment_text: 'Hello',
@@ -127,16 +126,13 @@ describe('comments (e2e)', () => {
         200,
       );
       expectBadRequestDetails(await comment(a, { comment_text: 'x' }), 'Proposal ID is required');
+      // Budget discussions are gone (D167): a BD target is no target.
       expectBadRequestDetails(
-        await comment(a, { comment_text: 'x', proposal_id: proposalId, bd_proposal_id: '1' }),
+        await comment(a, { comment_text: 'x', bd_proposal_id: '1' }),
         'Proposal ID is required',
       );
       expectBadRequestDetails(
         await comment(a, { comment_text: 'x', proposal_id: 999999 }),
-        'Proposal not found',
-      );
-      expectBadRequestDetails(
-        await comment(a, { comment_text: 'x', bd_proposal_id: 999999 }),
         'Proposal not found',
       );
       expectValidation(await comment(a, { comment_text: 'x', proposal_id: 'abc' }), 'proposal_id is invalid');
@@ -184,62 +180,6 @@ describe('comments (e2e)', () => {
     });
   });
 
-  describe('budget discussion comments (bd_proposal_id)', () => {
-    it('target is a master id with an active version; the counter moves on the active version', async () => {
-      const master = await createBdMaster(t, a.user.id);
-      const c = expectSingle(await comment(b, { bd_proposal_id: String(master), comment_text: 'bd' }))!;
-      expect(c.attributes).toMatchObject({ bd_proposal_id: String(master), proposal_id: null });
-      await comment(a, { bd_proposal_id: master, comment_parent_id: c.id, comment_text: 'bd reply' }).expect(
-        200,
-      );
-      expect((await t.prisma.bd.findUniqueOrThrow({ where: { id: master } })).commentsNumber).toBe(2);
-
-      // A second version (as src/budget writes it): the count follows the active row.
-      const v2 = await t.prisma.$transaction(async (tx) => {
-        await tx.bd.update({ where: { id: master }, data: { isActive: false } });
-        return tx.bd.create({
-          data: {
-            creatorId: a.user.id,
-            privacyPolicy: true,
-            isActive: true,
-            masterId: master,
-            commentsNumber: 2,
-          },
-        });
-      });
-      const res = await Promise.all(
-        Array.from({ length: 20 }, (_, i) => comment(b, { bd_proposal_id: master, comment_text: `bd${i}` })),
-      );
-      expect(res.map((r) => r.status)).toEqual(Array(20).fill(200));
-      expect((await t.prisma.bd.findUniqueOrThrow({ where: { id: v2.id } })).commentsNumber).toBe(22);
-      expect((await t.prisma.bd.findUniqueOrThrow({ where: { id: master } })).commentsNumber).toBe(2);
-      // Comments hang off the master id, not the version id.
-      expectBadRequestDetails(
-        await comment(b, { bd_proposal_id: v2.id, comment_text: 'x' }),
-        'Proposal not found',
-      );
-      // A parent on a proposal is not a parent on a BD.
-      const { proposalId } = await createProposal(t, a);
-      const pc = expectSingle(await comment(a, { proposal_id: proposalId, comment_text: 'p' }))!;
-      expectBadRequestDetails(
-        await comment(b, { bd_proposal_id: master, comment_parent_id: pc.id, comment_text: 'x' }),
-        'Parent comment not found',
-      );
-
-      const list = expectList(await t.api().get(topLevel('bd_proposal_id', master)), { total: 21 }) as Item[];
-      expect(list.find((x) => x.id === c.id)!.attributes.subcommens_number).toBe(1);
-    });
-
-    it('a chain with no active version is not a target', async () => {
-      const master = await createBdMaster(t, a.user.id);
-      await t.prisma.bd.update({ where: { id: master }, data: { isActive: false } });
-      expectBadRequestDetails(
-        await comment(b, { bd_proposal_id: master, comment_text: 'x' }),
-        'Proposal not found',
-      );
-    });
-  });
-
   describe('GET /api/comments', () => {
     let proposalId: number;
     let first: number;
@@ -266,7 +206,7 @@ describe('comments (e2e)', () => {
     });
 
     it('Appendix A top-level query: computed attributes, reports with reporter, no hash (Δ10)', async () => {
-      const res = await t.api().get(topLevel('proposal_id', proposalId));
+      const res = await t.api().get(topLevel(proposalId));
       const data = expectList(res, { total: 2, pageSize: 25 }) as Item[];
       expectNoKeyDeep(res.body, 'hash');
       expect(data.map((d) => d.attributes.comment_text)).toEqual(['second', 'first']);
@@ -274,7 +214,6 @@ describe('comments (e2e)', () => {
       expect(Object.keys(firstItem.attributes).sort()).toEqual(
         [
           'proposal_id',
-          'bd_proposal_id',
           'comment_parent_id',
           'user_id',
           'comment_text',
@@ -313,7 +252,7 @@ describe('comments (e2e)', () => {
           },
         ],
       });
-      const asc = expectList(await t.api().get(topLevel('proposal_id', proposalId, 'asc'))) as Item[];
+      const asc = expectList(await t.api().get(topLevel(proposalId, 'asc'))) as Item[];
       expect(asc.map((d) => d.attributes.comment_text)).toEqual(['first', 'second']);
     });
 
@@ -361,6 +300,10 @@ describe('comments (e2e)', () => {
         'Invalid populate comments_reports.moderator',
       );
       expectValidation(await t.api().get('/api/comments?filters[user][username]=x'), 'Invalid key user');
+      expectValidation(
+        await t.api().get('/api/comments?filters[bd_proposal_id]=1'),
+        'Invalid key bd_proposal_id',
+      );
     });
 
     it('filters on moderation_status', async () => {

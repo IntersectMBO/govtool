@@ -5680,3 +5680,28 @@ review"), and OPEN-48.
   on an empty volume.
 - The same `docker-stack.yml` serves every environment; only `.env` and the exported secrets
   differ.
+
+## D167 — The pdf backend drops budget discussions; a static archive replaces them
+
+**Date:** 2026-10-08
+**Amends:** D138 (scope: budget discussions leave it) and D165 (the Strapi data copied in no longer
+includes budget discussions).
+
+- Budget discussions are no longer a live feature. The 2025 budget proposals are a read-only archive
+  in the frontend: static JSON under `/budget-proposals-2025/`, split from a mainnet Strapi export,
+  with the list, every version, the final DRep poll totals and the comments. It replaces the BD API
+  for reading; nothing replaces it for writing.
+- Order: the frontend change landed first (#4280), so no released frontend calls a BD route when the
+  backend stops serving them.
+- `govtool-pdf-backend` removes the BD models, tables, routes, seeds and tests: `/api/bds`,
+  `/api/bd/versions/:id`, `/api/bd-drafts`, `/api/bd-polls`, `/api/bd-poll-votes`, the five `bd-*`
+  lookups and `/api/country-lists` answer 404. Comments target proposals only: `bd_proposal_id` is
+  gone from the comment attributes and filters, and `comments.proposal_id` is NOT NULL.
+- One new migration, `20261008000000_remove_budget_discussions`, applies to databases that hold BD
+  rows: it deletes BD comments (their replies and reports cascade), drops `bd_master_id` and the
+  comment target CHECK, then drops the BD and BD-only lookup tables with RESTRICT, so a missed
+  dependency fails the migration instead of being dropped with it. No BD data is exported by it;
+  the archive is the record.
+- SPEC.md keeps the removed section numbers (§5.4, §8.8–§8.11) and Δ numbers as empty entries, so
+  existing references stay valid.
+- Community tools that read the BD API lose it; the archive's files are the replacement.

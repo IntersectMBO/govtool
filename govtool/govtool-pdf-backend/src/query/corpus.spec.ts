@@ -2,12 +2,6 @@
 // resource rejects private user paths (§11.1 Allowlist).
 
 import { CORPUS } from '../../test/helpers/pdf-ui-corpus';
-import {
-  BD_DRAFTS_ALLOWLIST,
-  BD_POLL_VOTES_ALLOWLIST,
-  BD_POLLS_ALLOWLIST,
-  BDS_ALLOWLIST,
-} from '../budget/budget.allowlists';
 import { COMMENTS_ALLOWLIST } from '../comments/comment.allowlists';
 import { ApiError } from '../common/errors';
 import { lookupAllowlist } from '../lookups/lookups.controller';
@@ -25,11 +19,6 @@ const ALLOWLISTS: Record<string, QueryAllowlist> = {
   polls: POLLS_ALLOWLIST,
   'poll-votes': POLL_VOTES_ALLOWLIST,
   comments: COMMENTS_ALLOWLIST,
-  bds: BDS_ALLOWLIST,
-  'bds/1': BDS_ALLOWLIST,
-  'bd-polls': BD_POLLS_ALLOWLIST,
-  'bd-poll-votes': BD_POLL_VOTES_ALLOWLIST,
-  'bd-drafts': BD_DRAFTS_ALLOWLIST,
   ...Object.fromEntries(LOOKUP_ROUTES.map((r) => [r.path, lookupAllowlist(r.resource)])),
 };
 
@@ -74,32 +63,10 @@ describe('pdf-ui corpus (Appendix A)', () => {
     expect([...(reports?.children.keys() ?? [])]).toEqual(['reporter']);
     expect(reports?.children.get('reporter')?.fields).toEqual([]);
   });
-
-  it('bd single corpus populates further information without a component populate', () => {
-    const q = parseQuery(
-      parseQueryString('populate[0]=bd_further_information.proposal_links'),
-      BDS_ALLOWLIST,
-    );
-    expect(toPrismaInclude(BDS_ALLOWLIST.resource, q.populate)).toEqual({
-      furtherInformation: { include: { links: { orderBy: [{ position: 'asc' }, { id: 'asc' }] } } },
-    });
-  });
 });
 
 describe('private paths are rejected on every resource', () => {
   it.each([
-    ['bds', 'filters[creator][username]=e0', 'ValidationError: Invalid key creator.username'],
-    ['bds', 'filters[creator][email]=x', 'ValidationError: Invalid key creator.email'],
-    ['bds', 'sort[creator][email]=asc', 'ValidationError: Invalid key creator.email'],
-    ['bds', 'sort[creator][username]=asc', 'ValidationError: Invalid key creator.username'],
-    ['bds', 'populate=bd_contact_information', 'ValidationError: Invalid populate bd_contact_information'],
-    [
-      'bds',
-      'filters[bd_contact_information][be_email]=x',
-      'ValidationError: Invalid key bd_contact_information',
-    ],
-    ['bd-drafts', 'filters[creator][username]=e0', 'ValidationError: Invalid key creator.username'],
-    ['bd-drafts', 'filters[draft_data]=x', 'ValidationError: Invalid key draft_data'],
     [
       'comments',
       'filters[comments_reports][hash][$containsi]=a',

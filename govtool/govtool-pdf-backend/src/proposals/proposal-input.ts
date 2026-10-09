@@ -127,7 +127,7 @@ function readLinks(d: DataPayload): LinkInput[] {
     const text = readString(item, 'prop_link_text');
     // A blank link row carries nothing to show; drop it rather than store ''.
     if (link === undefined || link === null || link.trim() === '') continue;
-    // http, https or ipfs only, as BD links (Δ47, Δ46): no `javascript:` hrefs.
+    // http, https or ipfs only (Δ47): no `javascript:` hrefs.
     if (!isAllowedDocumentUrl(link)) throw validationError('prop_link is invalid');
     out.push({ link, text: text ?? null });
   }

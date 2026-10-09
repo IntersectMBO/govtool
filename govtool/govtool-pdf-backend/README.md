@@ -3,7 +3,8 @@
 The proposal discussion forum (pdf) backend: NestJS, Prisma, Postgres. It
 replaces the Strapi backend of govtool-proposal-pillar and serves the pdf-ui
 vendored in `../frontend/src/pdf-ui` unchanged, on the same `/api/...` paths
-and the Strapi v4 response envelope.
+and the Strapi v4 response envelope. Budget discussions are not served
+(D167): the 2025 budget proposals are a static archive in the frontend.
 
 - `SPEC.md`: the decided behaviour, including every deliberate difference
   from Strapi (§13).
@@ -20,7 +21,7 @@ curl http://127.0.0.1:1337/health
 
 This runs Postgres (published on 127.0.0.1:5442) and the backend on
 127.0.0.1:1337. Migrations and the lookup seed apply on start.
-`npm run seed:demo` adds sample proposals and budget discussions. Point the
+`npm run seed:demo` adds sample proposals with comments. Point the
 frontend at it with `VITE_PDF_API_URL=http://127.0.0.1:1337/` in
 `frontend/.env.local`. `../docker-compose.fixture.yml` also runs it as part
 of the whole local stack.

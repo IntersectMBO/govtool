@@ -196,9 +196,10 @@ underneath:
 - Documents are fetched ahead, not while a request waits. After each
   snapshot refresh the warmer fills a store with every DRep's and every
   governance action's anchored document, 30 at a time from the metadata
-  service ([document-store.ts](src/metadata/document-store.ts), D167).
-  `/drep/list`, `/proposal/list`, their searches and `/drep/getVotes` read
-  only from it. A failure the service reports is retried after 5, 10 and
+  service, waiting up to 120 s for each
+  ([document-store.ts](src/metadata/document-store.ts), D167).
+  `/drep/list`, `/proposal/list`, the governance action history list, their
+  searches and `/drep/getVotes` read only from it. A failure the service reports is retried after 5, 10 and
   20 minutes and then kept, with its reason in a DRep row's `metadataError`.
   A name or text search answers `503` until every document has had an
   answer, rather than a partial result.

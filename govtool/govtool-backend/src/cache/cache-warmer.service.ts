@@ -4,13 +4,11 @@ import {
   Logger,
   OnModuleDestroy,
   OnModuleInit,
-  Optional,
 } from '@nestjs/common';
 import type { ChainDataApiV1 } from '@govtool/data-providers/chain-data';
 
 import { BlockMark, CacheService, isSameBlock } from 'src/cache/cache.service';
 import { DRepService } from 'src/drep/drep.service';
-import { GovernanceActionsService } from 'src/governance-actions/governance-actions.service';
 import { ProposalService } from 'src/proposal/proposal.service';
 import { CHAIN_DATA } from 'src/providers/providers.module';
 
@@ -28,7 +26,6 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
     private readonly cacheService: CacheService,
     private readonly drepService: DRepService,
     private readonly proposalService: ProposalService,
-    @Optional() private readonly governanceActions?: GovernanceActionsService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -108,11 +105,6 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
               `Could not warm ${what}: ${error instanceof Error ? error.message : String(error)}`,
             );
           });
-        warmText('governanceActions search text', () =>
-          this.governanceActions
-            ? this.governanceActions.warmSearchText()
-            : Promise.resolve(),
-        );
         warmText('governance action documents', () =>
           this.proposalService.warmDocuments(),
         );

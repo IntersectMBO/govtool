@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import {
@@ -28,7 +29,11 @@ import {
   type ApiInteger,
 } from 'src/common/integer';
 import { toLegacyNullableInteger } from 'src/common/legacy';
-import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
+import {
+  BACKGROUND_METADATA,
+  CHAIN_DATA,
+  METADATA,
+} from 'src/providers/providers.module';
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 import { documentBody, drepFields, resolveBody } from 'src/metadata/enrich';
 import { DocumentStore } from 'src/metadata/document-store';
@@ -116,8 +121,11 @@ export class DRepService {
     private readonly proposalService: ProposalService,
     private readonly cacheService: CacheService,
     @Inject(METADATA) private readonly metadata: MetadataServiceV1 | null,
+    @Optional()
+    @Inject(BACKGROUND_METADATA)
+    backgroundMetadata?: MetadataServiceV1 | null,
   ) {
-    this.documents = new DocumentStore(metadata);
+    this.documents = new DocumentStore(backgroundMetadata ?? metadata);
   }
 
   /**

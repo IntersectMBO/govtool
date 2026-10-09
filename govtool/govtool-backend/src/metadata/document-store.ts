@@ -3,7 +3,7 @@ import type {
   MetadataServiceV1,
 } from '@govtool/data-providers/metadata';
 
-import { mapLimit, type Anchor } from './enrich';
+import type { Anchor } from './enrich';
 
 /**
  * Every anchored document a snapshot names, fetched ahead of the requests
@@ -36,6 +36,14 @@ export type StoredDocument =
 
 /** Documents asked of the metadata service at once. */
 export const DOCUMENT_FETCH_CONCURRENCY = 30;
+/**
+ * How long a fill waits for the metadata service's answer on one document.
+ * Nobody waits on a fill, so it outlasts the service's own fetch: a host that
+ * stalls one stage (40 s idle limit for http) or every IPFS gateway in turn
+ * (four at 15 s). Shorter, a slow but valid anchor would be given up on before
+ * the service answered, and its DRep would wait a block for its name.
+ */
+export const DOCUMENT_FETCH_TIMEOUT_MS = 120_000;
 /** Retries after a first failure, before the failure is final. */
 export const DOCUMENT_MAX_RETRIES = 3;
 /** The wait before each retry. */
@@ -54,6 +62,8 @@ type Entry = {
   failures: number;
   /** When the next attempt may start. */
   retryAt: number;
+  /** The attempt under way, which a fill named it again joins. */
+  inFlight?: Promise<void>;
 };
 
 const isObject = (value: unknown): value is Json =>
@@ -77,8 +87,11 @@ export function forgetDocumentFailure(hash: string, url: string): void {
 
 export class DocumentStore {
   private readonly entries = new Map<string, Entry>();
-  private filling?: Promise<void>;
   private answeredAll: boolean;
+  /** Fetches under way, across fills. */
+  private active = 0;
+  /** Fetches waiting for one of the DOCUMENT_FETCH_CONCURRENCY slots. */
+  private readonly waiting: (() => void)[] = [];
 
   constructor(
     private readonly metadata: MetadataServiceV1 | null,
@@ -93,7 +106,7 @@ export class DocumentStore {
    * Whether every anchor named so far has had an answer from the metadata
    * service. Until then a search would leave out documents nobody has asked
    * for yet, so it refuses instead. Once true it stays true: an anchor first
-   * named later is asked for on the next fill, one block on.
+   * named later is asked for by the fill that names it.
    */
   get ready(): boolean {
     return this.answeredAll;
@@ -124,24 +137,11 @@ export class DocumentStore {
 
   /**
    * Makes `anchors` the store's whole set and asks for every document that is
-   * new or due for a retry. One fill at a time: a call while one runs waits
-   * for it, and the next block's fill picks up what it did not cover.
+   * new or due for a retry, resolving once those have settled. Each anchor is
+   * fetched on its own under one limit shared by every fill, so a document
+   * that takes long holds a slot, not the next block's new anchors.
    */
-  fill(anchors: readonly Anchor[]): Promise<void> {
-    this.filling ??= this.runFill(anchors).finally(() => {
-      this.filling = undefined;
-    });
-    return this.filling;
-  }
-
-  forget(hash: string, url: string): void {
-    const key = keyOf(hash, url);
-    if (this.entries.get(key)?.document === undefined) {
-      this.entries.delete(key);
-    }
-  }
-
-  private async runFill(anchors: readonly Anchor[]): Promise<void> {
+  async fill(anchors: readonly Anchor[]): Promise<void> {
     const metadata = this.metadata;
     if (metadata === null) return;
 
@@ -168,37 +168,79 @@ export class DocumentStore {
     }
 
     const now = this.now();
-    const due = [...named.values()].filter(
-      (entry) =>
-        entry.document === undefined &&
-        entry.failures <= DOCUMENT_MAX_RETRIES &&
-        entry.retryAt <= now,
-    );
-    let unanswered = 0;
-    await mapLimit(due, DOCUMENT_FETCH_CONCURRENCY, async (entry) => {
-      if (!(await this.attempt(metadata, entry))) unanswered += 1;
+    const settling = [...named.values()].flatMap((entry) => {
+      if (entry.inFlight !== undefined) return [entry.inFlight];
+      if (
+        entry.document !== undefined ||
+        entry.failures > DOCUMENT_MAX_RETRIES ||
+        entry.retryAt > now
+      ) {
+        return [];
+      }
+      const attempt = this.limited(() => this.attempt(metadata, entry));
+      entry.inFlight = attempt.finally(() => {
+        entry.inFlight = undefined;
+      });
+      return [entry.inFlight];
     });
-    // Entries not due already have an answer, so this covers every anchor.
-    if (unanswered === 0) this.answeredAll = true;
+    await Promise.all(settling);
+
+    if (
+      [...this.entries.values()].every(
+        (entry) => entry.document !== undefined || entry.failure !== undefined,
+      )
+    ) {
+      this.answeredAll = true;
+    }
   }
 
-  /** One fetch. False when the metadata service gave no answer. */
+  forget(hash: string, url: string): void {
+    const key = keyOf(hash, url);
+    if (this.entries.get(key)?.document === undefined) {
+      this.entries.delete(key);
+    }
+  }
+
+  /** Runs `task` in one of the DOCUMENT_FETCH_CONCURRENCY slots. */
+  private async limited(task: () => Promise<void>): Promise<void> {
+    if (this.active < DOCUMENT_FETCH_CONCURRENCY) {
+      this.active += 1;
+    } else {
+      // Handed the slot of the fetch that finishes next.
+      await new Promise<void>((resolve) => this.waiting.push(resolve));
+    }
+    try {
+      await task();
+    } finally {
+      const next = this.waiting.shift();
+      if (next !== undefined) next();
+      else this.active -= 1;
+    }
+  }
+
+  /**
+   * One fetch. When the metadata service gives no answer the entry is left as
+   * it was, so the next fill asks again.
+   */
   private async attempt(
     metadata: MetadataServiceV1,
     entry: Entry,
-  ): Promise<boolean> {
+  ): Promise<void> {
+    // Dropped by a later fill while it waited for a slot.
+    if (this.entries.get(keyOf(entry.hash, entry.url)) !== entry) return;
+
     let result: MetadataResult;
     try {
       result = await metadata.getMetadata(entry.hash, entry.url);
     } catch {
-      return false;
+      return;
     }
 
     if (result.ok && isObject(result.body)) {
       entry.document = result.body;
       entry.failure = undefined;
       entry.failures = 0;
-      return true;
+      return;
     }
 
     entry.failures += 1;
@@ -208,6 +250,5 @@ export class DocumentStore {
       : { code: result.code, message: result.message };
     entry.retryAt =
       this.now() + (DOCUMENT_RETRY_DELAYS_MS[entry.failures - 1] ?? 0);
-    return true;
   }
 }

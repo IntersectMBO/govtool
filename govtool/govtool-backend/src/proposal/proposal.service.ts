@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import type {
@@ -24,7 +25,11 @@ import {
 } from 'src/common/legacy-network';
 import { compareFiguresDescending, voteFigure } from 'src/common/vote-figures';
 import { toLegacyNullableNumber } from 'src/common/legacy';
-import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
+import {
+  BACKGROUND_METADATA,
+  CHAIN_DATA,
+  METADATA,
+} from 'src/providers/providers.module';
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 import {
   documentBody,
@@ -32,7 +37,8 @@ import {
   proposalFields,
   resolveDocument,
 } from 'src/metadata/enrich';
-import { DocumentStore } from 'src/metadata/document-store';
+import { DocumentStore, type Json } from 'src/metadata/document-store';
+import type { Anchor } from 'src/metadata/enrich';
 import { toLegacyDescription } from 'src/common/legacy-description';
 import { toLegacyParamProposal } from 'src/epoch/epoch.service';
 import { readAll } from 'src/common/snapshot';
@@ -91,6 +97,10 @@ type ProposalSnapshotEntry = {
  */
 const ACTION_ID_TERM = /^(gov_action1[0-9a-z]*|[0-9a-f]{8,}(#\d*)?)$/i;
 
+/** Whether a search term can only be an action id; see `ACTION_ID_TERM`. */
+export const isActionIdTerm = (term: string): boolean =>
+  ACTION_ID_TERM.test(term.trim());
+
 @Injectable()
 export class ProposalService {
   private readonly proposalListSnapshotNamespace = 'proposalListSnapshot';
@@ -102,8 +112,24 @@ export class ProposalService {
     private readonly cacheService: CacheService,
     @Inject(METADATA) private readonly metadata: MetadataServiceV1 | null,
     private readonly network: LegacyNetwork = new LegacyNetwork(chain),
+    @Optional()
+    @Inject(BACKGROUND_METADATA)
+    backgroundMetadata?: MetadataServiceV1 | null,
   ) {
-    this.documents = new DocumentStore(metadata);
+    this.documents = new DocumentStore(backgroundMetadata ?? metadata);
+  }
+
+  /**
+   * An action's stored document, for the governance action history routes,
+   * which list the same actions; see `DocumentStore`.
+   */
+  storedDocument(anchor: Anchor): Json | undefined {
+    return this.documents.document(anchor);
+  }
+
+  /** Whether every action's document has had an answer; see `DocumentStore`. */
+  get documentsReady(): boolean {
+    return this.documents.ready;
   }
 
   /**
@@ -509,7 +535,7 @@ export class ProposalService {
     }
 
     const searchLower = search.toLowerCase();
-    const byId = ACTION_ID_TERM.test(search.trim());
+    const byId = isActionIdTerm(search);
     if (!byId && !this.documents.ready) {
       throw new ServiceUnavailableException({
         errorType: 'ServiceUnavailableError',

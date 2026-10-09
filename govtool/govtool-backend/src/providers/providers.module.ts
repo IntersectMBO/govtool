@@ -17,6 +17,7 @@ import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 import type { PinningServiceV1 } from '@govtool/data-providers/pinning';
 
 import { ConfigService } from '../config/config.service';
+import { DOCUMENT_FETCH_TIMEOUT_MS } from '../metadata/document-store';
 
 /**
  * Injection tokens for the data-layer contracts. Services depend on the
@@ -26,6 +27,8 @@ import { ConfigService } from '../config/config.service';
 export const CHAIN_DATA = 'CHAIN_DATA';
 export const PINNING = 'PINNING';
 export const METADATA = 'METADATA';
+/** The metadata service for fetches nobody waits on; see `DocumentStore`. */
+export const BACKGROUND_METADATA = 'BACKGROUND_METADATA';
 /** The chain data plus whatever it holds open (the db-sync pool). */
 const CHAIN_DATA_HANDLE = 'CHAIN_DATA_HANDLE';
 
@@ -146,6 +149,25 @@ const metadataProvider: Provider = {
   },
 };
 
+/**
+ * The same service with a timeout above its own fetch's, for the document
+ * store's background fetches. Request-time reads keep the client's default,
+ * which stays inside the frontend's 30 s request timeout.
+ */
+const backgroundMetadataProvider: Provider = {
+  provide: BACKGROUND_METADATA,
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService): MetadataServiceV1 | null => {
+    const baseUrl = configService.get().metadataServiceUrl;
+    return baseUrl
+      ? createHttpMetadataService({
+          baseUrl,
+          timeoutMs: DOCUMENT_FETCH_TIMEOUT_MS,
+        })
+      : null;
+  },
+};
+
 @Global()
 @Module({
   providers: [
@@ -154,8 +176,9 @@ const metadataProvider: Provider = {
     chainDataProvider,
     pinningProvider,
     metadataProvider,
+    backgroundMetadataProvider,
   ],
-  exports: [ConfigService, CHAIN_DATA, PINNING, METADATA],
+  exports: [ConfigService, CHAIN_DATA, PINNING, METADATA, BACKGROUND_METADATA],
 })
 export class ProvidersModule implements OnApplicationShutdown {
   constructor(

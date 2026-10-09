@@ -191,7 +191,55 @@ describe('DocumentStore', () => {
     expect(store.document(anchor('https://x/a'))).toEqual({ body: {} });
   });
 
-  it('runs one fill at a time', async () => {
+  it('does not hold an anchor named later behind a slow fetch', async () => {
+    let releaseSlow: () => void = () => undefined;
+    const { metadata } = service((url) =>
+      url === 'https://x/slow'
+        ? new Promise((resolve) => {
+            releaseSlow = () => resolve(resolved({}));
+          })
+        : Promise.resolve(resolved({ body: { givenName: 'New' } })),
+    );
+    const store = new DocumentStore(metadata);
+
+    const first = store.fill([anchor('https://x/slow')]);
+    // The next block names a new DRep while the slow fetch is still going.
+    const second = store.fill([
+      anchor('https://x/slow'),
+      anchor('https://x/new'),
+    ]);
+    await new Promise((resolve) => setImmediate(resolve));
+
+    expect(store.document(anchor('https://x/new'))).toEqual({
+      body: { givenName: 'New' },
+    });
+    expect(store.get(anchor('https://x/slow'))).toEqual({ status: 'pending' });
+    releaseSlow();
+    await Promise.all([first, second]);
+  });
+
+  it('shares one limit across fills that overlap', async () => {
+    let inFlight = 0;
+    let most = 0;
+    const { metadata } = service(async () => {
+      inFlight += 1;
+      most = Math.max(most, inFlight);
+      await new Promise((resolve) => setImmediate(resolve));
+      inFlight -= 1;
+      return resolved({});
+    });
+    const store = new DocumentStore(metadata);
+    const anchors = Array.from({ length: 50 }, (_, i) =>
+      anchor(`https://x/${i}`),
+    );
+
+    await Promise.all([store.fill(anchors.slice(0, 40)), store.fill(anchors)]);
+
+    expect(most).toBe(DOCUMENT_FETCH_CONCURRENCY);
+    expect(anchors.every((a) => store.document(a) !== undefined)).toBe(true);
+  });
+
+  it('asks once for an anchor already being fetched', async () => {
     let release: () => void = () => undefined;
     const { metadata, getMetadata } = service(
       () =>

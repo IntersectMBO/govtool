@@ -3,8 +3,8 @@
 Runs GovTool and its integration suites against a local Cardano devnet. Once
 images are pulled or built, nothing reaches a public network, hosted Kuber,
 Blockfrost, a faucet, Pinata or an IPFS gateway, and no secrets are needed.
-CI: `.github/workflows/test_integration_devnet.yml` (push to `dev` and
-`draft/govtool-provider-layer`, manual).
+CI: `.github/workflows/test_integration_devnet.yml` (push to `develop`,
+manual).
 
 - Chain: adaup (`cardano devnet up --docker`) runs cardano-node 11.0.1
   (magic 42, protocol 10), Kuber, db-sync 13.7 with its Postgres and an

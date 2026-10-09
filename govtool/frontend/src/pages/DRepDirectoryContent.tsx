@@ -17,7 +17,11 @@ import {
   useGetDRepDetailsQuery,
   useGetDRepListPaginatedQuery,
 } from "@hooks";
-import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
+import {
+  DataActionsBar,
+  EmptyStateDrepDirectory,
+  SearchNotReady,
+} from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
 import {
   isSameDRep,
@@ -143,6 +147,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     isPreviousData: isPrev,
     total,
     baselineTotalForStatus,
+    isSearchNotReady,
   } = useGetDRepListPaginatedQuery(
     {
       page: page - 1,
@@ -156,6 +161,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   );
 
   const showSearchSummary =
+    !isSearchNotReady &&
     searchText !== "" &&
     (!isFetching || !isPrev) &&
     total !== baselineTotalForStatus;
@@ -168,7 +174,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   if (
     (stakeKey && votingPower === undefined) ||
-    !dRepList ||
+    (!dRepList && !isSearchNotReady) ||
     (isConnected && currentDelegation === undefined)
   ) {
     return <Loader />;
@@ -177,7 +183,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const ada = correctDRepDirectoryFormat(votingPower);
 
   const filteredDoNotListDReps = uniqBy(
-    dRepList?.filter((dRep) => {
+    (dRepList ?? []).filter((dRep) => {
       if (typeof dRep.doNotList === "string") {
         return !parseBoolean(dRep.doNotList);
       }
@@ -337,7 +343,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             maxWidth: "100%",
           }}
         >
-          {filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />}
+          {isSearchNotReady ? (
+            <SearchNotReady />
+          ) : (
+            filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />
+          )}
           {filteredDoNotListDReps?.map((dRep) => (
             <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
               <Box>

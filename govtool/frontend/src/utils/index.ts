@@ -36,6 +36,7 @@ export * from "./governanceActions";
 export * from "./voteAggregate";
 export * from "./removeDuplicatedProposals";
 export * from "./removeMarkdown";
+export * from "./searchNotReady";
 export * from "./setProtocolParameterUpdate";
 export * from "./testIdFromLabel";
 export * from "./uniqBy";

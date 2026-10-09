@@ -636,6 +636,7 @@
     "navLabel": "Archived: 2025 Budget Proposals",
     "bannerText": "The 2025 budget process is closed. This is a read-only archive of the 2025 budget proposals, their versions, DRep poll results and comments."
   },
+  "searchNotReady": "Search is not available yet: GovTool is still loading DRep and governance action data. Please try again in a minute.",
   "govActions": {
     "about": "About",
     "abstract": "Abstract",
@@ -644,6 +645,7 @@
     "anchorHash": "Metadata anchor hash",
     "authors": {
       "noDataAvailable": "No data available",
+      "notLoaded": "Unknown: the document could not be loaded",
       "title": "Author(s)",
       "publicKey": "Public Key",
       "signature": "Signature",

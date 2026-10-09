@@ -4,6 +4,7 @@ import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { ProposalData } from "@models";
 import { getProposals, GetProposalsArguments } from "@services";
+import { isSearchNotReady } from "@utils";
 
 export const useGetProposalsInfiniteQuery = ({
   filters = [],
@@ -28,6 +29,7 @@ export const useGetProposalsInfiniteQuery = ({
 
   const {
     data,
+    error,
     isLoading,
     fetchNextPage,
     hasNextPage,
@@ -64,6 +66,7 @@ export const useGetProposalsInfiniteQuery = ({
     isProposalsFetching: isFetching,
     isProposalsFetchingNextPage: isFetchingNextPage,
     isProposalsLoading: isLoading,
+    isSearchNotReady: isSearchNotReady(error),
     proposals,
   };
 };

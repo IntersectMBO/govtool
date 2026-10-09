@@ -8,6 +8,7 @@ import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
+  SearchNotReady,
 } from "@molecules";
 import {
   useFetchNextPageDetector,
@@ -38,6 +39,7 @@ export const DashboardGovernanceActionsCategory = () => {
     isProposalsFetching,
     isProposalsFetchingNextPage,
     isProposalsLoading,
+    isSearchNotReady,
     proposals,
     proposalsfetchNextPage,
     proposalsHaveNextPage,
@@ -107,7 +109,9 @@ export const DashboardGovernanceActionsCategory = () => {
         >
           {getProposalTypeLabel(category ?? "")}
         </Typography>
-        {!mappedData || isEnableLoading || isProposalsLoading ? (
+        {isSearchNotReady ? (
+          <SearchNotReady />
+        ) : !mappedData || isEnableLoading || isProposalsLoading ? (
           <Box
             sx={{
               alignItems: "center",

@@ -241,9 +241,11 @@ test.describe("Perform voting", () => {
       window.scrollTo(0, 500)
     );
 
+    // The voted tab reads the DRep's votes every 20 s; give it one more read
+    // in case the first came before the vote's block.
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 30_000 });
 
     govActionDetailsPage = await governanceActionsPage.viewFirstVotedProposal();
 
@@ -276,9 +278,11 @@ test.describe("Perform voting", () => {
     await governanceActionsPage.getFirstProposal();
 
     await governanceActionsPage.votedTab.click();
+    // The voted tab reads the DRep's votes every 20 s; give it one more read
+    // in case the first came before the vote's block.
     await expect(
       govActionDetailsPage.currentPage.getByTestId("my-vote").getByText("Yes")
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 30_000 });
   });
 
    const verifyVoteWithMetadata = async (testInfo: any, useGovToolIPFS: boolean = false) => {

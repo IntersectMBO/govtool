@@ -5,9 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-As a minor extension, we also keep a semantic version for the `UNRELEASED`
-changes.
-
 ## [Unreleased]
 
 ### Added
@@ -16,6 +13,11 @@ changes.
 - `govtool-docs` Docker image, built by CI on `main`, `develop`, `test` and version tags; images from `main` and version tags always build for docs.gov.tools
 - A GitHub Pages preview of the documentation, deployed from `develop` and not indexed by search engines
 - Documentation checks on pull requests that touch `docs/`: the site build catches broken links and asset paths, and the Docker image is started and smoke-tested, before merge
+- Guides for AI coding agents: `AGENTS.md` files, each imported by a `CLAUDE.md`, at the root and in `govtool/frontend`, `govtool/govtool-backend` and `tests`, and a rewritten `govtool/AGENTS.md`, covering checks, couplings and traps. The guide to adding a governance action type now covers the data contract, providers, backend and forum ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
+
+### Fixed
+
+- Developer documentation no longer describes the removed Haskell backend or claims that pull requests run unit tests; broken anchors, the backend and test suite setup docs and their `.env.example` files are corrected, and the README links support, security reporting and the license ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 
 ### Changed
 

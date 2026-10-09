@@ -1,6 +1,6 @@
 # Build context is the `govtool/` directory, NOT this one.
 #
-# The backend depends on its three sibling packages by path
+# The backend depends on its sibling packages by path
 # (`file:../govtool-data-providers` and friends), so a build context of this
 # directory alone cannot resolve them. Build with:
 #
@@ -57,7 +57,7 @@ ENV NODE_ENV=production
 
 # The whole tree is carried over, because npm links a `file:` dependency as a
 # symlink into node_modules — copying only the backend's node_modules would
-# leave three dangling links. It also keeps the provider's `sql/` directory
+# leave dangling links. It also keeps the provider's `sql/` directory
 # next to its `dist/`, which is where the SQL loader resolves from.
 WORKDIR /app/govtool-backend
 COPY --from=build /src /app

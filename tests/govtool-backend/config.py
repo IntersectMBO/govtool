@@ -9,7 +9,6 @@ CURRENT_GIT_HASH = str(subprocess.check_output(["git", "rev-parse", "HEAD"]), "u
 
 dotenv.load_dotenv()
 
-RECORD_METRICS_API = os.getenv("RECORD_METRICS_API")
 METRICS_API_SECRET = os.getenv("METRICS_API_SECRET")
 KUBER_API_URL = os.getenv("KUBER_URL") or f'https://{os.getenv("NETWORK","preview")}.kuber.cardanoapi.io'
 KUBER_API_KEY = os.getenv("KUBER_API_KEY")

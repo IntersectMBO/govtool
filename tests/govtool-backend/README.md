@@ -23,11 +23,11 @@ To run setup script the main wallet must have enough balance. The address for th
 
 Run the setup script as follow.
 ```bash
-export KUBER_API_URL="..."
+export KUBER_URL="..."     # default: https://<NETWORK>.kuber.cardanoapi.io
 export KUBER_API_KEY="..." # if not self hosting.
 python3 ./setup.py
 ```
-This will generate test_data.json that will be used to run tests.
+Using the main wallet, topped up from the faucet, it registers the DReps and the ADA holders' stake keys, delegates the holders to the DReps and submits a no-confidence proposal. These are the wallets in the committed `test_data.json`, which the tests read; `setup.py` does not read or write that file.
 
 
 ## Run tests
@@ -38,6 +38,10 @@ export METRICS_URL="url" # metrics server Url
 export METRICS_API_SECRET="metrics-api-secret"
 pytest -v
 ```
+
+`config.py` runs `git rev-parse HEAD` on import, so run the suite inside a git checkout.
+
+To run against a local devnet instead, with the wallets already registered, use `tests/devnet/run-tests.sh pytest`; see [tests/devnet](../devnet/README.md).
 
 ## Allure Report
 Generate and view test reports using Allure.
@@ -53,6 +57,6 @@ Launch the Allure dashboard to view the test report:
 ```bash
 allure serve allure-results
 ```
-### TypeScript survey integration tests
+### Survey integration tests
 
-Set `RUN_SURVEY_TESTS=1` and run `test_cases/test_survey.py` against the TypeScript backend. The module is otherwise skipped so the shared suite still supports Haskell deployments. For successful lookup cases, set `SURVEY_TX_ID` and `SURVEY_PAYLOAD_CBOR_HEX` to a transaction and independently verified CBOR payload from the target network. These cases skip when neither value is configured and fail for incomplete or malformed configuration. Survey validation and missing-metadata cases do not require these values. The Haskell backend has no survey reference endpoint.
+Set `RUN_SURVEY_TESTS=1` and run `test_cases/test_survey.py` against the backend. The module is otherwise skipped. For successful lookup cases, set `SURVEY_TX_ID` and `SURVEY_PAYLOAD_CBOR_HEX` to a transaction and independently verified CBOR payload from the target network. These cases skip when neither value is configured and fail for incomplete or malformed configuration. Survey validation and missing-metadata cases do not require these values.

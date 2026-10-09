@@ -25,10 +25,9 @@ setup or extra DNS name.
   (`pip install docker-stack`) on a manager node. It resolves the stack's
   secrets from the deploying shell and versions them, so a changed value
   rolls out as a new secret version.
-- An nginx-proxy gateway (`mesudip/nginx-proxy`, as in
-  `tests/test-infrastructure`) on a swarm network, `frontend` by default. It
-  routes by the services' `VIRTUAL_HOST` and handles TLS. Point
-  `BASE_DOMAIN`'s DNS at it.
+- An nginx-proxy gateway (`mesudip/nginx-proxy`) on a swarm network,
+  `frontend` by default. It routes by the services' `VIRTUAL_HOST` and
+  handles TLS. Point `BASE_DOMAIN`'s DNS at it.
 - A chain data source for the backend, chosen by `CHAIN_DATA_PROVIDER`: a
   db-sync Postgres the backend can reach at `DBSYNC_POSTGRES_HOST`
   (`dbsync`, the default), or a Koios or Blockfrost API (`koios`,

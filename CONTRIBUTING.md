@@ -30,7 +30,7 @@ This document contains guidelines to help you get started and how to make sure y
       - [React](#react)
       - [CSS in Javascript](#css-in-javascript)
       - [CSS / SASS](#css--sass)
-      - [Haskell](#haskell)
+      - [TypeScript backend](#typescript-backend)
   - [Development Processes](#development-processes)
     - [Developer workflow](#developer-workflow)
     - [QA Workflow](#qa-workflow)
@@ -45,6 +45,8 @@ By participating, you are expected to uphold this code.
 ## Ask for Help
 
 See [`SUPPORT.md`](./SUPPORT.md) should you have any questions or need some help in getting set up.
+
+Security vulnerabilities are different: do not open an issue, follow [`SECURITY.md`](./SECURITY.md) instead.
 
 ## Roles and Responsibilities
 
@@ -62,7 +64,7 @@ Please complete the following steps in advance to help us fix any potential bug 
 - Make sure that you are using the latest version.
 - Determine if your bug is really a bug and not an error on your side.
   e.g. using incompatible environment components/versions.
-  If you are looking for support, you might want to check [this section](#i-have-a-question).
+  If you are looking for support, you might want to check [this section](#ask-for-help).
 - To see if other users have experienced (and potentially already solved) the same issue you are having.
 - Also make sure to search the internet (including Stack Overflow)
   to see if users outside of the GitHub community have discussed the issue.
@@ -104,8 +106,9 @@ Welcome to contributing to `GovTool`! Whether you're fixing a bug, adding a feat
 #### Getting Started
 
 1. **Set Up Your Environment**:
-   - Follow the [local development instructions](./README.md#-local-development) to clone the repository, select the required Node.js version, create the environment file, install dependencies, and start the frontend.
-   - For another component, use its setup guide: [frontend](./govtool/frontend/README.md), [backend](./govtool/govtool-backend/README.md), or [Docker Compose](./docker/README.md).
+   - Follow the [frontend's local development instructions](./govtool/frontend/README.md#local-development) to clone the repository, select the required Node.js version, create the environment file, install dependencies, and start the frontend.
+   - For another component, use its setup guide: [backend](./govtool/govtool-backend/README.md) or [Docker Compose](./docker/README.md).
+   - If you work with an AI coding agent, point it at the repository root: `AGENTS.md` there and in `govtool`, `govtool/frontend`, `govtool/govtool-backend` and `tests` (with `CLAUDE.md` importing it) gives it the conventions, checks and traps.
    - Make sure you're using the latest version of the project to avoid potential conflicts.
 
 2. **Find an Issue to Work On**:
@@ -128,7 +131,7 @@ Welcome to contributing to `GovTool`! Whether you're fixing a bug, adding a feat
    - Example: `feat/123-add-voting-ui` or `fix/456-update-api-endpoint`.
 
 6. **Make Your Changes**:
-   - Write clean, well-documented code following the [Style Guides](#style-guides) for React, Haskell, CSS, or other relevant technologies.
+   - Write clean, well-documented code following the [Style Guides](#style-guides) for React, CSS, the TypeScript backend, or other relevant technologies.
    - Add or update tests to ensure your changes are robust.
    - Keep your changes focused and aligned with the issue’s scope.
 
@@ -242,7 +245,7 @@ Releases that aren't stable will be released as pre-releases and will append a -
 During development, on every PR;
 
 - Make sure `CHANGELOG.md` is kept up-to-date with high-level, technical, but user-focused list of changes according to [keepachangelog](https://keepachangelog.com/en/1.0.0/).
-- Bump `UNRELEASED` version in `CHANGELOG.md` according to [semver](https://semver.org/).
+- Do not bump versions by hand: the `update-govtool-version.yml` workflow sets them and turns `[Unreleased]` into a release section, following [semver](https://semver.org/).
 
 ### Style Guides
 
@@ -271,7 +274,7 @@ The backend and its packages use Prettier and ESLint. In `govtool/govtool-backen
 - If the changes are not ready for review then feel free to create a draft PR, and link this to the ticket/issue.
 - When the PR is ready for review move the ticket from `in progress` to `in review`. Remember to change the state of the PR from draft to actual PR.
 - Developers should review each other's pull requests, and should be requested via [CODEOWNERS](./CODEOWNERS).
-- Unit tests are run on each pull request to `develop`.
+- Frontend and backend tests, lint and type checks run on pushes to a branch of this repository that touch their paths, not for pull requests from forks. Pull requests build and scan the backend and frontend images. Run the checks locally before asking for review.
 - After a review remember to address all the requests of changes since they are blocking PR from being merged.
 - Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually).
 - The ticket status can then be moved to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.

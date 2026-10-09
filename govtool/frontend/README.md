@@ -44,7 +44,7 @@ The values copied from `.env.example` are suitable for a local frontend connecte
 
 - `VITE_BASE_URL`: GovTool backend API URL. The local Docker setup uses `http://localhost:9999`.
 - `VITE_NETWORK_FLAG`: Cardano network selector; use `0` for a test network and `1` for mainnet.
-- `VITE_IS_DEV`: Keep this `true` locally to enable development behavior and skip the production maintenance check.
+- `VITE_IS_DEV`: Keep this `true` locally to enable development behavior and skip the production maintenance check. Any non-empty value, `false` included, turns it on; leave it empty, at build time as well as at runtime, to turn it off.
 - `VITE_IPFS_GATEWAY`: Gateway used to load `ipfs://` content.
 
 The following integrations are optional and may remain blank:
@@ -53,12 +53,25 @@ The following integrations are optional and may remain blank:
 - `VITE_CHATWOOT_URL` and `VITE_CHATWOOT_WEBSITE_TOKEN`: Chatwoot feedback widget.
 - `VITE_PDF_API_URL`: Proposal discussion service API.
 - `VITE_IPFS_PROJECT_ID`: Project identifier for gateways that require it.
+- `VITE_IS_CIP179_ENABLED`: CIP-179 surveys on governance actions and votes. On when unset; any value other than `true` turns it off. The surveys are also hidden when the backend reports `survey.linkedVoting` unavailable.
 
-`VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` can remain `false` when the proposal discussion service is not running.
+`VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` can remain `false` when the proposal discussion service is not running. Turning it on also needs `VITE_PDF_API_URL`, the forum backend's origin, such as `http://localhost:1337`.
 
 Governance action history uses the GovTool backend configured by `VITE_BASE_URL`. Its pages and navigation do not depend on an environment flag. The voting panel consumes the action's `vote_aggregates`, displaying each supported voter group independently without requesting network metrics. An unsupported applicable group has a direct provider-support message and no pass/fail indicator.
 
 For backend setup, see the [backend README](../govtool-backend/README.md). To run the complete service stack, see the [Docker Compose instructions](../../docker/README.md).
+
+## Checks
+
+CI runs `npm run tsc`, `npm run lint` and `npm test` on pushes that change the frontend. Locally, run:
+
+```bash
+npm run tsc
+npm run lint
+npx vitest run
+```
+
+`npm test` runs the same tests, but stays in watch mode in a terminal. Each test run rewrites the tracked `junit-report.xml`; restore it with `git checkout -- junit-report.xml` before committing.
 
 ## Troubleshooting
 
@@ -93,8 +106,9 @@ We distinguish two types of users:
 
 #### without a connected wallet who can:
 
-1. See the governance actions along with their details and the number of votes
-<!-- 2. See the list of DReps. -->
+1. See the governance actions along with their details and the number of votes.
+2. Browse the DRep directory.
+3. Read the governance action history, the 2025 budget proposals archive and, when enabled, the proposal discussions.
 
 #### with connected wallet who can:
 

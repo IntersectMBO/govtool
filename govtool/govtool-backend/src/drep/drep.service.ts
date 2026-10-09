@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import {
   ChainDataError,
   type ChainDataApiV1,
@@ -25,14 +30,8 @@ import {
 import { toLegacyNullableInteger } from 'src/common/legacy';
 import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
-import {
-  drepFields,
-  ENRICH_CONCURRENCY,
-  ENRICH_TIMEOUT_MS,
-  mapLimit,
-  resolveBody,
-} from 'src/metadata/enrich';
-import { DocumentSummaryCache } from 'src/metadata/text-cache';
+import { documentBody, drepFields, resolveBody } from 'src/metadata/enrich';
+import { DocumentStore } from 'src/metadata/document-store';
 import { readAll } from 'src/common/snapshot';
 import { ProposalService } from 'src/proposal/proposal.service';
 import {
@@ -52,13 +51,6 @@ import {
   VoteParams,
   VoteResponse,
 } from './drep.type';
-
-/**
- * The longest a DRep's vote history waits, in all, for its actions'
- * documents, so the response stays well inside the frontend's 30 s timeout
- * however many of them cannot be fetched.
- */
-const VOTE_HISTORY_DOCUMENT_BUDGET_MS = 5_000;
 
 /** Contract casing → the legacy API's casing. */
 const LEGACY_STATUS = {
@@ -113,31 +105,54 @@ const SNAPSHOT_DREP_SORTS: readonly DRepSort[] = [
   'activity',
 ];
 
-/**
- * Room for every DRep's name on mainnet several times over; a value is one
- * short string.
- */
-const NAME_CACHE_MAX_ENTRIES = 50_000;
-
 @Injectable()
 export class DRepService {
   private readonly drepListSnapshotNamespace = 'drepListSnapshot';
-  /** Each DRep's CIP-119 `givenName` by (hash, url), for name search. */
-  private readonly nameCache = new DocumentSummaryCache<{
-    givenName: string | null;
-  }>(NAME_CACHE_MAX_ENTRIES);
-  private warmingNames = false;
+  /** Every DRep's document, fetched ahead; see `DocumentStore`. */
+  private readonly documents: DocumentStore;
 
   constructor(
     @Inject(CHAIN_DATA) private readonly chain: ChainDataApiV1,
     private readonly proposalService: ProposalService,
     private readonly cacheService: CacheService,
     @Inject(METADATA) private readonly metadata: MetadataServiceV1 | null,
-  ) {}
+  ) {
+    this.documents = new DocumentStore(metadata);
+  }
 
-  /** A DRep's CIP-119 fields from its anchored document, when it resolves. */
+  /**
+   * A DRep's CIP-119 fields from its anchored document: the stored one, or
+   * fetched for the single-DRep routes when the store does not hold it.
+   */
   private async profileOf(url: string | null, hash: string | null) {
-    return drepFields(await resolveBody(this.metadata, { url, hash }));
+    return drepFields(
+      documentBody(this.documents.document({ url, hash })) ??
+        (await resolveBody(this.metadata, { url, hash })),
+    );
+  }
+
+  /**
+   * A directory row with what its stored document gives. A DRep whose
+   * document failed carries the reason in `metadataError`, as the Haskell
+   * backend's rows carried db-sync's fetch error. One with no answer yet goes
+   * out without its profile, and its card checks the document itself.
+   */
+  private withStoredProfile(item: DRepListItem): DRepListItem {
+    const stored = this.documents.get({
+      url: item.url,
+      hash: item.metadataHash,
+    });
+    if (stored?.status === 'resolved') {
+      const profile = drepFields(documentBody(stored.document));
+      return profile ? { ...item, ...profile } : item;
+    }
+    if (stored?.status === 'failed') {
+      return {
+        ...item,
+        metadataError: `${stored.failure.code}: ${stored.failure.message}`,
+      };
+    }
+    return item;
   }
 
   /**
@@ -321,7 +336,7 @@ export class DRepService {
 
     // A term that is not a DRep id is a name, as in the Haskell backend's
     // `given_name ILIKE`. No provider indexes names, so it is matched over the
-    // whole directory against the names the warmer has resolved.
+    // whole directory against the stored documents.
     const isName =
       search !== '' && tryLegacyDRepCandidates(search) === undefined;
     const snapshot = await this.getDRepListSnapShot(isName ? '' : search);
@@ -349,17 +364,11 @@ export class DRepService {
     const total = dreps.length;
     const offset = page * pageSize;
 
-    // Only the page being returned is resolved: the snapshot can hold
-    // thousands of DReps, and the metadata service caches each document by
-    // hash, so a page someone has looked at before costs nothing.
-    const elements = await mapLimit(
-      dreps.slice(offset, offset + pageSize),
-      ENRICH_CONCURRENCY,
-      async (item) => {
-        const profile = await this.profileOf(item.url, item.metadataHash);
-        return profile ? { ...item, ...profile } : item;
-      },
-    );
+    // Every document is fetched ahead into the store, so the page is read
+    // from it and the request never waits on a fetch.
+    const elements = dreps
+      .slice(offset, offset + pageSize)
+      .map((item) => this.withStoredProfile(item));
 
     return { page, pageSize, total, elements };
   }
@@ -382,19 +391,11 @@ export class DRepService {
             search,
           );
           // The details page opens a row as it is, without reading the
-          // proposal again, so each carries its document and authors. The
-          // documents share one budget: a history with many unreachable
-          // anchors would otherwise wait out ENRICH_TIMEOUT_MS on each, past
-          // the frontend's 30 s timeout. A row resolved after the budget is
-          // sent without its document; the fetch carries on and fills the
-          // metadata service's cache for the next read.
-          const deadline = Date.now() + VOTE_HISTORY_DOCUMENT_BUDGET_MS;
-          return mapLimit(ordered, ENRICH_CONCURRENCY, async (pair) => ({
+          // proposal again, so each carries its document and authors, read
+          // from the documents the warmer fetched for every action.
+          return ordered.map((pair) => ({
             ...pair,
-            proposal: await this.proposalService.withDocument(
-              pair.proposal,
-              Math.min(ENRICH_TIMEOUT_MS, Math.max(0, deadline - Date.now())),
-            ),
+            proposal: this.proposalService.withStoredDocument(pair.proposal),
           }));
         }),
     );
@@ -478,7 +479,7 @@ export class DRepService {
 
     let proposals = pairs.map((pair) => pair.proposal);
     proposals = this.proposalService.filterByType(proposals, selectedTypes);
-    proposals = await this.proposalService.filterBySearch(proposals, search);
+    proposals = this.proposalService.filterBySearch(proposals, search);
     proposals = this.proposalService.sortProposals(proposals, sort);
 
     return proposals.flatMap((proposal) => {
@@ -488,53 +489,39 @@ export class DRepService {
   }
 
   /**
-   * Resolves every DRep's name into the name cache, so a name search finds
-   * them: a directory holds thousands of DReps, more than a search could
-   * resolve on demand. One run at a time; failures only leave a name
-   * unresolved, and the metadata service keeps each document once fetched,
-   * so later runs are quick.
+   * Fetches every DRep's document into the store, so the directory, its
+   * name search and its cards are read without a fetch.
    */
-  async warmSearchNames(): Promise<void> {
-    const metadata = this.metadata;
-    if (metadata === null || this.warmingNames) return;
-    this.warmingNames = true;
-    try {
-      const dreps = (await this.getDRepListSnapShot('')).map((drep) =>
-        this.toLegacyListItem(drep),
-      );
-      await mapLimit(
-        dreps,
-        ENRICH_CONCURRENCY,
-        ({ url, metadataHash: hash }) =>
-          !url || !hash
-            ? Promise.resolve(undefined)
-            : this.nameCache.get(
-                hash,
-                url,
-                async () => {
-                  const fields = drepFields(
-                    await resolveBody(metadata, { url, hash }),
-                  );
-                  return fields ? { givenName: fields.givenName } : undefined;
-                },
-                { awaitRefresh: true },
-              ),
-      );
-    } finally {
-      this.warmingNames = false;
-    }
+  async warmDocuments(): Promise<void> {
+    if (this.metadata === null) return;
+    const dreps = await this.getDRepListSnapShot('');
+    await this.documents.fill(
+      dreps.map(({ anchor }) => ({
+        url: anchor?.url ?? null,
+        hash: anchor?.dataHash ?? null,
+      })),
+    );
   }
 
   /**
-   * DReps whose resolved name contains `search`, ignoring case. Reads only
-   * names already cached: one not resolved yet does not match, and is
-   * picked up once the warmer reaches it.
+   * DReps whose name contains `search`, ignoring case, from the stored
+   * documents. Until every document has had an answer the search would
+   * leave out the ones not asked for yet, so it refuses rather than answer
+   * with part of the directory.
    */
   private filterByName(dreps: DRepListItem[], search: string): DRepListItem[] {
+    if (!this.documents.ready) {
+      throw new ServiceUnavailableException({
+        errorType: 'ServiceUnavailableError',
+        message:
+          'DRep documents are still being fetched, so a name search cannot cover them yet. Try again shortly.',
+      });
+    }
     const needle = search.toLowerCase();
     return dreps.filter(({ url, metadataHash }) => {
-      if (!url || !metadataHash) return false;
-      const name = this.nameCache.peek(metadataHash, url)?.givenName;
+      const name = drepFields(
+        documentBody(this.documents.document({ url, hash: metadataHash })),
+      )?.givenName;
       return !!name && name.toLowerCase().includes(needle);
     });
   }

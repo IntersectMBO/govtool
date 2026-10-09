@@ -193,6 +193,15 @@ underneath:
   voted on and `GET /proposal/get` returns its vote. A `drepId` that names no
   DRep, such as the text `undefined` a disconnected frontend sends, is
   ignored.
+- Documents are fetched ahead, not while a request waits. After each
+  snapshot refresh the warmer fills a store with every DRep's and every
+  governance action's anchored document, 30 at a time from the metadata
+  service ([document-store.ts](src/metadata/document-store.ts), D167).
+  `/drep/list`, `/proposal/list`, their searches and `/drep/getVotes` read
+  only from it. A failure the service reports is retried after 5, 10 and
+  20 minutes and then kept, with its reason in a DRep row's `metadataError`.
+  A name or text search answers `503` until every document has had an
+  answer, rather than a partial result.
 - `GET /network/metrics` still answers its thirteen counters. The contract has
   no metrics resource, so [network.service.ts](src/network/network.service.ts)
   assembles them from the committee, the DRep counts, the proposal total and

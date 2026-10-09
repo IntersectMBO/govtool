@@ -19,6 +19,7 @@ changes.
 
 ### Changed
 
+- The backend fetches every DRep's and governance action's anchored document ahead, up to 30 at a time, and the DRep directory, the governance action list, their searches and a DRep's vote history read them from that store instead of fetching while the request waits. Failed fetches are retried three times, and a DRep row reports the reason in `metadataError`. A name or title search answers 503 until every document has been fetched once, instead of returning partial results
 - Budget discussions are now a read-only archive of the 2025 budget proposals (linked from a "2025 Budget Proposals" card in Useful links, with a read-only notice on its pages). The list, details, version history, final DRep poll totals and comments are served as static files under `/budget-proposals-2025/`, split from a mainnet export by `govtool/frontend/scripts/split-bd-archive.mjs`; the frontend makes no budget discussion requests. Old `/budget_discussion` links still resolve, `/budget_discussion/propose` redirects to the archive, and the archive is shown whether or not the proposal discussion forum is enabled
 - The frontend image compresses JSON and caches the archive files for 30 days
 

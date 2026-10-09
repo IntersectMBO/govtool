@@ -113,10 +113,10 @@ export class CacheWarmerService implements OnModuleDestroy, OnModuleInit {
             ? this.governanceActions.warmSearchText()
             : Promise.resolve(),
         );
-        warmText('proposal search text', () =>
-          this.proposalService.warmSearchText(),
+        warmText('governance action documents', () =>
+          this.proposalService.warmDocuments(),
         );
-        warmText('DRep names', () => this.drepService.warmSearchNames());
+        warmText('DRep documents', () => this.drepService.warmDocuments());
       }
     } finally {
       this.refreshing = false;

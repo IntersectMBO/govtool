@@ -307,24 +307,28 @@ describe('a governance action links a survey only through its verified document'
     );
 
   it('carries body.cip179 in json when the document verifies', async () => {
-    const body = await proposals({
+    const service = proposals({
       ok: true,
       hash: 'e'.repeat(64),
       body: document,
       fetchedAt: '2026-10-02T00:00:00Z',
-    }).list({ type: [], page: 0, pageSize: 10 });
+    });
+    await service.warmDocuments();
+    const body = await service.list({ type: [], page: 0, pageSize: 10 });
     expect(body.elements[0].json).toEqual(document);
   });
 
   it('carries no link when the document fails its hash check', async () => {
-    const body = await proposals({
+    const service = proposals({
       ok: false,
       code: 'HASH_MISMATCH',
       category: 'INVALID_CONTENT',
       message: 'Hash of fetched data does not match',
       servedHash: 'f'.repeat(64),
       checkedAt: '2026-10-02T00:00:00Z',
-    }).list({ type: [], page: 0, pageSize: 10 });
+    });
+    await service.warmDocuments();
+    const body = await service.list({ type: [], page: 0, pageSize: 10 });
     expect(body.elements[0].json).toBeNull();
   });
 });

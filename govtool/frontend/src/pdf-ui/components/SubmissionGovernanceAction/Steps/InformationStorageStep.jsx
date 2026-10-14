@@ -33,7 +33,11 @@ import {
     stepButtonSx,
 } from '../../CreationGoveranceAction/StepLayout';
 
-const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
+const InformationStorageStep = ({
+    proposal,
+    handleCloseSubmissionDialog,
+    handleGoToDataEdit = handleCloseSubmissionDialog,
+}) => {
     const navigate = useNavigate();
     const { walletAPI, validateMetadata, getEnactedProposalDetails } =
         useAppContext();
@@ -466,7 +470,7 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
             <ExternalDataNotMatchModal
                 open={showExternalDataNotMatchModal}
                 onClose={() => setShowExternalDataNotMatchModal(false)}
-                buttonOneClick={handleCloseSubmissionDialog}
+                buttonOneClick={handleGoToDataEdit}
                 buttonTwoClick={() => {
                     setShowExternalDataNotMatchModal(false);
                     setShowCancelRegistrationModal(true);
@@ -478,7 +482,7 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
                 status={metadataErrorStatus}
                 open={metadataErrorStatus !== null}
                 onClose={() => setMetadataErrorStatus(null)}
-                buttonOneClick={handleCloseSubmissionDialog}
+                buttonOneClick={handleGoToDataEdit}
                 buttonTwoClick={() => {
                     setMetadataErrorStatus(null);
                     setShowCancelRegistrationModal(true);
@@ -489,7 +493,7 @@ const InformationStorageStep = ({ proposal, handleCloseSubmissionDialog }) => {
             <UrlErrorModal
                 open={showUrlErrorModal}
                 onClose={() => setShowUrlErrorModal(false)}
-                buttonOneClick={handleCloseSubmissionDialog}
+                buttonOneClick={handleGoToDataEdit}
                 buttonTwoClick={() => {
                     setShowUrlErrorModal(false);
                     setShowCancelRegistrationModal(true);

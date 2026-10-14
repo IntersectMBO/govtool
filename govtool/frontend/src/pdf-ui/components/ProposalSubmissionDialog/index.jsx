@@ -17,6 +17,7 @@ const ProposalSubmissionDialog = ({
     proposal,
     openEditDialog,
     handleCloseSubmissionDialog,
+    handleGoToDataEdit,
 }) => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
@@ -57,6 +58,7 @@ const ProposalSubmissionDialog = ({
                                 handleCloseSubmissionDialog={
                                     handleCloseSubmissionDialog
                                 }
+                                handleGoToDataEdit={handleGoToDataEdit}
                             />
                         )}
                     </Box>

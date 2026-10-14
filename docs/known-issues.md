@@ -16,9 +16,6 @@ the full Playwright suite. Fixed problems are removed, not kept as history.
 - **The hard-fork form accepts any non-negative number.** Decimals such as 37.52 are accepted too. The ledger
   accepts only a direct successor of the current protocol version: `(major + 1, 0)` or `(major, minor + 1)`.
   Anything else is rejected on submission.
-- **"Go to Data Edit Screen" closes the dialog (7P).** After a metadata URL or hash check fails, the button only
-  closes the submission dialog; it does not open the edit form. **Question:** should it open the edit form, as
-  7P expects, or should the test change?
 - **Budget discussion links are capped at 20.** Proposal references have no cap since #4087. **Question:** does
   that decision cover budget discussions too?
 - **Users without a username are logged out when their token expires (#3689).** pdf-ui refreshes the access

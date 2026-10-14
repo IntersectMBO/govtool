@@ -2468,6 +2468,10 @@ const SingleGovernanceAction = ({ id }) => {
                             handleCloseSubmissionDialog={() =>
                                 setOpenGASubmissionDialog(false)
                             }
+                            handleGoToDataEdit={() => {
+                                setOpenGASubmissionDialog(false);
+                                handleEditProposal();
+                            }}
                         />
 
                         <ProposalOwnModal

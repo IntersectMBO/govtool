@@ -32,7 +32,7 @@ export const STRING_OPERATORS: readonly Operator[] = [
 /** A single comparison on a wire path. `value` is already coerced. */
 export interface CondNode {
   kind: 'cond';
-  /** Wire path segments, e.g. `['bd_psapb', 'type_name', 'id']`. */
+  /** Wire path segments, e.g. `['proposal', 'prop_likes']`. */
   path: string[];
   op: Operator;
   value: unknown;

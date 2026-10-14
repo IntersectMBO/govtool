@@ -11,7 +11,7 @@ export interface ListDelegate {
   count(args: object): Promise<number>;
 }
 
-/** `prisma.bdType` etc. typed loosely enough for findList. */
+/** `prisma.governanceActionType` etc. typed loosely enough for findList. */
 export function delegate(d: unknown): ListDelegate {
   return d as ListDelegate;
 }

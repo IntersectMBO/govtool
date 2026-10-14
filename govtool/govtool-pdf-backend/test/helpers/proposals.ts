@@ -55,10 +55,3 @@ export async function createPoll(t: TestApp, owner: StakeSession, proposalId: nu
   if (res.status !== 200) throw new Error(`createPoll: ${res.status} ${JSON.stringify(res.body)}`);
   return res.body.data.id as number;
 }
-
-/** A BD chain of one active version, written through Prisma (the BD routes are another module's). */
-export async function createBdMaster(t: TestApp, creatorId: number): Promise<number> {
-  const bd = await t.prisma.bd.create({ data: { creatorId, privacyPolicy: true, isActive: true } });
-  await t.prisma.bd.update({ where: { id: bd.id }, data: { masterId: bd.id } });
-  return bd.id;
-}

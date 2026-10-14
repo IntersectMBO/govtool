@@ -458,8 +458,8 @@ function ensure(ctx: PopCtx, tree: PopulateTree, path: string[]): PopulateNode |
   if (path.length > LIMITS.populateDepth) throw tooComplex();
   const p = path.join('.');
   if (isIgnored(ctx.c, p)) {
-    // `bd_further_information.proposal_links`: the component is a no-op but
-    // its owner is still populated.
+    // `comments_reports.maintainer`: the relation is a no-op but its owner
+    // is still populated.
     for (let i = path.length - 1; i > 0; i--) {
       const prefix = path.slice(0, i);
       const pp = prefix.join('.');

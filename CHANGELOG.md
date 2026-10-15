@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Developer documentation no longer describes the removed Haskell backend or claims that pull requests run unit tests; broken anchors, the backend and test suite setup docs and their `.env.example` files are corrected, and the README links support, security reporting and the license ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 - "Go to Data Edit Screen" in the proposal submission's URL, data mismatch and metadata error modals opens the proposal's edit form instead of only closing the submission and returning to the proposal page (playwright test 7P)
 - A newly registered DRep sees its DRep ID on the dashboard as soon as the registration lands, instead of up to 10 minutes later: the backend now drops its cached DRep id searches on each new block, as it does for other wallet state
+- The metadata service backs off an anchor that keeps failing, replaying the failure for 1 minute, then 10 minutes, 30 minutes, 1 hour, 6 hours and daily, instead of fetching it again and storing a new fetch report every minute; Retry keeps its one-minute window. The report picker lists the latest 10 reports
+- The browser tab title of the governance action history list reads "Historical Actions" instead of "Governance Action Details"
 
 ### Changed
 
@@ -28,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The DRep directory, the governance action lists, the governance action history and the voted-on tab retry a search the backend cannot run yet for about a minute, then say that search is still loading, instead of showing no results, "You haven't voted yet" or an endless spinner
 - Budget discussions are now a read-only archive of the 2025 budget proposals (linked from a "2025 Budget Proposals" card in Useful links, with a read-only notice on its pages). The list, details, version history, final DRep poll totals and comments are served as static files under `/budget-proposals-2025/`, split from a mainnet export by `govtool/frontend/scripts/split-bd-archive.mjs`; the frontend makes no budget discussion requests. Old `/budget_discussion` links still resolve, `/budget_discussion/propose` redirects to the archive, and the archive is shown whether or not the proposal discussion forum is enabled
 - The frontend image compresses JSON and caches the archive files for 30 days
+- The governance action history is labelled "Historical" in the navigation and "Historical Actions" on its page and in its breadcrumb
+- A metadata error on a governance action or DRep page shows its message, a "Why am I seeing this error?" link to the error docs and a "View Error Report" button that opens the fetch report, with Retry, in a dialog. The explanation paragraph moved to the DRep error conditions docs, which now also cover Data URL Blocked, Data Too Large, Data Not Checked and governance actions
 
 ### Removed
 

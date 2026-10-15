@@ -267,7 +267,9 @@ positions (D113).
 **Lifetime.** Reports are kept forever (D123). Each fetch adds one and a retry
 replaces nothing; the latest per (url, hash) is the default view. Bodies are
 stored by the hash of their bytes, so a url that keeps serving the same broken
-response stores it once. The one-minute error cache governs replay only (D121).
+response stores it once. The error cache governs replay only: one minute after
+the first failure, growing to a day for a url that keeps failing (D121, D169).
+Listing returns the latest ten reports; older ones stay readable by id.
 
 **The limit** is 2 MB, a named constant in the service's `config.ts`, not an
 environment variable (D120). `govtool-backend` uses the same value the same way.

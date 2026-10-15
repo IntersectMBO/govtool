@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Box } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 import { Button, Typography } from "@atoms";
 import { useCountdown, useTranslation } from "@hooks";
@@ -42,8 +43,9 @@ export const MetadataRetryButton = ({
     <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
       <Button
         data-testid="metadata-retry-button"
-        size="medium"
+        size="large"
         variant="outlined"
+        startIcon={<RefreshIcon />}
         disabled={isRunning}
         isLoading={isRetrying}
         onClick={onClick}

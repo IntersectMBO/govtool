@@ -130,13 +130,18 @@ export const DRepDetailsCard = ({
             isDrep
             sx={{ mb: 0 }}
             isValidating={isValidating}
-          />
-        )}
-        {metadataStatus && !isValidating && !!url && !!metadataHash && (
-          <MetadataFailureDetails
-            anchor={{ url, hash: metadataHash }}
-            canRetry={isMe}
-            onRecovered={() => setValidationRevision((value) => value + 1)}
+            reportAction={
+              !!url &&
+              !!metadataHash && (
+                <MetadataFailureDetails
+                  anchor={{ url, hash: metadataHash }}
+                  canRetry={isMe}
+                  onRecovered={() =>
+                    setValidationRevision((value) => value + 1)
+                  }
+                />
+              )
+            }
           />
         )}
         {metadataStatus && !!url && (

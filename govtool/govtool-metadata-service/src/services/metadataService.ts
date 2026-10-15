@@ -3,7 +3,8 @@ import * as json5 from "json5";
 import { blake2b } from "libcardano";
 import { prisma } from "../config/db";
 import {
-  ERROR_TTL_MS, FETCH_LIMIT_BYTES, HTTP_TIMEOUT_MS, IPFS_TIMEOUT_MS, REFRESH_WINDOW_MS,
+  ERROR_BACKOFF_MS, FETCH_LIMIT_BYTES, HTTP_TIMEOUT_MS, IPFS_TIMEOUT_MS, REFRESH_WINDOW_MS,
+  REPORT_LIST_LIMIT,
 } from "../config";
 import { fetchWithReport, type FetchHop, type FetchOutcome } from "../helpers/fetchWithReport";
 import { blacklistGateway, gatewayOrder, gatewayUrl, parseIpfsUrl, type IpfsAddress } from "../helpers/ipfs";
@@ -233,6 +234,18 @@ export const findLatestFailure = async (url: string, hash: Buffer) => {
   return { result, ageMs: Date.now() - row.fetchedAt.getTime() };
 };
 
+/**
+ * How long the latest failure for (url, hash) is replayed: longer the more
+ * often the pair has failed (D169). Content under the hash wins before any
+ * failure is read, so every failure counted is one in a row.
+ */
+const errorWindow = async (url: string, hash: Buffer) => {
+  const failures = await prisma.metadata.count({
+    where: { url, hash: Uint8Array.from(hash), error: { not: null } },
+  });
+  return ERROR_BACKOFF_MS[Math.min(Math.max(failures, 1), ERROR_BACKOFF_MS.length) - 1];
+};
+
 /* -- the fetch ---------------------------------------------------------------- */
 
 const timeoutFor = (isIpfs: boolean) => {
@@ -330,15 +343,15 @@ export const fetchAndRecord = async (hash: Buffer, url: string): Promise<Metadat
 
 /**
  * Resolve for the legacy GET route. Cached content wins outright. Otherwise a
- * recent failure for (url, hash) is replayed for the error TTL, or with
- * `invalidate` for the refresh window, which a request cannot shorten.
+ * recent failure for (url, hash) is replayed for its back-off window (D169),
+ * or with `invalidate` for the refresh window, which a request cannot shorten.
  */
 export const resolve = async (hash: Buffer, url: string | undefined, invalidate: boolean) => {
   const content = await findContent(hash);
   if (content) return content;
   if (!url) return undefined;
   const latest = await findLatestFailure(url, hash);
-  const window = invalidate ? REFRESH_WINDOW_MS : ERROR_TTL_MS;
+  const window = invalidate ? REFRESH_WINDOW_MS : await errorWindow(url, hash);
   if (latest && latest.ageMs < window) return latest.result;
   return fetchAndRecord(hash, url);
 };
@@ -415,10 +428,12 @@ export const getReport = async (id: string) => {
   };
 };
 
+/** The latest reports for (url, hash), newest first; older ones stay stored (D123, D169). */
 export const listReports = async (hash: Buffer, url: string) => {
   const rows = await prisma.fetch_report.findMany({
     where: { url, hash: Uint8Array.from(hash) },
     orderBy: { startedAt: "desc" },
+    take: REPORT_LIST_LIMIT,
     select: { id: true, startedAt: true, code: true, message: true },
   });
   return rows.map((r) => {

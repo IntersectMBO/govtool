@@ -279,6 +279,6 @@ export interface MetadataServiceV1 {
   /** One fetch report by id, or `null` when there is none. */
   getReport(reportId: string): Promise<MetadataReport | null>;
 
-  /** Every report for (url, hash), newest first. The first is the default view. */
+  /** The latest reports for (url, hash), newest first (D169). The first is the default view. */
   listReports(hash: Hex, url: string): Promise<MetadataReportSummary[]>;
 }

@@ -6,8 +6,23 @@
 /** Largest document accepted, and the most a fetch report keeps (2 MB). */
 export const FETCH_LIMIT_BYTES = 2 * 1024 * 1024;
 
-/** How long a failure for a (url, hash) pair is replayed without refetching. */
-export const ERROR_TTL_MS = 60 * 1000;
+/**
+ * How long a failure for a (url, hash) pair is replayed without refetching,
+ * by how many times it has failed: after the nth failure, the nth entry, and
+ * the last entry from then on (D169). A url that keeps failing is fetched
+ * less and less often, so it stops adding a report every minute.
+ */
+export const ERROR_BACKOFF_MS = [
+  60 * 1000,
+  10 * 60 * 1000,
+  30 * 60 * 1000,
+  60 * 60 * 1000,
+  6 * 60 * 60 * 1000,
+  24 * 60 * 60 * 1000,
+] as const;
+
+/** Reports listed for a (url, hash) pair, newest first (D169). */
+export const REPORT_LIST_LIMIT = 10;
 
 /** At most one real refetch per (url, hash) per window, whoever asks. */
 export const REFRESH_WINDOW_MS = 60 * 1000;

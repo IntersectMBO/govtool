@@ -280,24 +280,21 @@ export const GovernanceActionDetailsCardData = ({
         isInProgress={isInProgress}
         isSubmitted={isSubmitted}
         issues={metadataIssues}
+        reportAction={
+          !!url &&
+          !!metadataHash && (
+            // Anyone may retry a governance action's metadata (D125).
+            <MetadataFailureDetails
+              anchor={{ url, hash: metadataHash }}
+              canRetry
+              onRecovered={onMetadataRecovered}
+            />
+          )
+        }
       />
       {!isDataMissing && !isValidating && (
         <MetadataWarningInfoBox issues={metadataIssues} />
       )}
-      {isDataMissing &&
-        !isValidating &&
-        !isSubmitted &&
-        !isInProgress &&
-        !!url &&
-        !!metadataHash && (
-          // Anyone may retry a governance action's metadata (D125).
-          <MetadataFailureDetails
-            anchor={{ url, hash: metadataHash }}
-            canRetry
-            onRecovered={onMetadataRecovered}
-            sx={{ mb: 4 }}
-          />
-        )}
       <GovernanceActionCardElement
         label={t("govActions.governanceActionType")}
         text={label}

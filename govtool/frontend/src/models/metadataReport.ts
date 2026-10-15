@@ -149,3 +149,10 @@ export interface MetadataAnchor {
 
 /** The fetch limit the service applies (D120), for display only. */
 export const METADATA_FETCH_LIMIT_BYTES = 2 * 1024 * 1024;
+
+/**
+ * Reports offered in the report picker, newest first (D169). The service
+ * lists no more than this; an older service lists every report, so the
+ * picker cuts the list too.
+ */
+export const METADATA_REPORT_LIST_LIMIT = 10;

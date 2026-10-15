@@ -73,6 +73,11 @@ export default class BudgetDiscussionPage {
         ? "no-category"
         : category.toLowerCase().replace(/ /g, "-");
     await this.page.getByTestId(`${slug}-show-all-button`).click();
+    // The category page is a new route that remounts the list; wait for it,
+    // or a sort opened on the old list closes with it.
+    await expect(this.page).toHaveURL(new RegExp(`/category/${slug}$`));
+    await expect(this.backToListBtn).toBeVisible();
+    await this.page.locator(PROPOSAL_CARD_SELECTOR).first().waitFor();
   }
 
   async clickCategoryCheckboxes(names: string[]) {
@@ -145,8 +150,16 @@ export default class BudgetDiscussionPage {
   }
 
   async sortBy(type: BudgetProposalFilterTypes) {
-    await this.sortBtn.click();
-    await this.page.getByTestId(`${type}-sort-option`).click();
+    const menu = this.page.locator("#sort-menu");
+    const option = this.page.getByTestId(`${type}-sort-option`);
+    // Click again only while no menu is open: a click on an open menu's
+    // backdrop closes it.
+    await expect(async () => {
+      if (!(await menu.isVisible())) await this.sortBtn.click();
+      await expect(option).toBeVisible({ timeout: 10_000 });
+    }).toPass({ timeout: 30_000 });
+    await option.click();
+    await expect(menu).toBeHidden();
     await expect(this.sortBtn).toHaveText(`Sort: ${type}`);
   }
 

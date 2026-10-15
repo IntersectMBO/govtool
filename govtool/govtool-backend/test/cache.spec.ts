@@ -83,11 +83,13 @@ describe('CacheService.noteBlock', () => {
     cache.noteBlock({ block: 100 });
     cache.set('drepVotes', 'drep1', 'before the vote');
     cache.set('drepInfo', 'drep1', 'before the registration');
+    cache.set('drepIdSearch', 'drep1', 'before the registration');
 
     cache.noteBlock({ block: 101 });
 
     await expect(read(cache, 'drepVotes', 'drep1')).resolves.toBe('fresh');
     await expect(read(cache, 'drepInfo', 'drep1')).resolves.toBe('fresh');
+    await expect(read(cache, 'drepIdSearch', 'drep1')).resolves.toBe('fresh');
   });
 
   it('keeps the shared snapshots, which the warmer refreshes itself', async () => {

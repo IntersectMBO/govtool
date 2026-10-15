@@ -113,6 +113,12 @@ const SNAPSHOT_DREP_SORTS: readonly DRepSort[] = [
 @Injectable()
 export class DRepService {
   private readonly drepListSnapshotNamespace = 'drepListSnapshot';
+  /**
+   * Searches by DRep id: the directory search, a DRep's page and a wallet's
+   * own DRep on the dashboard. A registration changes the answer, so these
+   * are dropped on each new block, unlike the shared snapshot.
+   */
+  private readonly drepIdSearchNamespace = 'drepIdSearch';
   /** Every DRep's document, fetched ahead; see `DocumentStore`. */
   private readonly documents: DocumentStore;
 
@@ -347,7 +353,7 @@ export class DRepService {
     // whole directory against the stored documents.
     const isName =
       search !== '' && tryLegacyDRepCandidates(search) === undefined;
-    const snapshot = await this.getDRepListSnapShot(isName ? '' : search);
+    const snapshot = await this.getCachedDReps(isName ? '' : search);
     const activityVotes = new Map(
       snapshot.flatMap((drep) =>
         drep.activity === undefined
@@ -502,7 +508,7 @@ export class DRepService {
    */
   async warmDocuments(): Promise<void> {
     if (this.metadata === null) return;
-    const dreps = await this.getDRepListSnapShot('');
+    const dreps = await this.getCachedDReps('');
     await this.documents.fill(
       dreps.map(({ anchor }) => ({
         url: anchor?.url ?? null,
@@ -562,9 +568,12 @@ export class DRepService {
     }
   }
 
-  private getDRepListSnapShot(search: string): Promise<DRep[]> {
+  /** The whole directory for an empty search, else the DReps matching a DRep id. */
+  private getCachedDReps(search: string): Promise<DRep[]> {
     return this.cacheService.getOrSetStaleWhileRevalidate(
-      this.drepListSnapshotNamespace,
+      search === ''
+        ? this.drepListSnapshotNamespace
+        : this.drepIdSearchNamespace,
       search,
       () => this.fetchDRepListSnapshot(search),
       this.cacheService.drepListTtlSeconds(),

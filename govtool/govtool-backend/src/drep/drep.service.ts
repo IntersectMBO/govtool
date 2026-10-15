@@ -113,6 +113,11 @@ const SNAPSHOT_DREP_SORTS: readonly DRepSort[] = [
 @Injectable()
 export class DRepService {
   private readonly drepListSnapshotNamespace = 'drepListSnapshot';
+  /**
+   * A search by DRep id: a wallet's own DRep, which its registration changes,
+   * so it is wallet state rather than part of the shared snapshot.
+   */
+  private readonly drepIdSearchNamespace = 'drepIdSearch';
   /** Every DRep's document, fetched ahead; see `DocumentStore`. */
   private readonly documents: DocumentStore;
 
@@ -564,7 +569,9 @@ export class DRepService {
 
   private getDRepListSnapShot(search: string): Promise<DRep[]> {
     return this.cacheService.getOrSetStaleWhileRevalidate(
-      this.drepListSnapshotNamespace,
+      search === ''
+        ? this.drepListSnapshotNamespace
+        : this.drepIdSearchNamespace,
       search,
       () => this.fetchDRepListSnapshot(search),
       this.cacheService.drepListTtlSeconds(),

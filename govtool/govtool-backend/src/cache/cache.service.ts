@@ -21,6 +21,7 @@ const WALLET_STATE_NAMESPACES = [
   'accountInfo',
   'adaHolderCurrentDelegation',
   'adaHolderVotingPower',
+  'drepIdSearch',
   'drepInfo',
   'drepVoteRows',
   'drepVotes',

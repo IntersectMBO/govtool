@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Developer documentation no longer describes the removed Haskell backend or claims that pull requests run unit tests; broken anchors, the backend and test suite setup docs and their `.env.example` files are corrected, and the README links support, security reporting and the license ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 - "Go to Data Edit Screen" in the proposal submission's URL, data mismatch and metadata error modals opens the proposal's edit form instead of only closing the submission and returning to the proposal page (playwright test 7P)
+- A newly registered DRep sees its DRep ID on the dashboard as soon as the registration lands, instead of up to 10 minutes later: the backend now drops its cached DRep id searches on each new block, as it does for other wallet state
 
 ### Changed
 

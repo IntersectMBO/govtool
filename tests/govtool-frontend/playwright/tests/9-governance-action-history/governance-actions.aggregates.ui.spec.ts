@@ -276,7 +276,7 @@ for (const sample of samples) {
         )
         .toBeNull();
       await expect(
-        page.getByRole("heading", { name: "Governance action history" })
+        page.getByRole("heading", { name: "Historical Actions" })
       ).toBeVisible();
       const details = page.getByTestId(
         `${sample.txHash}#${sample.index}-view-details`

@@ -582,7 +582,7 @@
     }
   },
   "governanceActionHistoryList": {
-    "title": "Governance action history",
+    "title": "Historical Actions",
     "noResults": {
       "title": "No governance actions found",
       "description": "Governance actions are searchable by their ID both CIP-105 (legacy) and CIP-129 formats, title and abstract contents."
@@ -792,8 +792,8 @@
       "label": "Live Voting"
     },
     "history": {
-      "title": "Governance action history",
-      "label": "Governance action history"
+      "title": "Historical",
+      "label": "Historical"
     },
     "votedByMe": {
       "title": "Voted by me",

@@ -275,7 +275,9 @@ export default class GovernanceActionHistoryPage {
       await this.page.getByTestId("governance-actions").click();
     }
 
-    await expect(this.page.getByText(/Governance action history/i)).toHaveCount(2);
+    await expect(
+      this.page.getByRole("heading", { name: "Historical Actions" })
+    ).toBeVisible();
   }
 
   async filterGovernanceActionHistory() {

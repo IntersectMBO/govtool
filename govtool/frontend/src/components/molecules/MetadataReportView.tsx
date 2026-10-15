@@ -13,6 +13,7 @@ import { useTranslation } from "@hooks";
 import type { ConnectAttempt, FetchHop, MetadataReport } from "@models";
 
 import { MetadataReportBody } from "./MetadataReportBody";
+import { REPORT_BORDER, REPORT_LABEL } from "./metadataReportStyles";
 
 const formatTimestamp = (value: string) => {
   const date = new Date(value);
@@ -26,16 +27,53 @@ const Field = ({
   children,
   mono,
 }: PropsWithChildren<{ label: string; mono?: boolean }>) => (
-  <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 1 }}>
-    <Typography variant="body2" color="neutralGray">
-      {`${label}:`}
-    </Typography>
+  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, minWidth: 0 }}>
+    <Typography sx={REPORT_LABEL}>{label}</Typography>
     <Typography
-      variant="body2"
-      sx={{ ...breakAnywhere, ...(mono && { fontFamily: "monospace" }) }}
+      sx={{
+        fontSize: "16px",
+        fontWeight: 400,
+        overflowWrap: "anywhere",
+        ...(mono && { ...breakAnywhere, fontFamily: "monospace" }),
+      }}
     >
       {children}
     </Typography>
+  </Box>
+);
+
+/** Two fields side by side, stacked on a narrow screen. */
+const FieldPair = ({ children }: PropsWithChildren) => (
+  <Box
+    sx={{
+      display: "grid",
+      gridTemplateColumns: { xxs: "1fr", sm: "1fr 1fr" },
+      gap: 2,
+    }}
+  >
+    {children}
+  </Box>
+);
+
+const Section = ({
+  children,
+  shaded,
+  dataTestId,
+}: PropsWithChildren<{ shaded?: boolean; dataTestId?: string }>) => (
+  <Box
+    data-testid={dataTestId}
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      px: 3,
+      py: 2.5,
+      borderBottom: REPORT_BORDER,
+      "&:last-child": { borderBottom: 0 },
+      ...(shaded && { bgcolor: "#F5F7FC" }),
+    }}
+  >
+    {children}
   </Box>
 );
 
@@ -71,7 +109,18 @@ const AttemptsTable = ({ attempts }: { attempts: ConnectAttempt[] }) => {
   }
 
   return (
-    <Box sx={{ overflowX: "auto" }}>
+    <Box
+      sx={{
+        overflowX: "auto",
+        bgcolor: "neutralWhite",
+        border: REPORT_BORDER,
+        borderRadius: 2,
+        "& .MuiTableCell-root": { px: 2.5, py: 1.5 },
+        "& .MuiTableRow-root:last-of-type .MuiTableCell-body": {
+          borderBottom: 0,
+        },
+      }}
+    >
       <Table size="small" data-testid="metadata-report-attempts">
         <TableHead>
           <TableRow>
@@ -101,7 +150,7 @@ const AttemptsTable = ({ attempts }: { attempts: ConnectAttempt[] }) => {
             return (
               // eslint-disable-next-line react/no-array-index-key
               <TableRow key={`${attempt.address}-${index}`}>
-                <TableCell sx={{ fontFamily: "monospace", ...breakAnywhere }}>
+                <TableCell sx={{ fontFamily: "monospace", whiteSpace: "nowrap" }}>
                   {attempt.address}
                 </TableCell>
                 <TableCell>
@@ -138,40 +187,33 @@ const HopView = ({ hop, number }: { hop: FetchHop; number: number }) => {
   const headers = hop.response ? Object.entries(hop.response.headers) : [];
 
   return (
-    <Box
-      data-testid={`metadata-report-hop-${number}`}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-        p: 2,
-        border: "1px solid #E6E6F0",
-        borderRadius: 1,
-      }}
-    >
-      <Typography variant="body2" fontWeight={600}>
+    <Section shaded dataTestId={`metadata-report-hop-${number}`}>
+      <Typography sx={{ fontSize: "18px", fontWeight: 600 }}>
         {t("metadataReport.hop.title", { number })}
       </Typography>
-      <Field label={t("metadataReport.summary.url")} mono>
-        {hop.url}
-      </Field>
-
-      {"error" in hop.dns ? (
-        <Field label={t("metadataReport.hop.dnsError")} mono>
-          {`${hop.dns.error.code}: ${hop.dns.error.message}`}
+      <FieldPair>
+        <Field label={t("metadataReport.summary.url")} mono>
+          {hop.url}
         </Field>
-      ) : (
-        <Field label={t("metadataReport.hop.dnsAddresses")} mono>
-          {hop.dns.addresses.length > 0
-            ? hop.dns.addresses.map(({ address }) => address).join(", ")
-            : t("metadataReport.hop.dnsNoAddresses")}
-        </Field>
-      )}
+        {"error" in hop.dns ? (
+          <Field label={t("metadataReport.hop.dnsError")} mono>
+            {`${hop.dns.error.code}: ${hop.dns.error.message}`}
+          </Field>
+        ) : (
+          <Field label={t("metadataReport.hop.dnsAddresses")} mono>
+            {hop.dns.addresses.length > 0
+              ? hop.dns.addresses.map(({ address }) => address).join(", ")
+              : t("metadataReport.hop.dnsNoAddresses")}
+          </Field>
+        )}
+      </FieldPair>
 
-      <Typography variant="body2" color="neutralGray">
-        {t("metadataReport.hop.attempts")}
-      </Typography>
-      <AttemptsTable attempts={hop.attempts} />
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Typography sx={REPORT_LABEL}>
+          {t("metadataReport.hop.attempts")}
+        </Typography>
+        <AttemptsTable attempts={hop.attempts} />
+      </Box>
 
       {hop.response ? (
         <>
@@ -179,8 +221,8 @@ const HopView = ({ hop, number }: { hop: FetchHop; number: number }) => {
             {hop.response.status}
           </Field>
           {headers.length > 0 && (
-            <Box>
-              <Typography variant="body2" color="neutralGray">
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Typography sx={REPORT_LABEL}>
                 {t("metadataReport.hop.headers")}
               </Typography>
               <Box
@@ -206,7 +248,7 @@ const HopView = ({ hop, number }: { hop: FetchHop; number: number }) => {
           )}
         </>
       ) : (
-        <Typography variant="body2">
+        <Typography sx={{ fontSize: "16px", fontWeight: 400 }}>
           {t("metadataReport.hop.noResponse")}
         </Typography>
       )}
@@ -216,7 +258,7 @@ const HopView = ({ hop, number }: { hop: FetchHop; number: number }) => {
           {hop.redirectTo}
         </Field>
       )}
-    </Box>
+    </Section>
   );
 };
 
@@ -229,32 +271,58 @@ export const MetadataReportView = ({ report }: { report: MetadataReport }) => {
   const { result } = report;
 
   return (
-    <Box
-      data-testid="metadata-report"
-      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-    >
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-        <Typography
-          variant="body2"
-          fontWeight={600}
+    <Box data-testid="metadata-report">
+      <Section>
+        <Box
           data-testid="metadata-report-category"
+          sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
         >
-          {t(`metadataReport.categories.${result.category}`, {
-            defaultValue: result.category,
-          })}
-        </Typography>
-        <Field label={t("metadataReport.summary.code")} mono>
-          {result.code}
-        </Field>
+          <Typography sx={REPORT_LABEL}>
+            {t(`metadataReport.categories.${result.category}.title`, {
+              defaultValue: result.category,
+            })}
+          </Typography>
+          <Typography
+            sx={{ fontSize: "16px", fontWeight: 400, color: "errorRed" }}
+          >
+            {t(`metadataReport.categories.${result.category}.description`, {
+              defaultValue: result.code,
+            })}
+          </Typography>
+        </Box>
         <Field label={t("metadataReport.summary.message")}>
           {result.message}
         </Field>
-        <Field label={t("metadataReport.summary.startedAt")}>
-          {formatTimestamp(report.startedAt)}
-        </Field>
-        <Field label={t("metadataReport.summary.finishedAt")}>
-          {formatTimestamp(report.finishedAt)}
-        </Field>
+
+        {result.code === "HASH_MISMATCH" && (
+          <Box
+            data-testid="metadata-report-hash-mismatch"
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <Typography
+              sx={{ fontSize: "16px", fontWeight: 400, color: "errorRed" }}
+            >
+              {t("metadataReport.summary.hashMismatch")}
+            </Typography>
+            <Field label={t("metadataReport.summary.requestedHash")} mono>
+              {report.hash}
+            </Field>
+            <Field label={t("metadataReport.summary.servedHash")} mono>
+              {result.servedHash ?? "—"}
+            </Field>
+          </Box>
+        )}
+
+        <Box sx={{ borderTop: REPORT_BORDER }} />
+
+        <FieldPair>
+          <Field label={t("metadataReport.summary.startedAt")} mono>
+            {formatTimestamp(report.startedAt)}
+          </Field>
+          <Field label={t("metadataReport.summary.finishedAt")} mono>
+            {formatTimestamp(report.finishedAt)}
+          </Field>
+        </FieldPair>
         <Field label={t("metadataReport.summary.url")} mono>
           {report.url}
         </Field>
@@ -263,24 +331,7 @@ export const MetadataReportView = ({ report }: { report: MetadataReport }) => {
             {report.effectiveUrl}
           </Field>
         )}
-      </Box>
-
-      {result.code === "HASH_MISMATCH" && (
-        <Box
-          data-testid="metadata-report-hash-mismatch"
-          sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
-        >
-          <Typography variant="body2" sx={{ color: "errorRed" }}>
-            {t("metadataReport.summary.hashMismatch")}
-          </Typography>
-          <Field label={t("metadataReport.summary.requestedHash")} mono>
-            {report.hash}
-          </Field>
-          <Field label={t("metadataReport.summary.servedHash")} mono>
-            {result.servedHash ?? "—"}
-          </Field>
-        </Box>
-      )}
+      </Section>
 
       {report.hops.map((hop, index) => (
         // eslint-disable-next-line react/no-array-index-key
@@ -290,7 +341,12 @@ export const MetadataReportView = ({ report }: { report: MetadataReport }) => {
       {/* A mismatch references the served document by its hash rather than
           storing a copy (D114), so a missing body there is expected. */}
       {(report.body || result.code !== "HASH_MISMATCH") && (
-        <MetadataReportBody body={report.body} issues={result.issues ?? []} />
+        <Section>
+          <MetadataReportBody
+            body={report.body}
+            issues={result.issues ?? []}
+          />
+        </Section>
       )}
     </Box>
   );

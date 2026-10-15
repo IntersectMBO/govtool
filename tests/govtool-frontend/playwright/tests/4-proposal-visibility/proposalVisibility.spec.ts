@@ -352,7 +352,7 @@ test.describe("Invalid Live voting Metadata", () => {
         governanceActionTitle.toLowerCase() !== type.toLowerCase() &&
           `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
       ).toHaveText(type, { timeout: 60_000, ignoreCase: true });
-      await expect(page.getByText("Learn more")).toBeVisible();
+      await expect(page.getByTestId("metadata-error-learn-more")).toBeVisible();
       await expect(page.getByTestId("external-modal-button")).toBeVisible();
     });
   });

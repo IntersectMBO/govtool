@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import {
   Box,
+  ButtonBase,
   CircularProgress,
-  Collapse,
+  Dialog,
   MenuItem,
   Select,
   SxProps,
 } from "@mui/material";
+import AssignmentLateOutlinedIcon from "@mui/icons-material/AssignmentLateOutlined";
 
 import { Button, Typography } from "@atoms";
 import { useSnackbar } from "@context";
@@ -16,14 +18,19 @@ import {
   useGetMetadataResolveQuery,
   useTranslation,
 } from "@hooks";
-import type {
-  MetadataAnchor,
-  MetadataFailure,
-  MetadataRefreshOutcome,
+import {
+  METADATA_REPORT_LIST_LIMIT,
+  type MetadataAnchor,
+  type MetadataFailure,
+  type MetadataRefreshOutcome,
 } from "@models";
+import { openInNewTab } from "@utils";
+import { LINKS } from "@/consts/links";
+import { errorRed } from "@/consts/colors";
 
 import { MetadataReportView } from "./MetadataReportView";
 import { MetadataRetryButton } from "./MetadataRetryButton";
+import { REPORT_BORDER } from "./metadataReportStyles";
 
 type MetadataFailureDetailsProps = {
   anchor: MetadataAnchor | null | undefined;
@@ -48,10 +55,11 @@ const formatTimestamp = (value: string) => {
 };
 
 /**
- * The fetch report behind a metadata failure (D113, D117), collapsed under the
- * existing error label. It renders nothing when the backend reports no failure
- * for the anchor, or when it cannot answer (no metadata service configured):
- * the legacy label stays the source of the user-facing status either way.
+ * The fetch report behind a metadata failure (D113, D117), opened in a dialog
+ * from a "View Error Report" button. It renders nothing when the backend
+ * reports no failure for the anchor, or when it cannot answer (no metadata
+ * service configured): the legacy label stays the source of the user-facing
+ * status either way.
  */
 export const MetadataFailureDetails = ({
   anchor,
@@ -63,7 +71,7 @@ export const MetadataFailureDetails = ({
 }: MetadataFailureDetailsProps) => {
   const { t } = useTranslation();
   const { addSuccessAlert } = useSnackbar();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(
     null,
   );
@@ -83,20 +91,22 @@ export const MetadataFailureDetails = ({
   }, [latestReportId]);
 
   const shownReportId = selectedReportId ?? latestReportId;
-  const { reports } = useGetMetadataReportsQuery(
+  const { reports: listed } = useGetMetadataReportsQuery(
     anchor,
-    isExpanded && !!latestReportId,
+    isOpen && !!latestReportId,
   );
+  const reports = listed.slice(0, METADATA_REPORT_LIST_LIMIT);
   const {
     report,
     isLoading: isReportLoading,
     isError: isReportError,
-  } = useGetMetadataReportQuery(shownReportId, isExpanded);
+  } = useGetMetadataReportQuery(shownReportId, isOpen);
 
   const onOutcome = (outcome: MetadataRefreshOutcome) => {
     if (outcome.result.ok) {
       const message = t("metadataReport.retry.success");
       setRetryNotice(message);
+      setIsOpen(false);
       addSuccessAlert(message);
       onRecovered?.();
     } else if (outcome.refetched) {
@@ -118,6 +128,7 @@ export const MetadataFailureDetails = ({
   }
 
   const hasReport = !!latestReportId;
+  const isShownListed = reports.some(({ id }) => id === shownReportId);
 
   return (
     <Box
@@ -131,27 +142,31 @@ export const MetadataFailureDetails = ({
         ...sx,
       }}
     >
-      <Box
-        sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}
-      >
-        {hasReport && (
-          <Button
-            data-testid="metadata-failure-details-toggle"
-            size="small"
-            variant="text"
-            aria-expanded={isExpanded}
-            onClick={() => setIsExpanded((value) => !value)}
-            sx={{ px: 0 }}
-          >
-            {isExpanded
-              ? t("metadataReport.hideDetails")
-              : t("metadataReport.showDetails")}
-          </Button>
-        )}
-        {canRetry && (
-          <MetadataRetryButton anchor={anchor} onOutcome={onOutcome} />
-        )}
-      </Box>
+      {hasReport && (
+        <ButtonBase
+          data-testid="metadata-error-report-button"
+          aria-haspopup="dialog"
+          onClick={() => setIsOpen(true)}
+          sx={{
+            alignSelf: "flex-start",
+            gap: 0.75,
+            px: 1.5,
+            py: 0.75,
+            borderRadius: 50,
+            bgcolor: errorRed.c100,
+            color: errorRed.c700,
+            fontFamily: "Poppins",
+            fontSize: "16px",
+            "&:hover": { bgcolor: errorRed.c200 },
+          }}
+        >
+          <AssignmentLateOutlinedIcon fontSize="small" />
+          {t("metadataReport.viewReport")}
+        </ButtonBase>
+      )}
+      {!hasReport && canRetry && (
+        <MetadataRetryButton anchor={anchor} onOutcome={onOutcome} />
+      )}
 
       {error && (
         <Typography
@@ -163,50 +178,87 @@ export const MetadataFailureDetails = ({
         </Typography>
       )}
 
-      {retryNotice && (
-        <Typography variant="body2" data-testid="metadata-retry-notice">
-          {retryNotice}
-        </Typography>
-      )}
-
       {hasReport && (
-        <Collapse in={isExpanded} unmountOnExit>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {reports.length > 1 && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography variant="body2" color="neutralGray">
-                  {t("metadataReport.history.label")}
-                </Typography>
-                <Select
-                  size="small"
-                  value={shownReportId ?? ""}
-                  onChange={(event) =>
-                    setSelectedReportId(
-                      event.target.value === latestReportId
-                        ? null
-                        : (event.target.value as string),
-                    )
-                  }
-                  inputProps={{ "data-testid": "metadata-report-history" }}
-                  sx={{ fontSize: 14, maxWidth: "100%" }}
-                >
-                  {reports.map((summary, index) => (
-                    <MenuItem key={summary.id} value={summary.id}>
-                      {`${formatTimestamp(summary.startedAt)} · ${
-                        summary.code
-                      }${
-                        index === 0
-                          ? ` (${t("metadataReport.history.latest")})`
-                          : ""
-                      }`}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Box>
+        <Dialog
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          maxWidth="md"
+          fullWidth
+          aria-labelledby="metadata-report-title"
+          data-testid="metadata-report-dialog"
+          PaperProps={{
+            sx: {
+              borderRadius: "16px",
+              bgcolor: "neutralWhite",
+              maxWidth: "1000px",
+              m: { xxs: 2, md: 4 },
+              width: { xxs: "calc(100% - 32px)", md: "calc(100% - 64px)" },
+            },
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 2,
+              px: 3,
+              py: 2,
+              borderBottom: REPORT_BORDER,
+            }}
+          >
+            <Box
+              id="metadata-report-title"
+              sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            >
+              <AssignmentLateOutlinedIcon />
+              <Typography sx={{ fontSize: "20px", fontWeight: 600 }}>
+                {t("metadataReport.title")}
+              </Typography>
+            </Box>
+            {isShownListed && (
+              <Select
+                size="small"
+                value={shownReportId ?? ""}
+                onChange={(event) =>
+                  setSelectedReportId(
+                    event.target.value === latestReportId
+                      ? null
+                      : (event.target.value as string),
+                  )
+                }
+                inputProps={{
+                  "data-testid": "metadata-report-history",
+                  "aria-label": t("metadataReport.history.label"),
+                }}
+                sx={{
+                  fontSize: 14,
+                  width: { xxs: "100%", sm: "auto" },
+                  maxWidth: "100%",
+                  borderRadius: 2,
+                }}
+              >
+                {reports.map((summary, index) => (
+                  <MenuItem key={summary.id} value={summary.id}>
+                    {`${formatTimestamp(summary.startedAt)} · ${
+                      summary.code
+                    }${
+                      index === 0
+                        ? ` (${t("metadataReport.history.latest")})`
+                        : ""
+                    }`}
+                  </MenuItem>
+                ))}
+              </Select>
             )}
+          </Box>
 
+          <Box sx={{ overflowY: "auto" }}>
             {isReportLoading && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, p: 3 }}
+              >
                 <CircularProgress size={16} />
                 <Typography variant="body2">
                   {t("metadataReport.loading")}
@@ -214,18 +266,54 @@ export const MetadataFailureDetails = ({
               </Box>
             )}
             {isReportError && (
-              <Typography variant="body2" sx={{ color: "errorRed" }}>
+              <Typography variant="body2" sx={{ color: "errorRed", p: 3 }}>
                 {t("metadataReport.loadError")}
               </Typography>
             )}
             {!isReportLoading && !isReportError && report === null && (
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ p: 3 }}>
                 {t("metadataReport.notFound")}
               </Typography>
             )}
             {report && <MetadataReportView report={report} />}
           </Box>
-        </Collapse>
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1.5,
+              px: 3,
+              py: 2,
+              bgcolor: "#F3F4F8",
+              borderTop: REPORT_BORDER,
+            }}
+          >
+            <Button
+              data-testid="metadata-report-documentation"
+              size="large"
+              variant="outlined"
+              onClick={() => openInNewTab(LINKS.DREP_ERROR_CONDITIONS)}
+              sx={{
+                bgcolor: "neutralWhite",
+                borderColor: "#D6D8E0",
+                color: "textBlack",
+                "&:hover": { bgcolor: "neutralWhite", borderColor: "#B8BBC6" },
+              }}
+            >
+              {t("metadataReport.readDocumentation")}
+            </Button>
+            {canRetry && (
+              <MetadataRetryButton anchor={anchor} onOutcome={onOutcome} />
+            )}
+            {retryNotice && (
+              <Typography variant="body2" data-testid="metadata-retry-notice">
+                {retryNotice}
+              </Typography>
+            )}
+          </Box>
+        </Dialog>
       )}
     </Box>
   );

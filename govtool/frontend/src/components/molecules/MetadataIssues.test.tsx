@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import "@/i18n";
@@ -44,9 +44,30 @@ describe("DataMissingInfoBox", () => {
     expect(screen.getByTestId("metadata-error-message").textContent).toBe(
       message,
     );
-    expect(
-      screen.getByTestId("metadata-error-description").textContent,
-    ).not.toBe("");
+  });
+
+  it("links the why row to the docs, next to the report action", () => {
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+    render(
+      <DataMissingInfoBox
+        isDataMissing={MetadataValidationStatus.URL_BLOCKED}
+        reportAction={<button type="button">View Error Report</button>}
+      />,
+    );
+    expect(screen.getByTestId("metadata-error-explanation")).toHaveTextContent(
+      "View Error Report",
+    );
+
+    const why = screen.getByTestId("metadata-error-learn-more");
+    expect(why).toHaveTextContent("Why am I seeing this error?");
+    fireEvent.click(why);
+
+    expect(open).toHaveBeenCalledWith(
+      expect.stringContaining("drep-error-conditions"),
+      "_blank",
+      expect.anything(),
+    );
+    open.mockRestore();
   });
 
   it("lists the missing fields under a format failure", () => {

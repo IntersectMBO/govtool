@@ -5735,3 +5735,21 @@ includes budget discussions).
 - SPEC.md keeps the removed section numbers (§5.4, §8.8–§8.11) and Δ numbers as empty entries, so
   existing references stay valid.
 - Community tools that read the BD API lose it; the archive's files are the replacement.
+
+## D169 — A failing anchor backs off, and its report list shows the latest ten
+
+**Date:** 2026-10-15
+**Amends:** D121 (the error cache stays at one minute) and the metadata-service spec's §2.7 lifetime
+note. D123 (reports are kept forever) and D125 (anyone may retry once a minute) stand.
+
+- With a one-minute replay, any page view or backend fill after the minute fetched a failing url
+  again and stored a report. An anchor pointing at a private address had 914 reports on dev in eight
+  days, and the report dropdown listed them all.
+- A failure for (url, hash) is now replayed for longer the more often the pair has failed: 1 minute
+  after the first failure, then 10 minutes, 30 minutes, 1 hour, 6 hours, and 24 hours from the sixth
+  on. Content under the hash still wins first, so the count is of failures in a row. The schedule is
+  `ERROR_BACKOFF_MS` in the service's `config.ts`.
+- Retry (`refresh`) and `Cache-Control: invalidate` keep the one-minute refresh window, so a
+  publisher who fixed the url can check it at once. `verify` still fetches every time.
+- `listReports` returns the latest 10 reports, newest first (`REPORT_LIST_LIMIT`). Older reports stay
+  stored and readable by id.

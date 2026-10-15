@@ -10,6 +10,8 @@ import {
 } from "@models";
 import { buildHighlightedLines } from "@utils";
 
+import { REPORT_LABEL } from "./metadataReportStyles";
+
 /** Past this many lines the body renders on request, to keep the page light. */
 const INITIAL_LINE_LIMIT = 2000;
 
@@ -68,9 +70,7 @@ export const MetadataReportBody = ({ body, issues }: MetadataReportBodyProps) =>
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-      <Typography variant="body2" fontWeight={600}>
-        {t("metadataReport.body.title")}
-      </Typography>
+      <Typography sx={REPORT_LABEL}>{t("metadataReport.body.title")}</Typography>
 
       {!body && (
         <Typography variant="body2">{t("metadataReport.body.none")}</Typography>

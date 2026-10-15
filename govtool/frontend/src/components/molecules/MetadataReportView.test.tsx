@@ -85,13 +85,14 @@ const baseReport = (
 });
 
 describe("MetadataReportView", () => {
-  it("shows the category, code, message and hop details", () => {
+  it("shows the category, message and hop details", () => {
     render(<MetadataReportView report={baseReport()} />);
 
-    expect(screen.getByTestId("metadata-report-category")).toHaveTextContent(
-      "Schema invalid",
+    const category = screen.getByTestId("metadata-report-category");
+    expect(category).toHaveTextContent("Schema invalid");
+    expect(category).toHaveTextContent(
+      "the document does not meet the metadata standard",
     );
-    expect(screen.getByText("SCHEMA_INVALID")).toBeInTheDocument();
     expect(
       screen.getByText("body.givenName must be a string"),
     ).toBeInTheDocument();

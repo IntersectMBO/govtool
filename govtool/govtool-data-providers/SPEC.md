@@ -555,7 +555,8 @@ message, a display `category` derived from its code (`NETWORK`,
 detail: DNS answers, each address tried and its outcome, redirects, the
 response, every byte received up to the fetch limit, and content issues with
 source ranges for highlighting. Reports are never deleted (D123) and hide
-nothing from the user (D116).
+nothing from the user (D116). `listReports` returns the latest ten, newest
+first (D169).
 
 **The service connects only to public unicast addresses** (D122), checked on
 every resolved address and every redirect hop, and it connects to the address

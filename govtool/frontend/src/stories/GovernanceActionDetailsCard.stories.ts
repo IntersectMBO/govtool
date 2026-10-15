@@ -208,7 +208,7 @@ export const GovernanceActionDetailsDataMissing: Story = {
         /The data that was originally used when this Governance Action was created has not been found./i,
       ),
     ).toBeVisible();
-    await userEvent.click(canvas.getByText(/learn more/i));
+    await userEvent.click(canvas.getByText(/why am i seeing this error/i));
     await expect(window.open).toHaveBeenCalledTimes(1);
 
     await assertGovActionDetails(canvas, args);
@@ -234,7 +234,7 @@ export const GovernanceActionDetailsIncorrectFormat: Story = {
         /The data that was originally used when this Governance Action was created has been formatted incorrectly./i,
       ),
     ).toBeVisible();
-    await userEvent.click(canvas.getByText(/learn more/i));
+    await userEvent.click(canvas.getByText(/why am i seeing this error/i));
     await expect(window.open).toHaveBeenCalledTimes(1);
 
     await assertGovActionDetails(canvas, args);
@@ -260,7 +260,7 @@ export const GovernanceActionDetailsNotVerifiable: Story = {
         /The data that was originally used when this Governance Action was created has changed./i,
       ),
     ).toBeVisible();
-    await userEvent.click(canvas.getByText(/learn more/i));
+    await userEvent.click(canvas.getByText(/why am i seeing this error/i));
     await expect(window.open).toHaveBeenCalledTimes(1);
 
     await assertGovActionDetails(canvas, args);

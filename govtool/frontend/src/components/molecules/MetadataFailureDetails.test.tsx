@@ -85,20 +85,39 @@ describe("MetadataFailureDetails", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("is collapsed by default and loads the report only when expanded", () => {
+  it("is closed by default and loads the report only when opened", () => {
     render(<MetadataFailureDetails anchor={anchor} />);
 
-    const toggle = screen.getByTestId("metadata-failure-details-toggle");
-    expect(toggle).toHaveTextContent("Show details");
+    const button = screen.getByTestId("metadata-error-report-button");
+    expect(button).toHaveTextContent("View Error Report");
     expect(screen.queryByTestId("metadata-report")).not.toBeInTheDocument();
     expect(reportQuery).toHaveBeenLastCalledWith("r1", false);
 
-    fireEvent.click(toggle);
+    fireEvent.click(button);
 
     expect(reportQuery).toHaveBeenLastCalledWith("r1", true);
+    expect(screen.getByTestId("metadata-report-dialog")).toBeInTheDocument();
     expect(screen.getByTestId("metadata-report")).toBeInTheDocument();
     expect(screen.getByText("first attempt failed")).toBeInTheDocument();
-    expect(toggle).toHaveTextContent("Hide details");
+    expect(
+      screen.getByTestId("metadata-report-documentation"),
+    ).toHaveTextContent("Read documentation");
+  });
+
+  it("offers only the latest ten reports, however many the backend lists", () => {
+    state.reports = Array.from({ length: 12 }, (_, i) => ({
+      id: `r${i + 1}`,
+      startedAt: `2026-09-24T10:${String(59 - i).padStart(2, "0")}:00Z`,
+      code: "FETCH_ERROR",
+    }));
+    render(<MetadataFailureDetails anchor={anchor} />);
+    fireEvent.click(screen.getByTestId("metadata-error-report-button"));
+
+    fireEvent.mouseDown(screen.getByRole("combobox"));
+
+    const options = screen.getAllByRole("option");
+    expect(options).toHaveLength(10);
+    expect(options[0]).toHaveTextContent("(latest)");
   });
 
   it("shows the report of a failed submission check even when the cache has the document", () => {
@@ -106,7 +125,7 @@ describe("MetadataFailureDetails", () => {
     state.reportsById = { s1: report("s1", "Unexpected Status code: 404") };
     render(<MetadataFailureDetails anchor={anchor} reportId="s1" />);
 
-    fireEvent.click(screen.getByTestId("metadata-failure-details-toggle"));
+    fireEvent.click(screen.getByTestId("metadata-error-report-button"));
 
     expect(reportQuery).toHaveBeenLastCalledWith("s1", true);
     expect(screen.getByText("Unexpected Status code: 404")).toBeInTheDocument();
@@ -124,12 +143,13 @@ describe("MetadataFailureDetails", () => {
       "timeout of 30000ms exceeded",
     );
     expect(
-      screen.queryByTestId("metadata-failure-details-toggle"),
+      screen.queryByTestId("metadata-error-report-button"),
     ).not.toBeInTheDocument();
   });
 
   it("shows no retry button unless allowed", () => {
     render(<MetadataFailureDetails anchor={anchor} />);
+    fireEvent.click(screen.getByTestId("metadata-error-report-button"));
     expect(
       screen.queryByTestId("metadata-retry-button"),
     ).not.toBeInTheDocument();
@@ -154,6 +174,7 @@ describe("MetadataFailureDetails", () => {
         onRecovered={onRecovered}
       />,
     );
+    fireEvent.click(screen.getByTestId("metadata-error-report-button"));
 
     await act(async () => {
       fireEvent.click(screen.getByTestId("metadata-retry-button"));
@@ -173,7 +194,7 @@ describe("MetadataFailureDetails", () => {
       return { refetched: true, result: failure("r2") };
     });
     render(<MetadataFailureDetails anchor={anchor} canRetry />);
-    fireEvent.click(screen.getByTestId("metadata-failure-details-toggle"));
+    fireEvent.click(screen.getByTestId("metadata-error-report-button"));
     expect(screen.getByText("first attempt failed")).toBeInTheDocument();
 
     await act(async () => {

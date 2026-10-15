@@ -347,6 +347,34 @@ describe('GET /api/metadata', () => {
     expect(refreshed.body.metadata).toEqual(testMetadata);
   });
 
+  it('should replay a failure longer the more often the pair has failed', async () => {
+    const mockUrl = `http://localhost:${(mockServer.address() as any).port}/mutable`;
+    const path = `/api/metadata?hash=${testMetadataHash}&url=${encodeURIComponent(mockUrl)}`;
+    const ago = (minutes: number) => new Date(Date.now() - minutes * 60 * 1000);
+    // Two failures already: the second is replayed for ten minutes.
+    for (const minutes of [30, 2]) {
+      await prisma.metadata.create({
+        data: {
+          hash: Buffer.from(testMetadataHash, 'hex'),
+          url: mockUrl,
+          code: 'FETCH_ERROR',
+          error: 'connect ECONNREFUSED',
+          fetchedAt: ago(minutes),
+        },
+      });
+    }
+
+    const replayed = await request(server).get(path);
+    expect(replayed.status).toBe(502);
+    expect(fetchCount).toBe(0);
+
+    await prisma.metadata.updateMany({ data: { fetchedAt: ago(11) } });
+    mutableContent = testMetadata;
+    const refetched = await request(server).get(path);
+    expect(refetched.status).toBe(200);
+    expect(fetchCount).toBe(1);
+  });
+
   it('should return EXCEEDS_LIMIT for an oversized document', async () => {
     const mockUrl = `http://localhost:${(mockServer.address() as any).port}/too-large`;
     const response = await request(server)
@@ -537,7 +565,7 @@ describe('fetch reports', () => {
     expect(await prisma.fetch_body.count()).toBe(1);
   });
 
-  it('should list every report for an anchor, newest first', async () => {
+  it('should list the reports for an anchor, newest first', async () => {
     const url = `http://localhost:${port()}/mutable`;
     const first = await request(server).get(resolvePath(testMetadataHash, url));
     await prisma.metadata.updateMany({ data: { fetchedAt: new Date(Date.now() - 2 * 60 * 1000) } });
@@ -548,6 +576,28 @@ describe('fetch reports', () => {
     expect(list.status).toBe(200);
     expect(list.body.map((r: any) => r.id)).toEqual([second.body.reportId, first.body.reportId]);
     expect(list.body[0]).toMatchObject({ code: 'HASH_MISMATCH', category: 'INVALID_CONTENT' });
+  });
+
+  it('should list only the latest ten reports for an anchor', async () => {
+    const url = `http://localhost:${port()}/not-found`;
+    await prisma.fetch_report.createMany({
+      data: Array.from({ length: 12 }, (_, i) => ({
+        id: `report-${String(i).padStart(2, '0')}`,
+        hash: Buffer.from(testMetadataHash, 'hex'),
+        url,
+        code: 'FETCH_ERROR',
+        message: 'connect ECONNREFUSED',
+        startedAt: new Date(Date.now() - (12 - i) * 60 * 1000),
+        finishedAt: new Date(Date.now() - (12 - i) * 60 * 1000),
+        details: {},
+      })),
+    });
+
+    const list = await request(server).get(`/api/metadata/reports?hash=${testMetadataHash}&url=${encodeURIComponent(url)}`);
+    expect(list.status).toBe(200);
+    expect(list.body).toHaveLength(10);
+    expect(list.body[0].id).toBe('report-11');
+    expect(list.body[9].id).toBe('report-02');
   });
 
   it('should 404 an unknown or malformed report id', async () => {

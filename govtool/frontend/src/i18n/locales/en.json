@@ -355,14 +355,6 @@
     "walletNoCIP30Support": "Your wallet does not support CIP-30 extensions.",
     "walletNoCIP90FunctionsEnabled": "Your wallet did not enable the needed CIP-95 functions during connection.",
     "dRep": {
-      "description": {
-        "notVerifiable": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
-        "dataMissing": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
-        "incorrectFormat": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec.",
-        "urlBlocked": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. GovTool only fetches data from public internet addresses, and this URL points to a private, local or otherwise blocked address.",
-        "exceedsLimit": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the file at the URL is larger than the 2 MB GovTool accepts.",
-        "internalError": "Something went wrong on GovTool's side while checking this DRep's data. This is not a problem with the DRep's data. Please try again later."
-      },
       "message": {
         "notVerifiable": "The data that was originally used when this DRep was created has changed.",
         "dataMissing": "The data that was originally used when this DRep was created has not been found.",
@@ -373,14 +365,6 @@
       }
     },
     "gAMetadata": {
-      "description": {
-        "notVerifiable": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data when the Governance Action was originally posted.",
-        "dataMissing": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that GovTool cannot locate the data on the URL specified when the Governance Action was originally posted.",
-        "incorrectFormat": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data format as defined by the Cardano community.",
-        "urlBlocked": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. GovTool only fetches data from public internet addresses, and this URL points to a private, local or otherwise blocked address.",
-        "exceedsLimit": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the file at the URL is larger than the 2 MB GovTool accepts.",
-        "internalError": "Something went wrong on GovTool's side while checking this Governance Action's data. This is not a problem with the proposer's data. Please try again later."
-      },
       "message": {
         "notVerifiable": "The data that was originally used when this Governance Action was created has changed.",
         "dataMissing": "The data that was originally used when this Governance Action was created has not been found.",
@@ -582,7 +566,7 @@
     }
   },
   "governanceActionHistoryList": {
-    "title": "Governance action history",
+    "title": "Historical Actions",
     "noResults": {
       "title": "No governance actions found",
       "description": "Governance actions are searchable by their ID both CIP-105 (legacy) and CIP-129 formats, title and abstract contents."
@@ -792,8 +776,8 @@
       "label": "Live Voting"
     },
     "history": {
-      "title": "Governance action history",
-      "label": "Governance action history"
+      "title": "Historical",
+      "label": "Historical"
     },
     "votedByMe": {
       "title": "Voted by me",
@@ -846,15 +830,26 @@
     "title": "Update DRep Metadata"
   },
   "metadataReport": {
-    "showDetails": "Show details",
-    "hideDetails": "Hide details",
+    "whyError": "Why am I seeing this error?",
+    "viewReport": "View Error Report",
+    "title": "Report",
+    "readDocumentation": "Read documentation",
     "loading": "Loading the fetch report…",
     "loadError": "The fetch report could not be loaded.",
     "notFound": "No fetch report was found for this failure.",
     "categories": {
-      "NETWORK": "Network error: nothing usable came back from the URL",
-      "INVALID_CONTENT": "Invalid content: something came back, but it is not the anchored document",
-      "SCHEMA_INVALID": "Schema invalid: the document does not meet the metadata standard"
+      "NETWORK": {
+        "title": "Network error",
+        "description": "nothing usable came back from the URL"
+      },
+      "INVALID_CONTENT": {
+        "title": "Invalid content",
+        "description": "something came back, but it is not the anchored document"
+      },
+      "SCHEMA_INVALID": {
+        "title": "Schema invalid",
+        "description": "the document does not meet the metadata standard"
+      }
     },
     "summary": {
       "code": "Code",
@@ -868,7 +863,7 @@
       "hashMismatch": "The document served does not hash to the value anchored on chain."
     },
     "history": {
-      "label": "Report",
+      "label": "Select a report",
       "latest": "latest"
     },
     "hop": {

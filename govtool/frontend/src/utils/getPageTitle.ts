@@ -12,6 +12,12 @@ const PAGE_TITLES = [
   { path: PATHS.home, title: "Home" },
   { path: PATHS.dashboard, title: "Dashboard" },
 
+  // Before the action paths: "/governance_actions/:proposalId" also matches
+  // the history list, taking "history" for an action id.
+  {
+    path: `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`,
+    title: "Historical Actions",
+  },
   { path: PATHS.governanceActions, title: "Governance Actions" },
   {
     path: PATHS.governanceActionsCategory,
@@ -68,10 +74,6 @@ const PAGE_TITLES = [
   {
     path: `${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`,
     title: "Archived: 2025 Budget Proposals",
-  },
-  {
-    path: `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`,
-    title: "Governance action history",
   },
   {
     path: USER_PATHS.governanceActionsVotedByMe,

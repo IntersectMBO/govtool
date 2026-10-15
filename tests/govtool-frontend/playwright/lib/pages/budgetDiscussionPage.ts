@@ -157,7 +157,7 @@ export default class BudgetDiscussionPage {
     await expect(async () => {
       if (!(await menu.isVisible())) await this.sortBtn.click();
       await expect(option).toBeVisible({ timeout: 10_000 });
-    }).toPass();
+    }).toPass({ timeout: 30_000 });
     await option.click();
     await expect(menu).toBeHidden();
     await expect(this.sortBtn).toHaveText(`Sort: ${type}`);

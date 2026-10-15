@@ -45,7 +45,11 @@ import { NetworkService } from '../src/network/network.service';
 import { ProposalService } from '../src/proposal/proposal.service';
 import type { GovernanceActionType } from '../src/proposal/proposal.type';
 import { TransactionService } from '../src/transaction/transaction.service';
-import { drepIdToCip105, legacyStakeAddress } from '../src/common/legacy-ids';
+import {
+  drepIdToCip105,
+  drepIdToHex,
+  legacyStakeAddress,
+} from '../src/common/legacy-ids';
 import { LegacyNetwork } from '../src/common/legacy-network';
 import { actionId, drepId, numberedDRepId } from './ids';
 
@@ -1107,6 +1111,58 @@ describe('GET /drep/list', () => {
 
     await expect(
       service.list({ status: ['Retired'], page: 0, pageSize: 10 }),
+    ).resolves.toMatchObject({ total: 0 });
+  });
+});
+
+describe('GET /drep/list searched by DRep id', () => {
+  it('finds a DRep registered after the search, once its block lands', async () => {
+    // The dashboard searches for its own DRep before registering; that empty
+    // answer must not outlive the block the registration lands in.
+    let registered: DRep[] = [];
+    const cache = new CacheService({
+      get: () => ({
+        cacheDurationSeconds: 20,
+        drepListCacheDurationSeconds: 600,
+        cacheMaxEntries: 1_000,
+      }),
+    } as unknown as ConfigService);
+    const api = chain({
+      system: {
+        getCapabilities: () =>
+          Promise.resolve(
+            env(capabilitiesWith(['registrationDate', 'random'])),
+          ),
+      },
+      governance: {
+        dreps: { list: () => Promise.resolve(page(registered)) },
+      },
+    });
+    const service = new DRepService(
+      api,
+      new ProposalService(api, cache, null),
+      cache,
+      null,
+    );
+    const search = drepIdToHex(DREP_ID);
+    cache.noteBlock({ block: 100 });
+
+    await expect(
+      service.list({ search, status: [], page: 0, pageSize: 10 }),
+    ).resolves.toMatchObject({ total: 0 });
+    await expect(
+      service.list({ status: [], page: 0, pageSize: 10 }),
+    ).resolves.toMatchObject({ total: 0 });
+
+    registered = [fullDRep()];
+    cache.noteBlock({ block: 101 });
+
+    await expect(
+      service.list({ search, status: [], page: 0, pageSize: 10 }),
+    ).resolves.toMatchObject({ total: 1 });
+    // The whole directory stays a shared snapshot that the warmer refreshes.
+    await expect(
+      service.list({ status: [], page: 0, pageSize: 10 }),
     ).resolves.toMatchObject({ total: 0 });
   });
 });

@@ -4,3 +4,4 @@ export * from "./wallet";
 export * from "./metadataValidation";
 export * from "./metadataReport";
 export * from "./governanceActions";
+export * from "./maintenance";

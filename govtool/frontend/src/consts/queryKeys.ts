@@ -10,6 +10,7 @@ export const QUERY_KEYS = {
   useGetNetworkTotalStakeKey: "useGetNetworkTotalStakeKey",
   useGetNetworkInfoKey: "useGetNetworkInfoKey",
   useGetSystemFeaturesKey: "useGetSystemFeaturesKey",
+  useGetMaintenanceStatusKey: "useGetMaintenanceStatusKey",
   useGetProposalKey: "useGetProposalKey",
   useGetProposalsInfiniteKey: "useGetProposalsInfiniteKey",
   useGetProposalsKey: "useGetProposalsKey",

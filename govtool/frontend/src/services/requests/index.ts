@@ -9,6 +9,7 @@ export * from "./getNetworkMetrics";
 export * from "./getNetworkTotalStake";
 export * from "./getProposal";
 export * from "./getProposals";
+export * from "./getMaintenanceStatus";
 export * from "./getSystemFeatures";
 export * from "./getTransactionStatus";
 export * from "./getVoteContextTextFromFile";

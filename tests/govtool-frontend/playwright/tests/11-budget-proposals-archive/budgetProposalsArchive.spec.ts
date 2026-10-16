@@ -341,6 +341,7 @@ test.describe("Old budget discussion links", () => {
     page,
   }) => {
     await page.goto(`${environments.frontendUrl}/budget_discussion/99999999`);
-    await expect(page).toHaveURL(/\/budget_discussion$/);
+    // The archive redirects only once its proposal index has loaded.
+    await expect(page).toHaveURL(/\/budget_discussion$/, { timeout: 30_000 });
   });
 });

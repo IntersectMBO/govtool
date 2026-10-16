@@ -275,9 +275,19 @@ export default class GovernanceActionHistoryPage {
       await this.page.getByTestId("governance-actions").click();
     }
 
-    await expect(
-      this.page.getByRole("heading", { name: "Historical Actions" })
-    ).toBeVisible();
+    await expect(this.page).toHaveURL(/\/governance_actions\/history(\?|$)/);
+    // Text, not role: the governance actions menu reopened above leaves the
+    // page aria-hidden. Connected, the page has no heading of its own; the
+    // dashboard bar repeats the nav item's label.
+    if (isLoggedIn) {
+      await expect(
+        this.page.getByText("Historical", { exact: true })
+      ).toHaveCount(2);
+    } else {
+      await expect(
+        this.page.getByText("Historical Actions", { exact: true })
+      ).toBeVisible();
+    }
   }
 
   async filterGovernanceActionHistory() {

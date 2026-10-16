@@ -1,20 +1,34 @@
 import { PropsWithChildren } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import { Trans, useTranslation } from "react-i18next";
+import { useGetMaintenanceStatus } from "@hooks";
 import { useAppContext } from "@/context";
 import { LINKS } from "@/consts/links";
+import { MaintenanceBanner } from "./MaintenanceBanner";
 
 export const TopBanners = ({ children }: PropsWithChildren) => {
   const { isMainnet, networkName, isInBootstrapPhase, isAppInitializing } =
     useAppContext();
   const { t } = useTranslation();
+  const { maintenanceStatus } = useGetMaintenanceStatus();
+
+  // Shown even while the app initializes, since maintenance may keep it there.
+  const maintenanceBanner = maintenanceStatus ? (
+    <MaintenanceBanner
+      endsAt={maintenanceStatus.endsAt}
+      startsAt={maintenanceStatus.startsAt}
+    />
+  ) : null;
 
   if (isAppInitializing) {
-    return null;
+    return maintenanceBanner;
   }
 
   return (
     <Box>
+      {/* MAINTENANCE BANNER */}
+      {maintenanceBanner}
+
       <Box>
         {/* NETWORK BANNER */}
         {!isMainnet && (

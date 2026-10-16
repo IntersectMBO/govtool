@@ -334,6 +334,7 @@
     "whoops": "Whoops!"
   },
   "errors": {
+    "maintenanceTransactionsPaused": "GovTool is under maintenance, so transactions are paused. Please try again once it's over.",
     "appCannotCreateTransaction": "Application can not create transaction.",
     "appCannotGetDeposit": "Can not fetch deposit",
     "appCannotGetUtxos": "Application can not get utxos",

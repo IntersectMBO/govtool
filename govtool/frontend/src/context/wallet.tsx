@@ -687,7 +687,7 @@ const CardanoProvider = (props: Props) => {
       votingBuilder,
       transactionMetadata,
     }: BuildSignSubmitConwayCertTxArgs) => {
-      await checkIsMaintenanceOn();
+      await checkIsMaintenanceOn({ blockDuringNotice: true });
       const isPendingTx = isPendingTransaction();
       if (isPendingTx) return;
 

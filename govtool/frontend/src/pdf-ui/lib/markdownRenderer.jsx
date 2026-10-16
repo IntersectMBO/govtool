@@ -5,6 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { Box } from '@mui/material';
 import { Typography } from '@atoms';
 // GovTool's markdown table styles (striped rows, #D6E2FF borders), scoped
@@ -72,6 +73,15 @@ const fontSizes = {
 };
 
 const fontWeightFor = (tag) => fontWeights[tag] ?? 400;
+
+// Raw HTML is parsed so the tags added by preprocessContent (mark, ins, sup,
+// sub, del) render. Sanitizing right after keeps it to GitHub's allowlist,
+// so iframes, scripts, styles and event handlers are dropped. KaTeX runs
+// after the sanitizer, so its own markup is kept.
+const sanitizeSchema = {
+    ...defaultSchema,
+    tagNames: [...defaultSchema.tagNames, 'mark'],
+};
 
 const symbolReplacements = (text) =>
     text
@@ -422,7 +432,11 @@ const MarkdownTypography = ({ content, testId, onLinkClick }) => {
             <ReactMarkdown
                 components={typographyComponents}
                 key={testId}
-                rehypePlugins={[rehypeRaw, rehypeKatex]}
+                rehypePlugins={[
+                    rehypeRaw,
+                    [rehypeSanitize, sanitizeSchema],
+                    rehypeKatex,
+                ]}
                 remarkPlugins={[remarkBreaks, remarkMath, remarkGfm]}
             >
                 {processedContent}

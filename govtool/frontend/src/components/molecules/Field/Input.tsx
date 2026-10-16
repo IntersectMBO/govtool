@@ -36,9 +36,14 @@ export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
       inputRef.current?.focus();
     }, []);
 
+    // The Input atom owns onBlur (it forwards it to the <input> and calls it
+    // from its own imperative blur), so this only delegates.
     const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-      onBlur?.(e);
-      inputRef.current?.blur();
+      (
+        inputRef.current?.blur as
+          | ((event?: React.FocusEvent<HTMLInputElement>) => void)
+          | undefined
+      )?.(e);
     }, []);
 
     useImperativeHandle(
@@ -69,6 +74,7 @@ export const Input = forwardRef<HTMLInputElement, InputFieldProps>(
             rest.dataTestId ?? `${label && `${testIdFromLabel(label)}-`}input`
           }
           errorMessage={errorMessage}
+          onBlur={onBlur}
           {...rest}
           ref={inputRef}
         />

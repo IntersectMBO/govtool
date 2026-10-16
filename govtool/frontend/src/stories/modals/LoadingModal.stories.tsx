@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Meta, StoryFn } from "@storybook/react";
-import { expect, screen, waitFor, within } from "@storybook/test";
+import { Meta, StoryFn } from "@storybook/react-vite";
+import { expect, screen, waitFor, within } from "storybook/test";
 
 import { Modal } from "@atoms";
 import { LoadingModal, LoadingModalState } from "@organisms";

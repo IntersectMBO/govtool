@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Trans } from "react-i18next";
 
 import { IMAGES, PATHS } from "@consts";
 import { PendingTransaction } from "@context";
 import { useGetDRepDetailsQuery, useTranslation } from "@hooks";
-import { CurrentDelegation, MetadataStandard, VoterInfo } from "@models";
+import {
+  CurrentDelegation,
+  MetadataStandard,
+  MetadataValidationStatus,
+  VoterInfo,
+} from "@models";
 import {
   DashboardActionCard,
   DashboardActionCardProps,

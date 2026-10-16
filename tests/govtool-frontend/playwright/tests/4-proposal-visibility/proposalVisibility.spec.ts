@@ -15,6 +15,7 @@ import removeAllSpaces from "@helpers/removeAllSpaces";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { InvalidMetadata } from "@constants/index";
+import { ensureInvalidMetadataFixtures } from "@helpers/invalidMetadataFixtures";
 import { isMobile } from "@helpers/mobile";
 
 test.beforeEach(async () => {
@@ -180,21 +181,38 @@ test("4L. Should search governance actions", async ({ page }) => {
 test("4M. Should show view-all categorized governance actions", async ({
   page,
 }) => {
-  await page.route("**/proposal/list?**", async (route) =>
-    route.fulfill({
+  const requestedTypes: string[][] = [];
+  await page.route("**/proposal/list?**", async (route) => {
+    requestedTypes.push(
+      new URL(route.request().url()).searchParams.getAll("type[]")
+    );
+    await route.fulfill({
       body: JSON.stringify(infoTypeProposal),
-    })
+    });
+  });
+
+  // The categorized view is reached by URL (e.g. the details page "Back" link
+  // when opened from a category); the list page no longer links to it.
+  await page.goto(
+    `/governance_actions/category/${GovernanceActionType.InfoAction}`
   );
 
+  await expect(page.getByTestId("back-to-list-link")).toBeVisible();
+  // Category heading renders above the cards, which repeat the type label
+  await expect(
+    page.getByText("Info Action", { exact: true }).first()
+  ).toBeVisible();
+
   const governanceActionPage = new GovernanceActionsPage(page);
-  await governanceActionPage.goto();
-
-  await page.getByRole("link", { name: "Show All" }).click();
-
   const proposalCards = await governanceActionPage.getAllProposals();
 
+  expect(proposalCards).toHaveLength(infoTypeProposal.elements.length);
   for (const proposalCard of proposalCards) {
     await expect(proposalCard.getByTestId("InfoAction-type")).toBeVisible();
+  }
+  expect(requestedTypes.length).toBeGreaterThan(0);
+  for (const types of requestedTypes) {
+    expect(types).toEqual([GovernanceActionType.InfoAction]);
   }
 });
 
@@ -224,23 +242,12 @@ test("4K. Should display correct vote counts on governance details page for disc
   page,
   browser,
 }) => {
-  const responsesPromise = Object.keys(GovernanceActionType).map((filterKey) =>
-    page.waitForResponse((response) =>
-      response.url().includes(`&type[]=${GovernanceActionType[filterKey]}`)
-    )
-  );
+  const responsePromise = page.waitForResponse("**/proposal/list?**");
 
   const governanceActionsPage = new GovernanceActionsPage(page);
   await governanceActionsPage.goto();
-  const responses = await Promise.all(responsesPromise);
-  const proposals: IProposal[] = (
-    await Promise.all(
-      responses.map(async (response) => {
-        const data = await response.json();
-        return data.elements;
-      })
-    )
-  ).flat();
+  const response = await responsePromise;
+  const proposals: IProposal[] = (await response.json()).elements;
 
   expect(proposals.length, "No proposals found!").toBeGreaterThan(0);
 
@@ -255,52 +262,59 @@ test("4K. Should display correct vote counts on governance details page for disc
       const totalStakeResponsePromise = newPage.waitForResponse((response) =>
         response.url().includes(`network/total-stake`)
       );
+      // The totals the page renders: stake moves every epoch, which on a
+      // devnet is a minute, so the list read earlier can be a boundary behind.
+      const shownProposalPromise = newPage.waitForResponse((response) =>
+        response.url().includes("/proposal/get/")
+      );
       const govActionDetailsPage = new GovernanceActionDetailsPage(newPage);
       await govActionDetailsPage.goto(
         `${proposalToCheck.txHash}#${proposalToCheck.index}`
       );
+      const shown: IProposal = (await (await shownProposalPromise).json())
+        .proposal;
 
       const dRepTotalAbstainVote =
         await govActionDetailsPage.getDRepTotalAbstainVoted(
-          proposalToCheck,
+          shown,
           totalStakeResponsePromise
         );
 
       // check dRep votes
-      if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
+      if (await areDRepVoteTotalsDisplayed(shown)) {
         await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.dRepYesVotes)}`
         );
         await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
           `₳ ${correctVoteAdaFormat(dRepTotalAbstainVote)}`
         );
         await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.dRepNoVotes)}`
         );
       }
       // check sPos votes
-      if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
+      if (await areSPOVoteTotalsDisplayed(shown)) {
         await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.poolYesVotes)}`
         );
         await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.poolAbstainVotes)}`
         );
         await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.poolNoVotes)}`
         );
       }
 
       // check ccCommittee votes
-      if (areCCVoteTotalsDisplayed(proposalToCheck)) {
+      if (areCCVoteTotalsDisplayed(shown)) {
         await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
-          `${proposalToCheck.ccYesVotes}`
+          `${shown.ccYesVotes}`
         );
         await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
-          `${proposalToCheck.ccAbstainVotes}`
+          `${shown.ccAbstainVotes}`
         );
         await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
-          `${proposalToCheck.ccNoVotes}`
+          `${shown.ccNoVotes}`
         );
       }
     })
@@ -308,6 +322,10 @@ test("4K. Should display correct vote counts on governance details page for disc
 });
 
 test.describe("Invalid Live voting Metadata", () => {
+  test.beforeAll(async () => {
+    await ensureInvalidMetadataFixtures();
+  });
+
   InvalidMetadata.forEach(({ type, reason, url, hash }, index) => {
     test(`4P_${index + 1}: Should display ${type} message in live voting when ${reason}`, async ({
       page,
@@ -341,7 +359,7 @@ test.describe("Invalid Live voting Metadata", () => {
         governanceActionTitle.toLowerCase() !== type.toLowerCase() &&
           `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
       ).toHaveText(type, { timeout: 60_000, ignoreCase: true });
-      await expect(page.getByText("Learn more")).toBeVisible();
+      await expect(page.getByTestId("metadata-error-learn-more")).toBeVisible();
       await expect(page.getByTestId("external-modal-button")).toBeVisible();
     });
   });

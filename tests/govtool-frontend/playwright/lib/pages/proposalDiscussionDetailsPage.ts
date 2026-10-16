@@ -1,6 +1,7 @@
 import environments from "@constants/environments";
 import { Page, expect } from "@playwright/test";
 import { CommentResponse } from "@types";
+import { setUsernameIfPrompted } from "./pdfUsername";
 
 export default class ProposalDiscussionDetailsPage {
   // Buttons
@@ -46,6 +47,12 @@ export default class ProposalDiscussionDetailsPage {
     await this.page.goto(
       `${environments.frontendUrl}/proposal_discussion/${proposalId}`
     );
+  }
+
+  /** Signs in to pdf and sets a username if pdf-ui asks for one. */
+  async verifyIdentity() {
+    await this.verifyIdentityBtn.click();
+    await setUsernameIfPrompted(this.page);
   }
 
   async closeUsernamePrompt() {

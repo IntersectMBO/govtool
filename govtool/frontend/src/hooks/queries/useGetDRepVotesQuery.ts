@@ -1,8 +1,9 @@
-import { useQuery } from "react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { getDRepVotes } from "@services";
+import { isSearchNotReady } from "@utils";
 import { VotedProposal } from "@/models";
 
 export const useGetDRepVotesQuery = (
@@ -12,7 +13,7 @@ export const useGetDRepVotesQuery = (
 ) => {
   const { dRepID, pendingTransaction } = useCardano();
 
-  const { data, isLoading, refetch, isFetching } = useQuery({
+  const { data, error, isLoading, refetch, isFetching } = useQuery({
     queryKey: [
       QUERY_KEYS.useGetDRepVotesKey,
       pendingTransaction.vote?.transactionHash,
@@ -31,25 +32,21 @@ export const useGetDRepVotesQuery = (
       }),
     enabled: !!dRepID,
     refetchOnWindowFocus: true,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
+    refetchInterval: 20000,
   });
 
-  const groupedByType = data?.reduce((groups, item) => {
+  const groupedByType = data?.reduce<
+    Record<string, { title: string; actions: VotedProposal[] }>
+  >((groups, item) => {
     const itemType = item?.proposal.type;
 
-    // TODO: Provide better typing for groups
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     if (!groups[itemType]) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       groups[itemType] = {
         title: itemType,
         actions: [],
       };
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     groups[itemType].actions.push(item);
 
     return groups;
@@ -61,6 +58,7 @@ export const useGetDRepVotesQuery = (
       actions: VotedProposal[];
     }[],
     areDRepVotesLoading: isLoading,
+    isSearchNotReady: isSearchNotReady(error),
     refetch,
     isFetching,
   };

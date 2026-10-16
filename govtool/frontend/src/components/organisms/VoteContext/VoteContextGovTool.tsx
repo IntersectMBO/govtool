@@ -1,10 +1,10 @@
 import { useEffect, Dispatch, SetStateAction, useState } from "react";
 import { Box, Button, CircularProgress, Link, Typography } from "@mui/material";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { VoteContextWrapper } from "@organisms";
 import { postIpfs } from "@services";
-import { downloadTextFile, openInNewTab } from "@utils";
+import { downloadTextFile, ipfsGatewayUrl, openInNewTab } from "@utils";
 import { NodeObject } from "jsonld";
 import { UseFormSetValue } from "react-hook-form";
 import { VoteContextFormValues, useTranslation } from "@hooks";
@@ -37,7 +37,7 @@ export const VoteContextGovTool = ({
 
   const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
-  const { mutate, isLoading, isError } = useMutation<PostIpfsResponse, Error, { content: string }>({
+  const { mutate, isPending, isError } = useMutation<PostIpfsResponse, Error, { content: string }>({
     mutationFn: postIpfs,
     onSuccess: (data) => {
       const ipfsUrl = `ipfs://${data.ipfsCid}`;
@@ -89,7 +89,7 @@ export const VoteContextGovTool = ({
         <Typography sx={{ textAlign: "center", color: "error.main", mt: 2 }} variant="body1">
           {t("createGovernanceAction.uploadToIPFSError")}
         </Typography>
-      ) : isLoading ? (
+      ) : isPending ? (
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <CircularProgress size={24} />
         </Box>
@@ -121,12 +121,13 @@ export const VoteContextGovTool = ({
             >
               {apiResponse.ipfsCid ? (
                 <a
-                  href={`https://ipfs.io/ipfs/${apiResponse.ipfsCid}`}
+                  href={ipfsGatewayUrl(apiResponse.ipfsCid)}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ textDecoration: "none", color: primaryBlue.c500, cursor: "pointer" }}
                 >
-                  <span style={{ fontWeight: 500 }}>IPFS URI:</span> {`https://ipfs.io/ipfs/${apiResponse.ipfsCid}`}
+                  <span style={{ fontWeight: 500 }}>IPFS URI:</span>{" "}
+                  {ipfsGatewayUrl(apiResponse.ipfsCid)}
                 </a>
             ) : (
               "[URI]"

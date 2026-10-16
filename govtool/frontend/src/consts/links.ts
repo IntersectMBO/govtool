@@ -1,4 +1,5 @@
 export const LINKS = {
+  NEWSLETTER_SIGNUP: "https://newsletter.gov.tools/#/portal/signup",
   USING_GOVTOOL: "https://docs.gov.tools/cardano-govtool/using-govtool",
   COMPATIBLE_WALLETS:
     "https://docs.gov.tools/cardano-govtool/using-govtool/getting-started/compatible-wallets",
@@ -26,4 +27,6 @@ export const LINKS = {
   VIEW_GOVERNANCE_ACTIONS:
     "https://docs.gov.tools/cardano-govtool/using-govtool/governance-actions/view-governance-actions",
   DREPS: "https://docs.gov.tools/cardano-govtool/using-govtool/dreps",
+  PRIVACY_POLICY: "https://docs.gov.tools/legal/privacy-policy",
+  TERMS_OF_USE: "https://docs.gov.tools/legal/terms-of-use",
 };

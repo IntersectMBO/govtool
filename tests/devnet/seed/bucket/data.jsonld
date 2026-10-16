@@ -1,0 +1,9 @@
+{
+  "@context": {
+    "@language": "en-us"
+  },
+  "body": {
+    "title": "Devnet placeholder anchor",
+    "abstract": "Served by the local metadata bucket. Its hash deliberately matches no test fixture."
+  }
+}

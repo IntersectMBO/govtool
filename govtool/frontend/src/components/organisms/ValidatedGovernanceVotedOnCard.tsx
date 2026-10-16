@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 
 import { useValidateMutation } from "@/hooks/mutations";
-import { MetadataStandard, ProposalData, VotedProposal } from "@/models";
+import {
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+  VotedProposal,
+} from "@/models";
 import { GovernanceVotedOnCard } from "../molecules";
 
 type Props = {
@@ -16,9 +22,13 @@ export const ValidatedGovernanceVotedOnCard = ({
   const [metadataStatus, setMetadataStatus] = useState<
     MetadataValidationStatus | undefined
   >();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const { validateMetadata } = useValidateMutation();
-  const [extendedVotedProposal, setExtendedVotedProposal] =
-    useState<VotedProposal>(votedProposal);
+  // Only the resolved metadata is kept here. The vote and the rest come from
+  // the current props on every render, so a changed vote shows up.
+  const [resolvedMetadata, setResolvedMetadata] = useState<
+    Partial<Pick<ProposalData, "title" | "abstract" | "motivation" | "rationale">>
+  >({});
 
   useEffect(() => {
     if (!votedProposal.proposal.url) return;
@@ -26,25 +36,22 @@ export const ValidatedGovernanceVotedOnCard = ({
     const validate = async () => {
       setIsValidating(true);
 
-      const { status, metadata } = await validateMetadata({
+      const { status, metadata, issues } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: votedProposal.proposal.url,
         hash: votedProposal.proposal.metadataHash,
       });
 
       if (metadata) {
-        setExtendedVotedProposal((prevProposal) => ({
-          ...(prevProposal || {}),
-          proposal: {
-            ...(prevProposal.proposal || {}),
-            ...(metadata as Pick<
-              ProposalData,
-              "title" | "abstract" | "motivation" | "rationale"
-            >),
-          },
-        }));
+        setResolvedMetadata(
+          metadata as Pick<
+            ProposalData,
+            "title" | "abstract" | "motivation" | "rationale"
+          >,
+        );
       }
       setMetadataStatus(status);
+      setMetadataIssues(issues);
       setIsValidating(false);
     };
     validate();
@@ -52,10 +59,14 @@ export const ValidatedGovernanceVotedOnCard = ({
 
   return (
     <GovernanceVotedOnCard
-      votedProposal={extendedVotedProposal}
+      votedProposal={{
+        ...votedProposal,
+        proposal: { ...votedProposal.proposal, ...resolvedMetadata },
+      }}
       inProgress={inProgress}
       isValidating={isValidating}
       metadataStatus={metadataStatus}
+      metadataIssues={metadataIssues}
     />
   );
 };

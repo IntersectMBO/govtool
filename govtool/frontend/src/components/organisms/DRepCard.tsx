@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Box, ButtonBase, Divider, Avatar, Skeleton } from "@mui/material";
 
 import { Button, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useModal, useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
-import { DRepData, DRepStatus, MetadataStandard } from "@models";
+import {
+  DRepData,
+  DRepStatus,
+  MetadataStandard,
+  MetadataValidationStatus,
+} from "@models";
 import { Card } from "@molecules";
 import {
   correctDRepDirectoryFormat,

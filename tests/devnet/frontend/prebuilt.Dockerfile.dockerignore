@@ -1,0 +1,7 @@
+# Only what the prebuilt image copies; dist/ is included here, unlike
+# govtool/frontend/.dockerignore.
+*
+!nginx.conf
+!maintenance-page/index.html
+!dist
+!docker-entrypoint.sh

@@ -1,0 +1,50 @@
+{
+  "name": "@govtool/metadata-http",
+  "version": "0.1.0",
+  "description": "HTTP client implementing the GovTool Metadata Service contract (@govtool/data-providers/metadata) against the private metadata service.",
+  "license": "Apache-2.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "clean": "node --eval \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"{src,test}/**/*.ts\" \"*.json\" \"*.md\"",
+    "format:check": "prettier --check \"{src,test}/**/*.ts\" \"*.json\" \"*.md\"",
+    "pretest": "node --eval \"require('node:fs').rmSync('.test-build',{recursive:true,force:true})\" && tsc -p tsconfig.test.json",
+    "test": "node --test \".test-build/test/**/*.test.js\"",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@govtool/data-providers": "file:../govtool-data-providers"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.7",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^16.0.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.20.0"
+  }
+}

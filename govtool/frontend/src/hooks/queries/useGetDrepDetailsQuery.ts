@@ -1,11 +1,8 @@
-import { UseInfiniteQueryOptions } from "react-query";
-
-import { Infinite, DRepData } from "@/models";
 import { useGetDRepListInfiniteQuery } from "./useGetDRepListInfiniteQuery";
 
 export const useGetDRepDetailsQuery = (
   dRepId: string | null | undefined,
-  options?: UseInfiniteQueryOptions<Infinite<DRepData>>,
+  options?: { enabled?: boolean },
 ) => {
   const { dRepData, isDRepListLoading } = useGetDRepListInfiniteQuery(
     { searchPhrase: dRepId ?? undefined },

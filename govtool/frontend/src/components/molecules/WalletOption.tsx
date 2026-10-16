@@ -1,10 +1,10 @@
 import { FC, useCallback } from "react";
-import { To, useNavigate, useLocation } from "react-router-dom";
+import { To, useNavigate, useLocation } from "react-router";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
 import {
   BUDGET_DISCUSSION_PATHS,
-  OUTCOMES_PATHS,
+  GOV_ACTION_HISTORY_PATHS,
   PATHS,
   PDF_PATHS,
 } from "@consts";
@@ -45,8 +45,8 @@ export const WalletOptionButton: FC<WalletOption> = ({
       PDF_PATHS.proposalDiscussion.replace("/", ""),
     );
 
-    const isGovernanceOutcomesPillar = window.location.pathname.includes(
-      OUTCOMES_PATHS.governanceActionsOutcomes.replace("/", ""),
+    const isGovernanceGovernanceActionHistoryPillar = window.location.pathname.includes(
+      GOV_ACTION_HISTORY_PATHS.governanceActionHistory.replace("/", ""),
     );
 
     const result = await enable(name);
@@ -55,7 +55,7 @@ export const WalletOptionButton: FC<WalletOption> = ({
       if (
         isBudgetDiscussion ||
         isProposalDiscussionForum ||
-        isGovernanceOutcomesPillar
+        isGovernanceGovernanceActionHistoryPillar
       )
         return;
       navigate(

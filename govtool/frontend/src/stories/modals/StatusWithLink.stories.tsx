@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Meta, StoryFn } from "@storybook/react";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 import {
   expect,
   userEvent,
@@ -7,7 +7,7 @@ import {
   within,
   screen,
   fn,
-} from "@storybook/test";
+} from "storybook/test";
 
 import { Modal } from "@atoms";
 import { StatusModal, StatusModalState } from "@organisms";

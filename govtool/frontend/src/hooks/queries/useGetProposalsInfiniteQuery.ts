@@ -1,9 +1,10 @@
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@consts";
 import { useCardano } from "@context";
 import { ProposalData } from "@models";
 import { getProposals, GetProposalsArguments } from "@services";
+import { isSearchNotReady } from "@utils";
 
 export const useGetProposalsInfiniteQuery = ({
   filters = [],
@@ -28,13 +29,14 @@ export const useGetProposalsInfiniteQuery = ({
 
   const {
     data,
+    error,
     isLoading,
     fetchNextPage,
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-  } = useInfiniteQuery(
-    [
+  } = useInfiniteQuery({
+    queryKey: [
       QUERY_KEYS.useGetProposalsInfiniteKey,
       dRepID,
       filters,
@@ -43,17 +45,16 @@ export const useGetProposalsInfiniteQuery = ({
       searchPhrase,
       sorting,
     ],
-    fetchProposals,
-    {
-      getNextPageParam: (lastPage) => {
-        if (lastPage.elements.length === 0) {
-          return undefined;
-        }
-        return lastPage.page + 1;
-      },
-      refetchInterval: 20000,
+    queryFn: fetchProposals,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.elements.length === 0) {
+        return undefined;
+      }
+      return lastPage.page + 1;
     },
-  );
+    refetchInterval: 20000,
+  });
 
   const proposals = data?.pages.flatMap(
     (page) => page.elements,
@@ -65,6 +66,7 @@ export const useGetProposalsInfiniteQuery = ({
     isProposalsFetching: isFetching,
     isProposalsFetchingNextPage: isFetchingNextPage,
     isProposalsLoading: isLoading,
+    isSearchNotReady: isSearchNotReady(error),
     proposals,
   };
 };

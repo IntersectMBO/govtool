@@ -10,6 +10,8 @@ on:
 jobs:
   update-version:
     runs-on: ubuntu-latest
+    env:
+      VERSION: "${{ github.event.inputs.version }}"
 
     steps:
       - name: Checkout Repository
@@ -24,38 +26,23 @@ jobs:
           node-version-file: "./govtool/frontend/.nvmrc"
           scope: "@intersect.mbo"
 
-      - name: Set Version Variable
-        run: echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-
       - name: Update package.json files and install dependencies
         run: |
           jq --arg v "$VERSION" '.version = $v' govtool/frontend/package.json > temp.json && mv temp.json govtool/frontend/package.json
-          jq --arg v "$VERSION" '.version = $v' govtool/metadata-validation/package.json > temp.json && mv temp.json govtool/metadata-validation/package.json
 
           echo "Running npm install to update lock files..."
           cd govtool/frontend && npm install && cd ../..
-          cd govtool/metadata-validation && npm install && cd ../..
 
-      - name: Update vva-be.cabal version (Preserve Spacing)
+      - name: Update govtool-backend version
         run: |
-          sed -i -E "s/^(version:[[:space:]]+)[0-9]+\.[0-9]+\.[0-9]+/\1$VERSION/" govtool/backend/vva-be.cabal
-          echo "✅ Updated version in vva-be.cabal while preserving spacing."
-
-      - name: Update Dockerfile Versions
-        run: |
-          sed -i -E "s/vva-be-[0-9]+\.[0-9]+\.[0-9]+/vva-be-$VERSION/g" govtool/backend/Dockerfile
-          sed -i -E "s/vva-be-[0-9]+\.[0-9]+\.[0-9]+/vva-be-$VERSION/g" govtool/backend/Dockerfile.qovery
-          echo "✅ Updated vva-be version in Dockerfiles."
-
-      - name: Update Metadata Validation API Version
-        run: |
-          sed -i -E "s/(\.setVersion\()[\"'][0-9]+\.[0-9]+\.[0-9]+[\"']/\1\"$VERSION\"/" govtool/metadata-validation/src/main.ts
-          echo "✅ Updated API version in main.ts"
+          jq --arg v "$VERSION" '.version = $v' govtool/govtool-backend/package.json > temp.json && mv temp.json govtool/govtool-backend/package.json
+          cd govtool/govtool-backend && npm install --package-lock-only
+          echo "✅ Updated govtool-backend version."
 
       - name: Update CHANGELOG.md
         run: |
           #!/bin/bash
-          VERSION="${{ github.event.inputs.version }}"
+          VERSION="$VERSION"
           TODAY=$(date +%Y-%m-%d)
           RELEASE_TAG="v$VERSION"
           RELEASE_LINK="[v$VERSION](https://github.com/IntersectMBO/govtool/releases/tag/$RELEASE_TAG)"

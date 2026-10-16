@@ -1,0 +1,17 @@
+{
+  "name": "govtool-devnet-blockfrost-shim",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The Blockfrost endpoints the GovTool test suites call, served from a local devnet (Kuber + db-sync).",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}

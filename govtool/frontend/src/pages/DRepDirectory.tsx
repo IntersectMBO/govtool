@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import { Box } from "@mui/material";
 
 import { Background, PagePaddingBox, ContentBox } from "@atoms";

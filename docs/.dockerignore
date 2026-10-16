@@ -1,0 +1,10 @@
+node_modules
+build
+.docusaurus
+.cache-loader
+.git
+npm-debug.log*
+.DS_Store
+Dockerfile
+.dockerignore
+deploy

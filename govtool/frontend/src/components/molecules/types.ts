@@ -1,9 +1,10 @@
 import { SxProps } from "@mui/material";
+import { ReactElement } from "react";
 
 export type LinkWithIconProps = {
   label: string;
   onClick: () => void;
-  icon?: JSX.Element;
+  icon?: ReactElement;
   sx?: SxProps;
   cutWithEllipsis?: boolean;
   dataTestId?: string;

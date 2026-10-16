@@ -12,12 +12,12 @@ Contains the utility logic, helpers, mock datas and shared services, including:
 
 - \_mock (mock data)
 - constants
-- datafactory
 - fixtures
 - forms
 - Pages
 - helpers
 - Services
+- wallet (the in-repo CIP-30/CIP-95 test wallet, test-wallet derivation and faucet funding)
 
 ---
 
@@ -51,64 +51,23 @@ This directory contains all automated test cases, organized by feature area:
 8. **`8-proposal-discussion/`**  
    Tests related to proposal discussions adjacent to the submission form.
 
-9. **`9-outcomes/`**  
+9. **`9-governance-action-history/`**  
    Tests related to proposal outcome visibility and validations.
 
-10. **`10-user-snap/`**  
-    Usersnap-related test cases.
+10. **`10-feedback/`**  
+    Chatwoot feedback widget test cases.
 
-11. **`11-proposal-budget/`**  
-    Tests for proposal budget functionality and associated forms.
-
-12. **`12-proposal-budget-submission/`**  
-    Proposal budget submission form validation, draft, visibility, and submission tests.
+11. **`11-budget-proposals-archive/`**  
+    The read-only 2025 budget proposals archive: list search, filter and sort, details, poll totals, versions, comments and old links, checked against the static files it serves.
 
 ---
 
-### Authentication & Setup Scripts
+### Wallets & Setup
 
-13. **`adaholder.auth.setup.ts`**  
-    Sets up authentication for adaHolder wallets.
+Test wallets are HD accounts of `TEST_WALLET_MNEMONIC`, picked by name (`lib/wallet/testWallets.ts`) and funded from the faucet on demand. Specs connect one with `test.use({ walletName: "adaHolder01" })`; `lib/wallet/transactions.ts` registers stake keys and DReps.
 
-14. **`user.auth.setup.ts`**  
-    Sets up authentication for user wallets.
-
-15. **`proposal-budget.auth.setup.ts`**  
-    Authentication setup for proposal budget wallets.
-
-16. **`proposal-discussion.auth.setup.ts`**  
-    Authentication setup for proposal discussion wallets.
-
-17. **`dRep.auth.setup.ts`**  
-    Authentication setup for dRep wallets.
-
-18. **`dRep.setup.ts`**  
-    Setup for temporary and static dRep wallet registration.
-
-19. **`proposal-budget.dRep.setup.ts`**  
-    dRep wallet registration setup for proposal budget tests.
-
-20. **`proposal.setup.ts`**  
-    Setup for proposal submission wallets.
-
-21. **`wallet.bootstrap.ts`**  
-    Initializes adaHolder and dRep wallets with test funds for spendable ADA functionality.
-
----
-
-### Teardown Scripts
-
-21. **`delegation.teardown.ts`**  
-    Resets delegation status (abstains delegation from delegated wallets).
-
-22. **`faucet.teardown.ts`**  
-    Refunds all unspendable ADA from test wallets back to the faucet wallet.
-
-23. **`dRep.teardown.ts`**  
-    Handles deregistration of dRep wallets registered during tests or setup.
-
-24. **`generated-artifacts.teardown.ts`**  
-    Remove all artifacts generated during test execution
+12. **`dRep.setup.ts`**  
+    Registers the shared DReps (dRep01, dRep02) with metadata; tests also register them on first use (`lib/wallet/sharedDReps.ts`).
 
 ---
 
@@ -136,7 +95,7 @@ This directory contains all automated test cases, organized by feature area:
 
 > **Note:**
 >
-> - To run tests _without wallet dependency_, make sure the required wallet/auth setup has already been completed beforehand.
+> - The dRep and delegation projects depend on the `dRep setup` project (`tests/dRep.setup.ts`) only when `CI` is set. Without `CI`, tests register the shared DReps on first use; run `--project='dRep setup'` to do it up front.
 > - To run tests _with wallet dependency_ and generate **Allure reports**, **do not** remove the `CI` environment variable.
 
 ---
@@ -171,25 +130,24 @@ Tracks creation, display, and participation in proposal discussions.
 
 ![Proposal Discussion](./docs/proposal-discussion.png)
 
-#### ii. Budget Proposal
+#### ii. Budget Proposals Archive
 
-Tracks creation, display, and participation in budget-related proposals.
-
-![Budget Proposal](./docs/budget-proposal.png)
+The 2025 budget proposals are a read-only archive; its tests check the list,
+details and old links against the static files the frontend serves.
 
 ---
 
-### 4. Outcomes Pillars
+### 4. Governance action history
 
-Tests centered around outcomes from various actions.
+Tests of governance action history and lifecycle status.
 
-![Outcomes Pillars](./docs/outcomes-pillars.png)
+![Governance action history](./docs/governance-action-history.png)
 
 ---
 
 ### 5. Logged-In State
 
-Covers all test cases that require the user to be authenticated, and are not included in the delegation, voting, proposal, or outcomes pillars
+Covers all test cases that require the user to be authenticated, and are not included in the delegation, voting, proposal, or action history
 
 ![Logged-In State](./docs/loggedin.png)
 

@@ -4,12 +4,12 @@ import {
   useLocation,
   useParams,
   generatePath,
-} from "react-router-dom";
+} from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 import { AxiosError } from "axios";
 
 import { Background, Typography } from "@atoms";
-import { ICONS, OUTCOMES_PATHS, PATHS } from "@consts";
+import { ICONS, GOV_ACTION_HISTORY_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
@@ -24,7 +24,12 @@ import {
   getShortenedGovActionId,
 } from "@utils";
 import { Breadcrumbs } from "@molecules";
-import { MetadataStandard, ProposalData } from "@/models";
+import {
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+} from "@/models";
 import { useValidateMutation } from "@/hooks/mutations";
 
 type GovernanceActionDetailsState = {
@@ -47,9 +52,13 @@ export const GovernanceActionDetails = () => {
   const fullProposalId = txHash && getFullGovActionId(txHash, +index);
   const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, +index);
 
+  // A row opened from a list carries its document, and so its authors, only
+  // when the backend held it. Without one the action is read again for it,
+  // while the page shows the row it was given.
+  const needsDocument = !!state?.proposal && state.proposal.json == null;
   const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
-    !state?.proposal,
+    !state?.proposal || needsDocument,
   );
   // TODO: Refactor this mess with proposals and metadata validation
   // once authors are existing in all CIP-108 metadata
@@ -58,7 +67,17 @@ export const GovernanceActionDetails = () => {
   );
 
   useEffect(() => {
-    if (data?.proposal) {
+    if (!data?.proposal) return;
+    if (needsDocument) {
+      // Only the document and its authors: the text on the page is the one
+      // already checked against the anchor.
+      const { json, authors } = data.proposal;
+      setExtendedProposal((prevProposal) => ({
+        ...prevProposal,
+        json,
+        authors,
+      }));
+    } else {
       setExtendedProposal(data.proposal);
     }
   }, [data?.proposal]);
@@ -66,13 +85,16 @@ export const GovernanceActionDetails = () => {
   const [metadataStatus, setMetadataStatus] = useState<
     MetadataValidationStatus | undefined
   >();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const { validateMetadata } = useValidateMutation();
+  // Bumped when a retry resolves the metadata, to validate it again.
+  const [validationRevision, setValidationRevision] = useState(0);
 
   useEffect(() => {
     if (!extendedProposal?.url) return;
 
     const validate = async () => {
-      const { status, metadata } = await validateMetadata({
+      const { status, metadata, issues } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: extendedProposal?.url,
         hash: extendedProposal?.metadataHash ?? "",
@@ -88,9 +110,10 @@ export const GovernanceActionDetails = () => {
         }));
       }
       setMetadataStatus(status);
+      setMetadataIssues(issues);
     };
     validate();
-  }, [extendedProposal?.url]);
+  }, [extendedProposal?.url, validationRevision]);
 
   useEffect(() => {
     const isProposalNotFound =
@@ -98,14 +121,19 @@ export const GovernanceActionDetails = () => {
       error.response?.data.message.match(/Proposal with id: .* not found/);
     if (isProposalNotFound && fullProposalId) {
       navigate(
-        OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),
+        GOV_ACTION_HISTORY_PATHS.governanceActionHistoryDetail.replace(":id", fullProposalId),
       );
     } else if (
       isEnabled &&
       getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)
     ) {
-      const { pathname } = window.location;
-      navigate(`/connected${pathname}`);
+      // The effect can run again before this page unmounts (StrictMode runs
+      // it twice in development), so only redirect once, and keep the hash:
+      // it carries the action index.
+      const { pathname, search, hash: locationHash } = window.location;
+      if (!pathname.startsWith("/connected")) {
+        navigate(`/connected${pathname}${search}${locationHash}`);
+      }
     }
   }, [isEnabled, error]);
 
@@ -172,7 +200,7 @@ export const GovernanceActionDetails = () => {
                 {t("back")}
               </Typography>
             </Link>
-            {isLoading ? (
+            {isLoading && !state?.proposal ? (
               <Box
                 alignItems="center"
                 display="flex"
@@ -185,6 +213,11 @@ export const GovernanceActionDetails = () => {
               <Box data-testid="governance-action-details">
                 <GovernanceActionDetailsCard
                   isDataMissing={metadataStatus}
+                  isDocumentLoading={needsDocument && isLoading}
+                  metadataIssues={metadataIssues}
+                  onMetadataRecovered={() =>
+                    setValidationRevision((value) => value + 1)
+                  }
                   proposal={extendedProposal}
                 />
               </Box>

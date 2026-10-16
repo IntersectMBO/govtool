@@ -2,7 +2,7 @@ import { Box, Link } from "@mui/material";
 
 import { Button, Typography } from "@atoms";
 import { ICONS } from "@consts";
-import { useUsersnapApi } from "@context";
+import { useChatwoot } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { openInNewTab, testIdFromLabel } from "@utils";
 import { LINKS } from "@/consts/links";
@@ -33,19 +33,15 @@ const FooterLink = ({ label, onClick }: FooterLinkProps) => (
 export const Footer = () => {
   const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
-  const { openFeedbackWindow } = useUsersnapApi();
+  const { openFeedbackWindow } = useChatwoot();
 
   const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
 
-  const onClickPrivacyPolicy = () =>
-    openInNewTab(
-      "https://docs.intersectmbo.org/legal/policies-and-conditions/privacy-policy",
-    );
+  const onClickSubscribe = () => openInNewTab(LINKS.NEWSLETTER_SIGNUP);
 
-  const onClickTermOfService = () =>
-    openInNewTab(
-      "https://docs.intersectmbo.org/legal/policies-and-conditions/terms-of-use",
-    );
+  const onClickPrivacyPolicy = () => openInNewTab(LINKS.PRIVACY_POLICY);
+
+  const onClickTermOfService = () => openInNewTab(LINKS.TERMS_OF_USE);
 
   const onClickFeedback = () => openFeedbackWindow();
 
@@ -86,6 +82,7 @@ export const Footer = () => {
           sx={{
             display: "flex",
             flexDirection: "row",
+            flexWrap: "wrap",
             gap: 3,
             justifyContent: screenWidth < 640 ? "space-between" : undefined,
             mt: screenWidth < 640 ? 1.5 : 0,
@@ -100,6 +97,14 @@ export const Footer = () => {
             variant="text"
           >
             {t("menu.help")}
+          </Button>
+          <Button
+            data-testid="newsletter-footer-button"
+            onClick={onClickSubscribe}
+            size="small"
+            variant="outlined"
+          >
+            {t("footer.subscribe")}
           </Button>
           <Button
             data-testid="feedback-footer-button"

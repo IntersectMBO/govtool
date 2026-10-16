@@ -1,5 +1,5 @@
 import { Box, Grid } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 import { DrawerLink, Spacer } from "@atoms";
 import { CONNECTED_NAV_ITEMS, IMAGES, PATHS, DRAWER_WIDTH } from "@consts";
@@ -7,16 +7,10 @@ import { useFeatureFlag } from "@context";
 import { useGetVoterInfo } from "@hooks";
 import { WalletInfoCard, DRepInfoCard } from "@molecules";
 import { openInNewTab } from "@utils";
-import { useMaintenanceEndingBannerContext } from "./MaintenanceEndingBanner";
 
 export const Drawer = () => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { voter } = useGetVoterInfo();
-  const { height: maintenanceEndingBannerHeight } =
-    useMaintenanceEndingBannerContext();
 
   return (
     <Box
@@ -27,9 +21,9 @@ export const Drawer = () => {
         height: "100vh",
         position: "sticky",
         width: `${DRAWER_WIDTH}px`,
-        top: maintenanceEndingBannerHeight || 0,
+        top: 0,
         overflowY: "auto",
-        maxHeight: `calc(100vh - ${maintenanceEndingBannerHeight || 0}px)`,
+        maxHeight: `calc(100vh - ${0}px)`,
       }}
     >
       <NavLink
@@ -79,16 +73,6 @@ export const Drawer = () => {
                   if (
                     !isProposalDiscussionForumEnabled &&
                     childItem.dataTestId === "proposal-discussion-link"
-                  ) {
-                    return null;
-                  }
-
-                  if (
-                    !isGovernanceOutcomesPillarEnabled &&
-                    (childItem.dataTestId ===
-                      "governance-actions-voted-by-me-link" ||
-                      childItem.dataTestId ===
-                        "governance-actions-outcomes-link")
                   ) {
                     return null;
                   }

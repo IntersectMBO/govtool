@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
 import { useTranslation } from "react-i18next";
@@ -13,6 +13,7 @@ import { NodeObject } from "jsonld";
 
 import {
   GOVERNANCE_ACTION_CONTEXT,
+  GOVERNANCE_ACTION_CONTEXT_WITH_CIP179,
   PATHS,
   storageInformationErrorModals,
 } from "@consts";
@@ -22,11 +23,15 @@ import {
   downloadJson,
   generateJsonld,
   generateMetadataBody,
-  getItemFromLocalStorage,
-  PROTOCOL_PARAMS_KEY,
 } from "@utils";
 import { useWalletErrorModal } from "@hooks";
-import { MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus, ValidateMetadataResult } from "@models";
+import { API } from "@services";
+import {
+  decodeDefinition,
+  getRenderabilityProblem,
+  type SurveyDefinitionEnvelope,
+} from "@/cip179/core";
 import {
   GovernanceActionFieldSchemas,
   GovernanceActionType,
@@ -39,6 +44,7 @@ export type CreateGovernanceActionValues = {
   storeData?: boolean;
   storingURL: string;
   governance_action_type?: GovernanceActionType;
+  surveyTxId?: string;
 } & Partial<Record<keyof GovernanceActionFieldSchemas, string>>;
 
 export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
@@ -47,8 +53,6 @@ export const defaulCreateGovernanceActionValues: CreateGovernanceActionValues =
     storeData: false,
     storingURL: "",
   };
-
-const protocolParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
 
 export const useCreateGovernanceActionForm = (
   setStep?: Dispatch<SetStateAction<number>>,
@@ -75,7 +79,7 @@ export const useCreateGovernanceActionForm = (
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
   const openWalletErrorModal = useWalletErrorModal();
-  const { cExplorerBaseUrl } = useAppContext();
+  const { cExplorerBaseUrl, epochParams } = useAppContext();
 
   // Queries
   const { validateMetadata } = useValidateMutation();
@@ -94,10 +98,10 @@ export const useCreateGovernanceActionForm = (
   const govActionType = watch("governance_action_type");
 
   useEffect(() => {
-    if (govActionType === GovernanceActionType.ParameterChange) {
-      setValue("protocolParameters", JSON.stringify(protocolParams));
+    if (govActionType === GovernanceActionType.ParameterChange && epochParams) {
+      setValue("protocolParameters", JSON.stringify(epochParams));
     }
-  }, [govActionType]);
+  }, [govActionType, epochParams]);
 
   // Navigation
   const backToForm = useCallback(() => {
@@ -111,17 +115,64 @@ export const useCreateGovernanceActionForm = (
   }, []);
 
   // Business Logic
+  const validateSurveyLink = useCallback(
+    async (surveyTxId?: string) => {
+      const normalized = surveyTxId?.trim().toLowerCase();
+      if (!normalized) return;
+      if (!/^[0-9a-f]{64}$/.test(normalized)) {
+        throw new Error(
+          "Survey transaction hash must be 64 hexadecimal characters",
+        );
+      }
+      if (
+        epochParams?.epoch_no === null ||
+        epochParams?.epoch_no === undefined ||
+        epochParams.gov_action_lifetime === null ||
+        epochParams.gov_action_lifetime === undefined
+      ) {
+        throw new Error("Current governance action lifetime is unavailable");
+      }
+      const { data } = await API.get<SurveyDefinitionEnvelope>(
+        `/survey/definition/${normalized}/0`,
+      );
+      const actionExpiration =
+        epochParams.epoch_no + epochParams.gov_action_lifetime + 1;
+      const definition = decodeDefinition(
+        data,
+        { txId: normalized, index: 0 },
+        actionExpiration,
+      );
+      const renderabilityProblem = getRenderabilityProblem(definition);
+      if (renderabilityProblem) throw new Error(renderabilityProblem);
+    },
+    [epochParams?.epoch_no, epochParams?.gov_action_lifetime],
+  );
+
   const generateMetadata = useCallback(async () => {
     if (!govActionType) {
       throw new Error("Governance action type is not defined");
     }
 
+    const values = getValues();
+    await validateSurveyLink(values.surveyTxId);
     const body = await generateMetadataBody({
-      data: getValues(),
+      data: values,
       acceptedKeys: ["title", "motivation", "abstract", "rationale"],
     });
+    if (!body) throw new Error("Could not generate governance metadata");
+    if (values.surveyTxId?.trim()) {
+      body.cip179 = {
+        specVersion: 5,
+        kind: "survey-link",
+        surveyTxId: values.surveyTxId.trim().toLowerCase(),
+        surveyIndex: 0,
+      };
+    }
 
-    const jsonld = await generateJsonld(body, GOVERNANCE_ACTION_CONTEXT);
+    const context = values.surveyTxId?.trim()
+      ? GOVERNANCE_ACTION_CONTEXT_WITH_CIP179
+      : GOVERNANCE_ACTION_CONTEXT;
+    const jsonld = await generateJsonld(body, context);
 
     const jsonHash = blake2bHex(JSON.stringify(jsonld, null, 2), undefined, 32);
 
@@ -130,7 +181,7 @@ export const useCreateGovernanceActionForm = (
     setJson(jsonld);
 
     return jsonld;
-  }, [getValues]);
+  }, [getValues, validateSurveyLink]);
 
   const onClickDownloadJson = useCallback(() => {
     if (!json) return;
@@ -307,17 +358,21 @@ export const useCreateGovernanceActionForm = (
 
   const onSubmit = useCallback(
     async (data: CreateGovernanceActionValues) => {
+      let validation: ValidateMetadataResult<unknown> | undefined;
+
       try {
         setIsLoading(true);
         showLoadingModal();
+        await validateSurveyLink(data.surveyTxId);
         if (!hash) throw MetadataValidationStatus.INVALID_HASH;
-        const { status } = await validateMetadata({
+        validation = await validateMetadata({
           url: data.storingURL,
           hash,
+          verifyUrl: true,
         });
 
-        if (status) {
-          throw status;
+        if (validation.status) {
+          throw validation.status;
         }
 
         const govActionBuilder = await buildTransaction(data);
@@ -344,6 +399,9 @@ export const useCreateGovernanceActionForm = (
               ...storageInformationErrorModals[
                 error as MetadataValidationStatus
               ],
+              metadataAnchor: { url: data.storingURL, hash: hash ?? "" },
+              metadataReportId: validation?.reportId,
+              metadataError: validation?.error,
               onSubmit: backToForm,
               onCancel: backToDashboard,
             },
@@ -352,7 +410,9 @@ export const useCreateGovernanceActionForm = (
           openWalletErrorModal({
             error: isInsufficientBalance
               ? t("errors.insufficientBalanceDescription", {
-                  ada: correctVoteAdaFormat(protocolParams?.gov_action_deposit),
+                  ada: correctVoteAdaFormat(
+                    epochParams?.gov_action_deposit ?? undefined,
+                  ),
                 })
               : error,
             title: isInsufficientBalance
@@ -365,7 +425,13 @@ export const useCreateGovernanceActionForm = (
         setIsLoading(false);
       }
     },
-    [hash, buildTransaction, buildSignSubmitConwayCertTx],
+    [
+      hash,
+      buildTransaction,
+      buildSignSubmitConwayCertTx,
+      validateSurveyLink,
+      epochParams?.gov_action_deposit,
+    ],
   );
 
   return {

@@ -1,15 +1,18 @@
 import { Dispatch, SetStateAction } from "react";
 import { Box } from "@mui/material";
 
-import { IMAGES } from "@consts";
+import { IMAGES, storageInformationErrorModals } from "@consts";
 import { Button, Typography } from "@atoms";
 import { useScreenDimension, useTranslation, useVoteContextForm } from "@hooks";
+import { MetadataSubmissionFailure, MetadataValidationStatus } from "@models";
+import { MetadataFailureDetails } from "@molecules";
 
 type VoteContextCheckResultProps = {
   submitVoteContext: () => void;
   closeModal: () => void;
   setStep: Dispatch<SetStateAction<number>>;
   errorMessage?: string;
+  metadataFailure?: MetadataSubmissionFailure;
 };
 
 export const VoteContextCheckResult = ({
@@ -17,12 +20,17 @@ export const VoteContextCheckResult = ({
   closeModal,
   setStep,
   errorMessage,
+  metadataFailure,
 }: VoteContextCheckResultProps) => {
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
   const { watch } = useVoteContextForm();
   const isContinueDisabled = !watch("voteContextText");
+  // A validation status gets its own title and explanation, not its raw code.
+  const statusModal = errorMessage
+    ? storageInformationErrorModals[errorMessage as MetadataValidationStatus]
+    : undefined;
 
   return (
     <Box
@@ -48,11 +56,22 @@ export const VoteContextCheckResult = ({
         {errorMessage ? "Data validation failed" : "Success"}
       </Typography>
       <Typography variant="body1" sx={{ fontWeight: 400, mb: 2 }}>
-        {errorMessage ?? "GovTool has processed has your rationale"}
+        {statusModal?.title ??
+          errorMessage ??
+          "GovTool has processed has your rationale"}
       </Typography>
       <Typography>
-        {errorMessage ?? "You can now proceed to vote."}
+        {statusModal?.message ?? errorMessage ?? "You can now proceed to vote."}
       </Typography>
+      {errorMessage && metadataFailure && (
+        <Box sx={{ mt: 2, textAlign: "left", width: "100%" }}>
+          <MetadataFailureDetails
+            anchor={metadataFailure.anchor}
+            reportId={metadataFailure.reportId}
+            error={metadataFailure.error}
+          />
+        </Box>
+      )}
       {!errorMessage ? (
         <Button
           data-testid="go-to-vote-modal-button"

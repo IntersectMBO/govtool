@@ -109,6 +109,16 @@ const references = (body: Json, kind: 'Identity' | 'Link'): Reference[] => {
     .filter((ref) => ref['@type'] === kind);
 };
 
+/**
+ * CIP-119 `doNotList`: the DRep asks not to be listed in directories. Read
+ * from the document, which forms write as a boolean and some as text.
+ */
+export function drepDoNotList(body: Json | undefined): boolean {
+  if (!body) return false;
+  const value = unwrap(body['doNotList']);
+  return value === true || (typeof value === 'string' && value === 'true');
+}
+
 /** The CIP-119 fields of a DRep document, in the legacy response's names. */
 export function drepFields(body: Json | undefined) {
   if (!body) return undefined;

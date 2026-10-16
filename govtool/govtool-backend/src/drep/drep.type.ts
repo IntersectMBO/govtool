@@ -65,6 +65,11 @@ export type DRepListItem = {
   latestTxHash: string | null;
   latestRegistrationDate: string;
   metadataError: string | null;
+  /**
+   * CIP-119 `doNotList` from the DRep's document; the directory hides such a
+   * DRep. False until the document is read.
+   */
+  doNotList: boolean;
   paymentAddress: string | null;
   givenName: string | null;
   objectives: string | null;

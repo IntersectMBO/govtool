@@ -5753,3 +5753,17 @@ note. D123 (reports are kept forever) and D125 (anyone may retry once a minute) 
   publisher who fixed the url can check it at once. `verify` still fetches every time.
 - `listReports` returns the latest 10 reports, newest first (`REPORT_LIST_LIMIT`). Older reports stay
   stored and readable by id.
+
+## D170 — A DRep searched by id brings its document, and directory rows carry `doNotList`
+
+**Date:** 2026-10-16
+**Amends:** D167 ("a request never fetches") for `/drep/list` searches by DRep id.
+
+- A DRep is looked up by id as soon as it registers: its dashboard card and its own page. The warmer
+  reaches its document only on a later pass, so a row read from the store alone had no name or
+  payment address. A search by id now fetches the documents the store has no answer for, as
+  `/drep/info` does. It names one DRep, so the fetch is one document. Name searches and the
+  whole directory still read the store only.
+- Directory rows carry `doNotList` (CIP-119), read from the DRep's document, `false` until it is
+  read. The frontend hides such a DRep from the directory; the Haskell backend never sent the field
+  (its SQL did not select `do_not_list`), so that filter did nothing on real data.

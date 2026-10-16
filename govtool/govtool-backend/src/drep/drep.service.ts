@@ -35,7 +35,12 @@ import {
   METADATA,
 } from 'src/providers/providers.module';
 import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
-import { documentBody, drepFields, resolveBody } from 'src/metadata/enrich';
+import {
+  documentBody,
+  drepDoNotList,
+  drepFields,
+  resolveBody,
+} from 'src/metadata/enrich';
 import { DocumentStore } from 'src/metadata/document-store';
 import { readAll } from 'src/common/snapshot';
 import { ProposalService } from 'src/proposal/proposal.service';
@@ -157,8 +162,11 @@ export class DRepService {
       hash: item.metadataHash,
     });
     if (stored?.status === 'resolved') {
-      const profile = drepFields(documentBody(stored.document));
-      return profile ? { ...item, ...profile } : item;
+      const body = documentBody(stored.document);
+      const profile = drepFields(body);
+      return profile
+        ? { ...item, ...profile, doNotList: drepDoNotList(body) }
+        : item;
     }
     if (stored?.status === 'failed') {
       return {
@@ -167,6 +175,31 @@ export class DRepService {
       };
     }
     return item;
+  }
+
+  /**
+   * A row found by its DRep id: the stored profile, or the document fetched
+   * now while the store has no answer yet, as the single-DRep routes do. A
+   * DRep is looked up by id as soon as it registers (its dashboard card, its
+   * page), before the warmer reaches its document; read from the store alone
+   * it has no name or payment address, and its `doNotList` choice is lost.
+   */
+  private async withProfile(item: DRepListItem): Promise<DRepListItem> {
+    const stored = this.documents.get({
+      url: item.url,
+      hash: item.metadataHash,
+    });
+    if (stored !== undefined && stored.status !== 'pending') {
+      return this.withStoredProfile(item);
+    }
+    const body = await resolveBody(this.metadata, {
+      url: item.url,
+      hash: item.metadataHash,
+    });
+    const profile = drepFields(body);
+    return profile
+      ? { ...item, ...profile, doNotList: drepDoNotList(body) }
+      : item;
   }
 
   /**
@@ -379,10 +412,13 @@ export class DRepService {
     const offset = page * pageSize;
 
     // Every document is fetched ahead into the store, so the page is read
-    // from it and the request never waits on a fetch.
-    const elements = dreps
-      .slice(offset, offset + pageSize)
-      .map((item) => this.withStoredProfile(item));
+    // from it and the request never waits on a fetch. A search by id names
+    // one DRep, which may be too new for the store; it fetches what is missing.
+    const rows = dreps.slice(offset, offset + pageSize);
+    const elements =
+      search !== '' && !isName
+        ? await Promise.all(rows.map((item) => this.withProfile(item)))
+        : rows.map((item) => this.withStoredProfile(item));
 
     return { page, pageSize, total, elements };
   }
@@ -673,6 +709,7 @@ export class DRepService {
       // Whether an anchor resolved is the metadata service's answer, and this
       // backend has none wired; the same goes for every field below.
       metadataError: null,
+      doNotList: false,
       paymentAddress: null,
       givenName: null,
       objectives: null,

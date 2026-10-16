@@ -1,6 +1,6 @@
 {
   "name": "@govtool/docs",
-  "version": "0.0.0",
+  "version": "3.0.0",
   "private": true,
   "description": "GovTool documentation site (docs.gov.tools), built with Docusaurus",
   "scripts": {

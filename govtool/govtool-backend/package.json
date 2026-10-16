@@ -1,6 +1,6 @@
 {
   "name": "govtool-backend",
-  "version": "0.0.1",
+  "version": "3.0.0",
   "description": "GovTool backend — HTTP surface over the GovTool data-provider contracts.",
   "author": "",
   "private": true,

@@ -7,20 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [v3.0.0](https://github.com/IntersectMBO/govtool/compare/v2.1.0-beta.1...v3.0.0) 2026-10-17
 
-- Documentation site (docs.gov.tools) in `docs/`, migrated from GitBook to Docusaurus and updated to the current GovTool implementation
-- `govtool-docs` Docker image, built by CI on `main`, `develop`, `test` and version tags; images from `main` and version tags always build for docs.gov.tools
-- A GitHub Pages preview of the documentation, deployed from `develop` and not indexed by search engines
-- Documentation checks on pull requests that touch `docs/`: the site build catches broken links and asset paths, and the Docker image is started and smoke-tested, before merge
-- Guides for AI coding agents: `AGENTS.md` files, each imported by a `CLAUDE.md`, at the root and in `govtool/frontend`, `govtool/govtool-backend` and `tests`, and a rewritten `govtool/AGENTS.md`, covering checks, couplings and traps. The guide to adding a governance action type now covers the data contract, providers, backend and forum ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
+Major release. GovTool 3.0 is the 2.1 alpha and beta pre-releases below plus
+the fixes since the beta; the release notes cover upgrading an existing
+installation.
+
+### Added
 
 - A maintenance banner: a `/var/run/maintenance.json` in the frontend container keeps GovTool up during maintenance and shows a banner over every page counting down to its `endsAt`, which says GovTool will be back soon in its last five minutes. Transactions are refused while it shows, and an open page picks it up within a minute. `/var/run/maintenance_enabled` still takes the whole site to the maintenance page
 
 ### Fixed
 
 - The maintenance check before a wallet action asks the page's own origin, port included, so it no longer fails on any port but 80
-- Developer documentation no longer describes the removed Haskell backend or claims that pull requests run unit tests; broken anchors, the backend and test suite setup docs and their `.env.example` files are corrected, and the README links support, security reporting and the license ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 - "Go to Data Edit Screen" in the proposal submission's URL, data mismatch and metadata error modals opens the proposal's edit form instead of only closing the submission and returning to the proposal page (playwright test 7P)
 - A newly registered DRep sees its DRep ID on the dashboard as soon as the registration lands, instead of up to 10 minutes later: the backend now drops its cached DRep id searches on each new block, as it does for other wallet state
 - The metadata service backs off an anchor that keeps failing, replaying the failure for 1 minute, then 10 minutes, 30 minutes, 1 hour, 6 hours and daily, instead of fetching it again and storing a new fetch report every minute; Retry keeps its one-minute window. The report picker lists the latest 10 reports
@@ -29,6 +28,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A saved hard fork draft opens with its version filled in and can be continued; the forum also no longer treats version 0 as empty (7M_5)
 - A DRep searched by id, such as right after registering, comes back with its name and payment address, and directory rows carry CIP-119 `doNotList`; the DRep directory asks for `listed=true`, which leaves such DReps out before the total and paging (2N, 3Q)
 - Treasury withdrawal and parameter change proposals attach the guardrail script only when the enacted constitution names one, so they can be submitted on a network whose constitution has none, such as the local devnet (7H_2)
+- Raw HTML in proposal discussion forum content, such as proposals and comments, is sanitized: scripts, iframes, style tags and inline styles are dropped, while highlights, inserts, superscripts, subscripts, strikethrough, math and code blocks still render ([#4292](https://github.com/IntersectMBO/govtool/pull/4292))
+
+### Changed
+
+- The frontend, backend, metadata service, proposal discussion backend and docs packages, the ones built into Docker images, are versioned 3.0.0
+- The governance action history is labelled "Historical" in the navigation and "Historical Actions" on its page and in its breadcrumb
+- A metadata error on a governance action or DRep page shows its message, a "Why am I seeing this error?" link to the error docs and a "View Error Report" button that opens the fetch report, with Retry, in a dialog. The explanation paragraph moved to the DRep error conditions docs, which now also cover Data URL Blocked, Data Too Large, Data Not Checked and governance actions
+
+### Removed
+
+- Budget discussions in `govtool-pdf-backend`: the `/api/bds`, `/api/bd/versions/:id`, `/api/bd-drafts`, `/api/bd-polls`, `/api/bd-poll-votes`, `bd-*` lookup and `/api/country-lists` routes, and `bd_proposal_id` on comments. A new migration deletes budget discussion comments and drops the budget discussion tables, so their data is not kept; the 2025 proposals live on in the frontend archive
+
+## [v2.1.0-beta.1](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.2...v2.1.0-beta.1) 2026-10-09
+
+Pre-release. The new backend reaches parity with the Haskell backend, loads
+governance documents in the background, and GovTool deploys as a single
+Docker Swarm stack.
+
+### Added
+
+- Documentation site (docs.gov.tools) in `docs/`, migrated from GitBook to Docusaurus and updated to the current GovTool implementation
+- `govtool-docs` Docker image, built by CI on `main`, `develop`, `test` and version tags; images from `main` and version tags always build for docs.gov.tools
+- A GitHub Pages preview of the documentation, deployed from `develop` and not indexed by search engines
+- Documentation checks on pull requests that touch `docs/`: the site build catches broken links and asset paths, and the Docker image is started and smoke-tested, before merge
+- Guides for AI coding agents: `AGENTS.md` files, each imported by a `CLAUDE.md`, at the root and in `govtool/frontend`, `govtool/govtool-backend` and `tests`, and a rewritten `govtool/AGENTS.md`, covering checks, couplings and traps. The guide to adding a governance action type now covers the data contract, providers, backend and forum ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
+
+### Fixed
+
+- Developer documentation no longer describes the removed Haskell backend or claims that pull requests run unit tests; broken anchors, the backend and test suite setup docs and their `.env.example` files are corrected, and the README links support, security reporting and the license ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 
 ### Changed
 
@@ -37,8 +65,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The DRep directory, the governance action lists, the governance action history and the voted-on tab retry a search the backend cannot run yet for about a minute, then say that search is still loading, instead of showing no results, "You haven't voted yet" or an endless spinner
 - Budget discussions are now a read-only archive of the 2025 budget proposals (linked from a "2025 Budget Proposals" card in Useful links, with a read-only notice on its pages). The list, details, version history, final DRep poll totals and comments are served as static files under `/budget-proposals-2025/`, split from a mainnet export by `govtool/frontend/scripts/split-bd-archive.mjs`; the frontend makes no budget discussion requests. Old `/budget_discussion` links still resolve, `/budget_discussion/propose` redirects to the archive, and the archive is shown whether or not the proposal discussion forum is enabled
 - The frontend image compresses JSON and caches the archive files for 30 days
-- The governance action history is labelled "Historical" in the navigation and "Historical Actions" on its page and in its breadcrumb
-- A metadata error on a governance action or DRep page shows its message, a "Why am I seeing this error?" link to the error docs and a "View Error Report" button that opens the fetch report, with Retry, in a dialog. The explanation paragraph moved to the DRep error conditions docs, which now also cover Data URL Blocked, Data Too Large, Data Not Checked and governance actions
 
 ### Removed
 
@@ -46,7 +72,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The unused analytics dashboard (`govtool/analytics-dashboard`), a Next.js internal dashboard outside the core deployment
 - The Constitutional Committee Portal card in Useful links, replaced by the budget proposals archive card
 - Creating, editing, drafting and deleting budget proposals, voting in budget proposal polls, the DRep voters list of a poll, and commenting on or replying to budget proposals in the frontend
-- Budget discussions in `govtool-pdf-backend`: the `/api/bds`, `/api/bd/versions/:id`, `/api/bd-drafts`, `/api/bd-polls`, `/api/bd-poll-votes`, `bd-*` lookup and `/api/country-lists` routes, and `bd_proposal_id` on comments. A new migration deletes budget discussion comments and drops the budget discussion tables, so their data is not kept; the 2025 proposals live on in the frontend archive
 
 ## [v2.1.0-alpha.2](https://github.com/IntersectMBO/govtool/compare/v2.1.0-alpha.1...v2.1.0-alpha.2) 2026-10-02
 

@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A newly registered DRep sees its DRep ID on the dashboard as soon as the registration lands, instead of up to 10 minutes later: the backend now drops its cached DRep id searches on each new block, as it does for other wallet state
 - The metadata service backs off an anchor that keeps failing, replaying the failure for 1 minute, then 10 minutes, 30 minutes, 1 hour, 6 hours and daily, instead of fetching it again and storing a new fetch report every minute; Retry keeps its one-minute window. The report picker lists the latest 10 reports
 - The browser tab title of the governance action history list reads "Historical Actions" instead of "Governance Action Details"
+- Submitting a hard fork proposal from the proposal discussion forum builds the transaction with the version stored on the proposal and the latest enacted hard fork, instead of stopping silently after the metadata check (playwright test 7H_5)
+- A saved hard fork draft opens with its version filled in and can be continued; the forum also no longer treats version 0 as empty (7M_5)
+- A DRep searched by id, such as right after registering, comes back with its name and payment address, and directory rows carry CIP-119 `doNotList`; the DRep directory asks for `listed=true`, which leaves such DReps out before the total and paging (2N, 3Q)
+- Treasury withdrawal and parameter change proposals attach the guardrail script only when the enacted constitution names one, so they can be submitted on a network whose constitution has none, such as the local devnet (7H_2)
 
 ### Changed
 

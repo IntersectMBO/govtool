@@ -95,10 +95,11 @@ import {
   setProtocolParameterUpdate,
 } from "@utils";
 import { useTranslation } from "@hooks";
-import { getTransactionStatus } from "@services";
+import { getEnactedProposalDetails, getTransactionStatus } from "@services";
 import type { MetadatumMap } from "cip-179";
 import { buildAuxiliaryData } from "@/cip179/csl";
 import { AutomatedVotingOptionDelegationId } from "@/types/automatedVotingOptions";
+import { GovernanceActionType } from "@/types/governanceAction";
 import { env } from "@/config/env";
 import { getUtxos } from "./getUtxos";
 import { useAppContext, useModal, useSnackbar } from ".";
@@ -291,6 +292,13 @@ type Utxos = {
 }[];
 
 const NETWORK = +env.VITE_NETWORK_FLAG;
+
+/** Whether a previous action is named; index 0 is the most common one. */
+const hasPrevGovernanceAction = (
+  hash: string | undefined,
+  index: string | number | undefined,
+): hash is string =>
+  !!hash && index !== undefined && index !== null && String(index) !== "";
 
 /**
  * Whether a transaction body registers the stake credential with this key
@@ -1121,14 +1129,34 @@ const CardanoProvider = (props: Props) => {
     return RewardAddress.from_address(Address.from_bech32(bech32Address));
   }, [walletApi]);
 
+  /**
+   * The guardrail script for a treasury or parameter proposal, whose policy
+   * the ledger requires to be the constitution's script, or absent when the
+   * constitution names none (as on a local devnet). With no constitution
+   * enacted the answer is unknown, so the script is attached, as before.
+   */
+  const getGuardrailScript = useCallback(async () => {
+    const enacted = await getEnactedProposalDetails(
+      GovernanceActionType.NewConstitution,
+    ).catch(() => null);
+    const description = enacted?.description as
+      | { guardrailsScriptHash?: string | null }
+      | null
+      | undefined;
+    if (description?.guardrailsScriptHash === null) return undefined;
+    return PlutusScript.from_bytes_v3(
+      Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
+    );
+  }, []);
+
   const addVotingProposalToBuilder = useCallback(
     (
       govActionBuilder: VotingProposalBuilder,
       votingProposal: VotingProposal,
-      plutusScript: PlutusScript,
+      plutusScript?: PlutusScript,
     ) => {
       let redeemer: Redeemer;
-      if (isGuardrailScriptUsed.current) {
+      if (isGuardrailScriptUsed.current && plutusScript) {
         const redeemerTag = RedeemerTag.new_voting_proposal();
         const plutusData = PlutusData.new_map(PlutusMap.new());
         const exUnits = ExUnits.new(
@@ -1190,7 +1218,7 @@ const CardanoProvider = (props: Props) => {
         }
 
         let newConstitution;
-        if (prevGovernanceActionHash && prevGovernanceActionIndex) {
+        if (hasPrevGovernanceAction(prevGovernanceActionHash, prevGovernanceActionIndex)) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
             Number(prevGovernanceActionIndex),
@@ -1265,7 +1293,7 @@ const CardanoProvider = (props: Props) => {
         }
 
         let updateCommitteeAction;
-        if (prevGovernanceActionHash && prevGovernanceActionIndex) {
+        if (hasPrevGovernanceAction(prevGovernanceActionHash, prevGovernanceActionIndex)) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
             Number(prevGovernanceActionIndex),
@@ -1350,7 +1378,7 @@ const CardanoProvider = (props: Props) => {
         // Create new no confidence action; it must follow the last enacted
         // action of the committee lineage, if there is one.
         const noConfidenceAction =
-          prevGovernanceActionHash && prevGovernanceActionIndex
+          hasPrevGovernanceAction(prevGovernanceActionHash, prevGovernanceActionIndex)
             ? NoConfidenceAction.new_with_action_id(
                 GovernanceActionId.new(
                   TransactionHash.from_hex(prevGovernanceActionHash),
@@ -1416,14 +1444,14 @@ const CardanoProvider = (props: Props) => {
             withdrawal.amount,
           );
         });
-        const guardrailPlutusScript = PlutusScript.from_bytes_v3(
-          Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
-        );
-        const treasuryAction = TreasuryWithdrawalsAction.new_with_policy_hash(
-          treasuryWithdrawals,
-          guardrailPlutusScript.hash(),
-        );
-        isGuardrailScriptUsed.current = true;
+        const guardrailPlutusScript = await getGuardrailScript();
+        const treasuryAction = guardrailPlutusScript
+          ? TreasuryWithdrawalsAction.new_with_policy_hash(
+              treasuryWithdrawals,
+              guardrailPlutusScript.hash(),
+            )
+          : TreasuryWithdrawalsAction.new(treasuryWithdrawals);
+        isGuardrailScriptUsed.current = !!guardrailPlutusScript;
 
         const treasuryGovAct =
           GovernanceAction.new_treasury_withdrawals_action(treasuryAction);
@@ -1454,7 +1482,12 @@ const CardanoProvider = (props: Props) => {
         console.error(err);
       }
     },
-    [addVotingProposalToBuilder, requireEpochParams, getRewardAddress],
+    [
+      addVotingProposalToBuilder,
+      getGuardrailScript,
+      requireEpochParams,
+      getRewardAddress,
+    ],
   );
 
   const buildProtocolParameterChangeGovernanceAction = useCallback(
@@ -1475,27 +1508,31 @@ const CardanoProvider = (props: Props) => {
           setProtocolParameterUpdate(protocolParameterUpdate, key, value);
         }
 
-        const guardrailPlutusScript = PlutusScript.from_bytes_v3(
-          Buffer.from(COMPILED_GUARDRAIL_SCRIPT, "hex"),
-        );
+        const guardrailPlutusScript = await getGuardrailScript();
+        const policyHash = guardrailPlutusScript?.hash();
         let protocolParamChangeAction;
-        if (prevGovernanceActionHash && prevGovernanceActionIndex) {
+        if (hasPrevGovernanceAction(prevGovernanceActionHash, prevGovernanceActionIndex)) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
             Number(prevGovernanceActionIndex),
           );
-          protocolParamChangeAction =
-            ParameterChangeAction.new_with_policy_hash_and_action_id(
-              prevGovernanceActionId,
-              protocolParameterUpdate,
-              guardrailPlutusScript.hash(),
-            );
+          protocolParamChangeAction = policyHash
+            ? ParameterChangeAction.new_with_policy_hash_and_action_id(
+                prevGovernanceActionId,
+                protocolParameterUpdate,
+                policyHash,
+              )
+            : ParameterChangeAction.new_with_action_id(
+                prevGovernanceActionId,
+                protocolParameterUpdate,
+              );
         } else {
-          protocolParamChangeAction =
-            ParameterChangeAction.new_with_policy_hash(
-              protocolParameterUpdate,
-              guardrailPlutusScript.hash(),
-            );
+          protocolParamChangeAction = policyHash
+            ? ParameterChangeAction.new_with_policy_hash(
+                protocolParameterUpdate,
+                policyHash,
+              )
+            : ParameterChangeAction.new(protocolParameterUpdate);
         }
 
         const protocolParamChangeGovAct =
@@ -1529,7 +1566,12 @@ const CardanoProvider = (props: Props) => {
         console.error(err);
       }
     },
-    [addVotingProposalToBuilder, requireEpochParams, getRewardAddress],
+    [
+      addVotingProposalToBuilder,
+      getGuardrailScript,
+      requireEpochParams,
+      getRewardAddress,
+    ],
   );
 
   const buildHardForkGovernanceAction = useCallback(
@@ -1549,7 +1591,7 @@ const CardanoProvider = (props: Props) => {
         );
 
         let hardForkInitiationAction;
-        if (prevGovernanceActionHash && prevGovernanceActionIndex) {
+        if (hasPrevGovernanceAction(prevGovernanceActionHash, prevGovernanceActionIndex)) {
           const prevGovernanceActionId = GovernanceActionId.new(
             TransactionHash.from_hex(prevGovernanceActionHash),
             Number(prevGovernanceActionIndex),

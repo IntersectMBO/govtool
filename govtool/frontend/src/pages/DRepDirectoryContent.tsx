@@ -155,7 +155,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       searchPhrase: debouncedSearchText,
       sorting: chosenSorting as DRepListSort,
       status: chosenFilters as DRepStatus[],
-      sortingSeed
+      sortingSeed,
+      listed: true,
     },
     { enabled: !!chosenSorting },
   );

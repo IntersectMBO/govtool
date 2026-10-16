@@ -65,6 +65,11 @@ export type DRepListItem = {
   latestTxHash: string | null;
   latestRegistrationDate: string;
   metadataError: string | null;
+  /**
+   * CIP-119 `doNotList` from the DRep's document; the directory hides such a
+   * DRep. False until the document is read.
+   */
+  doNotList: boolean;
   paymentAddress: string | null;
   givenName: string | null;
   objectives: string | null;
@@ -106,4 +111,9 @@ export type DRepListParams = {
   status: DRepStatus[];
   sort?: DRepListSort;
   seed?: string;
+  /**
+   * The directory's view: leave out DReps whose document asks not to be
+   * listed (CIP-119 `doNotList`), before the total and the page.
+   */
+  listed?: boolean;
 };

@@ -177,8 +177,9 @@ test("3O. Should reject invalid dRep registration metadata", async ({
   await dRepRegistrationPage.metadataUrlInput.fill(invalidMetadataAnchor);
   await dRepRegistrationPage.submitBtn.click();
 
+  // A web page is not the anchored document: either rejection will do.
   await expect(dRepRegistrationPage.metadataErrorModal).toHaveText(
-    /your external data does not/i
+    /your external data (does not match|is not in the expected format)/i
   );
 });
 

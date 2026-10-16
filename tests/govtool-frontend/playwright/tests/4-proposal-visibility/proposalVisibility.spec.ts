@@ -262,52 +262,59 @@ test("4K. Should display correct vote counts on governance details page for disc
       const totalStakeResponsePromise = newPage.waitForResponse((response) =>
         response.url().includes(`network/total-stake`)
       );
+      // The totals the page renders: stake moves every epoch, which on a
+      // devnet is a minute, so the list read earlier can be a boundary behind.
+      const shownProposalPromise = newPage.waitForResponse((response) =>
+        response.url().includes("/proposal/get/")
+      );
       const govActionDetailsPage = new GovernanceActionDetailsPage(newPage);
       await govActionDetailsPage.goto(
         `${proposalToCheck.txHash}#${proposalToCheck.index}`
       );
+      const shown: IProposal = (await (await shownProposalPromise).json())
+        .proposal;
 
       const dRepTotalAbstainVote =
         await govActionDetailsPage.getDRepTotalAbstainVoted(
-          proposalToCheck,
+          shown,
           totalStakeResponsePromise
         );
 
       // check dRep votes
-      if (await areDRepVoteTotalsDisplayed(proposalToCheck)) {
+      if (await areDRepVoteTotalsDisplayed(shown)) {
         await expect(govActionDetailsPage.dRepYesVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.dRepYesVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.dRepYesVotes)}`
         );
         await expect(govActionDetailsPage.dRepAbstainVotes).toHaveText(
           `₳ ${correctVoteAdaFormat(dRepTotalAbstainVote)}`
         );
         await expect(govActionDetailsPage.dRepNoVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.dRepNoVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.dRepNoVotes)}`
         );
       }
       // check sPos votes
-      if (await areSPOVoteTotalsDisplayed(proposalToCheck)) {
+      if (await areSPOVoteTotalsDisplayed(shown)) {
         await expect(govActionDetailsPage.sPosYesVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.poolYesVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.poolYesVotes)}`
         );
         await expect(govActionDetailsPage.sPosAbstainVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.poolAbstainVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.poolAbstainVotes)}`
         );
         await expect(govActionDetailsPage.sPosNoVotes).toHaveText(
-          `₳ ${correctVoteAdaFormat(proposalToCheck.poolNoVotes)}`
+          `₳ ${correctVoteAdaFormat(shown.poolNoVotes)}`
         );
       }
 
       // check ccCommittee votes
-      if (areCCVoteTotalsDisplayed(proposalToCheck)) {
+      if (areCCVoteTotalsDisplayed(shown)) {
         await expect(govActionDetailsPage.ccCommitteeYesVotes).toHaveText(
-          `${proposalToCheck.ccYesVotes}`
+          `${shown.ccYesVotes}`
         );
         await expect(govActionDetailsPage.ccCommitteeAbstainVotes).toHaveText(
-          `${proposalToCheck.ccAbstainVotes}`
+          `${shown.ccAbstainVotes}`
         );
         await expect(govActionDetailsPage.ccCommitteeNoVotes).toHaveText(
-          `${proposalToCheck.ccNoVotes}`
+          `${shown.ccNoVotes}`
         );
       }
     })

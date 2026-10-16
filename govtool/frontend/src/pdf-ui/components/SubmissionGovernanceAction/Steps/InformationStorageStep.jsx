@@ -21,6 +21,8 @@ import {
 import { getViaProxy, updateProposalContent } from '../../../lib/api';
 import {
     adaToLovelace,
+    getHardForkContent,
+    isBlankValue,
     isValidURLFormat,
     isValidURLLength,
     openInNewTab,
@@ -209,25 +211,25 @@ const InformationStorageStep = ({
                         });
                 } else if (parseInt(proposalGATypeId) === 6) {
                     ///Hard Fork Initiation
+                    const { major, minor } = getHardForkContent(
+                        proposal?.attributes?.content?.attributes
+                            ?.proposal_hard_fork_content
+                    );
+                    if (isBlankValue(major) || isBlankValue(minor)) {
+                        throw new Error('The hard fork version is missing');
+                    }
                     govActionBuilder =
-                        await walletAPI.buildHardForkInitiationGovernanceActions(
-                            {
-                                prevGovernanceActionHash:
-                                    proposal?.attributes?.content?.attributes
-                                        ?.proposal_hard_fork_content
-                                        .previous_ga_hash,
-                                prevGovernanceActionIndex:
-                                    proposal?.attributes?.content?.attributes
-                                        ?.proposal_hard_fork_content
-                                        .previous_ga_id,
-                                major: proposal?.attributes?.content?.attributes
-                                    ?.proposal_hard_fork_content.major,
-                                minor: proposal?.attributes?.content?.attributes
-                                    ?.proposal_hard_fork_content.minor,
-                                hash: hashData,
-                                url: fileURL,
-                            }
-                        );
+                        await walletAPI.buildHardForkGovernanceAction({
+                            major,
+                            minor,
+                            hash: hashData,
+                            url: fileURL,
+                            // The ledger wants the latest enacted hard fork
+                            // now, not the one when the draft was saved.
+                            ...(await getPrevGovernanceAction(
+                                'HardForkInitiation'
+                            )),
+                        });
                 }
 
                 if (govActionBuilder) {

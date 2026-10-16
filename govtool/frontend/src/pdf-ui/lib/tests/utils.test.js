@@ -4,6 +4,8 @@ import {
     adaToLovelace,
     getGovActionDepositAda,
     getLovelaceFromCborBalance,
+    getHardForkContent,
+    isBlankValue,
     isValidURLFormat,
     setUrlPortsAllowed,
 } from '../utils';
@@ -82,5 +84,54 @@ describe('adaToLovelace', () => {
         expect(() => adaToLovelace('1.0000001')).toThrow();
         expect(() => adaToLovelace('abc')).toThrow();
         expect(() => adaToLovelace('')).toThrow();
+    });
+});
+
+describe('isBlankValue', () => {
+    it('counts zero as a value', () => {
+        expect(isBlankValue(0)).toBe(false);
+        expect(isBlankValue('0')).toBe(false);
+    });
+
+    it('counts missing and empty values as blank', () => {
+        expect(isBlankValue(undefined)).toBe(true);
+        expect(isBlankValue(null)).toBe(true);
+        expect(isBlankValue('')).toBe(true);
+        expect(isBlankValue('  ')).toBe(true);
+    });
+});
+
+describe('getHardForkContent', () => {
+    it('reads the relation the API returns', () => {
+        expect(
+            getHardForkContent({
+                data: {
+                    id: 5,
+                    attributes: {
+                        previous_ga_hash: null,
+                        previous_ga_id: null,
+                        major: '11',
+                        minor: '0',
+                    },
+                },
+            })
+        ).toEqual({
+            previous_ga_hash: null,
+            previous_ga_id: null,
+            major: '11',
+            minor: '0',
+        });
+    });
+
+    it('passes the flat form fields through', () => {
+        expect(getHardForkContent({ major: '10', minor: '1' })).toEqual({
+            major: '10',
+            minor: '1',
+        });
+    });
+
+    it('answers no fields for an empty relation or none', () => {
+        expect(getHardForkContent({ data: null })).toEqual({});
+        expect(getHardForkContent(undefined)).toEqual({});
     });
 });

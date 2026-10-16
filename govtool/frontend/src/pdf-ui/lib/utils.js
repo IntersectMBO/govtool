@@ -116,6 +116,25 @@ export const numberValidation = (value) => {
     return true;
 };
 
+/**
+ * Whether a form value is missing. Zero is a value: a hard fork to version
+ * 11.0 has minor version 0.
+ */
+export const isBlankValue = (value) =>
+    value === undefined || value === null || String(value).trim() === '';
+
+/**
+ * A proposal's hard fork fields. The form holds them flat; the API returns
+ * them as a relation, `{ data: { id, attributes } }`, with `data` null when
+ * there are none.
+ */
+export const getHardForkContent = (content) => {
+    if (content && typeof content === 'object' && 'data' in content) {
+        return content.data?.attributes ?? {};
+    }
+    return content ?? {};
+};
+
 export const containsString = (str) => {
     return /^(?!\s*$).+/.test(str)
         ? true

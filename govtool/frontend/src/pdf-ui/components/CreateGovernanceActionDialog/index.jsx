@@ -14,6 +14,7 @@ import {
 } from '../CreationGoveranceAction/StepLayout';
 import { useAppContext } from '../../context/context';
 import { createProposal, deleteProposal } from '../../lib/api';
+import { isBlankValue } from '../../lib/utils';
 import CreateGA2 from '../../assets/svg/CreateGA2.jsx';
 import { useLocation } from 'react-router';
 
@@ -144,9 +145,13 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
             }
             if (proposalData?.gov_action_type_id == 6) {
                 if (
-                    !proposalData?.proposal_hard_fork_content?.major ||
+                    isBlankValue(
+                        proposalData?.proposal_hard_fork_content?.major
+                    ) ||
                     hardForkErrors?.major ||
-                    !proposalData?.proposal_hard_fork_content?.minor ||
+                    isBlankValue(
+                        proposalData?.proposal_hard_fork_content?.minor
+                    ) ||
                     hardForkErrors?.minor
                 ) {
                     return setIsContinueDisabled(true);

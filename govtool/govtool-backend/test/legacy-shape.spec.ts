@@ -955,6 +955,7 @@ describe('GET /drep/list', () => {
       latestRegistrationDate: '2026-01-01T00:00:00.000Z',
       // Every field below is metadata-derived, and chain data carries none.
       metadataError: null,
+      doNotList: false,
       paymentAddress: null,
       givenName: null,
       objectives: null,

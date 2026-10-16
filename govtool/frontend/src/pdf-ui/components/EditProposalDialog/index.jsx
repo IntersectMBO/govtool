@@ -22,6 +22,7 @@ import {
 import {
     containsString,
     formatIsoDate,
+    isBlankValue,
     isRewardAddress,
     maxLengthCheck,
     numberValidation,
@@ -145,8 +146,8 @@ const EditProposalDialog = ({
             }
             if (draft?.gov_action_type_id == 6) {
                 if (
-                    draft?.proposal_hard_fork_content?.major == '' ||
-                    draft?.proposal_hard_fork_content?.minor == '' ||
+                    isBlankValue(draft?.proposal_hard_fork_content?.major) ||
+                    isBlankValue(draft?.proposal_hard_fork_content?.minor) ||
                     isNaN(Number(draft?.proposal_hard_fork_content?.major)) ||
                     isNaN(Number(draft?.proposal_hard_fork_content?.minor))
                 ) {

@@ -111,4 +111,9 @@ export type DRepListParams = {
   status: DRepStatus[];
   sort?: DRepListSort;
   seed?: string;
+  /**
+   * The directory's view: leave out DReps whose document asks not to be
+   * listed (CIP-119 `doNotList`), before the total and the page.
+   */
+  listed?: boolean;
 };

@@ -70,6 +70,7 @@ export class DRepController {
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
     @Query('seed') seed?: string,
+    @Query('listed') listed?: string,
   ): Promise<DRepListResponse> {
     return this.drepService.list({
       search,
@@ -78,6 +79,7 @@ export class DRepController {
       page: parsePageValue(page, 0, 'page'),
       pageSize: parsePageValue(pageSize, 10, 'pageSize', MAX_PAGE_SIZE),
       seed,
+      listed: listed === 'true',
     });
   }
   private normalizeQueryArray(value?: string | string[]): string[] {

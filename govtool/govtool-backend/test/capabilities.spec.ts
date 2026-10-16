@@ -771,6 +771,53 @@ describe('RAISE: search reaches names and titles, which no provider indexes', ()
     expect(row.givenName).toBeNull();
   });
 
+  it('leaves hidden DReps out of the directory before paging', async () => {
+    // Ids are built from hex seeds.
+    const seeds = '0123456789'.split('');
+    const hidden = seeds.map((seed) =>
+      drep({ id: drepId(seed), anchor: anchor(`https://x/${seed}.jsonld`) }),
+    );
+    const shown = drep({
+      id: drepId('f'),
+      anchor: anchor('https://x/f.jsonld'),
+    });
+    const documents: Record<string, Record<string, unknown>> = {
+      'https://x/f.jsonld': { body: { givenName: 'Shown' } },
+    };
+    for (const seed of seeds) {
+      documents[`https://x/${seed}.jsonld`] = { body: { doNotList: true } };
+    }
+    const cache = passthroughCache();
+    const api = chain({
+      governance: {
+        dreps: { list: () => Promise.resolve(page([...hidden, shown])) },
+      },
+      system: { getCapabilities: () => Promise.resolve(env(PROVIDER)) },
+    });
+    const service = new DRepService(
+      api,
+      new ProposalService(api, cache, null),
+      cache,
+      metadataService(documents),
+    );
+    await service.warmDocuments();
+
+    const directory = await service.list({
+      status: [],
+      page: 0,
+      pageSize: 10,
+      sort: 'RegistrationDate',
+      listed: true,
+    });
+    expect(directory.total).toBe(1);
+    expect(directory.elements.map((row) => row.givenName)).toEqual(['Shown']);
+
+    // Other callers still see every DRep, with the flag to decide on.
+    const everyone = await service.list({ status: [], page: 0, pageSize: 20 });
+    expect(everyone.total).toBe(11);
+    expect(everyone.elements.filter((row) => row.doNotList)).toHaveLength(10);
+  });
+
   it('fetches the document of a DRep searched by id before the warmer reaches it', async () => {
     const fresh = drep({ anchor: anchor('https://x/fresh.jsonld') });
     const cache = passthroughCache();

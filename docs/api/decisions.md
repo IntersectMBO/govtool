@@ -5765,5 +5765,8 @@ note. D123 (reports are kept forever) and D125 (anyone may retry once a minute) 
   `/drep/info` does. It names one DRep, so the fetch is one document. Name searches and the
   whole directory still read the store only.
 - Directory rows carry `doNotList` (CIP-119), read from the DRep's document, `false` until it is
-  read. The frontend hides such a DRep from the directory; the Haskell backend never sent the field
-  (its SQL did not select `do_not_list`), so that filter did nothing on real data.
+  read. The Haskell backend never sent the field (its SQL did not select `do_not_list`), so the
+  frontend's filter on it did nothing on real data.
+- `listed=true` is the directory's view: the backend leaves out `doNotList` DReps before the total
+  and the page, so pages stay full. Without it every DRep is listed, since the DRep's own page, its
+  dashboard and the edit form look it up by id through the same route.

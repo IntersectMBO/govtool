@@ -408,17 +408,25 @@ export class DRepService {
       this.sortDReps(dreps, sort, seed, activityVotes),
     );
 
+    // Every document is fetched ahead into the store, so rows are read from
+    // it and the request never waits on a fetch. A search by id names one
+    // DRep, which may be too new for the store; it fetches what is missing.
+    const isIdSearch = search !== '' && !isName;
+    const withProfiles = (items: DRepListItem[]) =>
+      isIdSearch
+        ? Promise.all(items.map((item) => this.withProfile(item)))
+        : Promise.resolve(items.map((item) => this.withStoredProfile(item)));
+
+    // The directory leaves hidden DReps out before counting and paging, so
+    // its pages stay full and its total counts only what it shows.
+    if (params.listed) {
+      dreps = (await withProfiles(dreps)).filter((drep) => !drep.doNotList);
+    }
+
     const total = dreps.length;
     const offset = page * pageSize;
-
-    // Every document is fetched ahead into the store, so the page is read
-    // from it and the request never waits on a fetch. A search by id names
-    // one DRep, which may be too new for the store; it fetches what is missing.
     const rows = dreps.slice(offset, offset + pageSize);
-    const elements =
-      search !== '' && !isName
-        ? await Promise.all(rows.map((item) => this.withProfile(item)))
-        : rows.map((item) => this.withStoredProfile(item));
+    const elements = params.listed ? rows : await withProfiles(rows);
 
     return { page, pageSize, total, elements };
   }

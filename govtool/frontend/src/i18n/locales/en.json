@@ -334,6 +334,7 @@
     "whoops": "Whoops!"
   },
   "errors": {
+    "maintenanceTransactionsPaused": "GovTool is under maintenance, so transactions are paused. Please try again once it's over.",
     "appCannotCreateTransaction": "Application can not create transaction.",
     "appCannotGetDeposit": "Can not fetch deposit",
     "appCannotGetUtxos": "Application can not get utxos",
@@ -1117,7 +1118,24 @@
   "system": {
     "description": "The Cardano GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
     "title": "This tool is connected to {{networkName}}",
-    "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>"
+    "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
+    "maintenance": {
+      "label": "Maintenance notice",
+      "title": "GovTool is under maintenance",
+      "titleFinalStretch": "Almost there, we'll be back soon",
+      "titleEnded": "GovTool is still under maintenance",
+      "description": "We'll be back in <strong>about {{duration}}</strong>. Voting and other transactions are paused until then.",
+      "descriptionNoEnd": "We'll be back soon. Voting and other transactions are paused until then.",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "backIn": "Back in",
+      "finishingUp": "Finishing up",
+      "h": "h",
+      "m": "m",
+      "s": "s"
+    }
   },
   "tooltips": {
     "delegateTodRep": {

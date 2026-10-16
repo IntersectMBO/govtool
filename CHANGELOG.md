@@ -15,8 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation checks on pull requests that touch `docs/`: the site build catches broken links and asset paths, and the Docker image is started and smoke-tested, before merge
 - Guides for AI coding agents: `AGENTS.md` files, each imported by a `CLAUDE.md`, at the root and in `govtool/frontend`, `govtool/govtool-backend` and `tests`, and a rewritten `govtool/AGENTS.md`, covering checks, couplings and traps. The guide to adding a governance action type now covers the data contract, providers, backend and forum ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 
+- A maintenance banner: a `/var/run/maintenance.json` in the frontend container keeps GovTool up during maintenance and shows a banner over every page counting down to its `endsAt`, which says GovTool will be back soon in its last five minutes. Transactions are refused while it shows, and an open page picks it up within a minute. `/var/run/maintenance_enabled` still takes the whole site to the maintenance page
+
 ### Fixed
 
+- The maintenance check before a wallet action asks the page's own origin, port included, so it no longer fails on any port but 80
 - Developer documentation no longer describes the removed Haskell backend or claims that pull requests run unit tests; broken anchors, the backend and test suite setup docs and their `.env.example` files are corrected, and the README links support, security reporting and the license ([#4196](https://github.com/IntersectMBO/govtool/issues/4196))
 - "Go to Data Edit Screen" in the proposal submission's URL, data mismatch and metadata error modals opens the proposal's edit form instead of only closing the submission and returning to the proposal page (playwright test 7P)
 - A newly registered DRep sees its DRep ID on the dashboard as soon as the registration lands, instead of up to 10 minutes later: the backend now drops its cached DRep id searches on each new block, as it does for other wallet state

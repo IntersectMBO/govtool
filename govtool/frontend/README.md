@@ -61,6 +61,31 @@ Governance action history uses the GovTool backend configured by `VITE_BASE_URL`
 
 For backend setup, see the [backend README](../govtool-backend/README.md). To run the complete service stack, see the [Docker Compose instructions](../../docker/README.md).
 
+## Maintenance mode
+
+The production image's nginx reads two files in the frontend container's `/var/run`.
+
+`maintenance.json` keeps GovTool up and shows a banner over every page. The app checks it every minute, counts down to `endsAt`, and refuses transactions while it is there; browsing and connecting a wallet still work. In its last five minutes the banner says GovTool will be back soon, and once `endsAt` passes it says GovTool is still under maintenance and finishing up, until the file is removed. Without `endsAt` the banner has no countdown. To show it for 60 minutes, timed by the container's clock:
+
+```bash
+docker exec <frontend-container> sh -c 'now=$(date -u +%s); printf "{\"startsAt\":\"%s\",\"endsAt\":\"%s\"}\n" "$(date -u -d @$now +%FT%TZ)" "$(date -u -d @$((now + 3600)) +%FT%TZ)" > /var/run/maintenance.json'
+```
+
+Write it again to move the end time, and remove it when maintenance is over:
+
+```bash
+docker exec <frontend-container> rm -f /var/run/maintenance.json
+```
+
+`maintenance_enabled` is for outages the app cannot run through: while it exists every page answers 503 with `maintenance-page/index.html`, and an open page reloads onto it before its next wallet action.
+
+```bash
+docker exec <frontend-container> touch /var/run/maintenance_enabled
+docker exec <frontend-container> rm -f /var/run/maintenance_enabled
+```
+
+Both files last until the container restarts, so a redeploy of the frontend drops them. On Swarm, find the container with `docker ps -q -f name=<stack>_frontend` on the node that runs it. The Vite dev server has neither file, so to see the banner run the production image, for example the devnet stack in `tests/devnet`.
+
 ## Checks
 
 CI runs `npm run tsc`, `npm run lint` and `npm test` on pushes that change the frontend. Locally, run:

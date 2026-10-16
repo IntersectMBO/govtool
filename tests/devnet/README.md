@@ -97,9 +97,10 @@ first, unless `DEVNET_PLAYWRIGHT_CIP179=0`.
 
 ## Workarounds in the suites
 
-- Wallet connect first requests `<protocol>//<hostname>/is-maintenance-mode-on`
-  without the page's port, which fails off port 80 and blocks every connect;
-  `lib/wallet/pageWallet.ts` answers it (`false`) in the page.
+- Wallet connect first requests `/is-maintenance-mode-on`, which a frontend
+  built before the maintenance banner asked for without the page's port, so it
+  failed off port 80 and blocked every connect; `lib/wallet/pageWallet.ts`
+  answers it (`false`) in the page.
 - `registeredDRepWallet()` registers with CIP-119 metadata unless given an
   anchor (without it the app treats the wallet as a direct voter); 2F and
   2W pre-register their ADA holders' stake keys (fresh HD wallets are

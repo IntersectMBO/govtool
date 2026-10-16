@@ -1,6 +1,6 @@
 import { Box, CircularProgress } from "@mui/material";
 
-import { useCardano } from "@context";
+import { useCardano, useFeatureFlag } from "@context";
 import {
   useGetAdaHolderVotingPowerQuery,
   useScreenDimension,
@@ -16,6 +16,19 @@ import { ProposeGovActionDashboardCard } from "./DashboardCards/ProposeGovAction
 export const DashboardCards = () => {
   const { dRepID, pendingTransaction, stakeKey } = useCardano();
   const { screenWidth } = useScreenDimension();
+  const { isFeatureAvailable } = useFeatureFlag();
+
+  // Whole-feature gate on the delegation surface. The card states, as fact,
+  // which DRep this wallet delegates to — and renders the "you have not
+  // delegated" call to action when the answer is null. A provider that cannot
+  // answer `account.currentDelegation` would therefore tell a delegated user
+  // they are undelegated, so the card is hidden rather than shown wrong.
+  //
+  // This is the NEAREST equivalent: the contract's `drep.delegationTimeline`
+  // (who joined, who left, and when) has no surface in this frontend at all.
+  const isDelegationStateAvailable = isFeatureAvailable(
+    "account.currentDelegation",
+  );
 
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
@@ -56,13 +69,15 @@ export const DashboardCards = () => {
         rowGap: 3,
       }}
     >
-      <DelegateDashboardCard
-        currentDelegation={currentDelegation}
-        delegateTx={pendingTransaction.delegate}
-        dRepID={dRepID}
-        voter={voter}
-        votingPower={votingPower}
-      />
+      {isDelegationStateAvailable && (
+        <DelegateDashboardCard
+          currentDelegation={currentDelegation}
+          delegateTx={pendingTransaction.delegate}
+          dRepID={dRepID}
+          voter={voter}
+          votingPower={votingPower}
+        />
+      )}
       <DRepDashboardCard
         dRepID={dRepID}
         pendingTransaction={pendingTransaction}

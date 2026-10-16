@@ -5,13 +5,22 @@ import { Button, ExternalModalButton, StatusPill, Typography } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import { useDelegateTodRep, useScreenDimension, useTranslation } from "@hooks";
-import { Card, DataMissingInfoBox } from "@molecules";
+import {
+  Card,
+  DataMissingInfoBox,
+  MetadataFailureDetails,
+} from "@molecules";
 import {
   correctDRepDirectoryFormat,
   encodeCIP129Identifier,
   testIdFromLabel,
 } from "@utils";
-import { DRepData, MetadataStandard } from "@/models";
+import {
+  DRepData,
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+} from "@/models";
 import { DRepDetailsCardHeader } from "./DRepDetailsCardHeader";
 import { useValidateMutation } from "@/hooks/mutations";
 
@@ -56,7 +65,10 @@ export const DRepDetailsCard = ({
   const [metadataStatus, setMetadataStatus] = useState<
     MetadataValidationStatus | undefined
   >();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const { validateMetadata } = useValidateMutation();
+  // Bumped when a retry resolves the document, to validate it again.
+  const [validationRevision, setValidationRevision] = useState(0);
 
   useEffect(() => {
     if (!url) return;
@@ -64,17 +76,18 @@ export const DRepDetailsCard = ({
     const validate = async () => {
       setIsValidating(true);
 
-      const { status: metadataValidationStatus } = await validateMetadata({
+      const { status: metadataValidationStatus, issues } = await validateMetadata({
         standard: MetadataStandard.CIP119,
         url,
         hash: metadataHash ?? "",
       });
 
       setMetadataStatus(metadataValidationStatus);
+      setMetadataIssues(issues);
       setIsValidating(false);
     };
     validate();
-  }, [url]);
+  }, [url, validationRevision]);
 
   return (
     <Card
@@ -113,9 +126,22 @@ export const DRepDetailsCard = ({
         {metadataStatus && (
           <DataMissingInfoBox
             isDataMissing={metadataStatus}
+            issues={metadataIssues}
             isDrep
             sx={{ mb: 0 }}
             isValidating={isValidating}
+            reportAction={
+              !!url &&
+              !!metadataHash && (
+                <MetadataFailureDetails
+                  anchor={{ url, hash: metadataHash }}
+                  canRetry={isMe}
+                  onRecovered={() =>
+                    setValidationRevision((value) => value + 1)
+                  }
+                />
+              )
+            }
           />
         )}
         {metadataStatus && !!url && (

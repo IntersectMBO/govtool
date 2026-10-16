@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { Box, Tabs, Tab, styled, Skeleton, Link } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -12,6 +12,8 @@ import {
   DataMissingInfoBox,
   DataMissingHeader,
   GovernanceActionsDatesBox,
+  MetadataFailureDetails,
+  MetadataWarningInfoBox,
   GovernanceActionDetailsDiffView,
   GovernanceActionNewCommitteeDetailsTabContent,
   GovernanceActionCardTreasuryWithdrawalElement,
@@ -28,7 +30,7 @@ import {
   encodeCIP129Identifier,
   validateSignature,
 } from "@utils";
-import { MetadataValidationStatus, ProposalData } from "@models";
+import { MetadataIssue, MetadataValidationStatus, ProposalData } from "@models";
 import { Trans } from "react-i18next";
 import { errorRed, successGreen } from "@/consts";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -67,20 +69,29 @@ const StyledTab = styled(({ isMobile, ...props }: StyledTabProps) => (
 type GovernanceActionDetailsCardDataProps = {
   isDashboard?: boolean;
   isDataMissing?: MetadataValidationStatus;
+  /** Errors are listed with the failure; warnings alone get their own box. */
+  metadataIssues?: MetadataIssue[];
   isInProgress?: boolean;
   isOneColumn: boolean;
   isSubmitted?: boolean;
   isValidating?: boolean;
+  /** The action's document is being read for its authors. */
+  isDocumentLoading?: boolean;
+  /** Called when a retry makes the anchored metadata resolve. */
+  onMetadataRecovered?: () => void;
   proposal: ProposalData;
 };
 
 export const GovernanceActionDetailsCardData = ({
   isDashboard,
   isDataMissing,
+  metadataIssues,
   isInProgress,
   isOneColumn,
   isSubmitted,
   isValidating,
+  isDocumentLoading,
+  onMetadataRecovered,
   proposal: {
     abstract,
     authors,
@@ -268,7 +279,22 @@ export const GovernanceActionDetailsCardData = ({
         isValidating={isValidating}
         isInProgress={isInProgress}
         isSubmitted={isSubmitted}
+        issues={metadataIssues}
+        reportAction={
+          !!url &&
+          !!metadataHash && (
+            // Anyone may retry a governance action's metadata (D125).
+            <MetadataFailureDetails
+              anchor={{ url, hash: metadataHash }}
+              canRetry
+              onRecovered={onMetadataRecovered}
+            />
+          )
+        }
       />
+      {!isDataMissing && !isValidating && (
+        <MetadataWarningInfoBox issues={metadataIssues} />
+      )}
       <GovernanceActionCardElement
         label={t("govActions.governanceActionType")}
         text={label}
@@ -383,10 +409,18 @@ export const GovernanceActionDetailsCardData = ({
         label={t("govActions.authors.title")}
         textVariant="longText"
         dataTestId="authors"
+        isValidating={isValidating || isDocumentLoading}
       >
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {/* With none to list, a document that did not load leaves the
+              authors unknown, which is not the same as a document that
+              lists none. */}
           {(authors ?? []).length <= 0
-            ? t("govActions.authors.noDataAvailable")
+            ? t(
+                jsonContent == null
+                  ? "govActions.authors.notLoaded"
+                  : "govActions.authors.noDataAvailable",
+              )
             : (authors ?? []).map((author) => (
               <Box
                 key={author.publicKey}

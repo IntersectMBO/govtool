@@ -1,0 +1,151 @@
+# Run GovTool locally against Koios, with no database.
+#
+# Trial setup for the data-layer experiment: it builds the contract, the
+# providers and govtool-backend from this directory, and serves the
+# frontend against it. Nothing here is a deployment artefact.
+#
+#   docker compose -f docker-compose.koios.yml up -d
+#   frontend  http://localhost:8080
+#   backend   http://localhost:9999
+#
+# That builds the backend and pulls the published frontend. After changing
+# backend code, rebuild it with: up -d --build backend
+#
+# Koios is a public API, so this needs no db-sync, no credentials and no
+# Cardano node. A KOIOS_TOKEN raises the rate limit but is optional.
+#
+# Point it at another network with:
+#
+#   KOIOS_NETWORK=preprod VITE_NETWORK_FLAG=0 docker compose -f ... up -d
+#
+# Both, always: the second is what the frontend compares against the wallet's
+# own network id, and a mismatch is reported as a rejected wallet rather than
+# as a misconfiguration. 1 is mainnet, 0 is every testnet.
+#
+# Every route the frontend calls is served on Koios. Document-derived fields
+# (DRep names, action titles) come from the metadata service below, which
+# fetches the anchors from the internet, IPFS included.
+
+name: govtool-koios
+
+services:
+  metadata-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: metadata
+      POSTGRES_PASSWORD: metadata
+      POSTGRES_DB: metadata
+    volumes:
+      - metadata-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metadata -d metadata"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  metadata:
+    build:
+      context: ./govtool-metadata-service
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # The image runs `prisma migrate deploy` before starting.
+      DATABASE_URL: postgresql://metadata:metadata@metadata-db:5432/metadata
+      # Optional: your own IPFS gateway, tried before the public ones.
+      IPFS_PRIMARY_GATEWAY: ${IPFS_PRIMARY_GATEWAY:-}
+    # No published port: only the backend talks to it (D119).
+    depends_on:
+      metadata-db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  backend:
+    build:
+      # The parent directory: the backend depends on its sibling packages by
+      # relative path, so a narrower context cannot resolve them.
+      context: .
+      dockerfile: govtool-backend/Dockerfile
+    environment:
+      NODE_ENV: production
+      GOVTOOL_HOST: 0.0.0.0
+      GOVTOOL_PORT: 9999
+
+      # The only setting that decides which implementation is constructed.
+      GOVTOOL_CHAIN_DATA_PROVIDER: koios
+      GOVTOOL_KOIOS_NETWORK: ${KOIOS_NETWORK:-mainnet}
+      # Optional. Without one the free public tier applies.
+      GOVTOOL_KOIOS_TOKEN: ${KOIOS_TOKEN:-}
+      # Optional. Set to run against a self-hosted Koios instead.
+      GOVTOOL_KOIOS_BASE_URL: ${KOIOS_BASE_URL:-}
+
+      # No GOVTOOL_DBSYNC_* here on purpose: they are required only when the
+      # provider is dbsync, and their absence is what proves the backend has
+      # no database dependency left.
+
+      GOVTOOL_CACHE_DURATION_SECONDS: ${CACHE_SECONDS:-20}
+      GOVTOOL_DREP_LIST_CACHE_DURATION_SECONDS: ${DREP_CACHE_SECONDS:-600}
+      # Optional: without it /ipfs/upload answers 503 and reads are unaffected.
+      GOVTOOL_PINATA_API_JWT: ${PINATA_API_JWT:-}
+      GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
+    ports:
+      - "${BACKEND_PORT:-9999}:9999"
+    depends_on:
+      metadata:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:9999/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1));",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    # Both keys, the same way docker/docker-compose.yaml does it: plain
+    # `up` uses the published image, and `--build` builds from ./frontend
+    # instead. Pulling is the default because the frontend build is killed by
+    # the OOM killer at 7.8 GB of Docker memory, and because nothing in this
+    # compose file changes frontend source.
+    image: ghcr.io/intersectmbo/govtool-frontend:${FRONTEND_TAG:-dev}
+    build:
+      # Stock image, unmodified: it is configured at run time by its own
+      # entrypoint, so nothing here needs a build argument.
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_BASE_URL: ${PUBLIC_BACKEND_URL:-http://localhost:9999}
+      VITE_APP_ENV: development
+      VITE_IS_DEV: "true"
+      # Must agree with GOVTOOL_KOIOS_NETWORK above: 1 for mainnet, 0 otherwise.
+      VITE_NETWORK_FLAG: ${VITE_NETWORK_FLAG:-1}
+      VITE_IPFS_GATEWAY: ${IPFS_GATEWAY:-https://ipfs.io/ipfs}
+      VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: "false"
+      # Governance action history is built in; unsupported voting groups are identified in the UI.
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  metadata-db:

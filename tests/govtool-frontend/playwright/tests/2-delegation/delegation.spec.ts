@@ -174,7 +174,10 @@ test.describe("DRep dependent tests", () => {
   test("2P. Should enable sharing of DRep details", async ({
     page,
     context,
+    isMobile,
   }) => {
+    // The DRep page shows its share button from 1020px wide only.
+    test.skip(isMobile, "Share button is desktop only");
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
     const dRepDetailsPage = new DRepDetailsPage(page);

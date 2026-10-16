@@ -70,12 +70,21 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          # The frontend's version: the cip179 tests load its dependencies.
+          node-version-file: "./govtool/frontend/.nvmrc"
           cache: "npm"
-          cache-dependency-path: "./tests/govtool-frontend/playwright/package-lock.json"
+          cache-dependency-path: |
+            ./tests/govtool-frontend/playwright/package-lock.json
+            ./govtool/frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
+
+      # The cip179 project encodes its fixtures with the frontend's own
+      # codecs, imported from its source and node_modules.
+      - name: Install frontend dependencies for the cip179 tests
+        working-directory: govtool/frontend
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Cache Playwright browsers
         id: cache-playwright-browsers
@@ -97,7 +106,6 @@ jobs:
         run: |
           mkdir -p ./lib/_mock
           chmod +w ./lib/_mock
-          npm run generate-wallets
 
           # Set API keys based on the network
           if [[ "${{ env.NETWORK }}" == "preprod" ]]; then
@@ -124,13 +132,6 @@ jobs:
           name: allure-results
           path: tests/govtool-frontend/playwright/allure-results
 
-      - name: Upload lock logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lock-logs
-          path: tests/govtool-frontend/playwright/lock_logs.txt
-
     env:
       DOCS_URL: ${{ vars.DOCS_URL }}
       KUBER_API_KEY: ${{secrets.KUBER_API_KEY}}
@@ -141,6 +142,7 @@ jobs:
       CARDANOAPI_METADATA_URL: ${{vars.CARDANOAPI_METADATA_URL}}
       FAUCET_PAYMENT_PRIVATE: ${{secrets.FAUCET_PAYMENT_PRIVATE}}
       FAUCET_STAKE_PRIVATE: ${{secrets.FAUCET_STAKE_PRIVATE}}
+      TEST_WALLET_MNEMONIC: ${{secrets.TEST_WALLET_MNEMONIC}}
 
   publish-report:
     runs-on: ubuntu-latest

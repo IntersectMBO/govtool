@@ -17,19 +17,6 @@ export const parseVotingPowerAndPercentage = (
   };
 };
 
-export const getWalletConfigForFaucet = () => {
-  return {
-    payment: {
-      private: environments.faucet.payment.private || "",
-    },
-    stake: {
-      private: environments.faucet.stake.private || "",
-    },
-    address: environments.faucet.address || "",
-  };
-};
-
-
 export const getProposalType = () => {
   return Object.values(ProposalType).filter(
     (type) =>
@@ -38,11 +25,4 @@ export const getProposalType = () => {
         type === ProposalType.hardFork
       )
   );
-};
-
-export const getProposalWalletCount = (): number => {
-  if (environments.isScheduled) {
-    return 1;
-  }
-  return environments.isHardforkProposalEnabled ? 6 : 5;
 };

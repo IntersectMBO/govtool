@@ -44,7 +44,7 @@ export const VoteContextText = ({
 
   const fieldProps = {
     layoutStyles: { mb: 3 },
-    name: "voteContextText",
+    name: "voteContextText" as const,
     placeholder: t("govActions.provideContext"),
     rules: {
       maxLength: {

@@ -1,9 +1,7 @@
 import environments from "@constants/environments";
 import { guardrailsScript, guardrailsScriptHash } from "@constants/index";
-import { proposal04Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
-import { isBootStrapingPhase } from "@helpers/cardano";
-import { ShelleyWallet } from "@helpers/crypto";
+import { getProtocolVersion, isBootStrapingPhase } from "@helpers/cardano";
 import { expectWithInfo } from "@helpers/exceptionHandler";
 import { getProposalType } from "@helpers/index";
 import {
@@ -11,6 +9,7 @@ import {
   uploadScriptAndGenerateUrl,
 } from "@helpers/metadata";
 import { extractProposalIdFromUrl } from "@helpers/string";
+import { ensureConstitutionFixture } from "@helpers/invalidMetadataFixtures";
 import { invalid, valid } from "@mock/index";
 import { Download, Locator, Page, expect } from "@playwright/test";
 import metadataBucketService from "@services/metadataBucketService";
@@ -18,8 +17,9 @@ import {
   ProposalCreateRequest,
   ProposalLink,
   ProposalType,
-  StaticWallet,
 } from "@types";
+import { testWallet } from "lib/wallet/testWallets";
+import { setUsernameIfPrompted } from "./pdfUsername";
 
 const formErrors = {
   proposalTitle: "title-input-error",
@@ -148,6 +148,7 @@ export default class ProposalSubmissionPage {
     await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
 
     await this.verifyIdentityBtn.click();
+    await setUsernameIfPrompted(this.page);
     await this.proposalCreateBtn.click();
 
     await this.continueBtn.click();
@@ -549,7 +550,7 @@ export default class ProposalSubmissionPage {
     if (proposalType === ProposalType.updatesToTheConstitution) {
       proposal.prop_constitution_url = forValidation
         ? valid.url()
-        : environments.metadataBucketUrl + "/data.jsonId";
+        : await ensureConstitutionFixture();
 
       if (hasGuardrails) {
         if (!forValidation) {
@@ -563,12 +564,14 @@ export default class ProposalSubmissionPage {
       }
     }
     if (proposalType == ProposalType.hardFork) {
-      proposal.prop_min_version = faker.number
-        .float({ min: 0, max: 100 })
-        .toString();
-      proposal.prop_major_version = faker.number
-        .float({ min: 0, max: 100 })
-        .toString();
+      // The ledger accepts only a direct successor of the current version:
+      // (major + 1, 0) or (major, minor + 1).
+      const { major, minor } = await getProtocolVersion();
+      const next = faker.datatype.boolean()
+        ? { major: major + 1, minor: 0 }
+        : { major, minor: minor + 1 };
+      proposal.prop_major_version = next.major.toString();
+      proposal.prop_min_version = next.minor.toString();
     }
 
     return proposal;
@@ -644,9 +647,7 @@ export default class ProposalSubmissionPage {
     const proposalFormValue = await this.generateValidProposalFormFields({
       proposalType: proposalType,
       is_draft: true,
-      receivingAddress: ShelleyWallet.fromJson(
-        proposal04Wallet
-      ).rewardAddressBech32(environments.networkId),
+      receivingAddress: (await testWallet("proposal04")).stakeAddress,
     });
     await this.fillupForm(proposalFormValue);
 

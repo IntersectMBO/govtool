@@ -4,11 +4,11 @@ import {
   useLocation,
   useParams,
   generatePath,
-} from "react-router-dom";
+} from "react-router";
 import { Box, CircularProgress, Link, Typography } from "@mui/material";
 import { AxiosError } from "axios";
 
-import { ICONS, OUTCOMES_PATHS, PATHS } from "@consts";
+import { ICONS, GOV_ACTION_HISTORY_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
@@ -19,7 +19,13 @@ import {
 import { getFullGovActionId, getShortenedGovActionId } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
-import { MetadataStandard, ProposalData, ProposalVote } from "@/models";
+import {
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+  ProposalVote,
+} from "@/models";
 import { useValidateMutation } from "@/hooks/mutations";
 
 type DashboardGovernanceActionDetailsState = {
@@ -45,13 +51,19 @@ export const DashboardGovernanceActionDetails = () => {
     MetadataValidationStatus | undefined
   >();
   const [isMetadataValid, setIsMetadataValid] = useState<boolean | undefined>();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const fullProposalId = txHash && getFullGovActionId(txHash, +index);
   const shortenedGovActionId =
     txHash && getShortenedGovActionId(txHash, +index);
 
+  const needsProposal = !state?.proposal || !state?.vote;
+  // A row opened from a list carries its document, and so its authors, only
+  // when the backend held it. Without one the action is read again for it,
+  // while the page shows the row it was given.
+  const needsDocument = !needsProposal && state?.proposal?.json == null;
   const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
-    !state?.proposal || !state?.vote,
+    needsProposal || needsDocument,
   );
   // TODO: Refactor this mess with proposals and metadata validation
   // once authors are existing in all CIP-108 metadata
@@ -60,14 +72,28 @@ export const DashboardGovernanceActionDetails = () => {
   );
 
   useEffect(() => {
+    if (!data?.proposal) return;
     const extendedProposalIndex = extendedProposal ? extendedProposal.index : -1;
-    if (data?.proposal && data?.proposal.index !== extendedProposalIndex) {
+    if (data.proposal.index !== extendedProposalIndex) {
       setExtendedProposal(data.proposal);
+    } else if (needsDocument) {
+      // Only the document and its authors: the text on the page is the one
+      // already checked against the anchor.
+      const { json, authors } = data.proposal;
+      setExtendedProposal((prevProposal) => ({
+        ...prevProposal,
+        json,
+        authors,
+      }));
     }
   }, [data?.proposal, isMetadataValid]);
-  const vote = (data ?? state)?.vote;
+  // A row's own vote, which a read made only for its document must not
+  // replace: a vote just cast may not have reached the backend yet.
+  const vote = (needsProposal ? data ?? state : state)?.vote;
 
   const { validateMetadata } = useValidateMutation();
+  // Bumped when a retry resolves the metadata, to validate it again.
+  const [validationRevision, setValidationRevision] = useState(0);
 
   useEffect(() => {
     if (!extendedProposal?.url) return;
@@ -75,7 +101,7 @@ export const DashboardGovernanceActionDetails = () => {
     const validate = async () => {
       setIsValidating(true);
 
-      const { status, metadata, valid } = await validateMetadata({
+      const { status, metadata, valid, issues } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: extendedProposal?.url,
         hash: extendedProposal?.metadataHash ?? "",
@@ -92,11 +118,16 @@ export const DashboardGovernanceActionDetails = () => {
       }
 
       setMetadataStatus(status);
+      setMetadataIssues(issues);
       setIsValidating(false);
       setIsMetadataValid(valid);
     };
     validate();
-  }, [extendedProposal?.url, extendedProposal?.metadataHash]);
+  }, [
+    extendedProposal?.url,
+    extendedProposal?.metadataHash,
+    validationRevision,
+  ]);
 
   useEffect(() => {
     const isProposalNotFound =
@@ -104,7 +135,7 @@ export const DashboardGovernanceActionDetails = () => {
       error.response?.data.message.match(/Proposal with id: .* not found/);
     if (isProposalNotFound && fullProposalId) {
       navigate(
-        OUTCOMES_PATHS.governanceActionOutcomes.replace(":id", fullProposalId),
+        GOV_ACTION_HISTORY_PATHS.governanceActionHistoryDetail.replace(":id", fullProposalId),
       );
     }
   }, [error]);
@@ -156,7 +187,7 @@ export const DashboardGovernanceActionDetails = () => {
         </Typography>
       </Link>
       <Box display="flex" flex={1} justifyContent="center">
-        {isLoading || isEnableLoading ? (
+        {(isLoading && needsProposal) || isEnableLoading ? (
           <Box
             sx={{
               alignItems: "center",
@@ -175,12 +206,17 @@ export const DashboardGovernanceActionDetails = () => {
               voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
             }
             isDataMissing={metadataStatus}
+            metadataIssues={metadataIssues}
             isInProgress={
               pendingTransaction.vote?.resourceId ===
               fullProposalId?.replace("#", "")
             }
             isDashboard
             isValidating={isValidating}
+            isDocumentLoading={needsDocument && isLoading}
+            onMetadataRecovered={() =>
+              setValidationRevision((value) => value + 1)
+            }
           />
         ) : (
           <Box mt={4} display="flex" flexWrap="wrap">

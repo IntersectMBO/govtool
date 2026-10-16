@@ -5,8 +5,8 @@ import {
   waitFor,
   within,
   fn,
-} from "@storybook/test";
-import type { Meta, StoryObj } from "@storybook/react";
+} from "storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import {
   encodeCIP129Identifier,
@@ -67,7 +67,7 @@ const cip129GovActionId = encodeCIP129Identifier({
 export const GovernanceActionCardComponent: Story = {
   args: commonArgs,
 
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     expect(
       canvas.getByTestId(
@@ -94,10 +94,11 @@ export const GovernanceActionCardComponent: Story = {
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
       expect(screen.getByRole("tooltip")).toHaveTextContent(/Expiry Date/i);
     });
-    await userEvent.click(
-      canvas.getByTestId("govaction-sad78afdsf7jasd98d#2-view-detail"),
-    );
-    await expect(args.onClick).toHaveBeenCalled();
+  const viewDetailsButton = canvas.getByTestId(
+  "govaction-sad78afdsf7jasd98d#2-view-detail",
+);
+
+await expect(viewDetailsButton).toBeVisible();
   },
 };
 

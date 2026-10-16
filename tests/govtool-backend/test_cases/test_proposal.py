@@ -28,7 +28,8 @@ def validate_expiry_date(proposal, gov_action_lifetime, query_system) -> bool:
     actual_expiry_date_in_datetime_format = datetime.strptime(actual_expiry_date, "%Y-%m-%dT%H:%M:%SZ")
 
     # Calculate the expected expiry date
-    epoch_length = query_system['epochLength']
+    # epochLength is in slots; public networks use 1 s slots, a devnet may not.
+    epoch_length = query_system['epochLength'] * query_system.get('slotLength', 1)
     created_epoch_no = proposal['createdEpochNo']
     start_time_of_0_epoch = query_system['systemStartTime']
     added_seconds = (created_epoch_no + 1 + gov_action_lifetime) * epoch_length

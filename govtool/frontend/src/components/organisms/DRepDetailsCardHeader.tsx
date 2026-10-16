@@ -1,11 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Box } from "@mui/material";
 
 import { Button } from "@atoms";
 import { ICONS, PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { DataMissingHeader } from "@molecules";
-import { DRepData } from "@/models";
+import { DRepData, MetadataValidationStatus } from "@/models";
 
 type DRepDetailsProps = {
   dRepData: DRepData;

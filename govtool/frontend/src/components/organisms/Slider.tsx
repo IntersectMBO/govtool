@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link } from "react-router";
 import { Box } from "@mui/material";
 import { KeenSliderOptions } from "keen-slider";
 import "keen-slider/keen-slider.min.css";

@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { Button, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { PATHS } from "@/consts";
 
 type Props = {

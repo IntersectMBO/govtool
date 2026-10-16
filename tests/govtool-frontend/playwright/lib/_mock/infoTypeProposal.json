@@ -1,372 +1,73 @@
 {
   "page": 0,
   "pageSize": 7,
-  "total": 20,
+  "total": 2,
   "elements": [
     {
-      "id": "81",
-      "txHash": "7a11d960c26700c8e480ab14bacb739180bb59c7be65c080e73c1597cec3ccdd",
+      "id": "gov_action10hpyyz2ny63mpq9gvm5xrrtapahh7q5fc049jv6zy3vshz8p8hmsqfy4mfw",
+      "txHash": "7dc242095326a3b080a866e8618d7d0f6f7f0289c3ea59334224590b88e13df7",
       "index": 0,
       "type": "InfoAction",
-      "details": {},
-      "expiryDate": "2024-06-06T06:59:21.477528Z",
-      "expiryEpochNo": 357,
-      "createdDate": "2024-05-31T14:22:33Z",
-      "createdEpochNo": 351,
-      "url": "https://bafkreiezyn2v5v5lhnvl6bckelvo7j5naowysq7jiiurqloqzasrjpio7q.ipfs.w3s.link",
-      "metadataHash": "6805152f22c80a395a19a2dd8e5f4e9b84287e6a621c184ccccb43c53c61f293",
-      "title": "hi",
-      "about": "hi",
-      "motivation": "hi",
-      "rationale": "hi",
-      "metadata": {
-        "@context": {
-          "@language": "en-us",
-          "CIP100": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
-          "CIP108": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#",
-          "authors": {
-            "@container": "@set",
-            "@context": {
-              "name": "http://xmlns.com/foaf/0.1/name",
-              "witness": {
-                "@context": {
-                  "publicKey": "CIP100:publicKey",
-                  "signature": "CIP100:signature",
-                  "witnessAlgorithm": "CIP100:witnessAlgorithm"
-                },
-                "@id": "CIP100:witness"
-              }
-            },
-            "@id": "CIP100:authors"
-          },
-          "body": {
-            "@context": {
-              "abstract": "CIP108:abstract",
-              "motivation": "CIP108:motivation",
-              "rationale": "CIP108:rationale",
-              "references": {
-                "@container": "@set",
-                "@context": {
-                  "GovernanceMetadata": "CIP100:GovernanceMetadataReference",
-                  "Other": "CIP100:OtherReference",
-                  "label": "CIP100:reference-label",
-                  "referenceHash": {
-                    "@context": {
-                      "hashAlgorithm": "CIP100:hashAlgorithm",
-                      "hashDigest": "CIP108:hashDigest"
-                    },
-                    "@id": "CIP108:referenceHash"
-                  },
-                  "uri": "CIP100:reference-uri"
-                },
-                "@id": "CIP108:references"
-              },
-              "title": "CIP108:title"
-            },
-            "@id": "CIP108:body"
-          },
-          "hashAlgorithm": "CIP100:hashAlgorithm"
-        },
-        "authors": [],
-        "body": {
-          "abstract": {
-            "@value": "hi"
-          },
-          "motivation": {
-            "@value": "hi"
-          },
-          "rationale": {
-            "@value": "hi"
-          },
-          "references": [],
-          "title": {
-            "@value": "hi"
-          }
-        },
-        "hashAlgorithm": {
-          "@value": "blake2b-256"
-        }
+      "details": {
+        "type": "InfoAction"
       },
-      "references": [],
-      "yesVotes": 0,
-      "noVotes": 50523999411,
-      "abstainVotes": 3434294559599,
-      "metadataStatus": {
-        "status": null,
-        "valid": false,
-        "raw": {
-          "valid": true
-        }
-      }
+      "expiryDate": "2026-10-10T00:00:00Z",
+      "expiryEpochNo": 1446,
+      "createdDate": "2026-09-09T15:30:23.000Z",
+      "createdEpochNo": 1415,
+      "url": "https://gateway.pinata.cloud/ipfs/bafkreiafpuc5hgrvwpszoub4atulgyzfmel5p5ghrnr3yo5wt5tveisegq",
+      "metadataHash": "2eca648b1246e58c900577a80908e9666992f6b7cfcd9c77e7f7efc7f651f02f",
+      "protocolParams": null,
+      "title": "[Preview test] Governance Improvement Survey",
+      "abstract": "Preview test only: this action and survey validate CIP-179 tooling. The source policy examples refer to mainnet, not Preview parameters. Responses are public. Every question is optional; an unanswered question is an abstention.\n\nThis Info Action and its attached CIP-179 survey are an information-gathering exercise about how Cardano governance could be improved. The survey collects structured opinions from governance participants on several open governance questions. Its purpose is to create a public, auditable preference signal that can help identify areas of agreement and disagreement, prioritize future research, and guide later work to improve Cardano governance.",
+      "motivation": "Neither the Info Action nor the survey implements any of the ideas being discussed. They do not change protocol parameters, amend the Constitution, approve treasury spending, or create new governance rules. The results are intended to inform future work. Any later change would still need its own research, technical development, public discussion, constitutional review where applicable, and the appropriate on-chain governance action.\n\n## What the vote means\n\nThe survey responses are where participants express their views on the individual governance topics. The Info Action vote is separate. \n\nA YES vote indicates support for collecting this information and using the survey results as an input to future governance research, discussion, and improvement work. It does not endorse any particular answer in the survey.\n\nA NO vote indicates that the voter does not support this Info Action as an information-gathering exercise or does not want its results treated as a governance preference signal. It should not be read as a NO vote on every idea in the attached survey.\n\nAn ABSTAIN vote takes no position on the information-gathering exercise itself.\n\n## Why use a survey\n\nMany governance issues do not fit cleanly into a single YES or NO choice. Some involve several separate decisions, and voters may agree with one part of an idea while rejecting another. A normal governance action can hide that nuance by forcing a whole package into one vote.\n\nCIP-179 lets participants answer those questions separately while keeping an auditable on-chain record of the responses. The goal is to learn where governance participants agree, where they disagree, and which areas deserve more research. The survey is not meant to settle technical details or substitute for later CIPs, parameter changes, constitutional changes, or governance actions.\n\n## Topics covered by the survey\n\n### DRep design, governance cadence, and incentives\n\nThe first part looks at the design of the DRep role itself. It covers DRep pledge, the registration deposit, governance timing, compensation, and delegator incentives. DRep pledge would be ADA a DRep commits as part of participating in governance. It could be only a public signal, or it could affect compensation or how much delegated voting power counts. A DRep currently locks 500 ADA to register, while the Constitution sets a 1 ADA minimum.\n\nGovernance actions currently remain open for 6 epochs, and a DRep remains active for 20 epochs without renewed governance activity. The Constitution currently allows a DRep inactivity period from 13 to 37 epochs and requires it to remain longer than the governance-action lifetime. One epoch is about five days. Compensation could make sustained participation more practical, and delegator incentives could encourage delegation toward active or less-concentrated DReps. Both also raise questions about funding, gaming, and concentration. The survey asks for direction on these choices without trying to design the final mechanism.\n\n### Net Change Limit and treasury process\n\nThe Net Change Limit, or NCL, is a constitutional guardrail on how much ADA can leave the treasury during a period. The current approach relies on an Info Action to set the limit and on the Constitutional Committee to apply it when reviewing treasury withdrawals.\n\nThere are several ways this could work in the future. The limit could remain a socially set spending envelope, become a protocol parameter, or be enforced directly by the ledger. It could be based on a fixed ADA amount or on treasury revenue over time. Treasury planning can also be separated from the governance actions that actually move funds. The survey focuses on these high-level choices rather than the detailed rules needed to implement them.\n\n### Delegation inactivity and reward distribution\n\nCardano delegation normally remains in effect until the holder changes it. That means voting or staking delegation can remain active for years even when the wallet itself is dormant. One family of proposals would let delegation expire after a long period of inactivity so that active participation has more weight.\n\nIf voters support an expiry model, a new delegatorInactivity protocol parameter would need to be introduced through a hard fork, with suitable constitutional guardrails defined before an initial value is set. That idea also creates a separate reward question. For this survey, inactive or ineligible stake means ADA that would not receive staking rewards under the rule being considered. Examples include unstaked ADA, stake delegated to a retired pool, stake above a pool's saturation limit, and stake whose delegation has expired. The survey separates the policy choice about delegation expiry from whether forfeited rewards should be distributed among active pools and delegators, returned to the reserves, or sent to the treasury.\n\n### Governance bodies and voting roles\n\nCardano currently divides governance authority among DReps, Stake Pool Operators, and the Constitutional Committee. Each body has a different role, and the effect of not voting can also differ depending on the rule being applied.\n\nThe survey therefore treats two issues separately. One is the role each governance body should have. The other is how non-participation should count when that body is entitled to vote. This distinction matters because a system can keep the same governance bodies while changing how abstention, non-voting, quorum, and approval thresholds work.",
+      "rationale": "## How the results should be used\n\nThe survey results should be treated as public opinion data and research input, not implementation instructions. They can help identify which governance problems deserve closer study, where there is broad support for a direction, and where more evidence or discussion is needed. Later work may include modeling, CIPs, parameter proposals, constitutional changes, or focused governance actions.\n\nRaw response counts and abstentions should be published by eligible governance role. Any secondary analysis that uses stake weighting, a different denominator, or another weighting method should explain that method clearly and remain separate from the raw CIP-179 results. DReps, SPOs, Constitutional Committee members, and other respondents should not be combined into one headline number unless the methodology makes clear what that number represents.\n\n## Relationship between this Info Action and the CIP-179 survey\n\nThe narrative above explains the purpose and context of the Info Action. The policy questions live in the attached CIP-179 survey linked through the action's anchor. The linked CIP-179 survey is the authoritative question set used for responses; its questions are intentionally kept outside this Info Action body. The survey responses, rather than the YES / NO / ABSTAIN vote on the Info Action, are the primary source of opinion data on the individual topics.",
+      "dRepYesVotes": 209532459629,
+      "dRepNoVotes": 3729768074206,
+      "dRepAbstainVotes": 0,
+      "poolYesVotes": 0,
+      "poolNoVotes": 1476695869310,
+      "poolAbstainVotes": 278405360178119,
+      "ccYesVotes": 0,
+      "ccNoVotes": 0,
+      "ccAbstainVotes": 0,
+      "prevGovActionIndex": null,
+      "prevGovActionTxHash": null,
+      "json": null,
+      "authors": []
     },
     {
-      "id": "73",
-      "txHash": "e79395f1b5e23e657486c6b3ce2fc528ffc090eb21ef6c6ab740c80a9226e6c8",
+      "id": "gov_action1trpys5w4gndq90lkxrejphlmpm2jrhle0sea43xs6y53s8wsy8asq9hdspn",
+      "txHash": "58c24851d544da02bff630f320dffb0ed521dff97c33dac4d0d129181dd021fb",
       "index": 0,
       "type": "InfoAction",
-      "details": {},
-      "expiryDate": "2024-06-06T06:59:21.477528Z",
-      "expiryEpochNo": 357,
-      "createdDate": "2024-05-31T05:21:20Z",
-      "createdEpochNo": 351,
-      "url": "https://bit.ly/3zCH2HL",
-      "metadataHash": "1111111111111111111111111111111111111111111111111111111111111111",
-      "title": null,
-      "about": null,
-      "motivation": null,
-      "rationale": null,
-      "metadata": null,
-      "references": null,
-      "yesVotes": 0,
-      "noVotes": 50523999411,
-      "abstainVotes": 3434294559599,
-      "metadataStatus": {
-        "status": null,
-        "valid": false,
-        "raw": {
-          "valid": true
-        }
-      }
-    },
-    {
-      "id": "84",
-      "txHash": "3c9d9224bf22014605a7f680708d2f44b549ca3416cb83cefc2e16e4696d8643",
-      "index": 0,
-      "type": "InfoAction",
-      "details": {},
-      "expiryDate": "2024-06-09T06:50:31.910112Z",
-      "expiryEpochNo": 360,
-      "createdDate": "2024-06-03T22:39:50Z",
-      "createdEpochNo": 354,
-      "url": "https://raw.githubusercontent.com/mpawel79/testrepo/master/Info.jsonld",
-      "metadataHash": "eebfff0e2213ff0c5331e6d9d99d47a5a825dce7053671b6ed4daae4b4e0df5e",
-      "title": null,
-      "about": null,
-      "motivation": null,
-      "rationale": null,
-      "metadata": null,
-      "references": null,
-      "yesVotes": 0,
-      "noVotes": 50523999411,
-      "abstainVotes": 3434294559599,
-      "metadataStatus": {
-        "status": null,
-        "valid": false,
-        "raw": {
-          "metadata": {
-            "abstract": "test",
-            "motivation": "test",
-            "rationale": "test",
-            "references": ["https://test.com"],
-            "title": "test"
-          },
-          "valid": true
-        }
-      }
-    },
-    {
-      "id": "82",
-      "txHash": "8c92cfc2bd4e43b4c323f0ae1899b17787143eeb2b4f410b695fabfd9f5589fd",
-      "index": 0,
-      "type": "InfoAction",
-      "details": {},
-      "expiryDate": "2024-06-06T06:59:21.477528Z",
-      "expiryEpochNo": 357,
-      "createdDate": "2024-05-31T14:24:23Z",
-      "createdEpochNo": 351,
-      "url": "https://raw.githubusercontent.com/mpawel79/testrepo/master/Info.jsonld",
-      "metadataHash": "eebfff0e2213ff0c5331e6d9d99d47a5a825dce7053671b6ed4daae4b4e0df5e",
-      "title": null,
-      "about": null,
-      "motivation": null,
-      "rationale": null,
-      "metadata": null,
-      "references": null,
-      "yesVotes": 0,
-      "noVotes": 50523999411,
-      "abstainVotes": 3434294559599,
-      "metadataStatus": {
-        "status": null,
-        "valid": false,
-        "raw": {
-          "metadata": {
-            "abstract": "test",
-            "motivation": "test",
-            "rationale": "test",
-            "references": ["https://test.com"],
-            "title": "test"
-          },
-          "valid": true
-        }
-      }
-    },
-    {
-      "id": "86",
-      "txHash": "79f95f77a980458a5532e70f1c74556557a2d8a4bd6172b316f19e9c4ec9b04f",
-      "index": 0,
-      "type": "InfoAction",
-      "details": {},
-      "expiryDate": "2024-06-10T06:47:35.38764Z",
-      "expiryEpochNo": 361,
-      "createdDate": "2024-06-04T10:25:18Z",
-      "createdEpochNo": 355,
-      "url": "https://metadata.cardanoapi.io/data/Info",
-      "metadataHash": "44c9719997b1bb5d15ef0e3e3f235d2b088dcbed531780fee9aa4ab79d6767e9",
-      "title": " ",
-      "about": " ",
-      "motivation": " ",
-      "rationale": " ",
-      "metadata": {
-        "@context": {
-          "@language": "en-us",
-          "CIP100": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
-          "CIP108": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#",
-          "authors": {
-            "@container": "@set",
-            "@context": {
-              "name": "http://xmlns.com/foaf/0.1/name",
-              "witness": {
-                "@context": {
-                  "publicKey": "CIP100:publicKey",
-                  "signature": "CIP100:signature",
-                  "witnessAlgorithm": "CIP100:witnessAlgorithm"
-                },
-                "@id": "CIP100:witness"
-              }
-            },
-            "@id": "CIP100:authors"
-          },
-          "body": {
-            "@context": {
-              "abstract": "CIP108:abstract",
-              "motivation": "CIP108:motivation",
-              "rationale": "CIP108:rationale",
-              "references": {
-                "@container": "@set",
-                "@context": {
-                  "GovernanceMetadata": "CIP100:GovernanceMetadataReference",
-                  "Other": "CIP100:OtherReference",
-                  "label": "CIP100:reference-label",
-                  "referenceHash": {
-                    "@context": {
-                      "hashAlgorithm": "CIP100:hashAlgorithm",
-                      "hashDigest": "CIP108:hashDigest"
-                    },
-                    "@id": "CIP108:referenceHash"
-                  },
-                  "uri": "CIP100:reference-uri"
-                },
-                "@id": "CIP108:references"
-              },
-              "title": "CIP108:title"
-            },
-            "@id": "CIP108:body"
-          },
-          "hashAlgorithm": "CIP100:hashAlgorithm"
-        },
-        "authors": [],
-        "body": {
-          "abstract": {
-            "@value": " "
-          },
-          "motivation": {
-            "@value": " "
-          },
-          "rationale": {
-            "@value": " "
-          },
-          "references": [],
-          "title": {
-            "@value": " "
-          }
-        },
-        "hashAlgorithm": {
-          "@value": "blake2b-256"
-        }
+      "details": {
+        "type": "InfoAction"
       },
-      "references": [],
-      "yesVotes": 0,
-      "noVotes": 50523999411,
-      "abstainVotes": 3434294559599,
-      "metadataStatus": {
-        "status": null,
-        "valid": false,
-        "raw": {
-          "metadata": {
-            "abstract": " ",
-            "motivation": " ",
-            "rationale": " ",
-            "references": [],
-            "title": " "
-          },
-          "valid": true
-        }
-      }
-    },
-    {
-      "id": "83",
-      "txHash": "9d28e20a0b406d81b2b50afc87c4cec0a46cd0acb6d820a8e79ff61673a3f4ff",
-      "index": 0,
-      "type": "InfoAction",
-      "details": {},
-      "expiryDate": "2024-06-09T06:50:31.910112Z",
-      "expiryEpochNo": 360,
-      "createdDate": "2024-06-03T14:03:59Z",
-      "createdEpochNo": 354,
-      "url": "https://raw.githubusercontent.com/mpawel79/testrepo/master/InfoJune03.jsonld",
-      "metadataHash": "eebfff0e2213ff0c5331e6d9d99d47a5a825dce7053671b6ed4daae4b4e0df5e",
-      "title": null,
-      "about": null,
-      "motivation": null,
-      "rationale": null,
-      "metadata": null,
-      "references": null,
-      "yesVotes": 0,
-      "noVotes": 50523999411,
-      "abstainVotes": 3434294559599,
-      "metadataStatus": {
-        "status": null,
-        "valid": false,
-        "raw": {
-          "metadata": {
-            "abstract": "test",
-            "motivation": "test",
-            "rationale": "test",
-            "references": ["https://test.com"],
-            "title": "test"
-          },
-          "valid": true
-        }
-      }
-    },
-    {
-      "id": "77",
-      "txHash": "b61762d4c4f923a08a9c180f5783760bb98e36da6c314f97632ed64bda9545c2",
-      "index": 0,
-      "type": "InfoAction",
-      "details": {},
-      "expiryDate": "2024-06-06T06:59:21.477528Z",
-      "expiryEpochNo": 357,
-      "createdDate": "2024-05-31T06:40:11Z",
-      "createdEpochNo": 351,
-      "url": "https://bit.ly/3zCH2HL",
-      "metadataHash": "1111111111111111111111111111111111111111111111111111111111111111",
-      "title": null,
-      "about": null,
-      "motivation": null,
-      "rationale": null,
-      "metadata": null,
-      "references": null,
-      "yesVotes": 0,
-      "noVotes": 50523999411,
-      "abstainVotes": 3434294559599,
-      "metadataStatus": {
-        "status": null,
-        "valid": false,
-        "raw": {
-          "valid": true
-        }
-      }
+      "expiryDate": "2026-10-10T00:00:00Z",
+      "expiryEpochNo": 1446,
+      "createdDate": "2026-09-09T13:20:38.000Z",
+      "createdEpochNo": 1415,
+      "url": "ipfs://bafkreieu4fdxexs4zd6otv5sz6f4ovrlhm4rcptggpmywqb2hc4lg6yz5y",
+      "metadataHash": "9ec565fc0bee943fcaea2c777fc145c64cadbb84a2cae428277cfa174ae43ecd",
+      "protocolParams": null,
+      "title": "[Preview test] Governance Improvement Survey",
+      "abstract": "Preview test only: this action and survey validate CIP-179 tooling. The source policy examples refer to mainnet, not Preview parameters. Responses are public. Every question is optional; an unanswered question is an abstention.\n\nThis Info Action and its attached CIP-179 survey are an information-gathering exercise about how Cardano governance could be improved. The survey collects structured opinions from governance participants on several open governance questions. Its purpose is to create a public, auditable preference signal that can help identify areas of agreement and disagreement, prioritize future research, and guide later work to improve Cardano governance.",
+      "motivation": "Neither the Info Action nor the survey implements any of the ideas being discussed. They do not change protocol parameters, amend the Constitution, approve treasury spending, or create new governance rules. The results are intended to inform future work. Any later change would still need its own research, technical development, public discussion, constitutional review where applicable, and the appropriate on-chain governance action.\n\n### What the vote means\n\nThe survey responses are where participants express their views on the individual governance topics. The Info Action vote is separate. \n\nA YES vote indicates support for collecting this information and using the survey results as an input to future governance research, discussion, and improvement work. It does not endorse any particular answer in the survey.\n\nA NO vote indicates that the voter does not support this Info Action as an information-gathering exercise or does not want its results treated as a governance preference signal. It should not be read as a NO vote on every idea in the attached survey.\n\nAn ABSTAIN vote takes no position on the information-gathering exercise itself.\n\n### Why use a survey\n\nMany governance issues do not fit cleanly into a single YES or NO choice. Some involve several separate decisions, and voters may agree with one part of an idea while rejecting another. A normal governance action can hide that nuance by forcing a whole package into one vote.\n\nCIP-179 lets participants answer those questions separately while keeping an auditable on-chain record of the responses. The goal is to learn where governance participants agree, where they disagree, and which areas deserve more research. The survey is not meant to settle technical details or substitute for later CIPs, parameter changes, constitutional changes, or governance actions.\n\n### Topics covered by the survey\n\n#### DRep design, governance cadence, and incentives\n\nThe first part looks at the design of the DRep role itself. It covers DRep pledge, the registration deposit, governance timing, compensation, and delegator incentives. DRep pledge would be ADA a DRep commits as part of participating in governance. It could be only a public signal, or it could affect compensation or how much delegated voting power counts. A DRep currently locks 500 ADA to register, while the Constitution sets a 1 ADA minimum.\n\nGovernance actions currently remain open for 6 epochs, and a DRep remains active for 20 epochs without renewed governance activity. The Constitution currently allows a DRep inactivity period from 13 to 37 epochs and requires it to remain longer than the governance-action lifetime. One epoch is about five days. Compensation could make sustained participation more practical, and delegator incentives could encourage delegation toward active or less-concentrated DReps. Both also raise questions about funding, gaming, and concentration. The survey asks for direction on these choices without trying to design the final mechanism.\n\n#### Net Change Limit and treasury process\n\nThe Net Change Limit, or NCL, is a constitutional guardrail on how much ADA can leave the treasury during a period. The current approach relies on an Info Action to set the limit and on the Constitutional Committee to apply it when reviewing treasury withdrawals.\n\nThere are several ways this could work in the future. The limit could remain a socially set spending envelope, become a protocol parameter, or be enforced directly by the ledger. It could be based on a fixed ADA amount or on treasury revenue over time. Treasury planning can also be separated from the governance actions that actually move funds. The survey focuses on these high-level choices rather than the detailed rules needed to implement them.\n\n#### Delegation inactivity and reward distribution\n\nCardano delegation normally remains in effect until the holder changes it. That means voting or staking delegation can remain active for years even when the wallet itself is dormant. One family of proposals would let delegation expire after a long period of inactivity so that active participation has more weight.\n\nIf voters support an expiry model, a new delegatorInactivity protocol parameter would need to be introduced through a hard fork, with suitable constitutional guardrails defined before an initial value is set. That idea also creates a separate reward question. For this survey, inactive or ineligible stake means ADA that would not receive staking rewards under the rule being considered. Examples include unstaked ADA, stake delegated to a retired pool, stake above a pool's saturation limit, and stake whose delegation has expired. The survey separates the policy choice about delegation expiry from whether forfeited rewards should be distributed among active pools and delegators, returned to the reserves, or sent to the treasury.\n\n#### Governance bodies and voting roles\n\nCardano currently divides governance authority among DReps, Stake Pool Operators, and the Constitutional Committee. Each body has a different role, and the effect of not voting can also differ depending on the rule being applied.\n\nThe survey therefore treats two issues separately. One is the role each governance body should have. The other is how non-participation should count when that body is entitled to vote. This distinction matters because a system can keep the same governance bodies while changing how abstention, non-voting, quorum, and approval thresholds work.",
+      "rationale": "### How the results should be used\n\nThe survey results should be treated as public opinion data and research input, not implementation instructions. They can help identify which governance problems deserve closer study, where there is broad support for a direction, and where more evidence or discussion is needed. Later work may include modeling, CIPs, parameter proposals, constitutional changes, or focused governance actions.\n\nRaw response counts and abstentions should be published by eligible governance role. Any secondary analysis that uses stake weighting, a different denominator, or another weighting method should explain that method clearly and remain separate from the raw CIP-179 results. DReps, SPOs, Constitutional Committee members, and other respondents should not be combined into one headline number unless the methodology makes clear what that number represents.\n\n### Relationship between this Info Action and the CIP-179 survey\n\nThe narrative above explains the purpose and context of the Info Action. The policy questions live in the attached CIP-179 survey linked through the action's anchor. They are reproduced at the end of this document for human review, but the linked CIP-179 survey is the authoritative question set used for responses. The survey responses, rather than the YES / NO / ABSTAIN vote on the Info Action, are the primary source of opinion data on the individual topics.\n\n### CIP-179 survey questions\n\nThis linked CIP-179 survey collects community preferences on the governance topics described above. Choose one answer unless a question says otherwise.\n\n### A. DRep design, governance cadence, and incentives\n\n#### Q1. What role, if any, should DRep pledge play?\n\n• No DRep pledge mechanism.\n\n• Disclosure only. Pledge is a public signal but does not change voting power or compensation.\n\n• Use pledge to limit compensation, but never voting power.\n\n• Use pledge to limit how much delegated voting power can count relative to the DRep's own pledge.\n\n• Use pledge for both voting-power limits and compensation eligibility.\n\n#### Q2. What should the DRep registration deposit be?\n\n• 500 ADA: Keep the current value.\n\n• 50 ADA.\n\n• 5 ADA.\n\n• 1 ADA: The current constitutional minimum.\n\n#### Q3. How long should a governance action remain open before it expires?\n\n• 6 epochs: Keep the current value.\n\n• 4 epochs.\n\n• 3 epochs.\n\n• 2 epochs.\n\n#### Q4. How long should a DRep remain active without renewed governance activity?\n\n• 20 epochs: Keep the current value.\n\n• 13 epochs: The current constitutional minimum.\n\n• 26 epochs.\n\n• 37 epochs: The current constitutional maximum.\n\n#### Q5. How should Cardano approach DRep compensation?\n\n• No formal compensation. \n\n• Use voluntary compensation only, such as delegator tips.\n\n• Run a focused pilot-program to see what works and what doesn’t.\n\n• Research a formal compensation mechanism before deciding.\n\n#### Q6. If DReps are compensated, who should fund it?\n\n• Governance-action proposers, for example through proposal deposits.\n\n• The Cardano treasury.\n\n• Voluntary delegator tips only.\n\n• No compensation mechanism.\n\n#### Q7. Should delegators also receive incentives for governance-related delegation choices?\n\n• Yes. Explore incentives that encourage delegation to active and less-concentrated DReps.\n\n• No. Governance incentives should focus on DReps, not delegators.\n\n• Research the idea further before deciding.\n\n### B. Net Change Limit and treasury process\n\n#### Q8. Where should the Net Change Limit, if any, be enforced?\n\n• Remove the constitutional NCL requirement.\n\n• Keep the current approach. Set the NCL through an Info Action and have the Constitutional Committee enforce it.\n\n• Store the NCL as a protocol parameter, but keep enforcement with the Constitutional Committee.\n\n• Enforce the NCL directly in the ledger so a treasury withdrawal that exceeds the remaining limit cannot ratify.\n\n#### Q9. If an NCL remains, what should the limit be based on?\n\n• A fixed ADA spending cap set in advance for a future period.\n\n• A percentage of recent treasury revenue measured over a trailing period.\n\n• A percentage of recent treasury revenue plus a hard ADA ceiling.\n\n• Not applicable: Remove the NCL.\n\n#### Q10. If an NCL remains, what time window should it use?\n\n• A rolling window of about 73 epochs, or one year.\n\n• A rolling window of about 36 epochs, or 180 days.\n\n• Fixed budget seasons, such as two per year.\n\n• One fixed annual budget window.\n\n• Not applicable: Remove the NCL.\n\n#### Q11. Should Cardano separate treasury planning from actual spending?\n\n• Yes. Keep planning and spending as separate decisions. Withdrawals should execute within an approved plan or envelope.\n\n• Partly. Planning should guide treasury decisions, but individual withdrawals should still be allowed outside the plan.\n\n• No. Do not create a separate formal planning layer. Evaluate and approve spending directly through Treasury Withdrawal governance actions.\n\n### C. Delegation inactivity and reward distribution\n\n#### Q12. Should long-inactive delegation eventually expire?\n\n• No. Delegation remains effective until the holder changes it.\n\n• Yes. Expire both staking and governance delegation after a defined inactivity period.\n\n• Expire governance delegation only. Staking delegation and staking rewards should continue indefinitely.\n\n#### Q13. When some ADA is inactive or otherwise ineligible for rewards, what should happen with the forfeited rewards?\n\n• Distribute it amongst the active pools and delegators.\n\n• Return it to the reserves.\n\n• Return it to the treasury.\n\n### D. Governance bodies and voting roles\n\n#### Q14. What role should the Constitutional Committee have?\n\n• Keep the Constitutional Committee and its current constitutional role.\n\n• Remove the Constitutional Committee from Cardano governance.\n\n#### Q15. What role should DReps have?\n\n• Keep DReps and their current voting role.\n\n• Remove DReps from Cardano governance.\n\n#### Q16. What role should SPOs have in governance?\n\n• Keep the current SPO role, including votes on the governance actions SPOs are currently entitled to vote on.\n\n• Veto only. SPO approval would no longer be required for an action to pass, but the action would fail if SPOs representing more than 50% of active stake explicitly vote NO.\n\n• Full voting role. Allow SPOs to vote on every governance action.\n\n• No governance voting role. Remove SPO governance votes. SPOs would still provide the operational readiness signal used for hard forks.\n\n#### Q17. When a governance body is allowed to vote, how should non-participation count?\n\n• Implicit NO. Non-voting seats or voting power remain in the ratification denominator, so not voting can prevent an action from passing.\n\n• Implicit ABSTAIN with a minimum quorum. Only explicit YES and NO votes determine the approval ratio, but the body must meet a separate minimum participation threshold.\n\n• Use different rules for the Constitutional Committee, DReps, and SPOs.",
+      "dRepYesVotes": 0,
+      "dRepNoVotes": 3729768074206,
+      "dRepAbstainVotes": 0,
+      "poolYesVotes": 0,
+      "poolNoVotes": 1476695869310,
+      "poolAbstainVotes": 278405360178119,
+      "ccYesVotes": 0,
+      "ccNoVotes": 0,
+      "ccAbstainVotes": 0,
+      "prevGovActionIndex": null,
+      "prevGovActionTxHash": null,
+      "json": null,
+      "authors": []
     }
   ]
 }

@@ -1,15 +1,6 @@
 export {};
-interface SentryEventDataLayer {
-  event: string;
-  sentryEventId: string;
-  sentryErrorMessage?: JSONValue;
-}
 
 declare global {
-  interface Window {
-    dataLayer: SentryEventDataLayer[];
-  }
-
   type VoteType = "yes" | "no" | "abstain" | "notVoted";
 
   type ActionTypeFromAPI = {

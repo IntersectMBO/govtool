@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, IconButton } from "@mui/material";
 
 import { VotingPowerChips, Typography } from "@atoms";
-import { ICONS } from "@consts";
+import { ICONS, PATHS } from "@consts";
 import {
   useGetDRepVotingPowerQuery,
   useGetVoterInfo,
@@ -10,9 +10,9 @@ import {
 } from "@hooks";
 import {
   DashboardDrawerMobile,
-  useMaintenanceEndingBannerContext,
 } from "@organisms";
 import { useCardano } from "@context";
+import { NavLink } from "react-router";
 
 type DashboardTopNavProps = {
   title: string;
@@ -31,8 +31,6 @@ export const DashboardTopNav = ({
   const { isEnableLoading } = useCardano();
   const { voter } = useGetVoterInfo();
   const { dRepVotingPower } = useGetDRepVotingPowerQuery(voter);
-  const { height: maintenanceEndingBannerHeight } =
-    useMaintenanceEndingBannerContext();
 
   const openDrawer = () => {
     setIsDrawerOpen(true);
@@ -58,7 +56,7 @@ export const DashboardTopNav = ({
           alignItems: "center",
           backdropFilter: "blur(10px)",
           backgroundColor:
-            windowScroll > POSITION_TO_BLUR + maintenanceEndingBannerHeight
+            windowScroll > POSITION_TO_BLUR
               ? "rgba(256, 256, 256, 0.7)"
               : isMobile
               ? "#FBFBFF59"
@@ -70,19 +68,25 @@ export const DashboardTopNav = ({
           minHeight: isMobile ? 36 : 48,
           px: isMobile ? 2 : 5,
           py: 3,
-          top: maintenanceEndingBannerHeight || 0,
+          top: 0,
           width: "fill-available",
           zIndex: 100,
         }}
       >
         <Box display="flex">
           {isMobile ? (
-            <img
-              alt="app-logo"
-              height={24}
-              src={ICONS.appLogoIcon}
-              width={27}
-            />
+            <NavLink
+              data-testid="logo-button"
+              style={{ display: "flex", justifyContent: "center" }}
+              to={PATHS.dashboard}
+            >
+              <img
+                alt="app-logo"
+                height={24}
+                src={ICONS.appLogoIcon}
+                width={27}
+              />
+            </NavLink>
           ) : null}
           {!isMobile && title ? (
             <Typography variant="headline5">{title}</Typography>

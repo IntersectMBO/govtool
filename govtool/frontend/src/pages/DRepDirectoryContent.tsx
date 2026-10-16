@@ -3,8 +3,13 @@ import { Trans, useTranslation } from "react-i18next";
 import { Box, CircularProgress } from "@mui/material";
 
 import { Typography } from "@atoms";
-import { DREP_DIRECTORY_FILTERS, DREP_DIRECTORY_SORTING } from "@consts";
-import { useCardano, useDataActionsBar, usePagination } from "@context";
+import { DREP_DIRECTORY_FILTERS } from "@consts";
+import {
+  useCardano,
+  useDataActionsBar,
+  useFeatureFlag,
+  usePagination,
+} from "@context";
 import {
   useDelegateTodRep,
   useGetAdaHolderCurrentDelegationQuery,
@@ -12,7 +17,11 @@ import {
   useGetDRepDetailsQuery,
   useGetDRepListPaginatedQuery,
 } from "@hooks";
-import { DataActionsBar, EmptyStateDrepDirectory } from "@molecules";
+import {
+  DataActionsBar,
+  EmptyStateDrepDirectory,
+  SearchNotReady,
+} from "@molecules";
 import { AutomatedVotingOptions, DRepCard } from "@organisms";
 import {
   isSameDRep,
@@ -51,6 +60,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   isConnected,
 }) => {
   const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
+  const { dRepDirectorySort } = useFeatureFlag();
   const { t } = useTranslation();
 
   const {
@@ -97,9 +107,24 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     }
   }, []);
 
+  // GovTool forces `Activity` on mount and keeps it across navigation, so it is
+  // the selection most likely to be gated away: Koios directory rows omit
+  // activity. Pick an allowed fallback, or clear the selection if no ordering
+  // is available, rather than sending a key the backend cannot honour.
   useEffect(() => {
-    if (!chosenSorting) setChosenSorting(DRepListSort.Activity);
-  }, [chosenSorting, setChosenSorting]);
+    if (!dRepDirectorySort.isAvailable) {
+      if (chosenSorting) setChosenSorting("");
+      return;
+    }
+    if (
+      !chosenSorting ||
+      dRepDirectorySort.isSelectionStale(chosenSorting)
+    ) {
+      setChosenSorting(
+        dRepDirectorySort.fallbackSelection(DRepListSort.Activity) ?? "",
+      );
+    }
+  }, [chosenSorting, setChosenSorting, dRepDirectorySort]);
 
   useUpdateEffect(() => {
     setPage(1);
@@ -122,6 +147,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     isPreviousData: isPrev,
     total,
     baselineTotalForStatus,
+    isSearchNotReady,
   } = useGetDRepListPaginatedQuery(
     {
       page: page - 1,
@@ -129,12 +155,14 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       searchPhrase: debouncedSearchText,
       sorting: chosenSorting as DRepListSort,
       status: chosenFilters as DRepStatus[],
-      sortingSeed
+      sortingSeed,
+      listed: true,
     },
     { enabled: !!chosenSorting },
   );
 
   const showSearchSummary =
+    !isSearchNotReady &&
     searchText !== "" &&
     (!isFetching || !isPrev) &&
     total !== baselineTotalForStatus;
@@ -147,7 +175,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   if (
     (stakeKey && votingPower === undefined) ||
-    !dRepList ||
+    (!dRepList && !isSearchNotReady) ||
     (isConnected && currentDelegation === undefined)
   ) {
     return <Loader />;
@@ -156,7 +184,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const ada = correctDRepDirectoryFormat(votingPower);
 
   const filteredDoNotListDReps = uniqBy(
-    dRepList?.filter((dRep) => {
+    (dRepList ?? []).filter((dRep) => {
       if (typeof dRep.doNotList === "string") {
         return !parseBoolean(dRep.doNotList);
       }
@@ -274,7 +302,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           setSearchText={setSearchText}
           filterOptions={DREP_DIRECTORY_FILTERS}
           filtersTitle={t("dRepDirectory.filterTitle")}
-          sortOptions={DREP_DIRECTORY_SORTING}
+          sortOptions={dRepDirectorySort.options}
+          isSorting={dRepDirectorySort.isAvailable}
           placeholder={t("dRepDirectory.searchBarPlaceholder")}
         />
 
@@ -315,7 +344,11 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             maxWidth: "100%",
           }}
         >
-          {filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />}
+          {isSearchNotReady ? (
+            <SearchNotReady />
+          ) : (
+            filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />
+          )}
           {filteredDoNotListDReps?.map((dRep) => (
             <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
               <Box>

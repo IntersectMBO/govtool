@@ -1,0 +1,7 @@
+{
+  "port": 9999,
+  "host": "0.0.0.0",
+  "cachedurationseconds": 20,
+  "dreplistcachedurationseconds": 600,
+  "sentryenv": "dev"
+}

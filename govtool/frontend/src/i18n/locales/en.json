@@ -127,6 +127,10 @@
     "creatingAGovernanceAction": "Creating a Governance Action: What you need to know",
     "creatingAGovernanceActionDescription": "To create a Governance Action, you will need to:\n\n• Fill out a form with the relevant data\n• Pay a refundable deposit of <strong>₳{{deposit}}</strong>\n• Store the metadata of your Governance Action at your own expense.\n\nYour deposit will be refunded to your wallet when the Governance Action is either enacted or expired.\n\nThe deposit will not affect your Voting Power.",
     "editSubmission": "Edit submission",
+    "surveyTxId": "CIP-179 survey transaction hash (optional)",
+    "surveyTxIdHelp": "Links survey index 0 to this Governance Action.",
+    "surveyTxIdPlaceholder": "64-character transaction hash",
+    "surveyTxIdInvalid": "Enter a valid 64-character hexadecimal transaction hash.",
     "fields": {
       "declarations": {
         "abstract": {
@@ -330,6 +334,7 @@
     "whoops": "Whoops!"
   },
   "errors": {
+    "maintenanceTransactionsPaused": "GovTool is under maintenance, so transactions are paused. Please try again once it's over.",
     "appCannotCreateTransaction": "Application can not create transaction.",
     "appCannotGetDeposit": "Can not fetch deposit",
     "appCannotGetUtxos": "Application can not get utxos",
@@ -351,27 +356,23 @@
     "walletNoCIP30Support": "Your wallet does not support CIP-30 extensions.",
     "walletNoCIP90FunctionsEnabled": "Your wallet did not enable the needed CIP-95 functions during connection.",
     "dRep": {
-      "description": {
-        "notVerifiable": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the data supplied by the DRep when they originally registered",
-        "dataMissing": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that GovTool cannot locate the data on the URL specified when the DRep was originally registered.",
-        "incorrectFormat": "GovTool uses external sources for DRep data, and these sources are maintained by the DReps themselves. This error means that the data stored by the DRep does not match the format defined by the DRep spec."
-      },
       "message": {
         "notVerifiable": "The data that was originally used when this DRep was created has changed.",
         "dataMissing": "The data that was originally used when this DRep was created has not been found.",
-        "incorrectFormat": "The data that was originally used when this DRep was created has been formatted incorrectly."
+        "incorrectFormat": "The data that was originally used when this DRep was created has been formatted incorrectly.",
+        "urlBlocked": "The URL this DRep registered points to an address GovTool does not fetch from.",
+        "exceedsLimit": "The data that was originally used when this DRep was created is too large to load.",
+        "internalError": "GovTool could not check the data for this DRep."
       }
     },
     "gAMetadata": {
-      "description": {
-        "notVerifiable": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data when the Governance Action was originally posted.",
-        "dataMissing": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that GovTool cannot locate the data on the URL specified when the Governance Action was originally posted.",
-        "incorrectFormat": "GovTool uses external sources for Governance Action data, and these sources are maintained by the proposers of the Actions. This error means that the data stored by the Proposer does not match the data format as defined by the Cardano community."
-      },
       "message": {
         "notVerifiable": "The data that was originally used when this Governance Action was created has changed.",
         "dataMissing": "The data that was originally used when this Governance Action was created has not been found.",
-        "incorrectFormat": "The data that was originally used when this Governance Action was created has been formatted incorrectly."
+        "incorrectFormat": "The data that was originally used when this Governance Action was created has been formatted incorrectly.",
+        "urlBlocked": "The URL this Governance Action was posted with points to an address GovTool does not fetch from.",
+        "exceedsLimit": "The data that was originally used when this Governance Action was created is too large to load.",
+        "internalError": "GovTool could not check the data for this Governance Action."
       },
       "title": {}
     }
@@ -379,7 +380,8 @@
   "footer": {
     "copyright": "© {{year}} GovTool",
     "privacyPolicy": "Privacy policy",
-    "termOfService": "Terms of Use"
+    "termOfService": "Terms of Use",
+    "subscribe": "Subscribe to updates"
   },
   "forms": {
     "link": "Link",
@@ -427,13 +429,199 @@
       "invalidValueType": "Invalid value type"
     }
   },
+  "actionRecord": {
+    "label": "Governance action",
+    "abstract": "Abstract",
+    "motivation": "Motivation",
+    "rationale": "Rationale",
+    "existing": "Existing",
+    "proposed": "Proposed",
+    "currentVersion": "Current version",
+    "proposedVersion": "Proposed version",
+    "prevGovernanceActionId": "Previous Governance Action ID",
+    "membersToBeAddedToCommittee": "Members to be added to the Committee",
+    "membersToBeRemovedToCommittee": "Members to be removed from the Committee",
+    "changeToTermsOfExistingMembers": "Change to terms of existing members",
+    "governanceActionType": "Governance Action Type",
+    "governanceActionId105": "Governance Action ID",
+    "governanceActionId129": "(CIP-129) Governance Action ID",
+    "metadataLink": "Metadata anchor link",
+    "metadataHash": "Metadata anchor hash",
+    "newConstitutionLink": "New constitution link",
+    "newConstitutionHash": "New constitution hash",
+    "newConstitutionScriptHash": "New constitution script hash",
+    "epoch": "Epoch",
+    "expirationEpoch": "Expiration epoch",
+    "newExpirationEpoch": "New expiration epoch",
+    "newThreshold": "New threshold value",
+    "supportingLinks": "Supporting links",
+    "treasury": {
+      "receivingAddress": "Receiving Address:",
+      "amount": "Amount:"
+    },
+    "authors": {
+      "noDataAvailable": "No author data available",
+      "title": "Author(s)",
+      "publicKey": "Public Key",
+      "signature": "Signature",
+      "witnessAlgorithm": "Witness Algorithm",
+      "verificationFailed": "Witness Verification Failed",
+      "witnessVerified": "Witness Verified"
+    },
+    "status": {
+      "title": "Status",
+      "fullTitle": "Governance Action Status",
+      "inProgress": "In Progress",
+      "ratified": "Ratified",
+      "enacted": "Enacted",
+      "expired": "Expired",
+      "dropped": "Not Ratified"
+    },
+    "dates": {
+      "submission": {
+        "title": "Submission Date",
+        "description": "The date when the governance action was submitted on-chain."
+      },
+      "expired": {
+        "title": "Expiration Date",
+        "label": "Expired:",
+        "paragraphOne": "The date when the governance action expired.",
+        "paragraphTwo": "IMPORTANT: If the governance action is ratified before the expiry date it will be considered ratified and it will not be available to vote on afterwards."
+      },
+      "notRatified": {
+        "title": "Not Ratified Date",
+        "label": "Not Ratified:",
+        "paragraphOne": "The date when the governance action was dropped without being ratified."
+      },
+      "enacted": {
+        "title": "Enactment Date",
+        "label": "Enacted:",
+        "paragraphOne": "The date when the governance action was enacted on-chain."
+      },
+      "expiry": {
+        "title": "Expiry Date",
+        "paragraphOne": "The date when the governance action will expire if it doesn't reach ratification thresholds.",
+        "paragraphTwo": "IMPORTANT: If the governance action is ratified before the expiry date it will be considered ratified and it will not be available to vote on afterwards."
+      },
+      "expires": "Expires:",
+      "submitted": "Submitted:"
+    },
+    "votes": {
+      "title": "Votes Submitted for this Governance Action:",
+      "dataUnavailable": "The configured data provider does not support this voting breakdown.",
+      "dataInconsistent": "The data provider returned an inconsistent voting breakdown, so it is not displayed.",
+      "totalEligible": "Total Eligible Voting Power",
+      "eligibleMembers": "Eligible Committee Members",
+      "ratificationDenominator": "Eligible Non-Abstaining Votes",
+      "noEligibleVotes": "There are no eligible non-abstaining votes for this tally.",
+      "dReps": "DReps",
+      "sPos": "SPOs",
+      "cCommitteeFull": "Constitutional Committee",
+      "cCommitteeShort": "CC",
+      "yes": "Yes",
+      "no": "No",
+      "noConfidence": "No Confidence",
+      "notVoted": "Not Voted",
+      "abstainVotes": "Abstain Votes",
+      "votingNotAvailable": "do not vote",
+      "onThisTypeOfAction": "on this type of action",
+      "totalsUnavailable": "Vote totals for this group are not available for this action from the configured data source.",
+      "totalStake": "Total Votes",
+      "numberOfCCs": "Number of Active CCs",
+      "metric": "Metric",
+      "value": "Value",
+      "totalActiveStake": "Total Active Stake",
+      "totalAbstain": "Total Abstain",
+      "autoAbstain": "Auto-Abstain",
+      "explicit": "Explicit",
+      "ratificationThreshold": "Ratification Threshold Stake"
+    },
+    "ratifiedStatus": {
+      "title": "Voting result",
+      "valueRatified": "Ratified",
+      "valueNotRatified": "Not Ratified"
+    },
+    "tabs": {
+      "reasoning": "Reasoning",
+      "parameters": "Parameters",
+      "details": "Details"
+    },
+    "viewDetails": "View Details",
+    "seeDiscussion": "See discussion",
+    "noResults": {
+      "title": "Governance action not found",
+      "description": "The governance action you're looking for could not be found. The ID might be incorrect, or there could be a temporary issue loading the data."
+    },
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "shareAction": "Share governance action",
+    "loaders": {
+      "loading": "Loading...",
+      "loadingTitle": "Loading governance action title...",
+      "loadingAbstract": "Loading governance action abstract, Loading governance action abstract, Loading governance action abstract..."
+    },
+    "proposalDiscussion": {
+      "title": "Discussion forum",
+      "notFound": "No discussion for this action in GovTool.",
+      "proposedOn": "Proposed on:"
+    }
+  },
+  "governanceActionHistoryList": {
+    "title": "Historical Actions",
+    "noResults": {
+      "title": "No governance actions found",
+      "description": "Governance actions are searchable by their ID both CIP-105 (legacy) and CIP-129 formats, title and abstract contents."
+    },
+    "showMore": "Show More Actions",
+    "searchPlaceholder": "Search Action...",
+    "clearSearchInput": "Clear search input",
+    "filters": {
+      "title": "Filters",
+      "clear": "Clear",
+      "types": {
+        "InfoAction": "Info Action",
+        "TreasuryWithdrawals": "Treasury Withdrawals",
+        "HardForkInitiation": "Hard-Fork Initiation",
+        "NewCommittee": "Update Committee",
+        "NoConfidence": "Motion of no Confidence",
+        "NewConstitution": "New Constitution",
+        "ParameterChange": "Protocol Parameter Change"
+      },
+      "statuses": {
+        "live": "Live",
+        "enacted": "Enacted",
+        "ratified": "Ratified",
+        "expired": "Expired"
+      }
+    },
+    "sort": {
+      "title": "Sort",
+      "fullTitle": "Sort Governance Actions",
+      "options": {
+        "newestFirst": {
+          "label": "Newest First",
+          "displayLabel": "Newest first"
+        },
+        "oldestFirst": {
+          "label": "Oldest First",
+          "displayLabel": "Oldest first"
+        },
+        "highestYesVotes": {
+          "label": "Highest amount of yes votes",
+          "displayLabel": "Yes votes"
+        }
+      }
+    }
+  },
   "proposalDiscussion": {
     "title": "Proposals",
     "proposeAGovernanceAction": "Propose a Governance Action"
   },
-  "budgetDiscussion": {
-    "title": "Budget Proposals"
+  "budgetProposalsArchive": {
+    "navLabel": "Archived: 2025 Budget Proposals",
+    "bannerText": "The 2025 budget process is closed. This is a read-only archive of the 2025 budget proposals, their versions, DRep poll results and comments."
   },
+  "searchNotReady": "Search is not available yet: GovTool is still loading DRep and governance action data. Please try again in a minute.",
   "govActions": {
     "about": "About",
     "abstract": "Abstract",
@@ -442,6 +630,7 @@
     "anchorHash": "Metadata anchor hash",
     "authors": {
       "noDataAvailable": "No data available",
+      "notLoaded": "Unknown: the document could not be loaded",
       "title": "Author(s)",
       "publicKey": "Public Key",
       "signature": "Signature",
@@ -533,6 +722,7 @@
     "votedOnByMe": "Voted on by me",
     "voteOnGovActions": "Vote on Governance Action",
     "voteSubmitted": "Votes submitted",
+    "voteTotalsUnavailable": "Vote totals are not available for this action from the configured data source.",
     "voteTransaction": "Vote transaction",
     "votes": "Votes:",
     "votesSubmitted": "DRep votes submitted",
@@ -586,9 +776,9 @@
       "title": "Live Voting",
       "label": "Live Voting"
     },
-    "outcomes": {
-      "title": "Outcomes",
-      "label": "Outcomes"
+    "history": {
+      "title": "Historical",
+      "label": "Historical"
     },
     "votedByMe": {
       "title": "Voted by me",
@@ -640,6 +830,114 @@
     "info": "Update Information",
     "title": "Update DRep Metadata"
   },
+  "metadataReport": {
+    "whyError": "Why am I seeing this error?",
+    "viewReport": "View Error Report",
+    "title": "Report",
+    "readDocumentation": "Read documentation",
+    "loading": "Loading the fetch report…",
+    "loadError": "The fetch report could not be loaded.",
+    "notFound": "No fetch report was found for this failure.",
+    "categories": {
+      "NETWORK": {
+        "title": "Network error",
+        "description": "nothing usable came back from the URL"
+      },
+      "INVALID_CONTENT": {
+        "title": "Invalid content",
+        "description": "something came back, but it is not the anchored document"
+      },
+      "SCHEMA_INVALID": {
+        "title": "Schema invalid",
+        "description": "the document does not meet the metadata standard"
+      }
+    },
+    "summary": {
+      "code": "Code",
+      "message": "Message",
+      "startedAt": "Started",
+      "finishedAt": "Finished",
+      "url": "Requested URL",
+      "effectiveUrl": "Effective URL",
+      "requestedHash": "Requested hash",
+      "servedHash": "Served hash",
+      "hashMismatch": "The document served does not hash to the value anchored on chain."
+    },
+    "history": {
+      "label": "Select a report",
+      "latest": "latest"
+    },
+    "hop": {
+      "title": "Request {{number}}",
+      "dns": "DNS",
+      "dnsAddresses": "Resolved to",
+      "dnsNoAddresses": "No addresses returned",
+      "dnsError": "DNS error",
+      "attempts": "Connection attempts",
+      "noAttempts": "No connection was attempted.",
+      "httpStatus": "HTTP status",
+      "headers": "Response headers",
+      "noResponse": "No HTTP response was received.",
+      "redirectTo": "Redirected to"
+    },
+    "attempt": {
+      "address": "Address",
+      "family": "Family",
+      "familyValue": "IPv{{family}}",
+      "outcome": "Outcome",
+      "errorCode": "Error code",
+      "message": "Message",
+      "timings": "Timings"
+    },
+    "timings": {
+      "connect": "connect {{ms}} ms",
+      "tls": "TLS {{ms}} ms",
+      "firstByte": "first byte {{ms}} ms",
+      "end": "end {{ms}} ms"
+    },
+    "outcomes": {
+      "connected": "Connected",
+      "blocked": "Blocked: not a public address",
+      "blockedRange": "Blocked: not a public address ({{range}})",
+      "refused": "Connection refused",
+      "reset": "Connection reset",
+      "unreachable": "Unreachable",
+      "timeout": "Timed out",
+      "timeoutStage": "Timed out during {{stage}}",
+      "tls_error": "TLS error",
+      "error": "Error"
+    },
+    "timeoutStages": {
+      "connect": "connect",
+      "tls": "TLS handshake",
+      "first_byte": "wait for first byte",
+      "body": "body download"
+    },
+    "body": {
+      "title": "Content received",
+      "none": "No content was received.",
+      "meta": "{{size}} bytes",
+      "metaWithType": "{{size}} bytes, {{contentType}}",
+      "binary": "Binary content, {{size}} bytes. It is not shown because it is not text.",
+      "truncated": "Reading stopped at the {{limit}} fetch limit, so the document is at least {{size}} bytes. Only the part received is shown.",
+      "showAllLines": "Show all {{count}} lines",
+      "hiddenLines": "{{count}} more lines not shown"
+    },
+    "issues": {
+      "title": "Problems found",
+      "position": "line {{line}}, column {{column}}",
+      "noPosition": "position unknown",
+      "jumpTo": "Show in content"
+    },
+    "retry": {
+      "button": "Retry",
+      "wait_one": "You can retry again in {{count}} second",
+      "wait_other": "You can retry again in {{count}} seconds",
+      "success": "The metadata now loads correctly.",
+      "stillFailing": "Retried: the document still fails. The details show the new attempt.",
+      "error": "The retry could not be sent. Please try again later."
+    }
+  },
   "modals": {
     "common": {
       "goToDashboard": "Go to Dashboard",
@@ -660,12 +958,24 @@
       "message": "GovTool checks the URL you entered to see if the JSON file that you self-host matches the one that was generated in GovTool. To complete registration, this match must be exact.\n\nIn this case, there is a mismatch. You can go back to the data edit screen and try the process again.",
       "title": "Your External Data Does Not Match the Original File."
     },
+    "externalDataIncorrectFormat": {
+      "buttonText": "Go to Data Edit Screen",
+      "cancelRegistrationText": "Cancel Registration",
+      "feedbackText": "Feedback",
+      "message": "GovTool checked the file at the URL you entered, and it does not follow the metadata standard for this kind of data. Make sure the URL serves the exact JSON file generated in GovTool, then try again.",
+      "title": "Your External Data Is Not in the Expected Format"
+    },
+    "externalDataTooLarge": {
+      "buttonText": "Go to Data Edit Screen",
+      "cancelRegistrationText": "Cancel Registration",
+      "feedbackText": "Feedback",
+      "message": "The file at the URL you entered is larger than the 2 MB GovTool accepts. Make sure the URL serves the JSON file generated in GovTool, then try again.",
+      "title": "Your External Data Is Too Large"
+    },
     "externalLink": {
       "beCareful": "Be Careful!",
       "continueTo": "Continue to external link",
       "description": "Exercise caution and verify the website's authenticity before sharing personal information. To proceed, click 'Continue'. To stay on Cardano, click 'Cancel'.",
-      "safety": "External Link Safety",
-      "thisIs": "This is an external link:",
       "youAreAboutToOpen": "You are about to open an external link to:"
     },
     "registration": {
@@ -685,6 +995,20 @@
       "linkText": "Learn More about self-hosting",
       "message": "GovTool cannot find the URL that you entered. Please check it and re-enter.",
       "title": "The URL You Entered Cannot Be Found"
+    },
+    "urlBlocked": {
+      "buttonText": "Go to Data Edit Screen",
+      "cancelRegistrationText": "Cancel Registration",
+      "feedbackText": "Feedback",
+      "message": "The URL you entered points to a private or local network address. GovTool only fetches data from public internet addresses, so host the file somewhere public and enter that URL.",
+      "title": "The URL You Entered Cannot Be Used"
+    },
+    "metadataCheckFailed": {
+      "buttonText": "Go to Data Edit Screen",
+      "cancelRegistrationText": "Cancel Registration",
+      "feedbackText": "Feedback",
+      "message": "Something went wrong on GovTool's side while checking the file at your URL. This is not a problem with your data. Please try again in a moment.",
+      "title": "GovTool Could Not Check Your Data"
     },
     "votingPower": {
       "govActionsVotes": "Governance Action votes",
@@ -795,10 +1119,22 @@
     "description": "The Cardano GovTool is a tool that allows you to participate in the governance of the Cardano network. You can propose, vote on, and delegate your voting power to other users.",
     "title": "This tool is connected to {{networkName}}",
     "bootstrappingWarning": "Govtool is in the Bootstrapping phase. Some features are not available. <docs>Learn more</docs>",
-    "maintenanceEnding": {
-      "title": "\uD83D\uDCA1 Next Step: Treasury Withdrawal based on your feedback has been submitted",
-      "description1": "<0>The Info Action</0> has passed — thank you for your support!",
-      "description2": "We have now submitted a <0>Treasury Withdrawal</0> that reflects the feedback gathered during the voting phase to ensure continued development and maintenance of GovTool as a community-owned governance interface on Cardano."
+    "maintenance": {
+      "label": "Maintenance notice",
+      "title": "GovTool is under maintenance",
+      "titleFinalStretch": "Almost there, we'll be back soon",
+      "titleEnded": "GovTool is still under maintenance",
+      "description": "We'll be back in <strong>about {{duration}}</strong>. Voting and other transactions are paused until then.",
+      "descriptionNoEnd": "We'll be back soon. Voting and other transactions are paused until then.",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "backIn": "Back in",
+      "finishingUp": "Finishing up",
+      "h": "h",
+      "m": "m",
+      "s": "s"
     }
   },
   "tooltips": {
@@ -854,7 +1190,23 @@
   "dataMissingErrors": {
     "dataMissing": "Data Missing",
     "notVerifiable": "Data Not Verifiable",
-    "incorrectFormat": "Data Formatted Incorrectly"
+    "incorrectFormat": "Data Formatted Incorrectly",
+    "urlBlocked": "Data URL Blocked",
+    "exceedsLimit": "Data Too Large",
+    "internalError": "Data Not Checked"
+  },
+  "metadataIssues": {
+    "fields": {
+      "abstract": "Abstract",
+      "givenName": "Name",
+      "motivation": "Motivation",
+      "rationale": "Rationale",
+      "title": "Title"
+    },
+    "maxLength": "{{field}} is {{actual}} characters long; the standard allows {{limit}}.",
+    "required": "{{field}} is missing or empty.",
+    "warningDescription": "It is shown as published, but other tools may cut these fields short or reject the data.",
+    "warningTitle": "This data does not fully follow its metadata standard"
   },
   "votes": {
     "abstain": "Abstain",
@@ -866,15 +1218,15 @@
   },
   "usefulLinks": {
     "title": "Useful links",
-    "ccPortal": {
-      "title": "Check the Constitutional Committee Portal",
-      "description": "See Interim Cardano Constitution and Constitutional committee votes rationales",
-      "link": "CC Portal"
-    },
     "intersectWebsite": {
       "title": "Intersect website",
-      "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development",
-      "link": "Intersect website"
+      "description": "Intersect is a member-based organization for the Cardano ecosystem — putting the community at the center of Cardano’s development.",
+      "link": "Visit intersectmbo.org"
+    },
+    "budgetProposalsArchive": {
+      "title": "2025 Budget Proposals",
+      "description": "Archived. Read the 2025 budget proposals, their versions, DRep poll results and comments.",
+      "link": "View the archive"
     }
   },
   "about": "About",

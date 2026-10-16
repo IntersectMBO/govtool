@@ -31,4 +31,7 @@ export * from "./VoteContext";
 export * from "./VoteContext/VoteContextChoice";
 export * from "./VoteContext/VoteContextGovTool";
 export * from "./WrongRouteInfo";
-export * from "./MaintenanceEndingBanner";
+export * from "./GovernanceActionHistoryDetails";
+export * from "./GovernanceActionVoting";
+export * from "./GovernanceActionHistoryList";
+export * from "./GovernanceActionHistorySearchFiltersSortBar";

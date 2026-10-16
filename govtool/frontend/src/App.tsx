@@ -1,11 +1,11 @@
 import { useCallback, useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate, useLocation } from "react-router";
 
 import { Modal, ScrollToTop } from "@atoms";
 import {
   PATHS,
   PDF_PATHS,
-  OUTCOMES_PATHS,
+  GOV_ACTION_HISTORY_PATHS,
   USER_PATHS,
   BUDGET_DISCUSSION_PATHS,
 } from "@consts";
@@ -34,6 +34,7 @@ import {
   RetireAsDirectVoter,
   EditDRepMetadata,
   ProposalDiscussionPillar,
+  BudgetProposalsArchive,
 } from "@pages";
 import { SetupInterceptors } from "@services";
 import {
@@ -41,26 +42,29 @@ import {
   getItemFromLocalStorage,
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
+  getPageTitle
 } from "@utils";
 import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
 import { DashboardHome } from "./pages/DashboardHome";
-import { GovernanceActionOutComesPillar } from "./pages/GovernanceActionOutComes";
+import { GovernanceActionHistoryPage } from "./pages/GovernanceActionHistory";
 
 export default () => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { enable, isEnabled } = useCardano();
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
+  const { pathname } = useLocation();
 
   useWalletConnectionListener();
 
   useEffect(() => {
     SetupInterceptors(navigate);
   }, []);
+
+  useEffect(() => {
+    document.title = getPageTitle(pathname);
+  }, [pathname]);
 
   const checkTheWalletIsActive = useCallback(() => {
     const isWalletAvailable = () =>
@@ -94,7 +98,9 @@ export default () => {
     };
 
     const isOnAllowedPage = [PATHS.home, PATHS.governanceActions, PATHS.governanceActionsAction]
-        .includes(window.location.pathname);
+        .includes(window.location.pathname) ||
+      pathname === GOV_ACTION_HISTORY_PATHS.governanceActionHistory ||
+      pathname.startsWith(`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/`);
 
     const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
 
@@ -126,55 +132,47 @@ export default () => {
           element={<GovernanceActionDetails />}
         />
         {isProposalDiscussionForumEnabled && !isEnabled && (
+          <Route
+            path={`${PDF_PATHS.proposalDiscussion}/*`}
+            element={<ProposalDiscussionPillar />}
+          />
+        )}
+        {!isEnabled && (
           <>
-            <Route
-              path={`${PDF_PATHS.proposalDiscussion}/*`}
-              element={<ProposalDiscussionPillar />}
-            />
             <Route
               path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
-              element={<ProposalDiscussionPillar />}
+              element={<BudgetProposalsArchive />}
             />
-          </>
-        )}
-        {isGovernanceOutcomesPillarEnabled && !isEnabled && (
-          <>
             <Route
-              path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
-              element={<GovernanceActionOutComesPillar />}
+              path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
+              element={<GovernanceActionHistoryPage />}
             />
             <Route
               path={USER_PATHS.governanceActionsVotedByMe}
-              element={<GovernanceActionOutComesPillar />}
+              element={<GovernanceActionHistoryPage />}
             />
           </>
         )}
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardHome />} />
           {isProposalDiscussionForumEnabled && (
-            <>
-              <Route
-                path={`${PDF_PATHS.proposalDiscussion}/*`}
-                element={<ProposalDiscussionPillar />}
-              />
-              <Route
-                path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
-                element={<ProposalDiscussionPillar />}
-              />
-            </>
+            <Route
+              path={`${PDF_PATHS.proposalDiscussion}/*`}
+              element={<ProposalDiscussionPillar />}
+            />
           )}
-          {isGovernanceOutcomesPillarEnabled && (
-            <>
-              <Route
-                path={`${OUTCOMES_PATHS.governanceActionsOutcomes}/*`}
-                element={<GovernanceActionOutComesPillar />}
-              />
-              <Route
-                path={USER_PATHS.governanceActionsVotedByMe}
-                element={<GovernanceActionOutComesPillar />}
-              />
-            </>
-          )}
+          <Route
+            path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+            element={<BudgetProposalsArchive />}
+          />
+          <Route
+            path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
+            element={<GovernanceActionHistoryPage />}
+          />
+          <Route
+            path={USER_PATHS.governanceActionsVotedByMe}
+            element={<GovernanceActionHistoryPage />}
+          />
           <Route
             path={PATHS.dashboardGovernanceActions}
             element={<DashboardGovernanceActions />}

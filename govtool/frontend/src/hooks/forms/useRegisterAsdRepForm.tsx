@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
@@ -8,7 +8,7 @@ import { CertificatesBuilder } from "@emurgo/cardano-serialization-lib-asmjs";
 
 import { DREP_CONTEXT, PATHS, storageInformationErrorModals } from "@consts";
 import { useCardano, useModal, useAppContext } from "@context";
-import { MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus, ValidateMetadataResult } from "@models";
 import {
   downloadJson,
   ellipsizeText,
@@ -49,7 +49,7 @@ export const useRegisterAsdRepForm = (
     buildSignSubmitConwayCertTx,
     buildVoteDelegationCert,
     dRepID,
-    registeredStakeKeysListState,
+    isStakeKeyRegistered,
     buildStakeKeyRegCert,
   } = useCardano();
 
@@ -136,7 +136,7 @@ export const useRegisterAsdRepForm = (
 
       certBuilder.add(registerCert);
 
-      if (!registeredStakeKeysListState.length) {
+      if (!isStakeKeyRegistered()) {
         const stakeKeyRegCert = await buildStakeKeyRegCert();
         certBuilder.add(stakeKeyRegCert);
       }
@@ -149,7 +149,11 @@ export const useRegisterAsdRepForm = (
     [
       buildDRepRegCert,
       buildDRepUpdateCert,
+      buildStakeKeyRegCert,
+      buildVoteDelegationCert,
+      dRepID,
       hash,
+      isStakeKeyRegistered,
       voter?.isRegisteredAsSoleVoter,
     ],
   );
@@ -182,19 +186,22 @@ export const useRegisterAsdRepForm = (
 
   const onSubmit = useCallback(
     async (data: DRepDataFormValues) => {
+      let validation: ValidateMetadataResult<unknown> | undefined;
+
       try {
         if (!hash) throw MetadataValidationStatus.INVALID_HASH;
 
         setIsLoading(true);
         showLoadingModal();
 
-        const { status } = await validateMetadata({
+        validation = await validateMetadata({
           url: data.storingURL,
           hash,
+          verifyUrl: true,
         });
 
-        if (status) {
-          throw status;
+        if (validation.status) {
+          throw validation.status;
         }
         const registerAsDRepCert = await createRegistrationCert(data);
         const result = await buildSignSubmitConwayCertTx({
@@ -212,6 +219,9 @@ export const useRegisterAsdRepForm = (
               ...storageInformationErrorModals[
                 error as MetadataValidationStatus
               ],
+              metadataAnchor: { url: data.storingURL, hash: hash ?? "" },
+              metadataReportId: validation?.reportId,
+              metadataError: validation?.error,
               onSubmit: backToForm,
               onCancel: backToDashboard,
             },

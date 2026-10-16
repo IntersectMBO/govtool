@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import {
   expect,
@@ -7,7 +7,7 @@ import {
   waitFor,
   within,
   fn,
-} from "@storybook/test";
+} from "storybook/test";
 
 import { ActionRadio } from "@atoms";
 

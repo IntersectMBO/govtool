@@ -2,8 +2,8 @@ import {
   GOVERNANCE_ACTIONS_FILTERS,
   GOVERNANCE_ACTIONS_SORTING,
 } from "@consts";
-import { expect, userEvent, within, fn } from "@storybook/test";
-import type { Meta, StoryObj } from "@storybook/react";
+import { expect, userEvent, within, fn } from "storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { DataActionsBar } from "@/components/molecules";
 
 const meta = {

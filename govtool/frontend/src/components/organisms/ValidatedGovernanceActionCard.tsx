@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 
 import { GovernanceActionCard } from "@molecules";
 import { useValidateMutation } from "@/hooks/mutations";
-import { MetadataStandard, ProposalData } from "@/models";
+import {
+  MetadataIssue,
+  MetadataStandard,
+  MetadataValidationStatus,
+  ProposalData,
+} from "@/models";
 
 type ActionTypeProps = Omit<
   ProposalData,
@@ -22,10 +27,13 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
   const [metadataStatus, setMetadataStatus] = useState<
     MetadataValidationStatus | undefined
   >();
+  const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
   const { validateMetadata } = useValidateMutation();
-  const [extendedProposal, setExtendedProposal] = useState<ProposalData>(
-    props as ProposalData,
-  );
+  // Only the resolved metadata is kept here. The rest comes from the current
+  // props on every render, so a change such as `inProgress` clearing shows up.
+  const [resolvedMetadata, setResolvedMetadata] = useState<
+    Partial<Pick<ProposalData, "title" | "abstract" | "motivation" | "rationale">>
+  >({});
 
   useEffect(() => {
     if (!props?.url) return;
@@ -33,26 +41,23 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
     const validate = async () => {
       setIsValidating(true);
 
-      const { status, metadata } = await validateMetadata({
+      const { status, metadata, issues } = await validateMetadata({
         standard: MetadataStandard.CIP108,
         url: props?.url,
         hash: props?.metadataHash ?? "",
       });
 
       if (metadata) {
-        setExtendedProposal(
-          (prevProposal) =>
-            ({
-              ...(prevProposal || {}),
-              ...(metadata as Pick<
-                ProposalData,
-                "title" | "abstract" | "motivation" | "rationale"
-              >),
-            } as ProposalData),
+        setResolvedMetadata(
+          metadata as Pick<
+            ProposalData,
+            "title" | "abstract" | "motivation" | "rationale"
+          >,
         );
       }
 
       setMetadataStatus(status);
+      setMetadataIssues(issues);
       setIsValidating(false);
     };
     validate();
@@ -60,9 +65,11 @@ export const ValidatedGovernanceActionCard = (props: ActionTypeProps) => {
 
   return (
     <GovernanceActionCard
-      {...extendedProposal}
+      {...props}
+      {...resolvedMetadata}
       isValidating={isValidating}
       metadataStatus={metadataStatus}
+      metadataIssues={metadataIssues}
     />
   );
 };

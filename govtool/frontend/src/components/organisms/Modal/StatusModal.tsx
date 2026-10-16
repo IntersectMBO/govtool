@@ -1,11 +1,13 @@
 import { forwardRef } from "react";
-import { Button, Link, Typography } from "@mui/material";
+import { Box, Button, Link, Typography } from "@mui/material";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
 import { ICONS, IMAGES } from "@consts";
-import { useModal, useUsersnapApi } from "@context";
+import { useModal, useChatwoot } from "@context";
 import { openInNewTab } from "@utils";
 import { useScreenDimension, useTranslation } from "@hooks";
+import { MetadataFailureDetails } from "@molecules";
+import type { MetadataAnchor } from "@models";
 
 export interface StatusModalState {
   buttonText?: string;
@@ -21,13 +23,22 @@ export interface StatusModalState {
   onFeedback?: () => void;
   title: string;
   dataTestId: string;
+  /**
+   * The (url, hash) whose validation failed. When the backend has a fetch
+   * report for it, the modal offers it so the author can see why (D117).
+   */
+  metadataAnchor?: MetadataAnchor;
+  /** The failed check's own report, shown instead of the anchor's (D152). */
+  metadataReportId?: string;
+  /** Why the check could not run, when it could not. */
+  metadataError?: string;
 }
 
 export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
-  const { openFeedbackWindow } = useUsersnapApi();
+  const { openFeedbackWindow } = useChatwoot();
 
   const onClickFeedback = () => {
     openFeedbackWindow();
@@ -78,6 +89,15 @@ export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
             </Link>
           )}
         </Typography>
+        {state?.metadataAnchor && (
+          <Box sx={{ mt: 2, textAlign: "left" }}>
+            <MetadataFailureDetails
+              anchor={state.metadataAnchor}
+              reportId={state.metadataReportId}
+              error={state.metadataError}
+            />
+          </Box>
+        )}
       </ModalContents>
       <Button
         data-testid="confirm-modal-button"

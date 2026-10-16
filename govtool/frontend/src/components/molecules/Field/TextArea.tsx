@@ -13,6 +13,7 @@ import { TextAreaFieldProps } from "./types";
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
   (
     {
+      errorDataTestId,
       errorMessage,
       errorStyles,
       helpfulText,
@@ -38,10 +39,15 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
       [],
     );
 
+    // The TextArea atom owns onBlur (it forwards it to the <textarea> and
+    // calls it from its own imperative blur), so this only delegates.
     const handleBlur = useCallback(
       (e: React.FocusEvent<HTMLTextAreaElement>) => {
-        onBlur?.(e);
-        textAreaRef.current?.blur();
+        (
+          textAreaRef.current?.blur as
+            | ((event?: React.FocusEvent<HTMLTextAreaElement>) => void)
+            | undefined
+        )?.(e);
       },
       [],
     );
@@ -87,6 +93,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
           <TextAreaBase
             errorMessage={errorMessage}
             maxLength={maxLength}
+            onBlur={onBlur}
             {...props}
             ref={textAreaRef}
           />
@@ -107,6 +114,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
           helpfulTextStyle={helpfulTextStyle}
         />
         <FormErrorMessage
+          dataTestId={errorDataTestId}
           errorMessage={errorMessage}
           errorStyles={errorStyles}
         />

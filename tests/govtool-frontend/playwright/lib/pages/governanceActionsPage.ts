@@ -3,10 +3,7 @@ import { Locator, Page, expect } from "@playwright/test";
 import { GovernanceActionType, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
-import { getEnumKeyByValue } from "@helpers/enum";
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
-
-const MAX_SLIDES_DISPLAY_PER_TYPE = 6;
 
 export default class GovernanceActionsPage {
   readonly filterBtn = this.page.getByTestId("filters-button");
@@ -41,6 +38,15 @@ export default class GovernanceActionsPage {
       .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
       .first()
       .click();
+    // Details live at /governance_actions/<txHash>#<index> (prefixed with
+    // /connected when a wallet is connected); wait for it so callers do not
+    // assert against the list page while navigation is still in flight.
+    await this.page.waitForURL(/\/governance_actions\/(?!category\/)[^/?#]+/);
+    // The router updates the URL before it renders the new route, so also
+    // wait for the list cards to go.
+    await expect(
+      this.page.locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
+    ).toHaveCount(0);
     return new GovernanceActionDetailsPage(this.page);
   }
 
@@ -150,70 +156,59 @@ export default class GovernanceActionsPage {
   async sortAndValidate(
     sortOption: string,
     validationFn: (p1: IProposal, p2: IProposal) => boolean,
-    filterKeys = Object.keys(GovernanceActionType)
+    filterKeys: string[] = []
   ) {
-    const responsesPromise = Promise.all(
-      filterKeys.map((filterKey) =>
-        this.page.waitForResponse((response) =>
-          response
-            .url()
-            .includes(
-              `&type[]=${GovernanceActionType[filterKey]}&sort=${sortOption}`
-            )
-        )
-      )
+    const expectedTypes = filterKeys.map(
+      (filterKey) => GovernanceActionType[filterKey]
     );
 
-    await this.sortProposal(sortOption);
-    const responses = await responsesPromise;
-
-    let proposalData: IProposal[][] = await Promise.all(
-      responses.map(async (response) => {
-        const { elements } = await response.json();
-        return elements.length ? elements : null;
-      })
-    );
-    const proposalsByType = proposalData.filter(Boolean);
-
-    // API validation
-    proposalsByType.forEach(async (proposalList) => {
-      if (proposalList.length <= 1) return;
-
-      const proposals = proposalList;
-      for (let i = 0; i <= proposals.length - 2; i++) {
-        const isValid = validationFn(proposals[i], proposals[i + 1]);
-        expect(isValid).toBe(true);
-      }
+    // The list is fetched as a single paged request carrying every selected
+    // type; axios percent-encodes the brackets, so decode before matching.
+    const responsePromise = this.page.waitForResponse((response) => {
+      if (!response.url().includes("/proposal/list?")) return false;
+      const params = new URL(response.url()).searchParams;
+      const types = params.getAll("type[]");
+      return (
+        params.get("page") === "0" &&
+        params.get("sort") === sortOption &&
+        types.length === expectedTypes.length &&
+        expectedTypes.every((type) => types.includes(type))
+      );
     });
 
-    await expect(
-      this.page.getByRole("progressbar").getByRole("img")
-    ).toBeHidden({ timeout: 20_000 });
+    await this.sortProposal(sortOption);
+    const response = await responsePromise;
+    const { elements: proposals }: { elements: IProposal[] } =
+      await response.json();
+
+    // API validation
+    for (let i = 0; i <= proposals.length - 2; i++) {
+      const isValid = validationFn(proposals[i], proposals[i + 1]);
+      expect(
+        isValid,
+        !isValid &&
+          `${sortOption} order broken between ${proposals[i].txHash}#${proposals[i].index} and ${proposals[i + 1].txHash}#${proposals[i + 1].index}`
+      ).toBe(true);
+    }
+
+    if (expectedTypes.length > 0) {
+      for (const proposal of proposals) {
+        expect(expectedTypes).toContain(proposal.type);
+      }
+    }
+
+    await expect(this.actionsLoading).toBeHidden({ timeout: 20_000 });
 
     await functionWaitedAssert(
       async () => {
-        // Frontend validation
-        for (let dIdx = 0; dIdx <= proposalsByType.length - 1; dIdx++) {
-          const proposals = proposalsByType[0] as IProposal[];
-          const filterOptionKey = getEnumKeyByValue(
-            GovernanceActionType,
-            proposals[0].type
-          );
+        // Frontend validation: the grid renders the response in order
+        const cards = this.page.locator(
+          '[data-testid^="govaction-"][data-testid$="-card"]'
+        );
+        expect(await cards.count()).toBeGreaterThanOrEqual(proposals.length);
 
-          const slides = await this.page
-            .locator(`[data-testid="govaction-${filterOptionKey}-card"]`)
-            .all();
-
-          const actualSlidesInDisplay =
-            proposals.length > MAX_SLIDES_DISPLAY_PER_TYPE
-              ? MAX_SLIDES_DISPLAY_PER_TYPE
-              : proposals.length;
-
-          expect(slides).toHaveLength(actualSlidesInDisplay);
-
-          for (let i = 0; i <= slides.length - 1; i++) {
-            await expect(slides[i]).toContainText(`${proposals[i].txHash}`);
-          }
+        for (let i = 0; i <= proposals.length - 1; i++) {
+          await expect(cards.nth(i)).toContainText(`${proposals[i].txHash}`);
         }
       },
       {

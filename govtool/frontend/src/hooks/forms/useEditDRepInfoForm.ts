@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import { blake2bHex } from "blakejs";
@@ -8,7 +8,7 @@ import { NodeObject } from "jsonld";
 import { DREP_CONTEXT, PATHS, storageInformationErrorModals } from "@consts";
 import { useCardano, useModal, useAppContext } from "@context";
 import { downloadJson, generateJsonld, generateMetadataBody } from "@utils";
-import { MetadataValidationStatus } from "@models";
+import { MetadataValidationStatus, ValidateMetadataResult } from "@models";
 import { useWalletErrorModal } from "@hooks";
 import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
@@ -137,19 +137,22 @@ export const useEditDRepInfoForm = (
     async (data: DRepDataFormValues) => {
       const url = data.storingURL;
 
+      let validation: ValidateMetadataResult<unknown> | undefined;
+
       try {
         if (!hash) throw MetadataValidationStatus.INVALID_HASH;
 
         setIsLoading(true);
         showLoadingModal();
 
-        const { status } = await validateMetadata({
+        validation = await validateMetadata({
           url,
           hash,
+          verifyUrl: true,
         });
 
-        if (status) {
-          throw status;
+        if (validation.status) {
+          throw validation.status;
         }
 
         const updateDRepMetadataCert = await buildDRepUpdateCert(url, hash);
@@ -168,6 +171,9 @@ export const useEditDRepInfoForm = (
               ...storageInformationErrorModals[
                 error as MetadataValidationStatus
               ],
+              metadataAnchor: { url, hash: hash ?? "" },
+              metadataReportId: validation?.reportId,
+              metadataError: validation?.error,
               onSubmit: backToForm,
               onCancel: backToDashboard,
             },

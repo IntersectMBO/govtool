@@ -1,0 +1,27 @@
+# Runs the GovTool documentation site on a single host (e.g. govtool2),
+# behind the host's reverse proxy.
+#
+#   cp .env.example .env   # adjust values
+#   docker compose up -d
+#
+# The container only listens on 127.0.0.1; the host reverse proxy terminates
+# TLS and forwards to it (see nginx-host.conf.example).
+
+services:
+  govtool-docs:
+    image: ${DOCS_IMAGE:-ghcr.io/intersectmbo/govtool-docs:dev}
+    container_name: govtool-docs
+    restart: unless-stopped
+    environment:
+      X_ROBOTS_TAG: ${X_ROBOTS_TAG:-noindex, nofollow}
+    ports:
+      - "127.0.0.1:${DOCS_PORT:-8085}:8080"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

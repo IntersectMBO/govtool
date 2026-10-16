@@ -1,10 +1,12 @@
+import { env } from "@/config/env";
+
 export const openInNewTab = (url: string) => {
   // Ensure the URL is absolute
   const fullUrl =
     url.startsWith("http://") || url.startsWith("https://")
       ? url
       : url.startsWith("ipfs")
-      ? `${import.meta.env.VITE_IPFS_GATEWAY}/${url.slice(7)}`
+      ? `${env.VITE_IPFS_GATEWAY}/${url.slice(7)}`
       : `https://${url}`;
 
   // eslint-disable-next-line no-console

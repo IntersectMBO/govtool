@@ -1,5 +1,5 @@
-import { expect, userEvent, within, fn } from "@storybook/test";
-import type { Meta, StoryObj } from "@storybook/react";
+import { expect, userEvent, within, fn } from "storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { TopNav } from "@organisms";
 

@@ -19,10 +19,21 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       inputRef.current?.focus();
     }, []);
 
-    const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-      onBlur?.(e);
-      inputRef.current?.blur();
-    }, []);
+    // onBlur is also forwarded to InputBase below. When the input has focus,
+    // blurring it fires that DOM handler, so it is not called twice; otherwise
+    // the imperative blur() still calls onBlur, as it always did.
+    const handleBlur = useCallback(
+      (e: React.FocusEvent<HTMLInputElement>) => {
+        const element = inputRef.current;
+        if (element && element === document.activeElement) {
+          element.blur();
+          return;
+        }
+        onBlur?.(e);
+        element?.blur();
+      },
+      [onBlur],
+    );
 
     useImperativeHandle(
       ref,
@@ -40,6 +51,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         id={id}
         inputProps={{ "data-testid": dataTestId }}
         inputRef={inputRef}
+        onBlur={onBlur}
         sx={{
           backgroundColor: errorMessage ? "inputRed" : "white",
           border: 1,

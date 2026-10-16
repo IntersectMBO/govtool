@@ -1,148 +1,128 @@
 # GovTool Frontend
 
-Installed on your machine:
+## Prerequisites
 
-1. Node.js >= 18 ([official website](https://nodejs.org/en))
-2. npm or yarn (recommended) - for package management
+- [Git](https://git-scm.com/)
+- [nvm](https://github.com/nvm-sh/nvm)
+- Node.js 22.22.0, as specified by [`.nvmrc`](./.nvmrc) and `package.json`
+- npm, using the committed `package-lock.json`
 
-Clone the project
+## Local development
 
-```bash
-git clone https://github.com/IntersectMBO/govtool
-```
-
-Fill .env based on env.example file
-
-Go to the project directory
+Clone the repository and enter the frontend package:
 
 ```bash
-cd govtool/frontend
+git clone https://github.com/IntersectMBO/govtool.git
+cd govtool/govtool/frontend
 ```
 
-Install dependencies
+Install and activate the required Node.js version:
 
 ```bash
-npm install
+nvm install
+nvm use
 ```
 
-or (recommended)
+Create the local environment file and install the locked dependencies:
 
 ```bash
-yarn install
+cp .env.example .env
+npm ci
 ```
 
-Start the server
-
-```bash
-npm run dev
-```
-
-or (recommended)
-
-```bash
-yarn dev
-```
-
-## Developing
-
-### Frontend Built With
-
-1. TypeScript - ^5.0.2
-2. React - ^18.2.0
-3. React Router Dom - ^6.13.0
-4. Vite - ^4.3.9
-5. Material UI - ^5.14.4
-6. Storybook - ^7.4.5
-7. Axios - ^1.4.0
-8. React Query - ^3.39.3
-9. React-Hook-Form - ^7.47.0
-10. Yup - ^1.3.2
-11. Keen-Slider - ^6.8.5
-12. Sentry - ^7.77.0
-13. Cardano serialization lib - 12.0.0-alpha.19
-14. i18next - ^23.7.19
-
-### Code Quality and Checks Are Handled BY
-
-1. eslint - ^8.38.0
-2. vitest - ^1.1.0
-3. chromatic - ^10.0.0
-
-### Prerequisites
-
-Install [`Git`](https://git-scm.com/) - version control.
-Recommended [`React developer tools`](https://react.dev/learn/react-developer-tools).
-
-To automatically set correct node version:
-
-1. Install [`nvm`](https://github.com/nvm-sh/nvm)
-2. Install `lts/hydrogen` version of node
-
-```bash
-  nvm install lts/hydrogen
-```
-
-3. Having that every time you enter the `govtool/frontend` package [`nvm`](https://github.com/nvm-sh/nvm) automatically sets the correct version of node.
-
-## To Develop
-
-### Standard way
-
-1. Install modules
-
-```bash
-npm install
-```
-
-or (recommended)
-
-```bash
-yarn install
-```
-
-2. Launch Server
+Start the frontend development server:
 
 ```bash
 npm run dev
 ```
 
-or (recommended)
+Vite prints the local URL when it starts, normally `http://localhost:5173`.
+
+### Environment variables
+
+The values copied from `.env.example` are suitable for a local frontend connected to the standard local services:
+
+- `VITE_BASE_URL`: GovTool backend API URL. The local Docker setup uses `http://localhost:9999`.
+- `VITE_NETWORK_FLAG`: Cardano network selector; use `0` for a test network and `1` for mainnet.
+- `VITE_IS_DEV`: Keep this `true` locally to enable development behavior and skip the production maintenance check. Any non-empty value, `false` included, turns it on; leave it empty, at build time as well as at runtime, to turn it off.
+- `VITE_IPFS_GATEWAY`: Gateway used to load `ipfs://` content.
+
+The following integrations are optional and may remain blank:
+
+- `VITE_SENTRY_DSN`: Sentry error reporting. `VITE_APP_ENV` labels the Sentry environment when a DSN is configured.
+- `VITE_CHATWOOT_URL` and `VITE_CHATWOOT_WEBSITE_TOKEN`: Chatwoot feedback widget.
+- `VITE_PDF_API_URL`: Proposal discussion service API.
+- `VITE_IPFS_PROJECT_ID`: Project identifier for gateways that require it.
+- `VITE_IS_CIP179_ENABLED`: CIP-179 surveys on governance actions and votes. On when unset; any value other than `true` turns it off. The surveys are also hidden when the backend reports `survey.linkedVoting` unavailable.
+
+`VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED` can remain `false` when the proposal discussion service is not running. Turning it on also needs `VITE_PDF_API_URL`, the forum backend's origin, such as `http://localhost:1337`.
+
+Governance action history uses the GovTool backend configured by `VITE_BASE_URL`. Its pages and navigation do not depend on an environment flag. The voting panel consumes the action's `vote_aggregates`, displaying each supported voter group independently without requesting network metrics. An unsupported applicable group has a direct provider-support message and no pass/fail indicator.
+
+For backend setup, see the [backend README](../govtool-backend/README.md). To run the complete service stack, see the [Docker Compose instructions](../../docker/README.md).
+
+## Maintenance mode
+
+The production image's nginx reads two files in the frontend container's `/var/run`.
+
+`maintenance.json` keeps GovTool up and shows a banner over every page. The app checks it every minute, counts down to `endsAt`, and refuses transactions while it is there; browsing and connecting a wallet still work. In its last five minutes the banner says GovTool will be back soon, and once `endsAt` passes it says GovTool is still under maintenance and finishing up, until the file is removed. Without `endsAt` the banner has no countdown. To show it for 60 minutes, timed by the container's clock:
 
 ```bash
-yarn dev
+docker exec <frontend-container> sh -c 'now=$(date -u +%s); printf "{\"startsAt\":\"%s\",\"endsAt\":\"%s\"}\n" "$(date -u -d @$now +%FT%TZ)" "$(date -u -d @$((now + 3600)) +%FT%TZ)" > /var/run/maintenance.json'
 ```
 
-#### Using Nix and Direnv
+Write it again to move the end time, and remove it when maintenance is over:
 
-1. Get [Nix](https://nixos.org/download) (And/Or) Get [GHCUP](https://www.haskell.org/ghcup/).
-
-2. Get [direnv](https://direnv.net/).
-
-3. Fill .envrc based on envrc.example file in project root.
-
-4. Enter `govtool/frontend` directory:
-
-```sh
-cd govtool/frontend
+```bash
+docker exec <frontend-container> rm -f /var/run/maintenance.json
 ```
 
-5. Allow direnv to setup your environment:
+`maintenance_enabled` is for outages the app cannot run through: while it exists every page answers 503 with `maintenance-page/index.html`, and an open page reloads onto it before its next wallet action.
 
-```sh
-direnv allow
+```bash
+docker exec <frontend-container> touch /var/run/maintenance_enabled
+docker exec <frontend-container> rm -f /var/run/maintenance_enabled
 ```
 
-5. Run project
+Both files last until the container restarts, so a redeploy of the frontend drops them. On Swarm, find the container with `docker ps -q -f name=<stack>_frontend` on the node that runs it. The Vite dev server has neither file, so to see the banner run the production image, for example the devnet stack in `tests/devnet`.
 
-```sh
-yarn dev
+## Checks
+
+CI runs `npm run tsc`, `npm run lint` and `npm test` on pushes that change the frontend. Locally, run:
+
+```bash
+npm run tsc
+npm run lint
+npx vitest run
 ```
 
-_To update the yarn.lock file after changes are made, run `nix develop .#js` for a developer shell with correct yarn/nodejs versions_
+`npm test` runs the same tests, but stays in watch mode in a terminal. Each test run rewrites the tracked `junit-report.xml`; restore it with `git checkout -- junit-report.xml` before committing.
 
-## After development
+## Troubleshooting
 
-Check our [Contributing Documentation](../../CONTRIBUTING.md) on how to submit a PR.
+### Wrong Node.js version
+
+Run `nvm install` followed by `nvm use` in this directory. Confirm that `node --version` reports `v22.22.0`.
+
+### Missing `.env`
+
+Create it again from the tracked example:
+
+```bash
+cp .env.example .env
+```
+
+### Port already in use
+
+Vite will normally choose another available port automatically. To choose one explicitly, run `npm run dev -- --port 5174`.
+
+### Backend or API is not running
+
+The page can start without the APIs, but data requests will fail. Start the required services using the [backend instructions](../govtool-backend/README.md) or the [Docker Compose stack](../../docker/README.md), then confirm that the URLs in `.env` match those services.
+
+## Contributing
+
+See the repository [contributing guide](../../CONTRIBUTING.md) before submitting a pull request.
 
 ### Users
 
@@ -151,8 +131,9 @@ We distinguish two types of users:
 
 #### without a connected wallet who can:
 
-1. See the governance actions along with their details and the number of votes
-<!-- 2. See the list of DReps. -->
+1. See the governance actions along with their details and the number of votes.
+2. Browse the DRep directory.
+3. Read the governance action history, the 2025 budget proposals archive and, when enabled, the proposal discussions.
 
 #### with connected wallet who can:
 

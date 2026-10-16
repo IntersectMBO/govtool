@@ -210,7 +210,7 @@ const InformationStorageStep = ({
                 } else if (parseInt(proposalGATypeId) === 6) {
                     ///Hard Fork Initiation
                     govActionBuilder =
-                        await walletAPI.buildHardForkInitiationGovernanceActions(
+                        await walletAPI.buildHardForkGovernanceAction(
                             {
                                 prevGovernanceActionHash:
                                     proposal?.attributes?.content?.attributes

@@ -22,7 +22,7 @@ const HardForkManager = ({
                     proposal_hard_fork_content: {
                         ...prevData.proposal_hard_fork_content,
                         previous_ga_hash: data.hash,
-                        previous_ga_id: data.id,
+                        previous_ga_id: data.index,
                     },
                 }));
             }
@@ -110,7 +110,7 @@ const HardForkManager = ({
                     disabled
                     value={
                         proposalData?.proposal_hard_fork_content
-                            ?.previous_ga_id || ''
+                            ?.previous_ga_id ?? ''
                     }
                     onChange={() => {}}
                     // required
@@ -125,7 +125,7 @@ const HardForkManager = ({
                     label={`Major version`}
                     placeholder=''
                     value={
-                        proposalData?.proposal_hard_fork_content?.major || ''
+                        proposalData?.proposal_hard_fork_content?.major ?? ''
                     }
                     onChange={(e) => {
                         handleHardForkDataChange('major', e.target.value);
@@ -141,7 +141,7 @@ const HardForkManager = ({
                     label={`Minor version`}
                     placeholder=''
                     value={
-                        proposalData?.proposal_hard_fork_content?.minor || ''
+                        proposalData?.proposal_hard_fork_content?.minor ?? ''
                     }
                     onChange={(e) => {
                         handleHardForkDataChange('minor', e.target.value);

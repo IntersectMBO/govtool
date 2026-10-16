@@ -116,6 +116,13 @@ export const numberValidation = (value) => {
     return true;
 };
 
+/**
+ * Whether a form value is missing. Zero is a value: a hard fork to version
+ * 11.0 has minor version 0.
+ */
+export const isBlankValue = (value) =>
+    value === undefined || value === null || String(value).trim() === '';
+
 export const containsString = (str) => {
     return /^(?!\s*$).+/.test(str)
         ? true

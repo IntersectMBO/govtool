@@ -43,6 +43,7 @@ vi.mock("@hooks", () => ({
   useWalletErrorModal: () => mocks.walletErrorModal,
 }));
 vi.mock("@services", () => ({
+  getEnactedProposalDetails: vi.fn().mockResolvedValue(null),
   getTransactionStatus: mocks.transactionStatus,
 }));
 vi.mock("@consts", () => ({

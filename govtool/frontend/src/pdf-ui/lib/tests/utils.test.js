@@ -4,6 +4,7 @@ import {
     adaToLovelace,
     getGovActionDepositAda,
     getLovelaceFromCborBalance,
+    isBlankValue,
     isValidURLFormat,
     setUrlPortsAllowed,
 } from '../utils';
@@ -82,5 +83,19 @@ describe('adaToLovelace', () => {
         expect(() => adaToLovelace('1.0000001')).toThrow();
         expect(() => adaToLovelace('abc')).toThrow();
         expect(() => adaToLovelace('')).toThrow();
+    });
+});
+
+describe('isBlankValue', () => {
+    it('counts zero as a value', () => {
+        expect(isBlankValue(0)).toBe(false);
+        expect(isBlankValue('0')).toBe(false);
+    });
+
+    it('counts missing and empty values as blank', () => {
+        expect(isBlankValue(undefined)).toBe(true);
+        expect(isBlankValue(null)).toBe(true);
+        expect(isBlankValue('')).toBe(true);
+        expect(isBlankValue('  ')).toBe(true);
     });
 });

@@ -123,6 +123,18 @@ export const numberValidation = (value) => {
 export const isBlankValue = (value) =>
     value === undefined || value === null || String(value).trim() === '';
 
+/**
+ * A proposal's hard fork fields. The form holds them flat; the API returns
+ * them as a relation, `{ data: { id, attributes } }`, with `data` null when
+ * there are none.
+ */
+export const getHardForkContent = (content) => {
+    if (content && typeof content === 'object' && 'data' in content) {
+        return content.data?.attributes ?? {};
+    }
+    return content ?? {};
+};
+
 export const containsString = (str) => {
     return /^(?!\s*$).+/.test(str)
         ? true

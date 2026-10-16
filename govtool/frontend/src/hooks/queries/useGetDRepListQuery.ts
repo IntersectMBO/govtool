@@ -27,7 +27,16 @@ type Args = GetDRepListArguments & {
 };
 
 export function useGetDRepListPaginatedQuery(
-  { page, pageSize = 10, filters = [], searchPhrase, sorting, status, sortingSeed }: Args,
+  {
+    page,
+    pageSize = 10,
+    filters = [],
+    searchPhrase,
+    sorting,
+    status,
+    sortingSeed,
+    listed = false,
+  }: Args,
   options?: { enabled?: boolean },
 ): PaginatedResult {
   const { pendingTransaction } = useCardano();
@@ -50,12 +59,13 @@ export function useGetDRepListPaginatedQuery(
     searchPhrase ?? "",
     sorting ?? "",
     status?.length ? status : "",
-    sortingSeed ?? ""
+    sortingSeed ?? "",
+    listed,
   ];
 
   const baselineKey = useMemo(
-    () => [QUERY_KEYS.useGetDRepListInfiniteKey, "baseline", statusKey],
-    [statusKey],
+    () => [QUERY_KEYS.useGetDRepListInfiniteKey, "baseline", statusKey, listed],
+    [statusKey, listed],
   );
 
   const { data, error, isLoading, isFetching, isPlaceholderData } = useQuery({
@@ -69,6 +79,7 @@ export function useGetDRepListPaginatedQuery(
         sorting,
         status,
         sortingSeed,
+        listed,
       });
       if (!searchPhrase && typeof response.total === "number") {
         queryClient.setQueryData(baselineKey, response);
@@ -89,7 +100,8 @@ export function useGetDRepListPaginatedQuery(
         searchPhrase: "",
         sorting,
         status,
-        sortingSeed
+        sortingSeed,
+        listed,
       }),
     initialData: () =>
       queryClient.getQueryData<Infinite<DRepData>>(baselineKey),

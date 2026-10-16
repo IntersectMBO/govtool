@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import { PdfInput } from '../PdfFields';
 import React, { useEffect } from 'react';
 import { getHardForkData } from '../../lib/api';
-import { numberValidation } from '../../lib/utils';
+import { getHardForkContent, numberValidation } from '../../lib/utils';
 
 const HardForkManager = ({
     proposalData,
@@ -36,24 +36,23 @@ const HardForkManager = ({
         fetchAndSetHardForkData();
         
     }, []);
-    useEffect(() => {   
-        if (isEdit === true)
-        {
-            if(proposalData?.proposal_hard_fork_content?.data?.attributes) 
-            {
-                let temp = proposalData?.proposal_hard_fork_content?.data?.attributes;
-            
-                setProposalData((prevData) => ({
+    // A draft opened from the list, or edited, carries the API's relation
+    // ({ data: { attributes } }); the form works on flat fields.
+    useEffect(() => {
+        const content = proposalData?.proposal_hard_fork_content;
+        if (content && typeof content === 'object' && 'data' in content) {
+            const stored = getHardForkContent(content);
+            setProposalData((prevData) => ({
                 ...prevData,
                 proposal_hard_fork_content: {
-                        previous_ga_hash: temp?.previous_ga_hash,
-                        previous_ga_id: temp?.previous_ga_id,
-                        major: temp?.major,
-                        minor: temp?.minor,
-            
-        }}))
-        }}
-    }, [proposalData?.proposal_hard_fork_content?.data?.attributes]);
+                    previous_ga_hash: stored?.previous_ga_hash,
+                    previous_ga_id: stored?.previous_ga_id,
+                    major: stored?.major,
+                    minor: stored?.minor,
+                },
+            }));
+        }
+    }, [proposalData?.proposal_hard_fork_content]);
         const handleHardForkDataChange = (field, value) => {
         setProposalData((prevData) => ({
             ...prevData,

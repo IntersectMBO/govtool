@@ -15,6 +15,8 @@ export type GetDRepListArguments = {
   status?: DRepStatus[];
   searchPhrase?: string;
   sortingSeed?: string;
+  /** The directory's view: the backend leaves out DReps that asked not to be listed. */
+  listed?: boolean;
 };
 
 export const getDRepList = async ({
@@ -24,7 +26,8 @@ export const getDRepList = async ({
   pageSize = 10,
   searchPhrase: rawSearchPhrase = "",
   status = [],
-  sortingSeed = ""
+  sortingSeed = "",
+  listed = false,
 }: GetDRepListArguments): Promise<Infinite<DRepData>> => {
   const searchPhrase = await dRepSearchPhraseProcessor(rawSearchPhrase);
 
@@ -37,6 +40,7 @@ export const getDRepList = async ({
       ...(sorting && { sort: sorting }),
       ...(status.length && { status }),
       ...(sortingSeed && { seed: sortingSeed }),
+      ...(listed && { listed: true }),
     },
   });
 

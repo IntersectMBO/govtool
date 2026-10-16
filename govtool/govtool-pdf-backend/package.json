@@ -1,6 +1,6 @@
 {
   "name": "govtool-pdf-backend",
-  "version": "0.0.1",
+  "version": "3.0.0",
   "description": "GovTool proposal discussion forum (PDF) backend: NestJS, Prisma, Postgres.",
   "private": true,
   "license": "Apache-2.0",

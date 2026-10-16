@@ -35,7 +35,7 @@ import type {
 } from '@govtool/data-providers/chain-data';
 
 export const BACKEND_PROVIDER_ID = 'govtool-backend';
-export const BACKEND_VERSION = '0.0.1';
+export const BACKEND_VERSION = '3.0.0';
 
 /**
  * When this was last reviewed against `src/`. A constant rather than

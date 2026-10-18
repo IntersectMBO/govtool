@@ -231,6 +231,7 @@ const MenuNavItem: FC<{
     <>
       <FakeLink
         dataTestId={navItem.dataTestId}
+        isActive={activeNavTo !== null}
         onClick={handleClick}
         label={
           <span

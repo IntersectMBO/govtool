@@ -8,6 +8,8 @@ const FONT_SIZE = {
   big: 22,
 };
 
+const ACTIVE_COLOR = "#FF640A";
+
 type LinkProps = {
   dataTestId?: string;
   isConnectWallet?: boolean;
@@ -15,7 +17,10 @@ type LinkProps = {
   navTo: string;
   onClick?: (event: MouseEvent<HTMLElement>) => void;
   size?: "small" | "big";
-  /** Overrides the router's prefix match, for links in a group. */
+  /**
+   * Overrides the router's prefix match, for links in a group and for a
+   * group's parent, which is active while any of its children is.
+   */
   isActive?: boolean;
 };
 
@@ -48,13 +53,13 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
         ref={ref}
       >
         {({ isActive: isRouteActive }) => {
-          const isActive = (isActiveOverride ?? isRouteActive) && navTo !== "";
+          const isActive = isActiveOverride ?? (isRouteActive && navTo !== "");
           return (
             <Typography
               sx={{
                 fontSize,
                 fontWeight: isActive ? 600 : 500,
-                color: isActive ? "#FF640A" : "textBlack",
+                color: isActive ? ACTIVE_COLOR : "textBlack",
               }}
             >
               {label}
@@ -76,6 +81,7 @@ export const FakeLink = forwardRef<HTMLElement, Omit<LinkProps, "navTo">>(
       label,
       size = "small",
       onClick,
+      isActive,
     } = props;
     const { disconnectWallet } = useCardano();
 
@@ -93,8 +99,8 @@ export const FakeLink = forwardRef<HTMLElement, Omit<LinkProps, "navTo">>(
         sx={{
           cursor: "pointer",
           fontSize,
-          fontWeight: 500,
-          color: "textBlack",
+          fontWeight: isActive ? 600 : 500,
+          color: isActive ? ACTIVE_COLOR : "textBlack",
         }}
       >
         {label}

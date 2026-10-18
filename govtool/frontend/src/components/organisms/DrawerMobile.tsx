@@ -157,6 +157,7 @@ const MenuNavItem: FC<{
         <Link
           navTo=""
           data-testid={navItem.dataTestId}
+          isActive={activeNavTo !== null}
           label={navItem.label}
           size="big"
         />

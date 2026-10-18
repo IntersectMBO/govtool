@@ -2,11 +2,15 @@ import { HttpException } from '@nestjs/common';
 import { ChainDataError } from '@govtool/data-providers/chain-data';
 import { PinningError } from '@govtool/data-providers/pinning';
 
+import { redactIpsDeep, redactIpsInText } from './redact-ip';
+
 /**
  * The single place the data layer's error vocabulary becomes HTTP.
  *
  * Status codes and `errorType` strings are the ones the legacy backend used,
- * so a client that branched on them keeps working.
+ * so a client that branched on them keeps working. Messages and details have
+ * their IP addresses redacted (D171): a provider or database error names the
+ * host it failed to reach.
  */
 const CHAIN_DATA_STATUS: Record<ChainDataError['code'], number> = {
   INVALID_INPUT: 400,
@@ -65,8 +69,8 @@ export function toHttpException(error: unknown): HttpException {
     return new HttpException(
       {
         errorType: CHAIN_DATA_ERROR_TYPE[error.code],
-        message: error.message,
-        ...(error.details ? { details: error.details } : {}),
+        message: redactIpsInText(error.message),
+        ...(error.details ? { details: redactIpsDeep(error.details) } : {}),
       },
       CHAIN_DATA_STATUS[error.code],
     );
@@ -79,14 +83,14 @@ export function toHttpException(error: unknown): HttpException {
     return new HttpException(
       {
         errorType: PINNING_ERROR_TYPE[error.reason],
-        message: error.message,
+        message: redactIpsInText(error.message),
       },
       PINNING_STATUS[error.reason],
     );
   }
 
   return new HttpException(
-    { errorType: 'CriticalError', message: String(error) },
+    { errorType: 'CriticalError', message: redactIpsInText(String(error)) },
     500,
   );
 }

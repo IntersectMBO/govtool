@@ -1,25 +1,25 @@
 import {
   GovernanceActionType,
   IProposal,
-  outcomeProposal,
-  outcomeType,
+  actionRecordProposal,
+  actionRecordType,
 } from "@types";
 import { isBootStrapingPhase } from "./cardano";
 import { SECURITY_RELEVANT_PARAMS_MAP } from "@constants/index";
 
 const getProposalType = (
-  type: keyof typeof outcomeType,
+  type: keyof typeof actionRecordType,
   fallback: GovernanceActionType,
-  proposal: IProposal | outcomeProposal
+  proposal: IProposal | actionRecordProposal
 ) =>
   "proposal_params" in proposal
-    ? Object.keys(outcomeType).find(
-        (key) => outcomeType[key] === outcomeType[type]
+    ? Object.keys(actionRecordType).find(
+        (key) => actionRecordType[key] === actionRecordType[type]
       )
     : fallback;
 
 export const areDRepVoteTotalsDisplayed = async (
-  proposal: IProposal | outcomeProposal
+  proposal: IProposal | actionRecordProposal
 ) => {
   const isInBootstrapPhase = await isBootStrapingPhase();
   const isSecurityGroup = Object.values(SECURITY_RELEVANT_PARAMS_MAP).some(
@@ -55,7 +55,7 @@ export const areDRepVoteTotalsDisplayed = async (
 };
 
 export const areSPOVoteTotalsDisplayed = async (
-  proposal: IProposal | outcomeProposal
+  proposal: IProposal | actionRecordProposal
 ) => {
   const isInBootstrapPhase = await isBootStrapingPhase();
   const isSecurityGroup = Object.values(SECURITY_RELEVANT_PARAMS_MAP).some(
@@ -96,7 +96,7 @@ export const areSPOVoteTotalsDisplayed = async (
 };
 
 export const areCCVoteTotalsDisplayed = (
-  proposal: IProposal | outcomeProposal
+  proposal: IProposal | actionRecordProposal
 ) => {
   const NoConfidence = getProposalType(
     "NoConfidence",

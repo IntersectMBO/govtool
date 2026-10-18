@@ -30,6 +30,7 @@ export type CheckboxFieldProps = CheckboxProps & {
 };
 
 export type TextAreaFieldProps = TextAreaProps & {
+  errorDataTestId?: string;
   errorMessage?: string;
   errorStyles?: MUITypographyProps;
   helpfulText?: string;

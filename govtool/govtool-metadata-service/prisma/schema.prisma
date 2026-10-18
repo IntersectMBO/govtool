@@ -1,0 +1,62 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider      = "prisma-client-js" // The Prisma client generator
+  binaryTargets = ["native", "linux-musl"]
+}
+
+// Two kinds of row share this table.
+//   Content (error IS NULL): `hash` is the blake2b-256 of `data`, the exact bytes
+//     served. Authoritative and permanent; looked up by hash alone, never by url.
+//   Error (error IS NOT NULL): the outcome of fetching `url` for the requested
+//     `hash`. Only valid for a bounded time, because a url can change what it
+//     serves. `servedHash` is set when the url served content with another hash.
+model metadata {
+  id         Int      @id @default(autoincrement())
+  hash       Bytes?
+  data       Bytes?
+  url        String?
+  fetchedAt  DateTime
+  error      String?
+  code       String?
+  servedHash Bytes?
+  reportId   String?
+
+  @@index([hash]) // Create an index on the hash field
+  @@index([url]) // Create an index on the url field
+}
+
+model datastore {
+  name      String   @id // Use `name` as the primary key
+  hash      String?  @unique // Optional hash field, unique for quick lookups
+  value     Bytes // File content stored as binary data
+  createdAt DateTime @default(now()) // Automatically set the creation timestamp
+  updatedAt DateTime @updatedAt // Automatically update the timestamp on changes
+
+  @@index([hash]) // Add an index for the hash field
+}
+
+// One per failed fetch, kept forever and never replaced. `details` holds the
+// hops, the body's size, truncation and content type, and the content issues.
+model fetch_report {
+  id         String   @id
+  hash       Bytes
+  url        String
+  code       String
+  message    String
+  servedHash Bytes?
+  bodyHash   Bytes?
+  startedAt  DateTime
+  finishedAt DateTime
+  details    Json
+
+  @@index([url, hash, startedAt])
+}
+
+// Bytes a failed fetch received, stored once per distinct body.
+model fetch_body {
+  hash Bytes @id
+  data Bytes
+}

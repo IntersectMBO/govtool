@@ -1,4 +1,3 @@
-import { user01AuthFile } from "@constants/auth";
 import {
   ABSTAIN_VOTE_DOC_URL,
   DELEGATION_DOC_URL,
@@ -7,27 +6,23 @@ import {
   PROPOSE_GOVERNANCE_ACTION_DOC_URL,
   REGISTER_DREP_DOC_URL,
   SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL,
+  docsPage,
 } from "@constants/docsUrl";
-import { user01Wallet } from "@constants/staticWallets";
-import { createTempUserAuth } from "@datafactory/createAuth";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
-import { ShelleyWallet } from "@helpers/crypto";
-import { createNewPageWithWallet } from "@helpers/page";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import ProposalDiscussionPage from "@pages/proposalDiscussionPage";
 import { Page, expect } from "@playwright/test";
+import { connectTestWallet } from "lib/wallet/pageWallet";
+import { randomWallet } from "lib/wallet/testWallets";
 
 test.beforeEach(async () => {
   await setAllureEpic("6. Miscellaneous");
 });
 
 test.describe("Logged in user", () => {
-  test.use({
-    storageState: user01AuthFile,
-    wallet: user01Wallet,
-  });
+  test.use({ walletName: "user01", walletFundsAda: 0 });
 
   test("6E. Should open Sanchonet docs in a new tab when clicking `Learn More` on dashboards in connected state.", async ({
     page,
@@ -39,32 +34,40 @@ test.describe("Logged in user", () => {
       context.waitForEvent("page"),
       page.getByTestId("delegate-learn-more-button").click(),
     ]);
-    await expect(delegationLearnMorepage).toHaveURL(DELEGATION_DOC_URL);
+    await expect(delegationLearnMorepage).toHaveURL(
+      docsPage(DELEGATION_DOC_URL)
+    );
 
     const [registerLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("d-rep-learn-more-button").click(),
     ]);
-    await expect(registerLearnMorepage).toHaveURL(REGISTER_DREP_DOC_URL);
+    await expect(registerLearnMorepage).toHaveURL(
+      docsPage(REGISTER_DREP_DOC_URL)
+    );
 
     const [directVoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("direct-voter-learn-more-button").first().click(),
     ]);
-    await expect(directVoterLearnMorepage).toHaveURL(DIRECT_VOTER_DOC_URL);
+    await expect(directVoterLearnMorepage).toHaveURL(
+      docsPage(DIRECT_VOTER_DOC_URL)
+    );
 
     const [GA_LearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("list-gov-actions-learn-more-button").click(),
     ]);
-    await expect(GA_LearnMorepage).toHaveURL(GOVERNANCE_ACTION_DOC_URL);
+    await expect(GA_LearnMorepage).toHaveURL(
+      docsPage(GOVERNANCE_ACTION_DOC_URL)
+    );
 
     const [proposed_GA_VoterLearnMorepage] = await Promise.all([
       context.waitForEvent("page"),
       page.getByTestId("propose-gov-action-learn-more-button").click(),
     ]);
     await expect(proposed_GA_VoterLearnMorepage).toHaveURL(
-      PROPOSE_GOVERNANCE_ACTION_DOC_URL
+      docsPage(PROPOSE_GOVERNANCE_ACTION_DOC_URL)
     );
   });
 
@@ -81,14 +84,14 @@ test.describe("Logged in user", () => {
       context.waitForEvent("page"),
       dRepDirectoryPage.abstainInfoButton.click(),
     ]);
-    await expect(abstain_Info_Page).toHaveURL(ABSTAIN_VOTE_DOC_URL);
+    await expect(abstain_Info_Page).toHaveURL(docsPage(ABSTAIN_VOTE_DOC_URL));
 
     const [signal_No_Confidence_Info_Page] = await Promise.all([
       context.waitForEvent("page"),
       dRepDirectoryPage.signalNoConfidenceInfoButton.click(),
     ]);
     await expect(signal_No_Confidence_Info_Page).toHaveURL(
-      SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL
+      docsPage(SIGNAL_NO_CONFIDENCE_VOTE_DOC_URL)
     );
   });
 
@@ -108,13 +111,9 @@ test.describe("Temporary user", () => {
   let userPage: Page;
   let proposalDiscussionPage: ProposalDiscussionPage;
 
-  test.beforeEach(async ({ page, browser }) => {
-    const wallet = (await ShelleyWallet.generate()).json();
-    const tempUserAuth = await createTempUserAuth(page, wallet);
-    userPage = await createNewPageWithWallet(browser, {
-      storageState: tempUserAuth,
-      wallet,
-    });
+  test.beforeEach(async ({ page }) => {
+    await connectTestWallet(page, await randomWallet());
+    userPage = page;
 
     proposalDiscussionPage = new ProposalDiscussionPage(userPage);
     await proposalDiscussionPage.goto();

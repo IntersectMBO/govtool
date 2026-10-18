@@ -1,6 +1,6 @@
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { expect, userEvent, within, fn } from "@storybook/test";
-import { Meta, StoryObj } from "@storybook/react";
+import { expect, userEvent, within, fn } from "storybook/test";
+import { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Button } from "@atoms";
 import { Field, Step } from "@molecules";

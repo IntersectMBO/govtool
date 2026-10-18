@@ -1,10 +1,8 @@
-import { user01AuthFile } from "@constants/auth";
-import { user01Wallet } from "@constants/staticWallets";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import LoginPage from "@pages/loginPage";
 
-test.use({ storageState: user01AuthFile, wallet: user01Wallet });
+test.use({ walletName: "user01", walletFundsAda: 0 });
 test.beforeEach(async () => {
   await setAllureEpic("1. Wallet connect");
 });

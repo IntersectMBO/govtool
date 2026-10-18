@@ -1,5 +1,5 @@
-import { expect, userEvent, within, fn } from "@storybook/test";
-import { Meta, StoryObj } from "@storybook/react";
+import { expect, userEvent, within, fn } from "storybook/test";
+import { Meta, StoryObj } from "@storybook/react-vite";
 
 import { ICONS } from "@consts";
 import { LinkWithIcon } from "@molecules";

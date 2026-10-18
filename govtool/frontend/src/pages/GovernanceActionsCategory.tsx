@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
-import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
+import { ICONS, PATHS } from "@consts";
+import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
+  SearchNotReady,
 } from "@molecules";
 import { Footer, TopNav, ValidatedGovernanceActionCard } from "@organisms";
 import {
@@ -28,6 +29,7 @@ import {
 export const GovernanceActionsCategory = () => {
   const { category } = useParams();
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { governanceActionsSort } = useFeatureFlag();
   const { chosenSorting } = dataActionsBarProps;
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
   const { isEnabled } = useCardano();
@@ -39,6 +41,7 @@ export const GovernanceActionsCategory = () => {
     isProposalsFetching,
     isProposalsFetchingNextPage,
     isProposalsLoading,
+    isSearchNotReady,
     proposals,
     proposalsfetchNextPage,
     proposalsHaveNextPage,
@@ -111,7 +114,8 @@ export const GovernanceActionsCategory = () => {
             <DataActionsBar
               {...dataActionsBarProps}
               isFiltering={false}
-              sortOptions={GOVERNANCE_ACTIONS_SORTING}
+              sortOptions={governanceActionsSort.options}
+              isSorting={governanceActionsSort.isAvailable}
             />
             <Typography
               variant="title2"
@@ -122,7 +126,9 @@ export const GovernanceActionsCategory = () => {
               {getProposalTypeLabel(category ?? "")}
             </Typography>
             {!isProposalsLoading ? (
-              !mappedData?.length ? (
+              isSearchNotReady ? (
+                <SearchNotReady />
+              ) : !mappedData?.length ? (
                 <EmptyStateGovernanceActionsCategory
                   category={category}
                   isSearch={!!debouncedSearchText.length}

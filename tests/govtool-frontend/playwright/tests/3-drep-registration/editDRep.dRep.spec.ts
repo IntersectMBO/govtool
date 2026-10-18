@@ -1,24 +1,25 @@
-import { dRep02Wallet } from "@constants/staticWallets";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/walletExtension";
 import { setAllureEpic } from "@helpers/allure";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
-import {
-  skipIfMainnet,
-  skipIfTemporyWalletIsNotAvailable,
-} from "@helpers/cardano";
+import { skipIfMainnet } from "@helpers/cardano";
 import EditDRepPage from "@pages/editDRepPage";
 import { expect } from "@playwright/test";
-import { dRep02AuthFile } from "@constants/auth";
 import { generateInvalidDRepInfo, generateValidDRepInfo } from "@helpers/dRep";
+import environments from "@constants/environments";
+import { sharedDRep } from "lib/wallet/sharedDReps";
 
 test.beforeEach(async () => {
   await setAllureEpic("3. DRep registration");
   await skipIfMainnet();
-  await skipIfTemporyWalletIsNotAvailable("registerDRepCopyWallets.json");
 });
 
-test.use({ wallet: dRep02Wallet, storageState: dRep02AuthFile });
+test.use({ walletName: "dRep02" });
+
+test.beforeAll(async () => {
+  test.setTimeout(2 * environments.txTimeOut);
+  await sharedDRep("dRep02");
+});
 
 test.describe("Validation of edit dRep Form", () => {
   test("3M_1. Should accept valid data in edit dRep form", async ({ page }) => {
@@ -127,7 +128,9 @@ test("3P. Should reject invalid edit dRep metadata", async ({ page }) => {
   await editDRepPage.metadataUrlInput.fill(invalidMetadataAnchor);
   await editDRepPage.submitBtn.click();
 
+  // A web page is not a CIP-119 document: GovTool says so with its own
+  // "not in the expected format" dialog, as the old validator classified it.
   await expect(page.getByTestId("modal")).toHaveText(
-    /your external data does not/i
+    /your external data (does not|is not in the expected format)/i
   );
 });

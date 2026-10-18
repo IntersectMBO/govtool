@@ -1,16 +1,8 @@
 # Contributing to the `GovTool` project
 
-⚠️ This is a work in progress document, more instruction on how-to contribute to come!
-
-Contributing todo:
-
-- [ ] Align with latest OSC policies
-- [ ] Refactor to reflect reality
-- [ ] Make more friendly to open source contributors
-
 Thanks for considering contributing and helping us on creating GovTool! 😎
 
-The best way to contribute right now is to try things out and provide feedback, but we also accept contributions to the documentation and the obviously to the code itself.
+We welcome bug reports, documentation improvements, and code contributions. Contributors should work from a focused branch based on `develop` and open a pull request targeting `develop`.
 
 This document contains guidelines to help you get started and how to make sure your contribution gets accepted, making you our newest GovTool contributor!
 
@@ -30,7 +22,7 @@ This document contains guidelines to help you get started and how to make sure y
     - [Branch Naming](#branch-naming)
     - [Commit Messages](#commit-messages)
       - [Rationale](#rationale)
-    - [Merge Commit PRs and Rebase Branches on top of Main](#merge-commit-prs-and-rebase-branches-on-top-of-main)
+    - [Merge PRs and Rebase Branches on top of develop](#merge-prs-and-rebase-branches-on-top-of-develop)
       - [Rationale](#rationale-1)
     - [Versioning](#versioning)
     - [Changelog](#changelog)
@@ -38,7 +30,7 @@ This document contains guidelines to help you get started and how to make sure y
       - [React](#react)
       - [CSS in Javascript](#css-in-javascript)
       - [CSS / SASS](#css--sass)
-      - [Haskell](#haskell)
+      - [TypeScript backend](#typescript-backend)
   - [Development Processes](#development-processes)
     - [Developer workflow](#developer-workflow)
     - [QA Workflow](#qa-workflow)
@@ -53,6 +45,8 @@ By participating, you are expected to uphold this code.
 ## Ask for Help
 
 See [`SUPPORT.md`](./SUPPORT.md) should you have any questions or need some help in getting set up.
+
+Security vulnerabilities are different: do not open an issue, follow [`SECURITY.md`](./SECURITY.md) instead.
 
 ## Roles and Responsibilities
 
@@ -70,7 +64,7 @@ Please complete the following steps in advance to help us fix any potential bug 
 - Make sure that you are using the latest version.
 - Determine if your bug is really a bug and not an error on your side.
   e.g. using incompatible environment components/versions.
-  If you are looking for support, you might want to check [this section](#i-have-a-question).
+  If you are looking for support, you might want to check [this section](#ask-for-help).
 - To see if other users have experienced (and potentially already solved) the same issue you are having.
 - Also make sure to search the internet (including Stack Overflow)
   to see if users outside of the GitHub community have discussed the issue.
@@ -112,8 +106,9 @@ Welcome to contributing to `GovTool`! Whether you're fixing a bug, adding a feat
 #### Getting Started
 
 1. **Set Up Your Environment**:
-   - Follow the instructions in [`README.md`](./README.md) file and navigate to the specific folder corresponding to the form you want to fix or enhance.
-   - Follow the setup instructions to clone the repository and install the necessary dependencies.
+   - Follow the [frontend's local development instructions](./govtool/frontend/README.md#local-development) to clone the repository, select the required Node.js version, create the environment file, install dependencies, and start the frontend.
+   - For another component, use its setup guide: [backend](./govtool/govtool-backend/README.md) or [Docker Compose](./docker/README.md).
+   - If you work with an AI coding agent, point it at the repository root: `AGENTS.md` there and in `govtool`, `govtool/frontend`, `govtool/govtool-backend` and `tests` (with `CLAUDE.md` importing it) gives it the conventions, checks and traps.
    - Make sure you're using the latest version of the project to avoid potential conflicts.
 
 2. **Find an Issue to Work On**:
@@ -131,19 +126,19 @@ Welcome to contributing to `GovTool`! Whether you're fixing a bug, adding a feat
     - Fork the `govtool` repository on GitHub to create a copy under your account.
 
 
-4. **Create a Branch**:
+5. **Create a Branch**:
    - Create a new branch from the `develop` branch with a descriptive name (see [Branch Naming](#branch-naming)).
    - Example: `feat/123-add-voting-ui` or `fix/456-update-api-endpoint`.
 
-5. **Make Your Changes**:
-   - Write clean, well-documented code following the [Style Guides](#style-guides) for React, Haskell, CSS, or other relevant technologies.
+6. **Make Your Changes**:
+   - Write clean, well-documented code following the [Style Guides](#style-guides) for React, CSS, the TypeScript backend, or other relevant technologies.
    - Add or update tests to ensure your changes are robust.
    - Keep your changes focused and aligned with the issue’s scope.
 
-6. **Commit Your Changes**:
+7. **Commit Your Changes**:
    - Write clear, concise commit messages following the [Commit Messages](#commit-messages) guidelines.
 
-7. **Submit a Pull Request**:
+8. **Submit a Pull Request**:
 
    `If You Have Push Permissions to the Original Repository`
     - Push your branch to the repository and create a pull request (PR) to the `develop` branch.
@@ -155,12 +150,12 @@ Welcome to contributing to `GovTool`! Whether you're fixing a bug, adding a feat
    - Describe your changes clearly, including why they’re needed and how they were tested.
    - If your PR isn’t ready for review, mark it as a draft.
 
-8. **Address Feedback**:
+9. **Address Feedback**:
    - Expect reviews from maintainers or other contributors (see [CODEOWNERS](./CODEOWNERS)).
    - Respond to feedback promptly and make requested changes.
    - Once approved, your PR will be merged into `develop` by the author after passing tests.
 
-9. **Celebrate Your Contribution!**:
+10. **Celebrate Your Contribution!**:
     - Once merged, your changes will move through the [Development Processes](#development-processes) (QA, staging, etc.).
     - You’re now a `GovTool` contributor! Share your achievement and consider tackling another issue.
 
@@ -224,12 +219,12 @@ There is plenty to say on this topic, but broadly the guidelines in [this post](
 Git commit messages are our only source of why something was changed the way it was changed.
 So we better make the readable, concise and detailed (when required).
 
-### Merge Commit PRs and Rebase Branches on top of Main
+### Merge PRs and Rebase Branches on top of `develop`
 
 When closing branches / PRs use merge commits, so we have a history of PRs also in the git history.
-Do not merge main into side branches, instead rebase them on top of main.
-Try to keep branches up-to-date with main (not strict requirement though).
-Once merged to main, please delete the branch.
+Do not merge `develop` into side branches; instead, rebase them on top of `develop`.
+Try to keep branches up-to-date with `develop` (not a strict requirement).
+Once merged into `develop`, please delete the branch.
 
 **Tip:** Use Github's merge button in PRs to merge with commit.
 This strategy helps us operate on the commits you've delivered: it's easier to [cherry-pick a merge commit](https://git-scm.com/docs/git-cherry-pick#Documentation/git-cherry-pick.txt--mltparent-numbergt) than a series of commits, and it's also easier to [revert changes using a merge commit](https://git-scm.com/docs/git-revert#Documentation/git-revert.txt--mparent-number) instead of a series of reverts.
@@ -250,25 +245,25 @@ Releases that aren't stable will be released as pre-releases and will append a -
 During development, on every PR;
 
 - Make sure `CHANGELOG.md` is kept up-to-date with high-level, technical, but user-focused list of changes according to [keepachangelog](https://keepachangelog.com/en/1.0.0/).
-- Bump `UNRELEASED` version in `CHANGELOG.md` according to [semver](https://semver.org/).
+- Do not bump versions by hand: the `update-govtool-version.yml` workflow sets them and turns `[Unreleased]` into a release section, following [semver](https://semver.org/).
 
 ### Style Guides
 
 #### React
 
-Please see [React Style Guide](./docs/style-guides/react/).
+Please see [React Style Guide](./docs/docs/developers/style-guides/react/README.md).
 
 #### CSS in Javascript
 
-Please see [CSS in Javascript Style Guide](./docs/style-guides/css-in-js/).
+Please see [CSS in Javascript Style Guide](./docs/docs/developers/style-guides/css-in-js/README.md).
 
 #### CSS / SASS
 
-Please see [CSS / SASS Style Guide](./docs/style-guides/css-sass/).
+Please see [CSS / SASS Style Guide](./docs/docs/developers/style-guides/css-sass/README.md).
 
-#### Haskell
+#### TypeScript backend
 
-Please see [stylish-haskell configuration](./govtool/backend/.stylish-haskell.yaml).
+The backend and its packages use Prettier and ESLint. In `govtool/govtool-backend`, `npm run format` and `npm run lint` fix what they can, and `npm run verify` runs the same checks CI does.
 
 ## Development Processes
 
@@ -279,7 +274,7 @@ Please see [stylish-haskell configuration](./govtool/backend/.stylish-haskell.ya
 - If the changes are not ready for review then feel free to create a draft PR, and link this to the ticket/issue.
 - When the PR is ready for review move the ticket from `in progress` to `in review`. Remember to change the state of the PR from draft to actual PR.
 - Developers should review each other's pull requests, and should be requested via [CODEOWNERS](./CODEOWNERS).
-- Unit tests are run on each pull request to `develop`.
+- Frontend and backend tests, lint and type checks run on pushes to a branch of this repository that touch their paths, not for pull requests from forks. Pull requests build and scan the backend and frontend images. Run the checks locally before asking for review.
 - After a review remember to address all the requests of changes since they are blocking PR from being merged.
 - Once tests pass and peer review is done the branch can be merged into `develop` by author and then deployed to the dev environment (manually).
 - The ticket status can then be moved to `in QA` making sure that the PR/branch has been added to the ticket/issue as a comment.

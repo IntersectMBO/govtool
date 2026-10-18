@@ -1,0 +1,17 @@
+# Only the backend image builds from this directory (govtool-backend/Dockerfile);
+# it needs the backend and the packages it depends on, built inside the image.
+*
+!govtool-data-providers
+!govtool-provider-dbsync
+!govtool-provider-koios
+!govtool-provider-blockfrost
+!govtool-provider-fixture
+!govtool-pinning-pinata
+!govtool-pinning-test
+!govtool-metadata-http
+!govtool-backend
+**/node_modules
+**/dist
+**/coverage
+**/.env
+**/.env.*

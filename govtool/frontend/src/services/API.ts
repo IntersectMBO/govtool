@@ -1,10 +1,11 @@
 import axios from "axios";
-import { NavigateFunction } from "react-router-dom";
+import { NavigateFunction } from "react-router";
 
 import { PATHS } from "@consts";
+import { env } from "@/config/env";
 
 const TIMEOUT_IN_SECONDS = 30 * 1000; // 1000 ms is 1 s then its 30 s
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = env.VITE_BASE_URL;
 
 export const API = axios.create({
   baseURL: BASE_URL,

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Box } from "@mui/material";
 
 import { IMAGES, PATHS, PDF_PATHS } from "@consts";

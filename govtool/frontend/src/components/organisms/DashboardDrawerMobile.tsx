@@ -1,5 +1,5 @@
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 import { Background, Link } from "@atoms";
 import { CONNECTED_NAV_ITEMS, ICONS, PATHS } from "@consts";
@@ -28,10 +28,7 @@ export const DashboardDrawerMobile = ({
   isDrawerOpen,
   setIsDrawerOpen,
 }: DashboardDrawerMobileProps) => {
-  const {
-    isProposalDiscussionForumEnabled,
-    isGovernanceOutcomesPillarEnabled,
-  } = useFeatureFlag();
+  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
   const { voter } = useGetVoterInfo();
 
@@ -111,15 +108,6 @@ export const DashboardDrawerMobile = ({
                         if (
                           !isProposalDiscussionForumEnabled &&
                           childItem.dataTestId === "proposal-discussion-link"
-                        ) {
-                          return null;
-                        }
-                        if (
-                          !isGovernanceOutcomesPillarEnabled &&
-                          (childItem.dataTestId ===
-                            "governance-actions-voted-by-me-link" ||
-                            childItem.dataTestId ===
-                              "governance-actions-outcomes-link")
                         ) {
                           return null;
                         }

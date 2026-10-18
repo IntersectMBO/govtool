@@ -28,13 +28,11 @@ export const ExternalLinkModal = forwardRef<HTMLDivElement>((_, ref) => {
         style={{ height: "84px", margin: "0 auto", width: "84px" }}
       />
       <ModalHeader sx={{ marginTop: "34px" }}>
-        {t(`modals.externalLink.${isMobile ? "safety" : "beCareful"}`)}
+        {t("modals.externalLink.beCareful")}
       </ModalHeader>
       <ModalContents>
         <Typography textAlign="center" sx={{ fontSize: "16px" }}>
-          {t(
-            `modals.externalLink.${isMobile ? "thisIs" : "youAreAboutToOpen"}`,
-          )}
+          {t("modals.externalLink.youAreAboutToOpen")}
         </Typography>
         <Typography
           textAlign="center"

@@ -1,0 +1,94 @@
+{
+  "name": "@govtool/data-providers",
+  "version": "0.3.0",
+  "description": "Provider-agnostic TypeScript contracts for GovTool chain data, off-chain metadata and pinning. Interfaces only \u2014 no implementation, no transport.",
+  "license": "Apache-2.0",
+  "private": true,
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./chain-data": {
+      "types": "./dist/chain-data/index.d.ts",
+      "default": "./dist/chain-data/index.js"
+    },
+    "./metadata": {
+      "types": "./dist/metadata/index.d.ts",
+      "default": "./dist/metadata/index.js"
+    },
+    "./pinning": {
+      "types": "./dist/pinning/index.d.ts",
+      "default": "./dist/pinning/index.js"
+    },
+    "./package.json": "./package.json",
+    "./index-provider": {
+      "types": "./dist/index-provider/index.d.ts",
+      "default": "./dist/index-provider/index.js"
+    },
+    "./committee-info": {
+      "types": "./dist/committee-info/index.d.ts",
+      "default": "./dist/committee-info/index.js"
+    },
+    "./tx-monitor": {
+      "types": "./dist/tx-monitor/index.d.ts",
+      "default": "./dist/tx-monitor/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "chain-data": [
+        "./dist/chain-data/index.d.ts"
+      ],
+      "metadata": [
+        "./dist/metadata/index.d.ts"
+      ],
+      "pinning": [
+        "./dist/pinning/index.d.ts"
+      ],
+      "index-provider": [
+        "./dist/index-provider/index.d.ts"
+      ],
+      "committee-info": [
+        "./dist/committee-info/index.d.ts"
+      ],
+      "tx-monitor": [
+        "./dist/tx-monitor/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "clean": "node --eval \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"{src,test}/**/*.ts\" \"*.json\" \"*.md\"",
+    "format:check": "prettier --check \"{src,test}/**/*.ts\" \"*.json\" \"*.md\"",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.10.7",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^16.0.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.20.0"
+  }
+}

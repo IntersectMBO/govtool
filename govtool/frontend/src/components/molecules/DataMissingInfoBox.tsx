@@ -1,10 +1,17 @@
+import { ReactNode } from "react";
 import { Box, Link, Skeleton, SxProps } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
-import { MetadataValidationStatus } from "@models";
-import { openInNewTab } from "@utils";
+import { MetadataIssue, MetadataValidationStatus } from "@models";
+import {
+  getMetadataErrors,
+  getMetadataIssueMessage,
+  getMetadataStatusErrorKey,
+  openInNewTab,
+} from "@utils";
 import { LINKS } from "@/consts/links";
+import { errorRed } from "@/consts/colors";
 
 export const DataMissingInfoBox = ({
   isDataMissing,
@@ -12,6 +19,8 @@ export const DataMissingInfoBox = ({
   isValidating,
   isSubmitted,
   isDrep = false,
+  issues,
+  reportAction,
   sx,
 }: {
   isDataMissing?: MetadataValidationStatus;
@@ -19,45 +28,23 @@ export const DataMissingInfoBox = ({
   isValidating?: boolean;
   isSubmitted?: boolean;
   isDrep?: boolean;
+  /** The rules the document breaks, listed under the message. */
+  issues?: MetadataIssue[];
+  /** Shown at the end of the docs link's row, such as the report button. */
+  reportAction?: ReactNode;
   sx?: SxProps;
 }) => {
   const { t } = useTranslation();
 
-  const gaMetadataErrorMessage = {
-    [MetadataValidationStatus.URL_NOT_FOUND]: isDrep
-      ? t("errors.dRep.message.dataMissing")
-      : t("errors.gAMetadata.message.dataMissing"),
-    [MetadataValidationStatus.INVALID_JSONLD]: isDrep
-      ? t("errors.dRep.message.incorrectFormat")
-      : t("errors.gAMetadata.message.incorrectFormat"),
-    [MetadataValidationStatus.INVALID_HASH]: isDrep
-      ? t("errors.dRep.message.notVerifiable")
-      : t("errors.gAMetadata.message.notVerifiable"),
-    [MetadataValidationStatus.INCORRECT_FORMAT]: isDrep
-      ? t("errors.dRep.message.incorrectFormat")
-      : t("errors.gAMetadata.message.incorrectFormat"),
-  }[isDataMissing as MetadataValidationStatus];
-
-  const gaMetadataErrorDescription = {
-    [MetadataValidationStatus.URL_NOT_FOUND]: isDrep
-      ? t("errors.dRep.description.dataMissing")
-      : t("errors.gAMetadata.description.dataMissing"),
-    [MetadataValidationStatus.INVALID_JSONLD]: isDrep
-      ? t("errors.dRep.description.incorrectFormat")
-      : t("errors.gAMetadata.description.incorrectFormat"),
-    [MetadataValidationStatus.INVALID_HASH]: isDrep
-      ? t("errors.dRep.description.notVerifiable")
-      : t("errors.gAMetadata.description.notVerifiable"),
-    [MetadataValidationStatus.INCORRECT_FORMAT]: isDrep
-      ? t("errors.dRep.description.incorrectFormat")
-      : t("errors.gAMetadata.description.incorrectFormat"),
-  }[isDataMissing as MetadataValidationStatus];
+  const errorKey = isDataMissing && getMetadataStatusErrorKey(isDataMissing);
+  const scope = isDrep ? "errors.dRep" : "errors.gAMetadata";
+  const gaMetadataErrorMessage = errorKey && t(`${scope}.message.${errorKey}`);
+  const errors = getMetadataErrors(issues);
 
   return isDataMissing && !isSubmitted && !isInProgress ? (
     <Box
       sx={{
         mb: 4,
-        pr: 6,
         maxWidth: {
           xxs: "295px",
           md: "100%",
@@ -74,48 +61,77 @@ export const DataMissingInfoBox = ({
         />
       ) : (
         <Typography
+          data-testid="metadata-error-message"
           sx={{
             fontSize: "18px",
             fontWeight: 500,
             color: "errorRed",
             mb: 0.5,
+            pr: 6,
           }}
         >
           {gaMetadataErrorMessage}
         </Typography>
       )}
+      {!isValidating && errors.length > 0 && (
+        <Box
+          component="ul"
+          data-testid="metadata-error-issues"
+          sx={{ color: "errorRed", mt: 0, mb: 0.5, pl: 3 }}
+        >
+          {errors.map((issue) => (
+            <Typography
+              component="li"
+              key={`${issue.field}-${issue.rule}`}
+              sx={{ color: "errorRed", fontWeight: 400 }}
+            >
+              {getMetadataIssueMessage(issue)}
+            </Typography>
+          ))}
+        </Box>
+      )}
       {isValidating ? (
         <Skeleton
-          sx={{ mb: 0.5 }}
+          sx={{ mt: 2 }}
           width="100%"
-          height="96px"
+          height="56px"
           variant="rounded"
         />
       ) : (
-        <Typography
+        <Box
+          data-testid="metadata-error-explanation"
           sx={{
-            fontWeight: 400,
-            color: "errorRed",
-            mb: 0.5,
+            mt: 2,
+            py: 1.5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 1.5,
+            borderTop: `1px dashed ${errorRed.c200}`,
+            bgcolor: "#FFF7F6",
           }}
         >
-          {gaMetadataErrorDescription}
-        </Typography>
-      )}
-      {isValidating ? (
-        <Skeleton width="128px" height="24px" variant="text" />
-      ) : (
-        <Link
-          onClick={() => openInNewTab(LINKS.DREP_ERROR_CONDITIONS)}
-          sx={{
-            fontFamily: "Poppins",
-            fontSize: "16px",
-            lineHeight: "24px",
-            cursor: "pointer",
-          }}
-        >
-          {t("learnMore")}
-        </Link>
+          {/* The explanation of each error lives in the docs. */}
+          <Link
+            component="button"
+            type="button"
+            data-testid="metadata-error-learn-more"
+            onClick={() => openInNewTab(LINKS.DREP_ERROR_CONDITIONS)}
+            underline="hover"
+            sx={{
+              fontFamily: "Poppins",
+              fontSize: "16px",
+              fontWeight: 600,
+              lineHeight: "24px",
+              textAlign: "left",
+              color: errorRed.c700,
+            }}
+          >
+            {t("metadataReport.whyError")}
+          </Link>
+          {reportAction}
+        </Box>
       )}
     </Box>
   ) : null;

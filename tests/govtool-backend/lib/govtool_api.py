@@ -18,13 +18,14 @@ class GovToolApi:
         self.requests_log = []
         self.tests_log = []
 
-    def __request(self, method: str, endpoint: str, param: Any | None = None, body: Any | None = None) -> Response:
+    def __request(self, method: str, endpoint: str, param: Any | None = None, body: Any | None = None, query: Any | None = None,
+        assert_success: bool = True,) -> Response:
         endpoint = endpoint if endpoint.startswith("/") else "/" + endpoint
         full_url = self._base_url + endpoint
         full_url = full_url + "/" + param if param else full_url
         start_time = int(time.time() * 1000000)
 
-        response = self._session.request(method, full_url, json=body)
+        response = self._session.request(method, full_url, json=body ,params=query)
 
         end_time = int(time.time() * 1000000)
         response_time = end_time - start_time
@@ -49,19 +50,23 @@ class GovToolApi:
 
         self.requests_log.append(request_info)
 
-        assert (
-            200 >= response.status_code <= 299
-        ), f"Expected {method}{endpoint} to succeed but got statusCode:{response.status_code} : body:{response.text}"
+        if assert_success:
+            assert (
+                200 <= response.status_code <= 299
+            ), f"Expected {method}{endpoint} to succeed but got statusCode:{response.status_code} : body:{response.text}"
         return response
 
-    def __get(self, endpoint: str, param: str | None = None) -> Response:
-        return self.__request("GET", endpoint, param)
+    def __get(self, endpoint: str, param: str | None = None, query: Any | None = None) -> Response:
+        return self.__request("GET", endpoint, param, query=query)
 
     def __post(self, endpoint: str, param: str | None = None, body=None) -> Response:
         return self.__request("POST", endpoint, param, body)
+    
+    def raw_get(self, endpoint: str, param: str | None = None, query: Any | None = None) -> Response:
+        return self.__request("GET", endpoint, param=param, query=query, assert_success=False)
 
-    def drep_list(self) -> Response:
-        return self.__get("/drep/list")
+    def drep_list(self, query: Any | None=None) -> Response:
+        return self.__get("/drep/list",query=query)
 
     def drep_info(self, drep_id) -> Response:
         return self.__get("/drep/info", drep_id)
@@ -71,12 +76,18 @@ class GovToolApi:
 
     def drep_get_voting_power(self, drep_id) -> Response:
         return self.__get("/drep/get-voting-power", drep_id)
-
-    def proposal_list(self) -> Response:
-        return self.__get("/proposal/list")
+    
+    def drep_voting_power_list(self, identifiers: list[str]) -> Response:
+        return self.__get("/drep/voting-power-list", query={"identifiers": identifiers})
+    
+    def proposal_list(self, query: Any | None=None) -> Response:
+        return self.__get("/proposal/list",query=query)
 
     def get_proposal(self, id) -> Response:
         return self.__get("/proposal/get", id)
+    
+    def proposal_enacted_details(self, proposal_type: str) -> Response:
+        return self.__get("/proposal/enacted-details", query={"type": proposal_type})
 
     def ada_holder_get_current_delegation(self, stake_key: str) -> Response:
         return self.__get("/ada-holder/get-current-delegation", stake_key)

@@ -1,0 +1,182 @@
+:root {
+  --ifm-color-primary: #0033ad;
+  --ifm-color-primary-dark: #002e9c;
+  --ifm-color-primary-darker: #002b93;
+  --ifm-color-primary-darkest: #002479;
+  --ifm-color-primary-light: #0038be;
+  --ifm-color-primary-lighter: #003bc7;
+  --ifm-color-primary-lightest: #0042e1;
+  --ifm-code-font-size: 95%;
+}
+
+[data-theme="dark"] {
+  --ifm-color-primary: #6f9bff;
+  --ifm-color-primary-dark: #4f84ff;
+  --ifm-color-primary-darker: #3f79ff;
+  --ifm-color-primary-darkest: #0f57ff;
+  --ifm-color-primary-light: #8fb2ff;
+  --ifm-color-primary-lighter: #9fbdff;
+  --ifm-color-primary-lightest: #cfdeff;
+}
+
+/* Typography */
+:root {
+  --ifm-font-family-base: "Inter Variable", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ifm-font-size-base: 15px;
+  --ifm-line-height-base: 1.65;
+  --ifm-heading-font-weight: 700;
+  --doc-sidebar-width: 290px;
+}
+
+/* Sidebar */
+.theme-doc-sidebar-menu.menu__list {
+  padding: 0.75rem 0.5rem 2rem;
+}
+
+.theme-doc-sidebar-menu .menu__list-item {
+  margin-top: 0.125rem;
+}
+
+.theme-doc-sidebar-menu .menu__link {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  color: var(--ifm-color-emphasis-700);
+  font-weight: 400;
+}
+
+.theme-doc-sidebar-menu .menu__link:hover {
+  color: var(--ifm-color-emphasis-900);
+  background: var(--ifm-color-emphasis-100);
+}
+
+.theme-doc-sidebar-menu .menu__link--active,
+.theme-doc-sidebar-menu .menu__link--active:hover {
+  color: var(--ifm-color-primary);
+  font-weight: 500;
+  background: transparent;
+}
+
+/* Top-level active item keeps a subtle highlight */
+.theme-doc-sidebar-menu > .menu__list-item > .menu__link--active,
+.theme-doc-sidebar-menu > .menu__list-item > .menu__list-item-collapsible > .menu__link--active {
+  background: var(--ifm-color-emphasis-100);
+}
+
+/* Category rows: smaller, lighter chevron */
+.theme-doc-sidebar-menu .menu__list-item-collapsible {
+  border-radius: 6px;
+}
+.theme-doc-sidebar-menu .menu__list-item-collapsible:hover {
+  background: var(--ifm-color-emphasis-100);
+}
+.theme-doc-sidebar-menu .menu__list-item-collapsible .menu__link:hover {
+  background: transparent;
+}
+.theme-doc-sidebar-menu .menu__caret::before,
+.theme-doc-sidebar-menu .menu__link--sublist-caret::after {
+  background-size: 1.1rem 1.1rem;
+  opacity: 0.55;
+}
+
+/* Nested levels: indented with a vertical guide line, like GitBook */
+.theme-doc-sidebar-menu .menu__list {
+  margin: 0.125rem 0 0.25rem 0.9rem;
+  padding-left: 0;
+  border-left: 1px solid var(--ifm-color-emphasis-300);
+}
+.theme-doc-sidebar-menu .menu__list .menu__link {
+  border-radius: 0 6px 6px 0;
+  padding-left: 0.9rem;
+}
+.theme-doc-sidebar-menu .menu__list .menu__link--active:not(.menu__link--sublist) {
+  margin-left: -1px;
+  border-left: 2px solid var(--ifm-color-primary);
+  padding-left: calc(0.9rem - 1px);
+}
+
+/* GitBook-style group headings in the sidebar */
+.theme-doc-sidebar-menu .sidebar-section {
+  display: block;
+  margin-top: 1.75rem;
+  margin-bottom: 0.35rem;
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-900);
+}
+.theme-doc-sidebar-menu > li.sidebar-section:first-child {
+  margin-top: 0.5rem;
+}
+
+/* GitBook <figure> exports */
+.markdown figure {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+.markdown figure img {
+  max-width: 100%;
+}
+.markdown figcaption {
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-700);
+}
+.markdown img.gitbook-cover {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* GitBook {% embed %} blocks */
+.gitbook-embed {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  margin-bottom: 0.5rem;
+}
+.gitbook-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.markdown details {
+  margin-bottom: 1rem;
+}
+
+/* The GovTool logo is black; invert it on the dark theme */
+[data-theme="dark"] .navbar__logo img {
+  filter: invert(1);
+}
+
+/* GitBook <mark> colour exports: GitBook renders these as soft tinted
+   labels, so map the raw inline colours to readable text/background pairs. */
+.markdown mark {
+  padding: 0.05em 0.3em;
+  border-radius: 4px;
+  background-color: transparent;
+}
+.markdown mark[style*="background-color:green"] {
+  color: #137333 !important;
+  background-color: #e6f4ea !important;
+}
+.markdown mark[style*="background-color:red"] {
+  color: #b3261e !important;
+  background-color: #fce8e6 !important;
+}
+[data-theme="dark"] .markdown mark[style*="background-color:green"] {
+  color: #81c995 !important;
+  background-color: rgba(129, 201, 149, 0.15) !important;
+}
+[data-theme="dark"] .markdown mark[style*="background-color:red"] {
+  color: #f28b82 !important;
+  background-color: rgba(242, 139, 130, 0.15) !important;
+}

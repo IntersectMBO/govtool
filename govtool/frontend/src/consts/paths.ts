@@ -32,11 +32,12 @@ export const PDF_PATHS = {
   proposalDiscussionPropose: "/proposal_discussion/propose",
 };
 
+// The read-only 2025 budget proposals archive keeps the budget discussion
+// paths, so old links resolve; /propose redirects to the list.
 export const BUDGET_DISCUSSION_PATHS = {
   budgetDiscussion: "/budget_discussion",
   budgetDiscussionProposal: "/budget_discussion/:id",
   budgetDiscussionPropose: "/budget_discussion/propose",
-  budgetDiscussionAction: "/budget_discussion/:proposalId",
   budgetDiscussionCategory: "/budget_discussion/category/:category",
   budgetDiscussionCategoryAction:
     "/budget_discussion/category/:category/:proposalId",
@@ -46,7 +47,7 @@ export const USER_PATHS = {
   governanceActionsVotedByMe: "/my/votes_and_favorites",
 };
 
-export const OUTCOMES_PATHS = {
-  governanceActionsOutcomes: "/outcomes",
-  governanceActionOutcomes: "/outcomes/governance_actions/:id",
+export const GOV_ACTION_HISTORY_PATHS = {
+  governanceActionHistory: "/governance_actions/history",
+  governanceActionHistoryDetail: "/governance_actions/history/:id",
 };

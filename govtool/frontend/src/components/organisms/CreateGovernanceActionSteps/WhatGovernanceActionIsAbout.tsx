@@ -4,11 +4,8 @@ import { Trans } from "react-i18next";
 import { Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { CenteredBoxBottomButtons } from "@molecules";
-import {
-  correctVoteAdaFormat,
-  getItemFromLocalStorage,
-  PROTOCOL_PARAMS_KEY,
-} from "@utils";
+import { useAppContext } from "@context";
+import { correctVoteAdaFormat } from "@utils";
 
 type WhatGovernanceActionIsAboutProps = {
   onClickCancel: () => void;
@@ -22,7 +19,7 @@ export const WhatGovernanceActionIsAbout = ({
   const { t } = useTranslation();
   const { isMobile } = useScreenDimension();
 
-  const protocolParams = getItemFromLocalStorage(PROTOCOL_PARAMS_KEY);
+  const { epochParams } = useAppContext();
 
   const onClickContinue = useCallback(() => setStep(2), []);
 
@@ -44,7 +41,9 @@ export const WhatGovernanceActionIsAbout = ({
         <Trans
           i18nKey="createGovernanceAction.creatingAGovernanceActionDescription"
           values={{
-            deposit: correctVoteAdaFormat(protocolParams?.gov_action_deposit),
+            deposit: correctVoteAdaFormat(
+              epochParams?.gov_action_deposit ?? undefined,
+            ),
           }}
         />
       </Typography>

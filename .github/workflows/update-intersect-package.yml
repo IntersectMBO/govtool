@@ -8,7 +8,6 @@ on:
         required: true
         type: choice
         options:
-          - "@intersect.mbo/govtool-outcomes-pillar-ui"
           - "@intersect.mbo/intersectmbo.org-icons-set"
           - "@intersect.mbo/pdf-ui"
       new_version:

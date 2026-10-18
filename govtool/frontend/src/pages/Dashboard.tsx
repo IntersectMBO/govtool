@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useLocation, Outlet, useNavigate } from "react-router-dom";
+import { useLocation, Outlet, useNavigate } from "react-router";
 import { Box } from "@mui/material";
 
 import { Background, ScrollToManage } from "@atoms";
@@ -7,7 +7,7 @@ import {
   BUDGET_DISCUSSION_PATHS,
   CONNECTED_NAV_ITEMS,
   DRAWER_WIDTH,
-  OUTCOMES_PATHS,
+  GOV_ACTION_HISTORY_PATHS,
   PATHS,
   PDF_PATHS,
 } from "@consts";
@@ -27,22 +27,18 @@ export const Dashboard = () => {
   const getPageTitle = (path: string) => {
     if (path === PATHS.dashboard) return t("dashboard.title");
 
-    if (path.startsWith(OUTCOMES_PATHS.governanceActionsOutcomes)) {
-      const outcomesNavItem = findNavItem(
+    if (path.startsWith(GOV_ACTION_HISTORY_PATHS.governanceActionHistory)) {
+      const governanceActionHistoryNavItem = findNavItem(
         CONNECTED_NAV_ITEMS,
-        OUTCOMES_PATHS.governanceActionsOutcomes,
+        GOV_ACTION_HISTORY_PATHS.governanceActionHistory,
       );
 
-      return outcomesNavItem ?? "";
+      return governanceActionHistoryNavItem ?? "";
     }
 
+    // Linked from Useful links, not the sidebar.
     if (path.startsWith(BUDGET_DISCUSSION_PATHS.budgetDiscussion)) {
-      const budgetNavItem = findNavItem(
-        CONNECTED_NAV_ITEMS,
-        BUDGET_DISCUSSION_PATHS.budgetDiscussion,
-      );
-
-      return budgetNavItem ?? "";
+      return t("budgetProposalsArchive.navLabel");
     }
 
     if (path.startsWith(PDF_PATHS.proposalDiscussion)) {

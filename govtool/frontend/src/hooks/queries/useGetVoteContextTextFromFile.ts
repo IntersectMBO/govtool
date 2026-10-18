@@ -1,8 +1,9 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { getVoteContextTextFromFile } from "@/services";
 import { QUERY_KEYS } from "@/consts";
 import { useCardano } from "@/context";
+import { ipfsGatewayUrl } from "@/utils/ipfsGateway";
 import { useGetVoterInfo } from ".";
 
 export const useGetVoteContextTextFromFile = (url: string | undefined,
@@ -11,19 +12,17 @@ export const useGetVoteContextTextFromFile = (url: string | undefined,
   const { voter } = useGetVoterInfo();
 
   if (url && url.startsWith("ipfs://")) {
-      url = url.replace("ipfs://", "https://ipfs.io/ipfs/");
+      url = ipfsGatewayUrl(url.slice("ipfs://".length));
   }
 
-  const { data, isLoading } = useQuery(
-  [QUERY_KEYS.useGetVoteContextFromFile, url],
-  () => getVoteContextTextFromFile(url, contextHash),
-  {
+  const { data, isLoading } = useQuery({
+    queryKey: [QUERY_KEYS.useGetVoteContextFromFile, url],
+    queryFn: () => getVoteContextTextFromFile(url, contextHash),
     enabled:
       !!url &&
       !!dRepID &&
       (!!voter?.isRegisteredAsDRep || !!voter?.isRegisteredAsSoleVoter),
-  },
-  );
+  });
 
   const voteContextText = (data?.metadata as { comment?: string })?.comment || "";
 

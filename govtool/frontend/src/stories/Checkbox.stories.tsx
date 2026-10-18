@@ -1,6 +1,6 @@
 import { ComponentProps } from "react";
-import { expect, within } from "@storybook/test";
-import type { Meta, StoryFn } from "@storybook/react";
+import { expect, within } from "storybook/test";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { Field } from "@molecules";
 

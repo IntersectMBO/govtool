@@ -7,6 +7,8 @@ export type EpochParams = {
   committee_max_term_length: number | null;
   committee_min_size: number | null;
   cost_model_id: number | null;
+  /** The joined cost-model row; `costs` feeds the script data hash. */
+  cost_model: { costs: Record<string, number[]> } | null;
   decentralisation: number | null;
   drep_activity: number | null;
   drep_deposit: number | null;
@@ -201,16 +203,17 @@ export type ProposalVote = {
   vote: Vote;
 };
 
+/** A `null` figure is one the backend could not get from its data source. */
 export type SubmittedVotesData = {
-  dRepYesVotes: number;
-  dRepNoVotes: number;
-  dRepAbstainVotes: number;
-  ccYesVotes: number;
-  ccNoVotes: number;
-  ccAbstainVotes: number;
-  poolYesVotes: number;
-  poolNoVotes: number;
-  poolAbstainVotes: number;
+  dRepYesVotes: number | null;
+  dRepNoVotes: number | null;
+  dRepAbstainVotes: number | null;
+  ccYesVotes: number | null;
+  ccNoVotes: number | null;
+  ccAbstainVotes: number | null;
+  poolYesVotes: number | null;
+  poolNoVotes: number | null;
+  poolAbstainVotes: number | null;
   type: GovernanceActionType;
   protocolParams: EpochParams | null;
 };
@@ -282,4 +285,17 @@ export type Account = {
   view: string;
   isRegistered: boolean;
   isScriptBased: boolean;
+};
+
+/**
+ * `GET /proposal/enacted-details`: the last enacted action of a type's
+ * lineage, which a new action of that lineage must name as its previous
+ * action. Null when nothing of the lineage has been enacted.
+ */
+export type EnactedProposalDetails = {
+  id: number | null;
+  txId: number | null;
+  index: number;
+  description: unknown;
+  hash: string;
 };

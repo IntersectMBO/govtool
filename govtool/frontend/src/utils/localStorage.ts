@@ -1,4 +1,6 @@
 export const PENDING_TRANSACTION_KEY = "pending_transaction";
+/** When a registration or retirement last expired before it confirmed. */
+export const VOTER_TRANSACTION_EXPIRED_KEY = "voter_transaction_expired";
 export const PROTOCOL_PARAMS_KEY = "protocol_params";
 export const NETWORK_METRICS_KEY = "network_metrics";
 export const NETWORK_INFO_KEY = "network_info";

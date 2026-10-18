@@ -1,5 +1,6 @@
 import { DRepData } from "@/models";
 import { fixViewForScriptBasedDRep } from "./dRep";
+import { env } from "@/config/env";
 
 const imageFetchDefaultOptions: RequestInit = {
   mode: "no-cors",
@@ -17,12 +18,12 @@ export const mapDtoToDrep = async (dto: DRepData): Promise<DRepData> => {
     console.debug("Fetching image", dto.imageUrl);
     fetch(
       isIPFSImage
-        ? `${import.meta.env.VITE_IPFS_GATEWAY}/${dto.imageUrl?.slice(7)}`
+        ? `${env.VITE_IPFS_GATEWAY}/${dto.imageUrl?.slice(7)}`
         : dto.imageUrl,
       isIPFSImage
         ? {
             ...imageFetchDefaultOptions,
-            headers: { project_id: import.meta.env.VITE_IPFS_PROJECT_ID },
+            headers: { project_id: env.VITE_IPFS_PROJECT_ID },
           }
         : // set request mode no-cors
           {
@@ -38,7 +39,7 @@ export const mapDtoToDrep = async (dto: DRepData): Promise<DRepData> => {
         };
       })
       .catch((error) => {
-        if (import.meta.env.VITE_IS_DEV) {
+        if (env.VITE_IS_DEV) {
           console.error("Error fetching image", error);
         }
       });

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getDRepVotingPowerList } from "@/services";
 import { QUERY_KEYS } from "@/consts";
 

@@ -1,13 +1,14 @@
 import { useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
-import { GOVERNANCE_ACTIONS_SORTING, ICONS, PATHS } from "@consts";
-import { useCardano, useDataActionsBar } from "@context";
+import { ICONS, PATHS } from "@consts";
+import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
+  SearchNotReady,
 } from "@molecules";
 import {
   useFetchNextPageDetector,
@@ -26,6 +27,7 @@ import { ValidatedGovernanceActionCard } from "@/components/organisms";
 export const DashboardGovernanceActionsCategory = () => {
   const { category } = useParams();
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
+  const { governanceActionsSort } = useFeatureFlag();
   const { chosenSorting } = dataActionsBarProps;
   const { isMobile, screenWidth } = useScreenDimension();
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ export const DashboardGovernanceActionsCategory = () => {
     isProposalsFetching,
     isProposalsFetchingNextPage,
     isProposalsLoading,
+    isSearchNotReady,
     proposals,
     proposalsfetchNextPage,
     proposalsHaveNextPage,
@@ -95,7 +98,8 @@ export const DashboardGovernanceActionsCategory = () => {
         <DataActionsBar
           {...dataActionsBarProps}
           isFiltering={false}
-          sortOptions={GOVERNANCE_ACTIONS_SORTING}
+          sortOptions={governanceActionsSort.options}
+          isSorting={governanceActionsSort.isAvailable}
         />
         <Typography
           variant="title2"
@@ -105,7 +109,9 @@ export const DashboardGovernanceActionsCategory = () => {
         >
           {getProposalTypeLabel(category ?? "")}
         </Typography>
-        {!mappedData || isEnableLoading || isProposalsLoading ? (
+        {isSearchNotReady ? (
+          <SearchNotReady />
+        ) : !mappedData || isEnableLoading || isProposalsLoading ? (
           <Box
             sx={{
               alignItems: "center",

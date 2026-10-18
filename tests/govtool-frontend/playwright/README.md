@@ -1,5 +1,7 @@
 # 🚀 GovTool Integration Test Guide
 
+For CIP-179 user stories and deterministic tests without funded wallets or API keys, see [CIP-179 linked surveys](docs/cip179-user-stories.md). They run in every default run as the `cip179 (desktop)` and `cip179 (mobile)` projects, against the run's frontend; to run only them or skip them, see [CIP-179 Linked Surveys](#10-cip-179-linked-surveys) below.
+
 ## ✅ Prerequisites
 
 Ensure the following tools are installed on your machine:
@@ -84,53 +86,34 @@ npx playwright install
 
 ---
 
-## 🔧 Faucet wallet Configuration
+## 🔧 Wallet Configuration
 
-This section guides you through generating a Cardano faucet wallet and configuring it for use. Follow the steps below to create and set the config on env
+Two secrets drive every wallet the tests use:
 
-### Step 1: Generate a Faucet Wallet
+- `TEST_WALLET_MNEMONIC`: a 24-word mnemonic. Each test wallet is a CIP-1852 account derived from it by name, fresh for every run.
+- `FAUCET_ADDRESS`, `FAUCET_PAYMENT_PRIVATE`, `FAUCET_STAKE_PRIVATE`: the faucet wallet, which funds the test wallets as tests need them.
 
-Run the following command to generate a new faucet wallet:
+No wallet keys are written to disk, and no wallets need to be generated before a run. To reuse a past run's wallets, set `HD_RUN_ID` to the id recorded in `lib/_mock/hdRun.json`.
+
+### Step 1: Generate the Secrets
 
 ```bash
+npm run generate-test-mnemonic
 npm run generate-faucet-wallet
 ```
 
-The script will:
-
-- Display the wallet details (payment private key, stake public key hash, and wallet address) in the terminal.
-
-**Example Output:**
-
-```
-🎉 Wallet generated successfully!
------------------------------------
-🔑 Payment Private Key: <your-payment-private-key>
-💰 Stake Private Key: <your-stake-private>
-🏠 Wallet Address: <your-wallet-address>
------------------------------------
-
-📋 Please copy the following to your environment variables:
-1. Set FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
-2. Set FAUCET_STAKE_PRIVATE=<your-stake-private>
-3. Set FAUCET_ADDRESS=<your-wallet-address>
-
-🎈 All set! Please ensure this wallet is funded with a sufficient balance
-```
-
-### Step 2: Configure Environment Variables
-
-Securely store the generated wallet details in your environment variables. Add the following to your `.env` file or environment configuration:
+Each script prints the lines to add to your `.env` file:
 
 ```env
-FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
-FAUCET_STAKE_PKH=<your-stake-pkh>
+TEST_WALLET_MNEMONIC="<24 words>"
 FAUCET_ADDRESS=<your-wallet-address>
+FAUCET_PAYMENT_PRIVATE=<your-payment-private-key>
+FAUCET_STAKE_PRIVATE=<your-stake-private-key>
 ```
 
-⚠️ **Security Note**: Store your wallet details in a secure location for future use. The payment private key is sensitive and must be protected to prevent unauthorized access to your funds.
+⚠️ **Security Note**: Keep these values secret. Anyone holding the mnemonic or the faucet keys can spend the test funds.
 
-### Step 3: Fund the Wallet
+### Step 2: Fund the Faucet Wallet
 
 Ensure your wallet has enough funds for your test runs. The required balance depends on the specific tests you plan to execute (see test-specific details below).
 
@@ -161,16 +144,6 @@ https://${network}.cardanoscan.io/address/<your-wallet-address>
 ---
 
 ## 🧪 Running Tests
-
-### 🔑 Generate Test Wallets
-
-Before each test run, generate test wallets required for wallet-dependent tests:
-
-```bash
-npm run generate-wallets
-```
-
----
 
 ### 🔁 Run All Tests
 
@@ -232,25 +205,35 @@ npm run test:headless:voting-pillar
 
 ---
 
-#### 3. **Outcomes**
+#### 3. **Governance action history**
 
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:outcomes
+npm run test:governance-action-history
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:outcomes
+npm run test:headless:governance-action-history
 ```
+
+For offline desktop/mobile aggregate replays, run:
+
+```bash
+npm run test:governance-action-aggregates
+```
+
+This starts a local Vite server and mocks HTTP; it needs no backend or wallet.
+The deployment suite excludes these fixtures. To replay a captured provider
+comparison, set `GOVTOOL_AGGREGATES_REPORT=/path/to/report.json` for the same command.
 
 ---
 
 #### 4. **Proposal Pillar**
 
-_Includes both Proposal Discussion and Budget Discussion_
+_Includes Proposal Discussion and the read-only 2025 Budget Proposals archive_
 
 - **Pre-requisite**: Ensure the faucet address holds at least **403,000 ADA**.
 
@@ -286,20 +269,21 @@ npm run test:headless:proposal-discussion
 
 ---
 
-#### 6. **Proposal Budget**
+#### 6. **Budget Proposals Archive**
 
-- **Pre-requisite**: Ensure the faucet address holds at least **1,000 ADA**.
+The 2025 budget proposals, read-only, served by the frontend as static files
+(no wallet, faucet or forum backend needed).
 
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:proposal-budget
+npm run test:budget-proposals-archive
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:proposal-budget
+npm run test:headless:budget-proposals-archive
 ```
 
 ---
@@ -320,18 +304,18 @@ npm run test:headless:wallet-connect
 
 ---
 
-#### 8. **Usersnap Integration**
+#### 8. **Chatwoot Feedback Integration**
 
 #### 🖥️ UI Mode
 
 ```bash
-npm run test:usersnap
+npm run test:chatwoot
 ```
 
 #### 🧪 Headless Mode (No UI)
 
 ```bash
-npm run test:headless:usersnap
+npm run test:headless:chatwoot
 ```
 
 ---
@@ -349,6 +333,42 @@ npm run test:misc
 ```bash
 npm run test:headless:misc
 ```
+
+---
+
+#### 10. **CIP-179 Linked Surveys**
+
+- **Pre-requisite**: the frontend's dependencies, which the tests load to encode their fixtures: `npm ci --ignore-scripts` in `govtool/frontend`. No funded wallet or API key: every request and the wallet are mocked.
+
+These run in every default run (`cip179 (desktop)` and `cip179 (mobile)`). User stories: [docs/cip179-user-stories.md](docs/cip179-user-stories.md).
+
+#### 🖥️ UI Mode
+
+```bash
+npx playwright test cip179/ --ui
+```
+
+#### 🧪 Headless Mode (No UI)
+
+Against the `HOST_URL` frontend:
+
+```bash
+npm run test:headless:cip179
+```
+
+On a local Vite dev server the config starts itself, with no `HOST_URL` or backend:
+
+```bash
+npm run test:cip179
+```
+
+#### ⏭️ Skip Them
+
+```bash
+npm run test:headless:no-cip179
+```
+
+This filters by path, so the cip179 files are never loaded and the frontend's dependencies are not needed. `--grep-invert` would load them first.
 
 ---
 

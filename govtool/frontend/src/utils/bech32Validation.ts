@@ -14,7 +14,7 @@ export const bech32Validation = async (value: string) => {
       return true;
     }
     throw new Error();
-  } catch (error) {
+  } catch {
     return I18n.t("createGovernanceAction.fields.validations.bech32");
   }
 };

@@ -10,7 +10,7 @@ export const useDelegateTodRep = () => {
     buildVoteDelegationCert,
     buildDRepRetirementCert,
     buildStakeKeyRegCert,
-    registeredStakeKeysListState,
+    isStakeKeyRegistered,
   } = useCardano();
   const { t } = useTranslation();
   const { addSuccessAlert, addErrorAlert } = useSnackbar();
@@ -36,7 +36,7 @@ export const useDelegateTodRep = () => {
           certBuilder.add(retirementCert);
         }
 
-        if (!registeredStakeKeysListState.length) {
+        if (!isStakeKeyRegistered()) {
           const stakeKeyRegCert = await buildStakeKeyRegCert();
           certBuilder.add(stakeKeyRegCert);
         }
@@ -63,9 +63,13 @@ export const useDelegateTodRep = () => {
     [
       addErrorAlert,
       addSuccessAlert,
+      buildDRepRetirementCert,
       buildSignSubmitConwayCertTx,
+      buildStakeKeyRegCert,
       buildVoteDelegationCert,
+      isStakeKeyRegistered,
       t,
+      voter,
       voter?.deposit,
       voter?.isRegisteredAsSoleVoter,
     ],

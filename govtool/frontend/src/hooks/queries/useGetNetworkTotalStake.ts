@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { getNetworkTotalStake } from "@services";
 import { QUERY_KEYS } from "@consts";
@@ -6,7 +6,7 @@ import { QUERY_KEYS } from "@consts";
 export const useGetNetworkTotalStake = () => {
   const { data: networkTotalStake, refetch: fetchNetworkTotalStake } = useQuery(
     {
-      queryKey: QUERY_KEYS.useGetNetworkTotalStakeKey,
+      queryKey: [QUERY_KEYS.useGetNetworkTotalStakeKey],
       queryFn: () => getNetworkTotalStake(),
       enabled: false,
     },

@@ -48,12 +48,11 @@ class AdaHandleService {
    * Get the details of a handle from the AdaHandle API.
    * @param handle - The handle to retrieve details for.
    * @returns A Promise that resolves to the HandleObject or null if the handle is not found.
+   * A network without a handle API (or a lookup before the network is known)
+   * resolves to null too, the same as a handle the API does not know.
    */
   async getHandleDetails(handle: string): Promise<HandleObject | null> {
-    if (!this.adaHandleBaseUrl) {
-      throw new Error("AdaHandleService is not initialized with a network.");
-    }
-    if (!handle) {
+    if (!this.adaHandleBaseUrl || !handle) {
       return null;
     }
 

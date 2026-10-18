@@ -4,12 +4,13 @@ import {
   removeItemFromLocalStorage,
   getItemFromLocalStorage,
   PENDING_TRANSACTION_KEY,
+  VOTER_TRANSACTION_EXPIRED_KEY,
   wait,
 } from "@utils";
 import { getTransactionStatus } from "@services";
 import { useTranslation } from "@hooks";
 import { StatusModalState } from "@organisms";
-import { useQueryClient } from "react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useModal, useSnackbar } from "..";
 import { TransactionState } from "./types";
 import { getDesiredResult, getQueryKey, refetchData } from "./utils";
@@ -18,6 +19,14 @@ const TIME_TO_EXPIRE_TRANSACTION = 3 * 60 * 1000; // 3 MINUTES
 const TRANSACTION_REFRESH_TIME = 15 * 1000; // 15 SECONDS
 const DB_SYNC_REFRESH_TIME = 3 * 1000; // 3 SECONDS
 const DB_SYNC_MAX_ATTEMPTS = 10;
+
+/** The transactions that change what the voter info reports. */
+const VOTER_TRANSACTION_TYPES: readonly TransactionState["type"][] = [
+  "registerAsDrep",
+  "registerAsDirectVoter",
+  "retireAsDrep",
+  "retireAsDirectVoter",
+];
 
 type UsePendingTransactionProps = {
   isEnabled: boolean;
@@ -66,32 +75,39 @@ export const usePendingTransaction = ({
 
   // Check transactions status
   useEffect(() => {
-    if (!transaction?.transactionHash) return;
+    if (!transaction?.transactionHash) return undefined;
 
     const { transactionHash, type, resourceId } = transaction;
+    // Set once the transaction is resolved or this effect is torn down, so a
+    // check still in flight cannot report again.
+    let isSettled = false;
+    // A check can outlast the polling interval while it waits for the backend
+    // to catch up, so two never run at once.
+    let isChecking = false;
+
+    const resetTransaction = () => {
+      isSettled = true;
+      clearInterval(interval);
+      removeItemFromLocalStorage(`${PENDING_TRANSACTION_KEY}_${stakeKey}`);
+      setTransaction(null);
+    };
 
     const checkTransaction = async () => {
-      const status = await getTransactionStatus(transactionHash);
+      if (isSettled || isChecking) return;
+      isChecking = true;
+      try {
+        const status = await getTransactionStatus(transactionHash);
 
-      const resetTransaction = () => {
-        removeItemFromLocalStorage(`${PENDING_TRANSACTION_KEY}_${stakeKey}`);
-        setTransaction(null);
-      };
-
-      if (
-        status.transactionConfirmed &&
-        (type === "vote" ? status.votingProcedure.length > 0 : true)
-      ) {
-        clearInterval(interval);
-
-        if (isEnabled) {
+        // A transaction on chain carries everything it did, so a confirmed
+        // vote transaction has cast its votes. Some backends cannot list a
+        // vote by its transaction and send an empty votingProcedure, so it is
+        // not required here.
+        if (status.transactionConfirmed && isEnabled) {
           const desiredResult = getDesiredResult(type, resourceId);
           const queryKey = getQueryKey(type, transaction);
 
-          let count = 0;
-          let isDBSyncUpdated = false;
-          while (!isDBSyncUpdated && count < DB_SYNC_MAX_ATTEMPTS) {
-            count++;
+          for (let count = 0; count < DB_SYNC_MAX_ATTEMPTS; count++) {
+            if (isSettled) return;
             // eslint-disable-next-line no-await-in-loop
             const data = await refetchData(
               type,
@@ -103,27 +119,43 @@ export const usePendingTransaction = ({
             if (desiredResult === data) {
               addSuccessAlert(t(`alerts.${type}.success`));
               resetTransaction();
-              isDBSyncUpdated = true;
-            } else {
-              // eslint-disable-next-line no-await-in-loop
-              await wait(DB_SYNC_REFRESH_TIME);
+              return;
             }
+            // eslint-disable-next-line no-await-in-loop
+            await wait(DB_SYNC_REFRESH_TIME);
           }
         }
-      }
 
-      if (isTransactionExpired(transaction.time)) {
-        addErrorAlert(t(`alerts.${type}.failed`));
-        resetTransaction();
+        // Still unresolved: keep polling until the change shows up or the
+        // transaction expires, so "in progress" never stays up for good.
+        if (!isSettled && isTransactionExpired(transaction.time)) {
+          // It may still land after this: the voter info keeps reading for a
+          // while (see useGetVoterInfo) rather than wait for a reload.
+          if (VOTER_TRANSACTION_TYPES.includes(type)) {
+            setItemToLocalStorage(
+              `${VOTER_TRANSACTION_EXPIRED_KEY}_${stakeKey}`,
+              Date.now(),
+            );
+          }
+          addErrorAlert(t(`alerts.${type}.failed`));
+          resetTransaction();
+        }
+      } finally {
+        isChecking = false;
       }
     };
 
-    let interval = setInterval(checkTransaction, TRANSACTION_REFRESH_TIME);
+    const interval = setInterval(checkTransaction, TRANSACTION_REFRESH_TIME);
     checkTransaction();
 
     if (isEnabled && transaction) {
       addWarningAlert(t("alerts.transactionInProgress"), 10000);
     }
+
+    return () => {
+      isSettled = true;
+      clearInterval(interval);
+    };
   }, [isEnabled, transaction]);
 
   const isPendingTransaction = useCallback(() => {

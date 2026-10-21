@@ -7,15 +7,35 @@ import type {
   MetadataServiceV1,
 } from '@govtool/data-providers/metadata';
 
+import { redactIpsDeep } from '../common/redact-ip';
 import { METADATA } from '../providers/providers.module';
 import { forgetDocumentFailure } from './document-store';
 
 /**
+ * Left as the service sent them when redacting addresses (D171): the
+ * document, which is the publisher's content; the urls, which the chain or
+ * the publisher's server named; and the ids and hashes, which callers send
+ * back. Everything else, the DNS answers, connect attempts, headers and
+ * messages, has its addresses redacted.
+ */
+const UNREDACTED = new Set([
+  'body',
+  'url',
+  'effectiveUrl',
+  'redirectTo',
+  'id',
+  'reportId',
+  'hash',
+  'servedHash',
+]);
+
+/**
  * The backend's public door to the private metadata service (D119).
  *
- * It passes the contract's values through and adds nothing about caching:
- * no `Cache-Control`, no TTLs. The retry window (one real fetch per anchor
- * per minute, D125) is enforced by the service; this relays its answer.
+ * It passes the contract's values through, with IP addresses redacted
+ * (D171), and adds nothing about caching: no `Cache-Control`, no TTLs. The
+ * retry window (one real fetch per anchor per minute, D125) is enforced by
+ * the service; this relays its answer.
  */
 @Injectable()
 export class MetadataGatewayService {
@@ -74,7 +94,7 @@ export class MetadataGatewayService {
       );
     }
     try {
-      return await run(this.metadata);
+      return redactIpsDeep(await run(this.metadata), UNREDACTED);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       this.logger.error(

@@ -182,7 +182,8 @@ export interface ReportBody {
 
 /**
  * The investigation view of one failed fetch (D113). Nothing in it is hidden
- * from the user (D116). Reports are kept forever and never replaced (D123).
+ * from the user (D116); the backend redacts the middle of IP addresses at its
+ * edge (D171). Reports are kept forever and never replaced (D123).
  */
 export interface MetadataReport {
   id: string;

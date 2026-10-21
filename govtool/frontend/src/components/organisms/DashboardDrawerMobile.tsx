@@ -1,11 +1,11 @@
 import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 
 import { Background, Link } from "@atoms";
 import { CONNECTED_NAV_ITEMS, ICONS, PATHS } from "@consts";
 import { DRepInfoCard, WalletInfoCard } from "@molecules";
 import { useGetVoterInfo, useScreenDimension } from "@hooks";
-import { openInNewTab } from "@utils";
+import { findActiveNavTo, openInNewTab } from "@utils";
 import { useFeatureFlag } from "@context";
 
 import { DashboardDrawerMobileProps } from "./types";
@@ -31,6 +31,7 @@ export const DashboardDrawerMobile = ({
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { screenWidth } = useScreenDimension();
   const { voter } = useGetVoterInfo();
+  const { pathname } = useLocation();
 
   const openDrawer = () => setIsDrawerOpen(true);
   const closeDrawer = () => setIsDrawerOpen(false);
@@ -94,6 +95,13 @@ export const DashboardDrawerMobile = ({
                 >
                   <Link
                     {...navItem}
+                    isActive={
+                      navItem.childNavItems &&
+                      findActiveNavTo(
+                        pathname,
+                        navItem.childNavItems.map((item) => item.navTo),
+                      ) !== null
+                    }
                     size="big"
                     onClick={() => {
                       if (navItem.newTabLink) openInNewTab(navItem.newTabLink);

@@ -50,6 +50,26 @@ describe("DrawerLink", () => {
     );
   });
 
+  it("applies active styles off its route when isActive is set", () => {
+    render(
+      <MemoryRouter initialEntries={["/child"]}>
+        <DrawerLink
+          label="Parent"
+          navTo="/parent"
+          icon="icon-path.png"
+          activeIcon="active-icon-path.png"
+          isActive
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("link")).toHaveStyle(
+      `backgroundColor: ${theme.palette.highlightBlue}`,
+    );
+    const img = screen.getByAltText("icon") as HTMLImageElement;
+    expect(img.src).toContain("active-icon-path.png");
+  });
+
   it("renders with an icon and activeIcon", () => {
     const icon = "icon-path.png";
     const activeIcon = "active-icon-path.png";

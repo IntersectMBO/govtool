@@ -25,7 +25,14 @@ import { invalidInput, notFound } from '../errors';
 import { decodeGovActionId, encodeGovActionId, isHex } from '../ids';
 import { toInt } from '../numbers';
 import { toPage, toWindow } from '../paging';
-import { BOUND, loadAggregates, validDRepVoteSql, type TallyTarget } from './proposals/aggregates';
+import {
+  activeDRepSql,
+  BOUND,
+  loadAggregates,
+  RENEWED,
+  validDRepVoteSql,
+  type TallyTarget,
+} from './proposals/aggregates';
 import { LINEAGE_DB_TYPES, TYPE_TO_DB } from './proposals/body';
 import {
   deriveStatus,
@@ -33,6 +40,7 @@ import {
   PROPOSAL_JOINS,
   STATUS_SQL,
   TALLY_EPOCH_SQL,
+  TALLY_LIVE_SQL,
   toGovAction,
   toLifecycle,
   type ProposalRow,
@@ -84,13 +92,15 @@ const own = <T extends object>(table: T, key: unknown): key is keyof T =>
  * Per-action DRep ranking keys over the filtered set `f`, for the two
  * vote-derived sorts. Yes stake reads `drep_distr` by (hash, epoch), which is
  * indexed; participation also needs each tally epoch's active total, which is
- * a sequential scan of `drep_distr`.
+ * a sequential scan of `drep_distr`. Activity and vote validity follow the
+ * displayed tally (aggregates.ts), so a ranking never disagrees with it.
  */
 function rankingCtes(sort: 'mostYesVotes' | 'highestParticipation'): string {
   const participation = sort === 'highestParticipation';
   return `,
-  eps AS (SELECT DISTINCT e FROM f),
+  cuts AS (SELECT DISTINCT e, live FROM f),
   ${BOUND},
+  ${RENEWED},
   dv AS (
     SELECT DISTINCT ON (vp.gov_action_proposal_id, vp.drep_voter)
            vp.gov_action_proposal_id AS pid, vp.drep_voter AS voter, vp.vote::text AS vote, vp.tx_id
@@ -101,8 +111,9 @@ function rankingCtes(sort: 'mostYesVotes' | 'highestParticipation'): string {
     SELECT f.id, sum(dd.amount) FILTER (WHERE dv.vote = 'Yes') AS yes, sum(dd.amount) AS voted
       FROM f
       JOIN dv ON dv.pid = f.id
-      JOIN drep_distr dd ON dd.hash_id = dv.voter AND dd.epoch_no = f.e AND dd.active_until >= f.e
-     WHERE ${validDRepVoteSql('dv', 'f.e')}
+      JOIN drep_distr dd ON dd.hash_id = dv.voter AND dd.epoch_no = f.e
+     WHERE ${activeDRepSql('dd', 'f')}
+       AND ${validDRepVoteSql('dv', 'f')}
      GROUP BY f.id),
   nc AS (
     SELECT dd.epoch_no AS e, sum(dd.amount) AS amount
@@ -113,10 +124,11 @@ function rankingCtes(sort: 'mostYesVotes' | 'highestParticipation'): string {
        participation
          ? `,
   act AS (
-    SELECT dd.epoch_no AS e, sum(dd.amount) AS amount
-      FROM drep_distr dd
-     WHERE dd.active_until >= dd.epoch_no AND dd.epoch_no IN (SELECT DISTINCT e FROM f)
-     GROUP BY dd.epoch_no)`
+    SELECT cuts.e, cuts.live, sum(dd.amount) AS amount
+      FROM cuts
+      JOIN drep_distr dd ON dd.epoch_no = cuts.e
+     WHERE ${activeDRepSql('dd', 'cuts')}
+     GROUP BY cuts.e, cuts.live)`
          : ''
      },
   r AS (
@@ -129,7 +141,7 @@ function rankingCtes(sort: 'mostYesVotes' | 'highestParticipation'): string {
            } AS participation_key
       FROM f
       LEFT JOIN dc ON dc.id = f.id
-      LEFT JOIN nc ON nc.e = f.e${participation ? '\n      LEFT JOIN act ON act.e = f.e' : ''})`;
+      LEFT JOIN nc ON nc.e = f.e${participation ? '\n      LEFT JOIN act ON act.e = f.e AND act.live = f.live' : ''})`;
 }
 
 /** A search term this provider can match: the action's CIP-129 id, or its transaction hash. */
@@ -176,6 +188,7 @@ export function createProposalsApi(ctx: Ctx): ProposalsApi {
       id: row.id,
       dbType: row.db_type,
       epoch: Number(row.tally_epoch),
+      live: row.tally_live,
       ...(paramKeys ? { paramKeys } : {}),
     }));
     const aggregates = await loadAggregates(db, targets);
@@ -246,7 +259,7 @@ export function createProposalsApi(ctx: Ctx): ProposalsApi {
       const filtered = `
         WITH cur AS (SELECT max(no) AS no FROM epoch),
         f AS (
-          SELECT g.id, g.type::text AS db_type, ${TALLY_EPOCH_SQL} AS e
+          SELECT g.id, g.type::text AS db_type, ${TALLY_EPOCH_SQL} AS e, ${TALLY_LIVE_SQL} AS live
             FROM gov_action_proposal g
             JOIN tx t ON t.id = g.tx_id
            CROSS JOIN cur

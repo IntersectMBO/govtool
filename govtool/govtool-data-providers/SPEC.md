@@ -334,6 +334,10 @@ implementation returns the wrong id and the ledger rejects the transaction.
 ledger decides by for DReps and pools. The denominator must be **the total as it
 stood for that action**, not the current total, so a percentage is reproducible
 after the fact. A declared representation is served completely or not declared.
+A concluded action is tallied from the state the ledger decided it from, the
+start of its ratified or expired epoch; a committee vote on it counts when it
+was valid when cast, even if its member left, expired or rotated keys before
+the tally (decisions.md D172).
 
 **Lifecycle** (`live`, `ratified`, `enacted`, `expired`, `dropped`) is returned
 on the entity. Filtering by status is **optional**, and a provider that does not

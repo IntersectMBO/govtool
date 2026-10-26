@@ -5791,3 +5791,37 @@ privacy concerns."
   failed to reach.
 - Redaction is at the backend's edge only. The metadata service stores and logs full addresses, and the
   backend's own logs keep them, so an operator can still investigate.
+
+## D172 — Tallies read the state the ledger decided from, and a committee vote counts as cast
+
+**Date:** 2026-10-26
+**Amends:** D158 (a historical tally takes committee membership at the tally epoch) and D160 (the
+tally epoch's transaction cutoff).
+**Evidence:** gov.tools (the Haskell backend) and a v3.0.0 rehearsal on the same mainnet db-sync,
+compared page by page. v3 showed the committee failing on an action the ledger ratified, left a
+renewed DRep out of every live tally, and counted fewer committee votes than were cast on six
+historical actions.
+**Said:** "their vote was valid when they casted voted, and that should count."
+
+- The ledger decides at an epoch boundary from the state the new epoch starts with, and db-sync's
+  `ratified_epoch` and `expired_epoch` name that epoch. A concluded action's tally now reads
+  certificates up to the end of the epoch before its tally epoch: hot-key authorisations,
+  resignations, DRep retirements (D160) and the vote delegations of pool reward accounts. One made
+  during the tally epoch played no part. On mainnet a committee member resigned during epoch 597;
+  read at the end of that epoch, the committee of 03f67179, ratified in 597, fell below its minimum
+  size and the action showed as failing. A live action still reads the chain as it stands.
+- A live DRep tally counts a DRep that voted, or sent a registration or update certificate, since
+  the epoch's snapshot as active, whatever the snapshot's `active_until` says: the vote renewed it
+  for the ledger's next snapshot, and the directory already called it active. The stake
+  distribution's DRep total does the same for the tip epoch, so the votes and the total they are
+  shown against agree. A concluded tally keeps the snapshot's answer.
+- A concluded action's committee aggregate counts every vote that was valid when cast: each
+  member's latest vote cast while it sat on the committee in force, within its term, with the hot
+  key it had authorised and before any resignation. A member replaced, expired, resigned or rotated
+  to a new hot key before the tally keeps that vote, as GovTool always showed it. Eligible is those
+  voters plus the members seated at the tally who cast none. A live action keeps the ledger's own
+  count, the seated members by their current hot key, since only that decides what happens next.
+- Checked on mainnet and preview: with these rules no ratified or enacted action shows a failing
+  voter group, and the six historical committee tallies match gov.tools. The only action whose
+  committee pass changes against the ledger's last count is 207b226e, which expired: the interim
+  committee voted 4 yes, 1 no and 2 abstain while in office and was replaced before the final count.

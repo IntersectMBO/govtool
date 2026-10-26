@@ -11,6 +11,7 @@ import {
   type DRep,
   type DRepSort,
   type DRepVoteRow,
+  type RegistrationEvent,
 } from '@govtool/data-providers/chain-data';
 
 import { CacheService } from 'src/cache/cache.service';
@@ -98,6 +99,14 @@ function isPredefinedView(
   identifier: string,
 ): identifier is keyof typeof PREDEFINED_VIEW {
   return identifier in PREDEFINED_VIEW;
+}
+
+/**
+ * The DRep's newest registration or update certificate. `latestUpdate` is
+ * only ever one sent after the latest registration, so it wins when present.
+ */
+function newestCertificate(drep: DRep): RegistrationEvent {
+  return drep.registration.latestUpdate ?? drep.registration.latest;
 }
 
 function isNotFound(error: unknown): boolean {
@@ -333,6 +342,11 @@ export class DRepService {
         const latest = drep.registration.latest;
         const registeredWithAnchor =
           latest.anchor === undefined ? hasAnchor : latest.anchor !== null;
+        // While registered, the transaction named is the certificate that set
+        // the current anchor, or cleared it: the newest registration or
+        // update, as the Haskell backend reported it.
+        const current = registered ? newestCertificate(drep) : latest;
+        const asDRep = registered ? hasAnchor : registeredWithAnchor;
 
         return {
           isScriptBased: drep.isScriptBased ?? false,
@@ -347,13 +361,11 @@ export class DRepService {
             drep.votingPower === null
               ? null
               : dbInteger(drep.votingPower.amount),
-          dRepRegisterTxHash: registeredWithAnchor ? latest.txRef.txHash : null,
+          dRepRegisterTxHash: asDRep ? current.txRef.txHash : null,
           // Retirement is dated on the contract but not attributed to a
           // transaction.
           dRepRetireTxHash: null,
-          soleVoterRegisterTxHash: registeredWithAnchor
-            ? null
-            : latest.txRef.txHash,
+          soleVoterRegisterTxHash: asDRep ? null : current.txRef.txHash,
           soleVoterRetireTxHash: null,
           // The CIP-119 body, resolved through the metadata service; null
           // when it is not configured or the document does not resolve.
@@ -712,8 +724,11 @@ export class DRepService {
       // reconstructed from its registration.
       status: LEGACY_STATUS[drep.status],
       type: LEGACY_KIND[drep.kind],
-      latestTxHash: drep.registration.latest.txRef.txHash,
-      latestRegistrationDate: drep.registration.latest.at.time ?? '',
+      // The newest registration or update certificate, as the Haskell
+      // backend dated it, so the registration-date sort orders a DRep by its
+      // last change.
+      latestTxHash: newestCertificate(drep).txRef.txHash,
+      latestRegistrationDate: newestCertificate(drep).at.time ?? '',
       // Whether an anchor resolved is the metadata service's answer, and this
       // backend has none wired; the same goes for every field below.
       metadataError: null,

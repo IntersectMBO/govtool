@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Live DRep tallies and the DRep stake total count a DRep whose activity had lapsed at the epoch's snapshot but who voted since, which renews it: on mainnet such a DRep's 1.3M ADA was missing from every live action's Yes or No
+- A concluded action is tallied from the state the ledger decided it from, the start of its ratified or expired epoch, so a committee resignation, hot-key authorisation, DRep retirement or vote delegation during that epoch no longer changes it. Treasury withdrawal 03f67179, ratified on mainnet, no longer shows the committee failing
+- The governance action history counts every committee vote that was valid when cast, including those of members who left, expired or rotated hot keys before the tally, as GovTool did before 3.0
+- The DRep directory dates a DRep by its newest registration or update certificate (`latestRegistrationDate`, `latestTxHash`, and the registration transaction on the DRep dashboard card), as GovTool did before 3.0
+- Importing the proposal discussion forum from Strapi merges accounts that share a username into one, keeping each one's comments, likes and poll votes, instead of keeping the first account and skipping the others' content. The backup taken before the import leaves out the copied Strapi tables, which hold emails and password hashes
+
 ## [v3.0.0](https://github.com/IntersectMBO/govtool/compare/v2.1.0-beta.1...v3.0.0) 2026-10-17
 
 Major release. GovTool 3.0 is the 2.1 alpha and beta pre-releases below plus

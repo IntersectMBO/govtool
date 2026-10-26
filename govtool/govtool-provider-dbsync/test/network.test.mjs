@@ -282,6 +282,13 @@ test('getStakeDistribution maps every computed field and never serves live stake
   });
 });
 
+test('the tip epoch counts DReps renewed since its snapshot as active; a past epoch keeps its snapshot', () => {
+  assert.match(STAKE_DISTRIBUTION_SQL, /WHERE target\.epoch_no = tip\.epoch_no AND b\.epoch_no = tip\.epoch_no - 1 OFFSET 0/);
+  assert.match(STAKE_DISTRIBUTION_SQL, /snap\.tx IS NOT NULL AND vp\.drep_voter IS NOT NULL AND vp\.tx_id > snap\.tx/);
+  assert.match(STAKE_DISTRIBUTION_SQL, /snap\.tx IS NOT NULL AND \(r\.deposit IS NULL OR r\.deposit > 0\) AND r\.tx_id > snap\.tx/);
+  assert.match(STAKE_DISTRIBUTION_SQL, /d\.active_until >= d\.epoch_no OR d\.hash_id IN \(SELECT hash_id FROM renewed\)/);
+});
+
 test('getStakeDistribution({ epoch }) binds the epoch; without one it binds null', async () => {
   const { chainData, db } = provider([[STAKE_DISTRIBUTION_SQL, (params) => [{ ...stakeRow, epoch_no: params[0] ?? 1430 }]]]);
   assert.equal((await chainData.network.getStakeDistribution({ epoch: 1400 })).data.epoch, 1400);

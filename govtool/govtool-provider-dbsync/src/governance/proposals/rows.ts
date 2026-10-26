@@ -21,6 +21,9 @@ import { decodeBody } from './body';
  */
 export const TALLY_EPOCH_SQL = 'COALESCE(g.ratified_epoch, g.expired_epoch, g.dropped_epoch, cur.no)';
 
+/** Whether TALLY_EPOCH_SQL fell through to the current epoch: the action is still live. */
+export const TALLY_LIVE_SQL = '(g.ratified_epoch IS NULL AND g.expired_epoch IS NULL AND g.dropped_epoch IS NULL)';
+
 /**
  * Status predicates over `g`, keyed by contract status. The same precedence as
  * `deriveStatus`: enacted > ratified > expired > dropped > live. db-sync sets
@@ -57,7 +60,7 @@ export const PROPOSAL_COLUMNS = `
   g.id::text AS id, encode(t.hash, 'hex') AS tx_hash, g.index, g.type::text AS db_type,
   g.description::text AS description, g.deposit::text AS deposit, sa.view AS return_address,
   g.expiration, g.ratified_epoch, g.enacted_epoch, g.dropped_epoch, g.expired_epoch,
-  ${TALLY_EPOCH_SQL} AS tally_epoch,
+  ${TALLY_EPOCH_SQL} AS tally_epoch, ${TALLY_LIVE_SQL} AS tally_live,
   b.epoch_no AS sub_epoch, b.slot_no AS sub_slot, b.block_no AS sub_block, b.time AS sub_time,
   va.url AS anchor_url, encode(va.data_hash, 'hex') AS anchor_hash,
   encode(pt.hash, 'hex') AS prev_tx_hash, pg.index AS prev_index`;
@@ -80,6 +83,7 @@ export interface ProposalRow extends EpochColumns {
   return_address: string | null;
   expiration: number | null;
   tally_epoch: number;
+  tally_live: boolean;
   sub_epoch: number | null;
   sub_slot: string | number | null;
   sub_block: string | number | null;

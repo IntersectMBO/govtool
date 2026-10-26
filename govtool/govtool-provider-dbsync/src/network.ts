@@ -296,12 +296,31 @@ export function mapProtocolParams(row: ProtocolParamsRow): ProtocolParams | unde
  * follow each pool's reward account (from its latest registration or update
  * before the epoch) to that account's latest vote delegation before the
  * epoch, which is the state the epoch-boundary snapshot was taken from.
+ *
+ * For the tip epoch, a DRep that voted or sent a registration or update
+ * certificate since the snapshot counts as active, as in a live action's
+ * tally (aggregates.ts, RENEWED): the stake behind its votes is in the
+ * denominator they are shown against. A past epoch keeps its snapshot's
+ * answer. `snap` is the last transaction before the tip epoch, NULL for any
+ * other, which leaves `renewed` empty.
  */
 export const STAKE_DISTRIBUTION_SQL = `WITH ${TIP_EPOCH_CTE},
 target AS (SELECT COALESCE($1::int, (SELECT epoch_no FROM tip)) AS epoch_no),
+snap AS (
+  SELECT (SELECT t.id FROM tx t WHERE t.block_id <= lb.max_block ORDER BY t.block_id DESC, t.id DESC LIMIT 1) AS tx
+    FROM (SELECT max(x.id) AS max_block
+            FROM (SELECT b.id FROM block b, target, tip
+                   WHERE target.epoch_no = tip.epoch_no AND b.epoch_no = tip.epoch_no - 1 OFFSET 0) x) lb),
+renewed AS (
+  SELECT vp.drep_voter AS hash_id FROM voting_procedure vp, snap
+   WHERE snap.tx IS NOT NULL AND vp.drep_voter IS NOT NULL AND vp.tx_id > snap.tx
+  UNION
+  SELECT r.drep_hash_id FROM drep_registration r, snap
+   WHERE snap.tx IS NOT NULL AND (r.deposit IS NULL OR r.deposit > 0) AND r.tx_id > snap.tx),
 dd AS (
   SELECT count(*) AS n,
-         sum(d.amount) FILTER (WHERE h.raw IS NOT NULL AND d.active_until >= d.epoch_no) AS active_dreps,
+         sum(d.amount) FILTER (WHERE h.raw IS NOT NULL
+                                 AND (d.active_until >= d.epoch_no OR d.hash_id IN (SELECT hash_id FROM renewed))) AS active_dreps,
          sum(d.amount) FILTER (WHERE h.raw IS NULL AND h.view = 'drep_always_abstain') AS always_abstain,
          sum(d.amount) FILTER (WHERE h.raw IS NULL AND h.view = 'drep_always_no_confidence') AS always_no_confidence
     FROM drep_distr d JOIN drep_hash h ON h.id = d.hash_id

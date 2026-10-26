@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v3.0.0](https://github.com/IntersectMBO/govtool/compare/v2.1.0-beta.1...v3.0.0) 2026-10-17
+## [v3.0.0](https://github.com/IntersectMBO/govtool/compare/v2.1.0-beta.1...v3.0.0) 2026-10-26
 
 Major release. GovTool 3.0 is the 2.1 alpha and beta pre-releases below plus
 the fixes since the beta; the release notes cover upgrading an existing
@@ -29,15 +29,15 @@ installation.
 - A DRep searched by id, such as right after registering, comes back with its name and payment address, and directory rows carry CIP-119 `doNotList`; the DRep directory asks for `listed=true`, which leaves such DReps out before the total and paging (2N, 3Q)
 - Treasury withdrawal and parameter change proposals attach the guardrail script only when the enacted constitution names one, so they can be submitted on a network whose constitution has none, such as the local devnet (7H_2)
 - Raw HTML in proposal discussion forum content, such as proposals and comments, is sanitized: scripts, iframes, style tags and inline styles are dropped, while highlights, inserts, superscripts, subscripts, strikethrough, math and code blocks still render ([#4292](https://github.com/IntersectMBO/govtool/pull/4292))
-- "Governance Actions" in the navigation is highlighted while one of its pages (Proposals, Live Voting or Historical) is open, in the top bar, the dashboard sidebar and both mobile menus
-- A governance action you have voted on shows its metadata error and "View Error Report" like any other action, instead of hiding them once your vote is recorded or while it is in progress
+- "Governance Actions" in the navigation is highlighted while one of its pages (Proposals, Live Voting or Historical) is open, in the top bar, the dashboard sidebar and both mobile menus ([#4298](https://github.com/IntersectMBO/govtool/pull/4298))
+- A governance action you have voted on shows its metadata error and "View Error Report" like any other action, instead of hiding them once your vote is recorded or while it is in progress ([#4298](https://github.com/IntersectMBO/govtool/pull/4298))
 
 ### Changed
 
 - The frontend, backend, metadata service, proposal discussion backend and docs packages, the ones built into Docker images, are versioned 3.0.0
 - The governance action history is labelled "Historical" in the navigation and "Historical Actions" on its page and in its breadcrumb
 - A metadata error on a governance action or DRep page shows its message, a "Why am I seeing this error?" link to the error docs and a "View Error Report" button that opens the fetch report, with Retry, in a dialog. The explanation paragraph moved to the DRep error conditions docs, which now also cover Data URL Blocked, Data Too Large, Data Not Checked and governance actions
-- The backend sends IP addresses with their middle hidden, such as `203.xx.xx.45`, in metadata fetch reports and failure messages and in error responses
+- The backend sends IP addresses with their middle hidden, such as `203.xx.xx.45`, in metadata fetch reports and failure messages and in error responses ([#4298](https://github.com/IntersectMBO/govtool/pull/4298))
 
 ### Removed
 

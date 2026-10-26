@@ -71,9 +71,7 @@ type GovernanceActionDetailsCardDataProps = {
   isDataMissing?: MetadataValidationStatus;
   /** Errors are listed with the failure; warnings alone get their own box. */
   metadataIssues?: MetadataIssue[];
-  isInProgress?: boolean;
   isOneColumn: boolean;
-  isSubmitted?: boolean;
   isValidating?: boolean;
   /** The action's document is being read for its authors. */
   isDocumentLoading?: boolean;
@@ -86,9 +84,7 @@ export const GovernanceActionDetailsCardData = ({
   isDashboard,
   isDataMissing,
   metadataIssues,
-  isInProgress,
   isOneColumn,
-  isSubmitted,
   isValidating,
   isDocumentLoading,
   onMetadataRecovered,
@@ -274,11 +270,11 @@ export const GovernanceActionDetailsCardData = ({
         title={title}
         shareLink={govActionLinkToShare}
       />
+      {/* The action's metadata fails the same whether or not this wallet has
+          voted on it, so neither the box nor the diagnostics hide on a vote. */}
       <DataMissingInfoBox
         isDataMissing={isDataMissing}
         isValidating={isValidating}
-        isInProgress={isInProgress}
-        isSubmitted={isSubmitted}
         issues={metadataIssues}
         reportAction={
           !!url &&

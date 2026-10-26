@@ -1,16 +1,17 @@
 import { Box, Grid } from "@mui/material";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 
 import { DrawerLink, Spacer } from "@atoms";
 import { CONNECTED_NAV_ITEMS, IMAGES, PATHS, DRAWER_WIDTH } from "@consts";
 import { useFeatureFlag } from "@context";
 import { useGetVoterInfo } from "@hooks";
 import { WalletInfoCard, DRepInfoCard } from "@molecules";
-import { openInNewTab } from "@utils";
+import { findActiveNavTo, openInNewTab } from "@utils";
 
 export const Drawer = () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { voter } = useGetVoterInfo();
+  const { pathname } = useLocation();
 
   return (
     <Box
@@ -52,6 +53,13 @@ export const Drawer = () => {
           <Grid item key={navItem.label}>
             <DrawerLink
               {...navItem}
+              isActive={
+                navItem.childNavItems &&
+                findActiveNavTo(
+                  pathname,
+                  navItem.childNavItems.map((item) => item.navTo),
+                ) !== null
+              }
               onClick={
                 navItem.newTabLink
                   ? () => openInNewTab(navItem.newTabLink)

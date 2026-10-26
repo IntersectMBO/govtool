@@ -178,6 +178,24 @@ describe('metadata routes', () => {
       expect(res.body).toEqual(FAILURE);
     });
 
+    it('redacts the middle of an address in a failure message', async () => {
+      await start({
+        getMetadata: () =>
+          Promise.resolve({
+            ...FAILURE,
+            message: 'Refused: x.example resolves only to 10.0.0.5 (private)',
+          }),
+      });
+      const res = await request(app.getHttpServer())
+        .get('/metadata/resolve')
+        .query({ hash: HASH, url: URL_ })
+        .expect(200);
+      expect(res.body).toEqual({
+        ...FAILURE,
+        message: 'Refused: x.example resolves only to 10.xx.xx.5 (private)',
+      });
+    });
+
     it.each([
       ['a short hash', { hash: 'ab', url: URL_ }],
       ['a non-hex hash', { hash: 'zz'.repeat(32), url: URL_ }],
@@ -275,6 +293,61 @@ describe('metadata routes', () => {
         .expect(200);
       expect(res.body).toEqual(REPORT);
       expect(calls).toEqual([{ method: 'getReport', args: ['rep-1'] }]);
+    });
+
+    it('redacts the middle of every address, keeping the urls and body', async () => {
+      const ipUrl = 'http://203.0.113.45/drep.jsonld';
+      const report: MetadataReport = {
+        ...REPORT,
+        url: ipUrl,
+        effectiveUrl: ipUrl,
+        hops: [
+          {
+            url: ipUrl,
+            dns: { addresses: [{ address: '203.0.113.45', family: 4 }] },
+            attempts: [
+              {
+                address: '203.0.113.45',
+                family: 4,
+                outcome: 'refused',
+                errorCode: 'ECONNREFUSED',
+                message: 'connect ECONNREFUSED 203.0.113.45:80',
+                timings: { endMs: 3 },
+              },
+            ],
+          },
+        ],
+        body: {
+          hash: HASH,
+          size: 12,
+          truncated: false,
+          encoding: 'utf8',
+          data: '"10.0.0.5"',
+        },
+        result: {
+          ...REPORT.result,
+          message:
+            'connect ECONNREFUSED 203.0.113.45:80 [ECONNREFUSED 203.0.113.45]',
+        },
+      };
+      await start({ getReport: () => Promise.resolve(report) });
+      const res = await request(app.getHttpServer())
+        .get('/metadata/reports/rep-1')
+        .expect(200);
+      const body = res.body as MetadataReport;
+      expect(body.url).toBe(ipUrl);
+      expect(body.hops[0].url).toBe(ipUrl);
+      expect(body.body?.data).toBe('"10.0.0.5"');
+      expect(body.hops[0].dns).toEqual({
+        addresses: [{ address: '203.xx.xx.45', family: 4 }],
+      });
+      expect(body.hops[0].attempts[0]).toMatchObject({
+        address: '203.xx.xx.45',
+        message: 'connect ECONNREFUSED 203.xx.xx.45:80',
+      });
+      expect(body.result.message).toBe(
+        'connect ECONNREFUSED 203.xx.xx.45:80 [ECONNREFUSED 203.xx.xx.45]',
+      );
     });
 
     it('answers 404 when there is no such report', async () => {

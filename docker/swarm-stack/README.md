@@ -152,6 +152,25 @@ docker exec "$(docker ps -q -f name="${STACK_NAME}_postgres")" \
 The metadata database is a cache of fetched documents and reports; losing
 it only means fetching them again.
 
+To move a forum over from Strapi, take a `pg_dump -Fc` of the Strapi
+database and import it with `import-forum.sh` (which runs
+`import-strapi.sql`) from this folder, on the node running the stack's
+Postgres, before anyone posts here: the import needs an empty forum and
+keeps Strapi's ids. Each step prints what it did; the script's header says
+what is imported and what is left out.
+
+```bash
+STACK_NAME=... ./import-forum.sh prepare strapi.dump
+STACK_NAME=... ./import-forum.sh dry-run
+STACK_NAME=... ./import-forum.sh import
+STACK_NAME=... ./import-forum.sh cleanup
+```
+
+The Strapi dump and the `strapi` schema `prepare` creates hold emails,
+password hashes and tokens: run `cleanup` and delete the dump once the
+import is checked. The `pdf-before-import-*.dump` that `import` writes
+leaves the `strapi` schema out.
+
 ## Updating
 
 Set `GOVTOOL_TAG` in `.env`, export everything as for the first deploy, and

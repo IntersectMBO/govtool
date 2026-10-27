@@ -1,10 +1,12 @@
 import { Page } from "@playwright/test";
 
+export function isMobileWidth(width: number) {
+  return width <= 414;
+}
+
 export function isMobile(page: Page) {
   const { width } = page.viewportSize();
-  if (width <= 414) return true;
-
-  return false;
+  return isMobileWidth(width);
 }
 
 export async function openDrawer(page: Page) {

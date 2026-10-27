@@ -15,7 +15,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-FROM fholzer/nginx-brotli:v1.28
+FROM fholzer/nginx-brotli:v1.30
 
 RUN apk add --no-cache gettext jq
 

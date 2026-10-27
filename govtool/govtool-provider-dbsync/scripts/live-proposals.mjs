@@ -218,6 +218,97 @@ for (const a of bySort.newest) {
 }
 check(aggBad === 0, `every aggregate balances, roles fit the type (${bySort.newest.length} actions)`, aggBad);
 
+// The ledger ratified these, so every voter group they needed passed: a tally
+// read from the wrong state fails here (03f67179 on mainnet, D172).
+const passes = (v) => {
+  if (v.passing !== undefined) return v.passing;
+  const [num, den] = [BigInt(v.threshold.numerator), BigInt(v.threshold.denominator)];
+  const counted = BigInt(v.totalEligible) - BigInt(v.abstain);
+  return num === 0n || (counted > 0n && BigInt(v.yes) * den >= num * counted);
+};
+const ratified = bySort.newest.filter((a) => a.lifecycle.ratifiedAt);
+const failingGroups = ratified.flatMap((a) => a.voteAggregates.filter((v) => !passes(v)).map((v) => `${a.txHash.slice(0, 8)} ${v.role}`));
+check(failingGroups.length === 0, `every ratified action passes in each voter group it needed (${ratified.length})`, failingGroups.slice(0, 10));
+
+// Independent recount of every concluded committee tally (D173, D174): the
+// committee in force at the tally epoch, its members unexpired then, each by
+// the hot key it held when that epoch began (authorised before it, not
+// resigned since), with that key's latest vote cast before it. A member who
+// left before the decision has no key here and does not count, and a vote cast
+// during the tally epoch came after the decision.
+const ccRecount = await q(`
+  WITH f AS (
+    SELECT g.id, encode(t.hash, 'hex') h, g.index i, COALESCE(g.ratified_epoch, g.expired_epoch, g.dropped_epoch) e
+      FROM gov_action_proposal g JOIN tx t ON t.id = g.tx_id
+     WHERE COALESCE(g.ratified_epoch, g.expired_epoch, g.dropped_epoch) IS NOT NULL),
+  head AS MATERIALIZED (
+    SELECT f.id, f.e,
+           (SELECT x.id FROM gov_action_proposal x
+             WHERE x.type IN ('NewCommittee', 'NoConfidence') AND x.enacted_epoch <= f.e
+             ORDER BY x.enacted_epoch DESC, x.id DESC LIMIT 1) head_id
+      FROM f),
+  members AS (
+    SELECT head.id, head.e, cm.committee_hash_id cold
+      FROM head
+      JOIN committee c ON (head.head_id IS NULL AND c.gov_action_proposal_id IS NULL) OR c.gov_action_proposal_id = head.head_id
+      JOIN committee_member cm ON cm.committee_id = c.id AND cm.expiration_epoch >= head.e),
+  certs AS MATERIALIZED (
+    SELECT r.cold_key_id cold, r.hot_key_id hot, r.tx_id, b.epoch_no ep
+      FROM committee_registration r JOIN tx ON tx.id = r.tx_id JOIN block b ON b.id = tx.block_id
+    UNION ALL
+    SELECT d.cold_key_id, NULL, d.tx_id, b.epoch_no
+      FROM committee_de_registration d JOIN tx ON tx.id = d.tx_id JOIN block b ON b.id = tx.block_id),
+  seated AS (
+    SELECT m.id,
+           (SELECT c.hot FROM certs c WHERE c.cold = m.cold AND c.ep < m.e
+             ORDER BY c.tx_id DESC, (c.hot IS NULL) LIMIT 1) hot
+      FROM members m),
+  first_block AS (
+    SELECT x.e, (SELECT min(y.id) FROM (SELECT b.id FROM block b WHERE b.epoch_no = x.e OFFSET 0) y) id
+      FROM (SELECT DISTINCT e FROM f) x),
+  vote AS (
+    SELECT DISTINCT ON (vp.gov_action_proposal_id, vp.committee_voter)
+           vp.gov_action_proposal_id pid, vp.committee_voter hot, vp.vote::text v
+      FROM voting_procedure vp
+      JOIN f ON f.id = vp.gov_action_proposal_id
+      JOIN first_block fb ON fb.e = f.e
+     WHERE vp.committee_voter IS NOT NULL AND vp.invalid IS NULL
+       AND (SELECT t.block_id FROM tx t WHERE t.id = vp.tx_id) < fb.id
+     ORDER BY vp.gov_action_proposal_id, vp.committee_voter, vp.tx_id DESC, vp.id DESC),
+  unseated AS (
+    SELECT o.pid, count(*)::int n FROM vote o
+     WHERE NOT EXISTS (SELECT 1 FROM seated s WHERE s.id = o.pid AND s.hot = o.hot)
+     GROUP BY o.pid)
+  SELECT f.h, f.i,
+         count(s.hot)::int eligible,
+         count(*) FILTER (WHERE vote.v = 'Yes')::int yes,
+         count(*) FILTER (WHERE vote.v = 'No')::int no,
+         count(*) FILTER (WHERE vote.v = 'Abstain')::int abstain,
+         COALESCE(u.n, 0) unseated
+    FROM f
+    LEFT JOIN seated s ON s.id = f.id AND s.hot IS NOT NULL
+    LEFT JOIN vote ON vote.pid = f.id AND vote.hot = s.hot
+    LEFT JOIN unseated u ON u.pid = f.id
+   GROUP BY f.id, f.h, f.i, u.n`);
+const recount = new Map(ccRecount.map((r) => [`${r.h}#${r.i}`, r]));
+const ccBad = [];
+let ccCompared = 0;
+for (const a of bySort.newest.filter((x) => x.lifecycle.status !== 'live')) {
+  const cc = a.voteAggregates.find((v) => v.role === 'cc');
+  const r = recount.get(`${a.txHash}#${a.index}`);
+  if (!cc) {
+    if (r?.eligible > 0 && !['NoConfidence', 'UpdateCommittee'].includes(a.type)) ccBad.push({ id: a.txHash.slice(0, 8), ours: 'no committee', recount: r.eligible });
+    continue;
+  }
+  ccCompared++;
+  const ours = [cc.totalEligible, cc.yes, cc.no, cc.abstain].join('/');
+  const theirs = r ? [r.eligible, r.yes, r.no, r.abstain].join('/') : '0/0/0/0';
+  if (ours !== theirs) ccBad.push({ id: a.txHash.slice(0, 8), status: a.lifecycle.status, ours, recount: theirs });
+}
+const unseated = ccRecount.filter((r) => r.unseated > 0);
+console.log(`  info ${unseated.length} concluded actions have committee votes from members not seated at the decision: ${unseated.map((r) => `${r.h.slice(0, 8)} (${r.unseated})`).join(', ') || 'none'}`);
+check(ccBad.length === 0, `concluded committee tallies equal an independent recount of the members seated at the decision (${ccCompared}, eligible/yes/no/abstain)`, ccBad.slice(0, 10));
+
 /* -- getEnacted ----------------------------------------------------------- */
 console.log('\ngetEnacted');
 const lineageTypes = { pparamUpdate: ['ParameterChange'], hardFork: ['HardForkInitiation'], committee: ['NewCommittee', 'NoConfidence'], constitution: ['NewConstitution'] };

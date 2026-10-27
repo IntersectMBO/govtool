@@ -30,6 +30,8 @@ import {
   BOUND,
   loadAggregates,
   RENEWED,
+  RETIRED,
+  tallyVotesSql,
   validDRepVoteSql,
   type TallyTarget,
 } from './proposals/aggregates';
@@ -101,12 +103,8 @@ function rankingCtes(sort: 'mostYesVotes' | 'highestParticipation'): string {
   cuts AS (SELECT DISTINCT e, live FROM f),
   ${BOUND},
   ${RENEWED},
-  dv AS (
-    SELECT DISTINCT ON (vp.gov_action_proposal_id, vp.drep_voter)
-           vp.gov_action_proposal_id AS pid, vp.drep_voter AS voter, vp.vote::text AS vote, vp.tx_id
-      FROM voting_procedure vp
-     WHERE vp.invalid IS NULL AND vp.drep_voter IS NOT NULL AND vp.gov_action_proposal_id IN (SELECT id FROM f)
-     ORDER BY vp.gov_action_proposal_id, vp.drep_voter, vp.tx_id DESC, vp.id DESC),
+  ${RETIRED},
+  dv AS (${tallyVotesSql('drep_voter', 'f', 'vp.gov_action_proposal_id IN (SELECT id FROM f)')}),
   dc AS (
     SELECT f.id, sum(dd.amount) FILTER (WHERE dv.vote = 'Yes') AS yes, sum(dd.amount) AS voted
       FROM f

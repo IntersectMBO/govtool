@@ -10,7 +10,6 @@ import {
   CC_SQL,
   DREP_SQL,
   PARAMS_SQL,
-  RENEWED,
   SPO_SQL,
   activeDRepSql,
   assembleAggregates,
@@ -50,34 +49,6 @@ test('a concluded tally reads certificates up to the end of the epoch before its
   }
   assert.match(SPO_SQL, /JOIN rdv ON rdv\.addr_id = r\.reward_addr_id AND rdv\.tx_id <= bound\.max_tx/);
   assert.match(SPO_SQL, /LEFT JOIN deleg d ON d\.e = r\.e AND d\.live = p\.live/);
-});
-
-test('a live DRep tally counts DReps renewed since the snapshot as active, in the votes and the total alike', () => {
-  assert.match(RENEWED, /vp\.drep_voter IS NOT NULL AND vp\.tx_id > bound\.snap_tx/);
-  assert.match(RENEWED, /\(r\.deposit IS NULL OR r\.deposit > 0\) AND r\.tx_id > bound\.snap_tx/);
-  assert.match(RENEWED, /WHERE bound\.live/);
-  assert.equal(
-    activeDRepSql('dd', 'p'),
-    `(dd.active_until >= dd.epoch_no
-         OR (p.live AND (dd.hash_id, dd.epoch_no) IN (SELECT rn.hash_id, rn.e FROM renewed rn)))`,
-  );
-  assert.ok(DREP_SQL.includes(`WHERE ${activeDRepSql('dd', 'p')}`), 'cast votes');
-  assert.ok(DREP_SQL.includes(`FILTER (WHERE ${activeDRepSql('dd', 'cuts')}) AS active`), 'the active total');
-  assert.match(DREP_SQL, /LEFT JOIN tot ON tot\.e = p\.e AND tot\.live = p\.live/);
-});
-
-test('a concluded committee tally counts each vote valid when cast; a live one, the seated members by hot key', () => {
-  // live: seated at the cutoff, by the member's hot key then
-  assert.match(CC_SQL, /JOIN seated s ON s\.e = p\.e AND s\.live = p\.live\s+LEFT JOIN v ON v\.pid = p\.id AND v\.voter = s\.hot_id\s+WHERE p\.live/);
-  // concluded: a vote counts for the members in office at its epoch whose hot key it was
-  assert.match(CC_SQL, /JOIN comm ON comm\.e = vt\.e/);
-  assert.match(CC_SQL, /cm\.expiration_epoch >= vt\.e/);
-  assert.match(CC_SQL, /cr\.cold_key_id = cm\.committee_hash_id AND cr\.tx_id <= vt\.tx_id/);
-  assert.match(CC_SQL, /reg ON reg\.hot_key_id = vt\.hot_id/);
-  assert.match(CC_SQL, /d\.tx_id > reg\.tx_id AND d\.tx_id <= vt\.tx_id/);
-  // eligible: those voters plus the seated members that cast none
-  assert.match(CC_SQL, /SELECT s\.cold_id FROM seated s WHERE s\.e = p\.e AND s\.live = p\.live\s+UNION\s+SELECT c\.cold_id FROM cast_by c WHERE c\.pid = p\.id/);
-  assert.match(CC_SQL, /WHERE NOT p\.live\)/);
 });
 
 test('loadAggregates sends each target\'s tally epoch and liveness to every tally', async () => {

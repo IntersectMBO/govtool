@@ -35,18 +35,24 @@ export async function pollTransaction(txHash: string) {
   );
 }
 
+/**
+ * Runs `triggerCallback` and waits until the transaction is on chain and the
+ * app no longer shows it in progress. The hash comes from the first status
+ * check the app makes after the callback starts, so the callback must submit
+ * the transaction: the app checks as soon as it submits, and on the devnet a
+ * block can include the transaction before that check, which is then the
+ * last one.
+ */
 export async function waitForTxConfirmation(
   page: Page,
-  triggerCallback?: () => Promise<void>
+  triggerCallback: () => Promise<unknown>
 ) {
   let transactionHash: string | undefined;
   try {
-    // Listen before triggering, so a status poll that starts while the
-    // trigger is still running is not missed.
     const transactionStatusPromise = page.waitForRequest((request) => {
       return request.url().includes("/transaction/status/");
     });
-    await triggerCallback?.call(this);
+    await triggerCallback();
 
     await expect(
       page

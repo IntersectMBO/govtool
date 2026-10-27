@@ -92,8 +92,7 @@ test.describe("Budget proposals archive list", () => {
     await budgetDiscussionPage.filterBtn.click();
 
     await budgetDiscussionPage.applyAndValidateFilters(
-      Object.values(BudgetDiscussionEnum),
-      budgetDiscussionPage._validateTypeFiltersInProposalCard
+      Object.values(BudgetDiscussionEnum)
     );
   });
 

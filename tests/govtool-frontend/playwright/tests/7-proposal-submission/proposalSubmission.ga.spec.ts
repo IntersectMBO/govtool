@@ -61,16 +61,16 @@ getProposalType().forEach((proposalType, index) => {
     await userPage.getByTestId("agree-checkbox").click();
     proposalSubmissionPage.continueBtn.click();
 
-    await proposalSubmissionPage.fillUpValidMetadata();
+    await waitForTxConfirmation(userPage, async () => {
+      await proposalSubmissionPage.fillUpValidMetadata();
 
-    await expect(userPage.getByTestId("ga-submitted-modal-title")).toHaveText(
-      /governance action submitted!/i,
-      {
-        timeout: 60_000,
-      }
-    );
-
-    await waitForTxConfirmation(userPage);
+      await expect(userPage.getByTestId("ga-submitted-modal-title")).toHaveText(
+        /governance action submitted!/i,
+        {
+          timeout: 60_000,
+        }
+      );
+    });
   });
 });
 

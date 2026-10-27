@@ -86,17 +86,11 @@ export default class BudgetDiscussionPage {
     }
   }
 
-  async applyAndValidateFilters(
-    filters: string[],
-    validateFunction: (
-      proposalCard: Locator,
-      filters: string[]
-    ) => Promise<boolean>
-  ) {
+  async applyAndValidateFilters(filters: string[]) {
     // single filter
     for (const filter of filters) {
       await this.clickCategoryCheckboxes([filter]);
-      await this.validateFilters([filter], validateFunction);
+      await this.validateFilters([filter]);
       await this.clickCategoryCheckboxes([filter]);
     }
 
@@ -104,49 +98,31 @@ export default class BudgetDiscussionPage {
     const multipleFilters = [...filters];
     while (multipleFilters.length > 1) {
       await this.clickCategoryCheckboxes(multipleFilters);
-      await this.validateFilters(multipleFilters, validateFunction);
+      await this.validateFilters(multipleFilters);
       await this.clickCategoryCheckboxes(multipleFilters);
       multipleFilters.pop();
     }
   }
 
-  async validateFilters(
-    filters: string[],
-    validateFunction: (
-      proposalCard: Locator,
-      filters: string[]
-    ) => Promise<boolean>
-  ) {
+  async validateFilters(filters: string[]) {
     await functionWaitedAssert(async () => {
-      const proposalCards = await this.getAllProposals();
+      await this.getAllProposals();
+      // One read for every card: a read per card is a round trip each, and
+      // the filters show up to every card in the archive.
+      const types = await this.page
+        .locator(PROPOSAL_CARD_SELECTOR)
+        .getByTestId("budget-discussion-type")
+        .allTextContents();
 
-      for (const proposalCard of proposalCards) {
-        const type = await proposalCard
-          .getByTestId("budget-discussion-type")
-          .textContent();
-        const hasFilter = await validateFunction(proposalCard, filters);
-
+      for (const type of types) {
+        const category =
+          type === "None of these" ? BudgetDiscussionEnum.NoCategory : type;
         expect(
-          hasFilter,
-          !hasFilter &&
-            `A budget proposal type ${type} does not contain on ${filters}`
+          filters.includes(category),
+          `A budget proposal type ${type} does not contain on ${filters}`
         ).toBe(true);
       }
     });
-  }
-
-  async _validateTypeFiltersInProposalCard(
-    proposalCard: Locator,
-    filters: string[]
-  ): Promise<boolean> {
-    const type = await proposalCard
-      .getByTestId("budget-discussion-type")
-      .textContent();
-
-    if (type === "None of these") {
-      return filters.includes(BudgetDiscussionEnum.NoCategory);
-    }
-    return filters.includes(type);
   }
 
   async sortBy(type: BudgetProposalFilterTypes) {

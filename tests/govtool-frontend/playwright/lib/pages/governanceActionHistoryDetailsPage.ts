@@ -144,26 +144,23 @@ export default class GovernanceActionHistoryDetailsPage {
     url: string;
     hash: string;
   }) {
-    let governanceActionPromise = this.page.route(
-      "**/governance-actions/*",
-      async (route) => {
-        if (route.request().url().includes("/governance-actions/metadata")) {
-          await route.continue();
-        } else {
-          await route.fulfill({ body: JSON.stringify(actionRecordResponse) });
-        }
+    await this.page.route("**/governance-actions/*", async (route) => {
+      if (route.request().url().includes("/governance-actions/metadata")) {
+        await route.continue();
+      } else {
+        await route.fulfill({ body: JSON.stringify(actionRecordResponse) });
       }
+    });
+    // Straight to the details page, the only page checked here; the list and
+    // its links are 9A-9F's.
+    await this.goto(
+      `${actionRecordResponse.tx_hash}#${actionRecordResponse.index}`
     );
-    const actionRecordPage = new GovernanceActionHistoryPage(this.page);
-    await actionRecordPage.goto();
-    await actionRecordPage.viewFirstGovernanceActionHistory();
-    await governanceActionPromise;
-    const actionRecordTitle = await actionRecordPage.title.textContent();
 
+    const actionRecordPage = new GovernanceActionHistoryPage(this.page);
     await expect(
       actionRecordPage.title,
-      actionRecordTitle.toLowerCase() !== type.toLowerCase() &&
-        `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
+      `The URL "${url}" and hash "${hash}" do not match the expected properties for type "${type}".`
     ).toHaveText(type, {
       ignoreCase: true,
       timeout: 60_000,

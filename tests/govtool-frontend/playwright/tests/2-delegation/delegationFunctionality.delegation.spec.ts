@@ -141,12 +141,13 @@ test.describe("Register DRep state", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
-    await dRepPage.getByTestId("continue-button").click();
-    await expect(
-      dRepPage.getByTestId("registration-transaction-submitted-modal")
-    ).toBeVisible({ timeout: 60_000 });
-    await dRepPage.getByTestId("confirm-modal-button").click();
-    await waitForTxConfirmation(dRepPage);
+    await waitForTxConfirmation(dRepPage, async () => {
+      await dRepPage.getByTestId("continue-button").click();
+      await expect(
+        dRepPage.getByTestId("registration-transaction-submitted-modal")
+      ).toBeVisible({ timeout: 60_000 });
+      await dRepPage.getByTestId("confirm-modal-button").click();
+    });
 
     // Checks in dashboard
     await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible({
@@ -164,12 +165,13 @@ test.describe("Register DRep state", () => {
     test.setTimeout(testInfo.timeout + environments.txTimeOut);
 
     await dRepPage.getByTestId("register-as-sole-voter-button").click();
-    await dRepPage.getByTestId("continue-button").click();
-    await expect(
-      dRepPage.getByTestId("registration-transaction-submitted-modal")
-    ).toBeVisible({ timeout: 60_000 });
-    await dRepPage.getByTestId("confirm-modal-button").click();
-    await waitForTxConfirmation(dRepPage);
+    await waitForTxConfirmation(dRepPage, async () => {
+      await dRepPage.getByTestId("continue-button").click();
+      await expect(
+        dRepPage.getByTestId("registration-transaction-submitted-modal")
+      ).toBeVisible({ timeout: 60_000 });
+      await dRepPage.getByTestId("confirm-modal-button").click();
+    });
     await expect(dRepPage.getByText("You are a Direct Voter")).toBeVisible({
       timeout: 60_000,
     });
@@ -251,10 +253,11 @@ test.describe("No confidence delegation", () => {
     await dRepDirectoryPage.goto();
 
     await dRepDirectoryPage.automaticDelegationOptionsDropdown.click();
-    await page
-      .getByTestId("signal-no-confidence-on-every-vote-delegate-button")
-      .click();
-    await waitForTxConfirmation(page);
+    await waitForTxConfirmation(page, () =>
+      page
+        .getByTestId("signal-no-confidence-on-every-vote-delegate-button")
+        .click()
+    );
 
     const balance = await adaBalance(wallet!);
     await expect(

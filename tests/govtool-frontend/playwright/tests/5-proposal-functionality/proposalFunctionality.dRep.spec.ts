@@ -328,12 +328,13 @@ test.describe("Check voting power", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
-    await dRepPage.getByTestId("continue-retirement-button").click();
-    await expect(
-      dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible({ timeout: 60_000 });
-    dRepPage.getByTestId("confirm-modal-button").click();
-    await waitForTxConfirmation(dRepPage);
+    await waitForTxConfirmation(dRepPage, async () => {
+      await dRepPage.getByTestId("continue-retirement-button").click();
+      await expect(
+        dRepPage.getByTestId("retirement-transaction-submitted-modal")
+      ).toBeVisible({ timeout: 60_000 });
+      await dRepPage.getByTestId("confirm-modal-button").click();
+    });
 
     const balance = await adaBalance(wallet);
     expect(balance, "Retirement deposit not returned").toBeGreaterThan(500);

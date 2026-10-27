@@ -1,11 +1,12 @@
 import { allure } from "allure-playwright";
-import { isMobile } from "./mobile";
-import { chromium } from "@playwright/test";
+import { isMobileWidth } from "./mobile";
+import { test } from "@playwright/test";
 
+// Reads the project's viewport: launching a browser to ask a page left one
+// running for every test, each traced and screenshotted by every later test.
 export const setAllureEpic = async (groupName: string) => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  if (isMobile(page)) {
+  const { viewport } = test.info().project.use;
+  if (viewport && isMobileWidth(viewport.width)) {
     await allure.epic("6. Miscellaneous");
     await allure.story("6A. Should be accessible from mobile");
   } else {

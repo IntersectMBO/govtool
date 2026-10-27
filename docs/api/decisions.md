@@ -5825,3 +5825,82 @@ historical actions.
   voter group, and the six historical committee tallies match gov.tools. The only action whose
   committee pass changes against the ledger's last count is 207b226e, which expired: the interim
   committee voted 4 yes, 1 no and 2 abstain while in office and was replaced before the final count.
+
+## D173 — A concluded committee tally is the ledger's count at the decision
+
+**Date:** 2026-10-27
+**Amends:** D172 (a concluded action's committee aggregate counts every vote valid when cast).
+**Evidence:** D172 read more into the request than it said. The request was that a vote that
+counted when an action was decided stays in that tally after the voter retires; D172 also counted
+committee members who had left before the decision, which the ledger did not.
+**Said:** "their last month valid vote should count for last month's proposal, even if they have
+retired now. Because they retired now we shouldn't remove them from past tally"
+
+- A concluded action's committee aggregate is the ledger's own count, as a live action's is: the
+  members of the committee in force at the tally epoch, unexpired then, each by the hot key it held
+  when that epoch began (D172's cutoff) with no resignation by then, and that key's vote. A member
+  who resigns, rotates its hot key or is replaced after the decision keeps its vote in that tally:
+  349e55 resigned during 597 and keeps its vote on 03f67179, 3285b7fd and a36eafae, which the
+  ledger decided from the start of 597. A member who left before the decision does not count.
+- On mainnet three expired actions change against D172, which matched gov.tools (eligible/yes/no/
+  abstain): 207b226e (NewConstitution, expired 581; the interim committee voted in 578-580 and was
+  replaced at 581) 8/4/1/2 to 3/1/0/1, so its committee no longer shows as approving; 7d37220b
+  8/5/1/1 to 7/5/1/0 and f57f8fcb 8/1/5/0 to 7/1/4/0 (TreasuryWithdrawals, expired 656; member
+  9cc3f3's term ended at 653). Preview has no such action.
+- The rule is tested against db-sync, not by matching the query's text:
+  scripts/live-proposals.mjs recounts every concluded committee tally independently and checks
+  that every ratified action passes in each voter group it needed. With this change both hold on
+  mainnet (154 tallies, 81 ratified) and preview (1339, 14); D172's build fails the recount on the
+  three actions above.
+- Unchanged here: a concluded tally still takes each voter's latest vote, including one cast during
+  the tally epoch, after the state the ledger decided from. On mainnet that is 31 committee, 241
+  DRep and 14 pool votes on ratified actions. D174 changes that.
+
+## D174 — A concluded tally counts the votes cast before the decision
+
+**Date:** 2026-10-27
+**Amends:** D172 (a concluded tally reads certificates up to the end of the epoch before its tally
+epoch, but every vote).
+**Evidence:** of the 78 mainnet actions ratified with the committee's approval, all pass on the
+committee votes cast before their ratified epoch, and only 21 on those cast before the epoch
+before it: the ledger decides from the state its tally epoch starts with, votes included. A vote
+cast during the tally epoch is accepted on chain but played no part, and a concluded tally took
+each voter's latest vote, those included: on mainnet 31 committee, 241 DRep and 14 pool votes on
+ratified actions.
+**Said:** "if it is correct way, and ledger uses it we should fix our code to the correct
+behaviour"
+
+- A concluded action's DRep, pool and committee aggregates count each voter's latest vote cast up
+  to the end of the epoch before its tally epoch, the cutoff its certificates already use (BOUND).
+  A live action counts the latest so far. The mostYesVotes and highestParticipation rankings read
+  votes the same way (tallyVotesSql), so a ranking never disagrees with the tally.
+- An action's vote list still shows every vote cast, a late one included: it records what voters
+  did, the tally what the ledger counted.
+- On mainnet this changes 27 committee, 49 DRep and 2 pool aggregates, all on enacted actions, and
+  no voter group's pass or fail (for example a committee yes count of 7 becomes 5, and one DRep yes
+  stake drops by 91.5M ADA); on preview one pool aggregate. Live tallies are unchanged.
+- Tested against db-sync by scripts/live-proposals.mjs: every ratified action still passes in each
+  voter group it needed on the votes cast before its decision, which would fail had the ledger
+  needed a later vote (mainnet 81, preview 14), and the committee recount counts the same votes
+  (mainnet 154, preview 1339).
+
+## D175 — A live DRep tally leaves out a DRep that retired since the snapshot
+
+**Date:** 2026-10-27
+**Amends:** D172 (a live DRep tally counts a DRep renewed since the snapshot as active).
+**Evidence:** a DRep that retired during an epoch lost its vote on live actions at once, but its
+stake stayed in the live total, from the epoch's `drep_distr` snapshot, as not voted, which weighs
+as a No until the epoch ends. The ledger's next count leaves an unregistered DRep out of its votes
+and its stake alike. On mainnet active DReps retired in 105 of 157 epochs, at most 2.2% of the
+active DRep stake in one epoch.
+**Said:** "Ok lets fix it immediately"
+
+- A live DRep tally, the mostYesVotes and highestParticipation rankings, and the tip epoch's DRep
+  stake total leave out a DRep whose retirement certificate came after the epoch's snapshot and
+  which has not registered again since (RETIRED), the converse of RENEWED. A concluded tally keeps
+  the snapshot it was decided from.
+- Cost on the mainnet replica: the live DRep tally went from 19.7 ms to 20.8 ms, all from cache;
+  drep_registration is 3,603 rows and its (drep_hash_id, deposit, tx_id) index covers the reads.
+- RENEWED and RETIRED read certificates and votes up to the tally's cutoff (`max_tx`), which for a
+  live action is the chain as it stands.
+- No dedicated test: a retirement during the current epoch is rare and short-lived.

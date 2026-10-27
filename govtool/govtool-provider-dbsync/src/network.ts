@@ -298,11 +298,12 @@ export function mapProtocolParams(row: ProtocolParamsRow): ProtocolParams | unde
  * epoch, which is the state the epoch-boundary snapshot was taken from.
  *
  * For the tip epoch, a DRep that voted or sent a registration or update
- * certificate since the snapshot counts as active, as in a live action's
- * tally (aggregates.ts, RENEWED): the stake behind its votes is in the
- * denominator they are shown against. A past epoch keeps its snapshot's
- * answer. `snap` is the last transaction before the tip epoch, NULL for any
- * other, which leaves `renewed` empty.
+ * certificate since the snapshot counts as active, and one that retired since
+ * without registering again does not, as in a live action's tally
+ * (aggregates.ts, RENEWED and RETIRED): the denominator holds the stake behind
+ * the votes it is shown against. A past epoch keeps its snapshot's answer.
+ * `snap` is the last transaction before the tip epoch, NULL for any other,
+ * which leaves `renewed` and `retired` empty.
  */
 export const STAKE_DISTRIBUTION_SQL = `WITH ${TIP_EPOCH_CTE},
 target AS (SELECT COALESCE($1::int, (SELECT epoch_no FROM tip)) AS epoch_no),
@@ -317,10 +318,16 @@ renewed AS (
   UNION
   SELECT r.drep_hash_id FROM drep_registration r, snap
    WHERE snap.tx IS NOT NULL AND (r.deposit IS NULL OR r.deposit > 0) AND r.tx_id > snap.tx),
+retired AS (
+  SELECT r.drep_hash_id AS hash_id FROM drep_registration r, snap
+   WHERE snap.tx IS NOT NULL AND r.deposit < 0 AND r.tx_id > snap.tx
+     AND NOT EXISTS (SELECT 1 FROM drep_registration again
+                      WHERE again.drep_hash_id = r.drep_hash_id AND again.deposit > 0 AND again.tx_id > r.tx_id)),
 dd AS (
   SELECT count(*) AS n,
          sum(d.amount) FILTER (WHERE h.raw IS NOT NULL
-                                 AND (d.active_until >= d.epoch_no OR d.hash_id IN (SELECT hash_id FROM renewed))) AS active_dreps,
+                                 AND (d.active_until >= d.epoch_no OR d.hash_id IN (SELECT hash_id FROM renewed))
+                                 AND d.hash_id NOT IN (SELECT hash_id FROM retired)) AS active_dreps,
          sum(d.amount) FILTER (WHERE h.raw IS NULL AND h.view = 'drep_always_abstain') AS always_abstain,
          sum(d.amount) FILTER (WHERE h.raw IS NULL AND h.view = 'drep_always_no_confidence') AS always_no_confidence
     FROM drep_distr d JOIN drep_hash h ON h.id = d.hash_id

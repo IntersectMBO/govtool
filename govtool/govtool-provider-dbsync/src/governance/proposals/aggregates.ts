@@ -28,7 +28,9 @@
  *        action a DRep that voted, or sent a registration or update
  *        certificate, since the epoch's snapshot is active whatever the
  *        snapshot says: that renewed it for the ledger's next one (RENEWED),
- *        and the DRep directory already calls it active.
+ *        and the DRep directory already calls it active. One that retired
+ *        since, and has not registered again, is out of the votes and the
+ *        total alike, as the ledger's next count will have it (RETIRED).
  * SPO:   eligible = the pool distribution. A pool that did not vote follows
  *        the ledger default: on HardForkInitiation it is `notVoted` (No);
  *        during bootstrap (protocol major 9) it abstains; otherwise its reward
@@ -128,19 +130,38 @@ export const RENEWED = `renewed AS (
       FROM bound
       CROSS JOIN LATERAL (
         SELECT vp.drep_voter AS hash_id FROM voting_procedure vp
-         WHERE vp.drep_voter IS NOT NULL AND vp.tx_id > bound.snap_tx
+         WHERE vp.drep_voter IS NOT NULL AND vp.tx_id > bound.snap_tx AND vp.tx_id <= bound.max_tx
         UNION
         SELECT r.drep_hash_id FROM drep_registration r
-         WHERE (r.deposit IS NULL OR r.deposit > 0) AND r.tx_id > bound.snap_tx) a
+         WHERE (r.deposit IS NULL OR r.deposit > 0) AND r.tx_id > bound.snap_tx AND r.tx_id <= bound.max_tx) a
      WHERE bound.live)`;
 
 /**
- * Whether a DRep in the tally's distribution `dd` counts as active (see
- * RENEWED); `target` carries `live`. The IN is uncorrelated, so `renewed` is
- * hashed once rather than scanned per row.
+ * DReps that retired after a live tally's snapshot and have not registered
+ * again since. The snapshot still lists their stake, but the ledger's next
+ * count leaves an unregistered DRep out, its votes and its stake alike. A
+ * concluded tally keeps the snapshot it was decided from. drep_registration
+ * holds a row per certificate, and its (drep_hash_id, deposit, tx_id) index
+ * covers both reads.
  */
-export const activeDRepSql = (dd: string, target: string) => `(${dd}.active_until >= ${dd}.epoch_no
-         OR (${target}.live AND (${dd}.hash_id, ${dd}.epoch_no) IN (SELECT rn.hash_id, rn.e FROM renewed rn)))`;
+export const RETIRED = `retired AS (
+    SELECT DISTINCT bound.e, r.drep_hash_id AS hash_id
+      FROM bound
+      JOIN drep_registration r ON r.deposit < 0 AND r.tx_id > bound.snap_tx AND r.tx_id <= bound.max_tx
+     WHERE bound.live
+       AND NOT EXISTS (
+        SELECT 1 FROM drep_registration again
+         WHERE again.drep_hash_id = r.drep_hash_id AND again.deposit > 0
+           AND again.tx_id > r.tx_id AND again.tx_id <= bound.max_tx))`;
+
+/**
+ * Whether a DRep in the tally's distribution `dd` counts as active (see
+ * RENEWED and RETIRED); `target` carries `live`. The INs are uncorrelated, so
+ * `renewed` and `retired` are hashed once rather than scanned per row.
+ */
+export const activeDRepSql = (dd: string, target: string) => `((${dd}.active_until >= ${dd}.epoch_no
+          OR (${target}.live AND (${dd}.hash_id, ${dd}.epoch_no) IN (SELECT rn.hash_id, rn.e FROM renewed rn)))
+         AND NOT (${target}.live AND (${dd}.hash_id, ${dd}.epoch_no) IN (SELECT rt.hash_id, rt.e FROM retired rt)))`;
 
 /**
  * Each voter's latest vote on each action that its tally counts: the latest
@@ -171,6 +192,7 @@ export const DREP_SQL = `
 WITH ${TARGETS},
   ${BOUND},
   ${RENEWED},
+  ${RETIRED},
   v AS (${latestVotes('drep_voter')}),
   cast_ AS (
     SELECT p.id,

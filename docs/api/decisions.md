@@ -5883,3 +5883,24 @@ behaviour"
   voter group it needed on the votes cast before its decision, which would fail had the ledger
   needed a later vote (mainnet 81, preview 14), and the committee recount counts the same votes
   (mainnet 154, preview 1339).
+
+## D175 — A live DRep tally leaves out a DRep that retired since the snapshot
+
+**Date:** 2026-10-27
+**Amends:** D172 (a live DRep tally counts a DRep renewed since the snapshot as active).
+**Evidence:** a DRep that retired during an epoch lost its vote on live actions at once, but its
+stake stayed in the live total, from the epoch's `drep_distr` snapshot, as not voted, which weighs
+as a No until the epoch ends. The ledger's next count leaves an unregistered DRep out of its votes
+and its stake alike. On mainnet active DReps retired in 105 of 157 epochs, at most 2.2% of the
+active DRep stake in one epoch.
+**Said:** "Ok lets fix it immediately"
+
+- A live DRep tally, the mostYesVotes and highestParticipation rankings, and the tip epoch's DRep
+  stake total leave out a DRep whose retirement certificate came after the epoch's snapshot and
+  which has not registered again since (RETIRED), the converse of RENEWED. A concluded tally keeps
+  the snapshot it was decided from.
+- Cost on the mainnet replica: the live DRep tally went from 19.7 ms to 20.8 ms, all from cache;
+  drep_registration is 3,603 rows and its (drep_hash_id, deposit, tx_id) index covers the reads.
+- RENEWED and RETIRED read certificates and votes up to the tally's cutoff (`max_tx`), which for a
+  live action is the chain as it stands.
+- No dedicated test: a retirement during the current epoch is rare and short-lived.

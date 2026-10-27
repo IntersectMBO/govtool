@@ -30,6 +30,7 @@ import {
   BOUND,
   loadAggregates,
   RENEWED,
+  RETIRED,
   tallyVotesSql,
   validDRepVoteSql,
   type TallyTarget,
@@ -102,6 +103,7 @@ function rankingCtes(sort: 'mostYesVotes' | 'highestParticipation'): string {
   cuts AS (SELECT DISTINCT e, live FROM f),
   ${BOUND},
   ${RENEWED},
+  ${RETIRED},
   dv AS (${tallyVotesSql('drep_voter', 'f', 'vp.gov_action_proposal_id IN (SELECT id FROM f)')}),
   dc AS (
     SELECT f.id, sum(dd.amount) FILTER (WHERE dv.vote = 'Yes') AS yes, sum(dd.amount) AS voted

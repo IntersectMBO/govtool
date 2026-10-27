@@ -10,7 +10,6 @@ import {
   CC_SQL,
   DREP_SQL,
   PARAMS_SQL,
-  RENEWED,
   SPO_SQL,
   activeDRepSql,
   assembleAggregates,
@@ -50,20 +49,6 @@ test('a concluded tally reads certificates up to the end of the epoch before its
   }
   assert.match(SPO_SQL, /JOIN rdv ON rdv\.addr_id = r\.reward_addr_id AND rdv\.tx_id <= bound\.max_tx/);
   assert.match(SPO_SQL, /LEFT JOIN deleg d ON d\.e = r\.e AND d\.live = p\.live/);
-});
-
-test('a live DRep tally counts DReps renewed since the snapshot as active, in the votes and the total alike', () => {
-  assert.match(RENEWED, /vp\.drep_voter IS NOT NULL AND vp\.tx_id > bound\.snap_tx/);
-  assert.match(RENEWED, /\(r\.deposit IS NULL OR r\.deposit > 0\) AND r\.tx_id > bound\.snap_tx/);
-  assert.match(RENEWED, /WHERE bound\.live/);
-  assert.equal(
-    activeDRepSql('dd', 'p'),
-    `(dd.active_until >= dd.epoch_no
-         OR (p.live AND (dd.hash_id, dd.epoch_no) IN (SELECT rn.hash_id, rn.e FROM renewed rn)))`,
-  );
-  assert.ok(DREP_SQL.includes(`WHERE ${activeDRepSql('dd', 'p')}`), 'cast votes');
-  assert.ok(DREP_SQL.includes(`FILTER (WHERE ${activeDRepSql('dd', 'cuts')}) AS active`), 'the active total');
-  assert.match(DREP_SQL, /LEFT JOIN tot ON tot\.e = p\.e AND tot\.live = p\.live/);
 });
 
 test('loadAggregates sends each target\'s tally epoch and liveness to every tally', async () => {

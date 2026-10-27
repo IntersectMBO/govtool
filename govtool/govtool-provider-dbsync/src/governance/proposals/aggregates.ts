@@ -35,15 +35,12 @@
  *        account's DRep delegation decides — always-abstain abstains,
  *        always-no-confidence is Yes on NoConfidence and No elsewhere, and
  *        anything else is `notVoted` (No).
- * CC:    live, the ledger's own count: members of the committee in force who
- *        are unexpired, have an authorised hot key and have not resigned,
- *        each with its current hot key's vote. Concluded, every vote that was
- *        valid when cast counts: each member's latest vote cast while it sat
- *        on the committee in force, within its term, with the hot key it had
- *        authorised and before any resignation. A member replaced, expired,
- *        resigned or rotated to a new hot key before the tally keeps that
- *        vote. Eligible is those voters plus the members seated at the tally
- *        who cast none.
+ * CC:    the ledger's own count: members of the committee in force at the
+ *        tally epoch who are unexpired, have an authorised hot key and have
+ *        not resigned, each with that hot key's vote. A concluded action reads
+ *        them as its tally epoch started (BOUND), so a member who resigns,
+ *        rotates its hot key or is replaced after the decision keeps its vote
+ *        in that tally, and one who left before it does not count.
  */
 import { ChainDataError, type Ratio, type VoteAggregate, type VoterRole } from '@govtool/data-providers/chain-data';
 
@@ -237,33 +234,23 @@ SELECT p.id::text AS id, p.e,
  * Committee counts. The committee in force at an epoch is the one produced by
  * the latest ENACTED committee-lineage action: none after a NoConfidence, the
  * genesis committee (db-sync `committee` row with no proposal) before any.
- * It is read at each tally epoch and, for a concluded action, at the epoch of
- * each committee vote, which decides whether the vote was valid when cast.
+ * It is read at each tally epoch.
  *
- * A member's hot key at a point is its newest authorisation up to it, with no
- * resignation since. Within one transaction certificates apply before votes,
- * so a key authorised, or a resignation sent, in the voting transaction
- * already counts. committee_registration and committee_de_registration have no
- * index but the primary key; they hold a row per authorisation, so the lateral
- * reads stay small.
+ * A member's hot key at the cutoff (BOUND) is its newest authorisation up to
+ * it, with no resignation since, and the member counts by that key's vote.
+ * committee_registration and committee_de_registration have no index but the
+ * primary key; they hold a row per authorisation, so the lateral reads stay
+ * small.
  */
 export const CC_SQL = `
 WITH ${TARGETS},
   ${BOUND},
-  vt AS (
-    SELECT vp.gov_action_proposal_id AS pid, vp.committee_voter AS hot_id, vp.vote::text AS vote, vp.tx_id, vp.id,
-           b.epoch_no AS e
-      FROM voting_procedure vp
-      JOIN tx ON tx.id = vp.tx_id
-      JOIN block b ON b.id = tx.block_id
-     WHERE vp.invalid IS NULL AND vp.committee_voter IS NOT NULL AND vp.gov_action_proposal_id = ANY($1::bigint[])
-       AND vp.gov_action_proposal_id IN (SELECT id FROM p WHERE NOT live)),
   head AS (
-    SELECT x.e, h.id AS head_id, h.type::text AS head_type
-      FROM (SELECT e FROM eps UNION SELECT e FROM vt) x
+    SELECT eps.e, h.id AS head_id, h.type::text AS head_type
+      FROM eps
       LEFT JOIN LATERAL (
         SELECT g.id, g.type FROM gov_action_proposal g
-         WHERE g.type IN ('NewCommittee', 'NoConfidence') AND g.enacted_epoch <= x.e
+         WHERE g.type IN ('NewCommittee', 'NoConfidence') AND g.enacted_epoch <= eps.e
          ORDER BY g.enacted_epoch DESC, g.id DESC
          LIMIT 1) h ON true),
   comm AS (
@@ -284,45 +271,17 @@ WITH ${TARGETS},
      WHERE NOT EXISTS (
         SELECT 1 FROM committee_de_registration d
          WHERE d.cold_key_id = cm.committee_hash_id AND d.tx_id > reg.tx_id AND d.tx_id <= bound.max_tx)),
-  cast_by AS (
-    SELECT DISTINCT ON (vt.pid, cm.committee_hash_id) vt.pid, cm.committee_hash_id AS cold_id, vt.vote
-      FROM vt
-      JOIN comm ON comm.e = vt.e
-      JOIN committee_member cm ON cm.committee_id = comm.committee_id AND cm.expiration_epoch >= vt.e
-      JOIN LATERAL (
-        SELECT cr.hot_key_id, cr.tx_id FROM committee_registration cr
-         WHERE cr.cold_key_id = cm.committee_hash_id AND cr.tx_id <= vt.tx_id
-         ORDER BY cr.tx_id DESC, cr.id DESC
-         LIMIT 1) reg ON reg.hot_key_id = vt.hot_id
-     WHERE NOT EXISTS (
-        SELECT 1 FROM committee_de_registration d
-         WHERE d.cold_key_id = cm.committee_hash_id AND d.tx_id > reg.tx_id AND d.tx_id <= vt.tx_id)
-     ORDER BY vt.pid, cm.committee_hash_id, vt.tx_id DESC, vt.id DESC),
-  v AS (${latestVotes('committee_voter')}),
-  tally AS (
-    SELECT p.id, s.cold_id, v.vote
-      FROM p
-      JOIN seated s ON s.e = p.e AND s.live = p.live
-      LEFT JOIN v ON v.pid = p.id AND v.voter = s.hot_id
-     WHERE p.live
-    UNION ALL
-    SELECT p.id, m.cold_id, cb.vote
-      FROM p
-      CROSS JOIN LATERAL (
-        SELECT s.cold_id FROM seated s WHERE s.e = p.e AND s.live = p.live
-        UNION
-        SELECT c.cold_id FROM cast_by c WHERE c.pid = p.id) m
-      LEFT JOIN cast_by cb ON cb.pid = p.id AND cb.cold_id = m.cold_id
-     WHERE NOT p.live)
+  v AS (${latestVotes('committee_voter')})
 SELECT p.id::text AS id, p.e, comm.committee_id IS NOT NULL AS has_committee,
        comm.quorum_numerator::text AS quorum_numerator, comm.quorum_denominator::text AS quorum_denominator,
-       count(t.cold_id) AS eligible,
-       count(t.cold_id) FILTER (WHERE t.vote = 'Yes') AS yes,
-       count(t.cold_id) FILTER (WHERE t.vote = 'No') AS no,
-       count(t.cold_id) FILTER (WHERE t.vote = 'Abstain') AS abstain
+       count(s.cold_id) AS eligible,
+       count(s.cold_id) FILTER (WHERE v.vote = 'Yes') AS yes,
+       count(s.cold_id) FILTER (WHERE v.vote = 'No') AS no,
+       count(s.cold_id) FILTER (WHERE v.vote = 'Abstain') AS abstain
   FROM p
   LEFT JOIN comm ON comm.e = p.e
-  LEFT JOIN tally t ON t.id = p.id
+  LEFT JOIN seated s ON s.e = p.e AND s.live = p.live
+  LEFT JOIN v ON v.pid = p.id AND v.voter = s.hot_id
  GROUP BY p.id, p.e, comm.committee_id, comm.quorum_numerator, comm.quorum_denominator`;
 
 /** Thresholds and protocol version at each tally epoch. */

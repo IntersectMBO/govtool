@@ -66,20 +66,6 @@ test('a live DRep tally counts DReps renewed since the snapshot as active, in th
   assert.match(DREP_SQL, /LEFT JOIN tot ON tot\.e = p\.e AND tot\.live = p\.live/);
 });
 
-test('a concluded committee tally counts each vote valid when cast; a live one, the seated members by hot key', () => {
-  // live: seated at the cutoff, by the member's hot key then
-  assert.match(CC_SQL, /JOIN seated s ON s\.e = p\.e AND s\.live = p\.live\s+LEFT JOIN v ON v\.pid = p\.id AND v\.voter = s\.hot_id\s+WHERE p\.live/);
-  // concluded: a vote counts for the members in office at its epoch whose hot key it was
-  assert.match(CC_SQL, /JOIN comm ON comm\.e = vt\.e/);
-  assert.match(CC_SQL, /cm\.expiration_epoch >= vt\.e/);
-  assert.match(CC_SQL, /cr\.cold_key_id = cm\.committee_hash_id AND cr\.tx_id <= vt\.tx_id/);
-  assert.match(CC_SQL, /reg ON reg\.hot_key_id = vt\.hot_id/);
-  assert.match(CC_SQL, /d\.tx_id > reg\.tx_id AND d\.tx_id <= vt\.tx_id/);
-  // eligible: those voters plus the seated members that cast none
-  assert.match(CC_SQL, /SELECT s\.cold_id FROM seated s WHERE s\.e = p\.e AND s\.live = p\.live\s+UNION\s+SELECT c\.cold_id FROM cast_by c WHERE c\.pid = p\.id/);
-  assert.match(CC_SQL, /WHERE NOT p\.live\)/);
-});
-
 test('loadAggregates sends each target\'s tally epoch and liveness to every tally', async () => {
   const calls = [];
   const db = { query: async (sql, params) => (calls.push({ sql, params }), []) };

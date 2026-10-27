@@ -31,8 +31,9 @@ test.describe("Abstain delegation", () => {
     await dRepDirectoryPage.goto();
 
     await dRepDirectoryPage.automaticDelegationOptionsDropdown.click();
-    await page.getByTestId("abstain-from-every-vote-delegate-button").click();
-    await waitForTxConfirmation(page);
+    await waitForTxConfirmation(page, () =>
+      page.getByTestId("abstain-from-every-vote-delegate-button").click()
+    );
 
     const balance = await adaBalance(wallet!);
 

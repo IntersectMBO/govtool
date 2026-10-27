@@ -186,13 +186,13 @@ test.describe("Temporary DReps", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
-    await dRepPage.getByTestId("continue-retirement-button").click();
-    await expect(
-      dRepPage.getByTestId("retirement-transaction-submitted-modal")
-    ).toBeVisible({ timeout: 60_000 });
-    dRepPage.getByTestId("confirm-modal-button").click();
-
-    await waitForTxConfirmation(dRepPage);
+    await waitForTxConfirmation(dRepPage, async () => {
+      await dRepPage.getByTestId("continue-retirement-button").click();
+      await expect(
+        dRepPage.getByTestId("retirement-transaction-submitted-modal")
+      ).toBeVisible({ timeout: 60_000 });
+      await dRepPage.getByTestId("confirm-modal-button").click();
+    });
 
     await expect(dRepPage.getByTestId("voting-power-chips")).not.toBeVisible({
       timeout: 20_000,
@@ -215,6 +215,16 @@ test.describe("Temporary DReps", () => {
     const wallet = await unregisteredDRepWallet("3I:dRep");
     const dRepPage = await createNewPageWithWallet(browser, { wallet });
 
+    // A devnet block can include the registration before the dashboard
+    // opens, and the app's first status check then ends "In Progress" at
+    // once. Report the transaction unconfirmed until the dashboard shows it.
+    const transactionStatus = "**/transaction/status/**";
+    await dRepPage.route(transactionStatus, (route) =>
+      route.fulfill({
+        json: { transactionConfirmed: false, votingProcedure: [] },
+      })
+    );
+
     const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
     await dRepRegistrationPage.goto();
     await dRepRegistrationPage.registerWithoutTxConfirmation({
@@ -229,7 +239,10 @@ test.describe("Temporary DReps", () => {
       { timeout: 20_000 }
     );
 
-    await waitForTxConfirmation(dRepPage);
+    // The app checks every 15 s; from the next check on, the backend answers.
+    await waitForTxConfirmation(dRepPage, () =>
+      dRepPage.unroute(transactionStatus)
+    );
 
     await expect(dRepPage.getByTestId("d-rep-in-progress")).not.toBeVisible({
       timeout: 20_000,

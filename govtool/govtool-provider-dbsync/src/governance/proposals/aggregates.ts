@@ -142,12 +142,25 @@ export const RENEWED = `renewed AS (
 export const activeDRepSql = (dd: string, target: string) => `(${dd}.active_until >= ${dd}.epoch_no
          OR (${target}.live AND (${dd}.hash_id, ${dd}.epoch_no) IN (SELECT rn.hash_id, rn.e FROM renewed rn)))`;
 
-const latestVotes = (column: string) => `
+/**
+ * Each voter's latest vote on each action that its tally counts: the latest
+ * cast up to the tally's cutoff (BOUND). A concluded action takes the last
+ * vote cast before its tally epoch began, the state the ledger decided from;
+ * one cast during that epoch came after the decision. A live action takes the
+ * latest so far. `target` names the rows carrying each action's `id`, `e` and
+ * `live`; `filter` narrows voting_procedure by action id for its index. The
+ * displayed totals and the ranking both read votes through this.
+ */
+export const tallyVotesSql = (column: string, target: string, filter: string) => `
   SELECT DISTINCT ON (vp.gov_action_proposal_id, vp.${column})
          vp.gov_action_proposal_id AS pid, vp.${column} AS voter, vp.vote::text AS vote, vp.tx_id
     FROM voting_procedure vp
-   WHERE vp.invalid IS NULL AND vp.${column} IS NOT NULL AND vp.gov_action_proposal_id = ANY($1::bigint[])
+    JOIN ${target} ON ${target}.id = vp.gov_action_proposal_id
+    JOIN bound ON bound.e = ${target}.e AND bound.live = ${target}.live
+   WHERE vp.invalid IS NULL AND vp.${column} IS NOT NULL AND ${filter} AND vp.tx_id <= bound.max_tx
    ORDER BY vp.gov_action_proposal_id, vp.${column}, vp.tx_id DESC, vp.id DESC`;
+
+const latestVotes = (column: string) => tallyVotesSql(column, 'p', 'vp.gov_action_proposal_id = ANY($1::bigint[])');
 
 /**
  * DRep totals. `drep_distr` has no epoch-leading index in db-sync 13.x, so the

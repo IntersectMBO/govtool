@@ -230,17 +230,18 @@ const ratified = bySort.newest.filter((a) => a.lifecycle.ratifiedAt);
 const failingGroups = ratified.flatMap((a) => a.voteAggregates.filter((v) => !passes(v)).map((v) => `${a.txHash.slice(0, 8)} ${v.role}`));
 check(failingGroups.length === 0, `every ratified action passes in each voter group it needed (${ratified.length})`, failingGroups.slice(0, 10));
 
-// Independent recount of every concluded committee tally (D173): the committee
-// in force at the tally epoch, its members unexpired then, each by the hot key
-// it held when that epoch began (authorised before it, not resigned since),
-// with that key's latest vote on the action. A member who left before the
-// decision has no key here and does not count.
+// Independent recount of every concluded committee tally (D173, D174): the
+// committee in force at the tally epoch, its members unexpired then, each by
+// the hot key it held when that epoch began (authorised before it, not
+// resigned since), with that key's latest vote cast before it. A member who
+// left before the decision has no key here and does not count, and a vote cast
+// during the tally epoch came after the decision.
 const ccRecount = await q(`
   WITH f AS (
     SELECT g.id, encode(t.hash, 'hex') h, g.index i, COALESCE(g.ratified_epoch, g.expired_epoch, g.dropped_epoch) e
       FROM gov_action_proposal g JOIN tx t ON t.id = g.tx_id
      WHERE COALESCE(g.ratified_epoch, g.expired_epoch, g.dropped_epoch) IS NOT NULL),
-  head AS (
+  head AS MATERIALIZED (
     SELECT f.id, f.e,
            (SELECT x.id FROM gov_action_proposal x
              WHERE x.type IN ('NewCommittee', 'NoConfidence') AND x.enacted_epoch <= f.e
@@ -262,16 +263,21 @@ const ccRecount = await q(`
            (SELECT c.hot FROM certs c WHERE c.cold = m.cold AND c.ep < m.e
              ORDER BY c.tx_id DESC, (c.hot IS NULL) LIMIT 1) hot
       FROM members m),
+  first_block AS (
+    SELECT x.e, (SELECT min(y.id) FROM (SELECT b.id FROM block b WHERE b.epoch_no = x.e OFFSET 0) y) id
+      FROM (SELECT DISTINCT e FROM f) x),
   vote AS (
     SELECT DISTINCT ON (vp.gov_action_proposal_id, vp.committee_voter)
            vp.gov_action_proposal_id pid, vp.committee_voter hot, vp.vote::text v
       FROM voting_procedure vp
+      JOIN f ON f.id = vp.gov_action_proposal_id
+      JOIN first_block fb ON fb.e = f.e
      WHERE vp.committee_voter IS NOT NULL AND vp.invalid IS NULL
+       AND (SELECT t.block_id FROM tx t WHERE t.id = vp.tx_id) < fb.id
      ORDER BY vp.gov_action_proposal_id, vp.committee_voter, vp.tx_id DESC, vp.id DESC),
   unseated AS (
     SELECT o.pid, count(*)::int n FROM vote o
-     WHERE o.pid IN (SELECT id FROM f)
-       AND NOT EXISTS (SELECT 1 FROM seated s WHERE s.id = o.pid AND s.hot = o.hot)
+     WHERE NOT EXISTS (SELECT 1 FROM seated s WHERE s.id = o.pid AND s.hot = o.hot)
      GROUP BY o.pid)
   SELECT f.h, f.i,
          count(s.hot)::int eligible,

@@ -5854,4 +5854,32 @@ retired now. Because they retired now we shouldn't remove them from past tally"
   three actions above.
 - Unchanged here: a concluded tally still takes each voter's latest vote, including one cast during
   the tally epoch, after the state the ledger decided from. On mainnet that is 31 committee, 241
-  DRep and 14 pool votes on ratified actions.
+  DRep and 14 pool votes on ratified actions. D174 changes that.
+
+## D174 — A concluded tally counts the votes cast before the decision
+
+**Date:** 2026-10-27
+**Amends:** D172 (a concluded tally reads certificates up to the end of the epoch before its tally
+epoch, but every vote).
+**Evidence:** of the 78 mainnet actions ratified with the committee's approval, all pass on the
+committee votes cast before their ratified epoch, and only 21 on those cast before the epoch
+before it: the ledger decides from the state its tally epoch starts with, votes included. A vote
+cast during the tally epoch is accepted on chain but played no part, and a concluded tally took
+each voter's latest vote, those included: on mainnet 31 committee, 241 DRep and 14 pool votes on
+ratified actions.
+**Said:** "if it is correct way, and ledger uses it we should fix our code to the correct
+behaviour"
+
+- A concluded action's DRep, pool and committee aggregates count each voter's latest vote cast up
+  to the end of the epoch before its tally epoch, the cutoff its certificates already use (BOUND).
+  A live action counts the latest so far. The mostYesVotes and highestParticipation rankings read
+  votes the same way (tallyVotesSql), so a ranking never disagrees with the tally.
+- An action's vote list still shows every vote cast, a late one included: it records what voters
+  did, the tally what the ledger counted.
+- On mainnet this changes 27 committee, 49 DRep and 2 pool aggregates, all on enacted actions, and
+  no voter group's pass or fail (for example a committee yes count of 7 becomes 5, and one DRep yes
+  stake drops by 91.5M ADA); on preview one pool aggregate. Live tallies are unchanged.
+- Tested against db-sync by scripts/live-proposals.mjs: every ratified action still passes in each
+  voter group it needed on the votes cast before its decision, which would fail had the ledger
+  needed a later vote (mainnet 81, preview 14), and the committee recount counts the same votes
+  (mainnet 154, preview 1339).

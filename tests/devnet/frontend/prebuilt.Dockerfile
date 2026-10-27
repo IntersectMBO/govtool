@@ -7,7 +7,7 @@
 # Build context: govtool/frontend. The runtime stage matches
 # govtool/frontend/Dockerfile, so runtime config (window.__ENV__) works the
 # same way.
-ARG NGINX_IMAGE=fholzer/nginx-brotli:v1.28
+ARG NGINX_IMAGE=fholzer/nginx-brotli:v1.30
 FROM ${NGINX_IMAGE}
 
 RUN apk add --no-cache gettext jq

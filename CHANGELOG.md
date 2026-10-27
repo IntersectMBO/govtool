@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The frontend and docs images use nginx 1.30 instead of 1.28; the devnet's prebuilt frontend image follows
+
 ### Fixed
 
 - Live DRep tallies and the DRep stake total count a DRep whose activity had lapsed at the epoch's snapshot but who voted since, which renews it: on mainnet such a DRep's 1.3M ADA was missing from every live action's Yes or No

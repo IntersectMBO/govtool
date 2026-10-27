@@ -24,7 +24,7 @@ ENV DOCS_URL=${DOCS_URL} \
 RUN npm run build
 
 
-FROM nginxinc/nginx-unprivileged:1.28-alpine
+FROM nginxinc/nginx-unprivileged:1.30-alpine
 
 # The same path the site was built for: pages, assets and the 404 page are
 # served under it. The default, /, is docs.gov.tools.

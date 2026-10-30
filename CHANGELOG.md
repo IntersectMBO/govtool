@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Once a develop build's images are on GHCR, CI asks the GitOps repository (the `k8s-dev` environment's `GOVTOOL_ARGO_REPO` variable) to deploy that commit to k8s.dev.gov.tools
+
 ### Changed
 
 - The frontend and docs images use nginx 1.30 instead of 1.28; the devnet's prebuilt frontend image follows

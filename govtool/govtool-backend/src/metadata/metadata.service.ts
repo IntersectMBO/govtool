@@ -27,6 +27,8 @@ import { fetchMetadataText, MetadataFetchError } from './safe-metadata-fetch';
 /** CIP-108 length limits, per the CIP text (F43). */
 const CIP108_TITLE_MAX_LENGTH = 80;
 const CIP108_ABSTRACT_MAX_LENGTH = 2500;
+/** CIP-119's `givenName` limit, which the registration form also applies. */
+const CIP119_GIVEN_NAME_MAX_LENGTH = 80;
 
 /**
  * How long validation waits for the metadata service before falling back to
@@ -327,9 +329,7 @@ export class MetadataService {
   ): MetadataIssue[] {
     switch (standard) {
       case MetadataStandard.CIP119:
-        return this.getFieldValue(body, 'givenName')
-          ? []
-          : [{ field: 'givenName', rule: 'required', severity: 'error' }];
+        return this.validateCip119Body(body);
 
       case MetadataStandard.CIP108:
         return this.validateCip108Body(body);
@@ -337,6 +337,34 @@ export class MetadataService {
       default:
         return [];
     }
+  }
+
+  /**
+   * An over-long `givenName` is an error, unlike CIP-108's warnings: no
+   * mainnet DRep name was over the limit when it was added (D176).
+   */
+  private validateCip119Body(body: Record<string, unknown>): MetadataIssue[] {
+    const givenName = this.getFieldValue(body, 'givenName');
+
+    if (!givenName) {
+      return [{ field: 'givenName', rule: 'required', severity: 'error' }];
+    }
+    if (
+      typeof givenName === 'string' &&
+      givenName.length > CIP119_GIVEN_NAME_MAX_LENGTH
+    ) {
+      return [
+        {
+          field: 'givenName',
+          rule: 'maxLength',
+          severity: 'error',
+          limit: CIP119_GIVEN_NAME_MAX_LENGTH,
+          actual: givenName.length,
+        },
+      ];
+    }
+
+    return [];
   }
 
   /**

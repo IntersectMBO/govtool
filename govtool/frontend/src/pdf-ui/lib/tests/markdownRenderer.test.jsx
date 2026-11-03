@@ -58,10 +58,21 @@ describe('MarkdownTypography', () => {
         expect(container.querySelector('del')).toHaveTextContent('gone');
     });
 
+    it('leaves single dollar signs as text', () => {
+        const container = renderMarkdown(
+            'Budget of $500,000 now and $250,000 later'
+        );
+
+        expect(container.querySelector('math')).toBeNull();
+        expect(container).toHaveTextContent(
+            'Budget of $500,000 now and $250,000 later'
+        );
+    });
+
     it('still renders math and code blocks', () => {
         const container = renderMarkdown(
             [
-                'Inline $\\frac{a}{b}$',
+                'Inline $$\\frac{a}{b}$$',
                 '$$\n\\sqrt{x}\n$$',
                 '```js\nconst a = 1;\n```',
             ].join('\n\n')

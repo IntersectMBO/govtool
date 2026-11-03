@@ -437,7 +437,12 @@ const MarkdownTypography = ({ content, testId, onLinkClick }) => {
                     [rehypeSanitize, sanitizeSchema],
                     rehypeKatex,
                 ]}
-                remarkPlugins={[remarkBreaks, remarkMath, remarkGfm]}
+                // A single $ is a currency sign in proposals; math needs $$.
+                remarkPlugins={[
+                    remarkBreaks,
+                    [remarkMath, { singleDollarTextMath: false }],
+                    remarkGfm,
+                ]}
             >
                 {processedContent}
             </ReactMarkdown>

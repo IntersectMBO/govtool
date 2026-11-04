@@ -291,7 +291,7 @@ export async function setup(
 }
 
 export async function openVote(page: Page) {
-  await page.goto(`/connected/governance_actions/${actionHash}#0`);
+  await page.goto(`/connected/actions/${actionHash}#0`);
   await expect(page.getByTestId("yes-radio")).toBeVisible();
   await page.getByTestId("yes-radio").click();
 }

@@ -801,7 +801,7 @@ const EditProposalDialog = ({
                         open={openDeleteConfirmationModal}
                         onClose={() => {
                             handleCloseEditDialog();
-                            navigate('/proposal_discussion');
+                            navigate('/proposals');
                             if (setShouldRefresh) {
                                 setShouldRefresh(true);
                             }
@@ -815,7 +815,7 @@ const EditProposalDialog = ({
                             onClick: () => {
                                 setOpenDeleteConfirmationModal(false);
                                 handleCloseEditDialog();
-                                navigate('/proposal_discussion');
+                                navigate('/proposals');
                                 if (setShouldRefresh) {
                                     setShouldRefresh(true);
                                 }
@@ -826,7 +826,7 @@ const EditProposalDialog = ({
                             onClick={() => {
                                 setOpenDeleteConfirmationModal(false);
                                 handleCloseEditDialog();
-                                navigate('/proposal_discussion');
+                                navigate('/proposals');
                                 if (setShouldRefresh) {
                                     setShouldRefresh(true);
                                 }

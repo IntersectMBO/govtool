@@ -191,7 +191,7 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
                         setShowDraftSuccessfulModal(true);
                     } else {
                         navigate(
-                            `/proposal_discussion/${data?.attributes?.proposal_id}`
+                            `/proposals/${data?.attributes?.proposal_id}`
                         );
                     }
 
@@ -244,7 +244,7 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
                         onClick={() => {
                             onClose();
                             if (location.pathname.includes('propose')) {
-                                navigate('/proposal_discussion');
+                                navigate('/proposals');
                             }
                         }}
                         data-testid='show-all-button'
@@ -259,7 +259,7 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
                                 onClose={() => {
                                     onClose();
                                     if (location.pathname.includes('propose')) {
-                                        navigate('/proposal_discussion');
+                                        navigate('/proposals');
                                     }
                                 }}
                                 setSelectedDraftId={setSelectedDraftId}

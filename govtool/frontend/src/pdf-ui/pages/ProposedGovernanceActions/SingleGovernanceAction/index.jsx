@@ -278,7 +278,7 @@ const SingleGovernanceAction = ({ id }) => {
     useEffect(() => {
         let domain = new URL(window.location.href);
         let origin = domain.origin;
-        setProposalLink(`${origin}/proposal_discussion/`);
+        setProposalLink(`${origin}/proposals/`);
     }, [proposalLink]);
 
     const disableShareClick = () => {
@@ -354,7 +354,7 @@ const SingleGovernanceAction = ({ id }) => {
             if (!response) return;
 
             handleCloseDeleteModal();
-            navigate('/proposal_discussion');
+            navigate('/proposals');
         } catch (error) {
             console.error('Failed to delete proposal:', error);
         } finally {
@@ -372,7 +372,7 @@ const SingleGovernanceAction = ({ id }) => {
             if (!response) return;
 
             if (response?.attributes?.content?.attributes?.is_draft) {
-                return navigate('/proposal_discussion');
+                return navigate('/proposals');
             }
             let totalLength =
                 response.attributes?.content?.attributes?.prop_abstract.length +
@@ -392,7 +392,7 @@ const SingleGovernanceAction = ({ id }) => {
                 error?.response?.data?.error?.details ===
                     'You can not access draft proposal details.'
             ) {
-                return navigate('/proposal_discussion');
+                return navigate('/proposals');
             }
             console.error(error);
         } finally {
@@ -624,7 +624,7 @@ const SingleGovernanceAction = ({ id }) => {
                                         sx={{ fontSize: 14 }}
                                     />
                                 }
-                                onClick={() => navigate(`/proposal_discussion`)}
+                                onClick={() => navigate(`/proposals`)}
                                 sx={{
                                     px: 0,
                                     minWidth: 0,
@@ -765,7 +765,7 @@ const SingleGovernanceAction = ({ id }) => {
                                                         data-testid='review-and-vote-button'
                                                         onClick={() =>
                                                             navigate(
-                                                                `/connected/governance_actions/${proposal?.attributes?.content?.attributes?.prop_submission_tx_hash}#0`
+                                                                `/connected/actions/${proposal?.attributes?.content?.attributes?.prop_submission_tx_hash}#0`
                                                             )
                                                         }
                                                         endIcon={
@@ -1713,7 +1713,7 @@ const SingleGovernanceAction = ({ id }) => {
                                                     data-testid='review-and-vote-link'
                                                     onClick={() =>
                                                         navigate(
-                                                            `/connected/governance_actions/${proposal?.attributes?.content?.attributes?.prop_submission_tx_hash}#0`
+                                                            `/connected/actions/${proposal?.attributes?.content?.attributes?.prop_submission_tx_hash}#0`
                                                         )
                                                     }
                                                     sx={textLinkSx}

@@ -28,6 +28,7 @@ import {
   GovernanceActions,
   GovernanceActionsCategory,
   Home,
+  LegacyPathRedirect,
   RegisterAsdRep,
   RegisterAsDirectVoter,
   RetireAsDrep,
@@ -225,7 +226,7 @@ export default () => {
         />
         <Route path={PATHS.stakeKeys} element={<ChooseStakeKey />} />
         <Route path={PATHS.editDrepMetadata} element={<EditDRepMetadata />} />
-        <Route path="*" element={<ErrorPage />} />
+        <Route path="*" element={<LegacyPathRedirect />} />
         <Route path={PATHS.error} element={<ErrorPage />} />
       </Routes>
       {modals[modal.type]?.component && (

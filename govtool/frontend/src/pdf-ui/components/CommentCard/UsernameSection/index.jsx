@@ -40,7 +40,7 @@ const UsernameSection = ({ drepData, comment }) => {
             >
                 {drepData?.givenName && (
                     <Link
-                        href={'/connected/drep_directory/' + drepData?.view}
+                        href={'/connected/dreps/' + drepData?.view}
                         target='_blank'
                         rel='noopener noreferrer'
                         underline='none'
@@ -58,7 +58,7 @@ const UsernameSection = ({ drepData, comment }) => {
 
                 {drepData?.view && (
                     <Link
-                        href={'/connected/drep_directory/' + drepData?.view}
+                        href={'/connected/dreps/' + drepData?.view}
                         target='_blank'
                         rel='noopener noreferrer'
                         underline='none'

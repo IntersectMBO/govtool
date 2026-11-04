@@ -74,7 +74,7 @@ export default class GovernanceActionDetailsPage {
 
   async goto(proposalId: string) {
     await this.page.goto(
-      `${environments.frontendUrl}/governance_actions/${proposalId}`
+      `${environments.frontendUrl}/actions/${proposalId}`
     );
   }
 

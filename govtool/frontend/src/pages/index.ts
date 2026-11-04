@@ -9,6 +9,7 @@ export * from "./Dashboard";
 export * from "./DashboardGovernanceActionsCategory";
 export * from "./EditDRepMetadata";
 export * from "./ErrorPage";
+export * from "./LegacyPathRedirect";
 export * from "./GovernanceActionDetails";
 export * from "./GovernanceActions";
 export * from "./GovernanceActionsCategory";

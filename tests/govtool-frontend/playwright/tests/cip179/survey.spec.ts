@@ -432,7 +432,7 @@ for (const connected of [false, true]) {
   }) => {
     const fixture = await setup(page, { connected, registered: false });
     await page.goto(
-      `/${connected ? "connected/" : ""}governance_actions/${actionHash}#0`
+      `/${connected ? "connected/" : ""}actions/${actionHash}#0`
     );
     await expect(
       page.getByRole("heading", {

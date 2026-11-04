@@ -188,7 +188,7 @@ for (const sample of samples) {
       });
     }
     await page.goto(
-      `/governance_actions/history/${sample.txHash}#${sample.index}`
+      `/actions/history/${sample.txHash}#${sample.index}`
     );
     const panel = page.getByTestId("single-action-voting-numbers");
     await expect(panel).toBeVisible();
@@ -269,7 +269,7 @@ for (const sample of samples) {
           JSON.stringify("unavailable-wallet")
         )
       );
-      await page.goto("/governance_actions/history");
+      await page.goto("/actions/history");
       await expect
         .poll(() =>
           page.evaluate(() => localStorage.getItem("wallet_data_name"))
@@ -283,7 +283,7 @@ for (const sample of samples) {
       );
       await expect(details).toHaveAttribute(
         "href",
-        `/governance_actions/history/${sample.txHash}#${sample.index}`
+        `/actions/history/${sample.txHash}#${sample.index}`
       );
       await details.click();
       await expect(

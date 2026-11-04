@@ -56,7 +56,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
     bech32Prefix: "gov_action",
   });
 
-  const pathname = useLocation().pathname.replace(/governance_actions.*/g, "governance_actions");
+  const pathname = useLocation().pathname.replace(/\/actions.*/, "/actions");
   const isCategoryView = useLocation().pathname.includes("category");
 
   return (

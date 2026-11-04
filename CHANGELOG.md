@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Frontend URLs are short and dashed (/dreps, /actions, /proposals, /budget, /my/votes, /register-drep and so on); the old underscore URLs redirect to them
 - The frontend and docs images use nginx 1.30 instead of 1.28; the devnet's prebuilt frontend image follows
 
 ### Fixed

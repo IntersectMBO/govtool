@@ -105,7 +105,7 @@ const CommentReview = ({ reportHash }) => {
                         <strong>Comment:</strong>{' '}
                         {comment.attributes.comment_text}
                         {'  '}
-                        <Link href='/proposal_discussion/8047'>
+                        <Link href='/proposals/8047'>
                             View on GovTool
                         </Link>
                     </Typography>

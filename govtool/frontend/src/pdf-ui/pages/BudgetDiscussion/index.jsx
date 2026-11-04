@@ -31,7 +31,7 @@ import {
     getArchiveList,
 } from '../../lib/budgetArchive';
 
-const LIST_PATH = '/budget_discussion';
+const LIST_PATH = '/budget';
 
 // GovTool's DataActionsBar look: OrderActionsChip pills for the filter and
 // sort triggers, and the DataActionsFilters/DataActionsSorting dropdowns.
@@ -117,7 +117,7 @@ const EmptyState = ({ title, message }) => (
 );
 
 // The read-only list of the 2025 budget proposals. `category` is the slug
-// of /budget_discussion/category/:category, which shows that category in
+// of /budget/category/:category, which shows that category in
 // full; without it every category is a carousel.
 const ProposedBudgetDiscussion = ({ category = null, showTitle = true }) => {
     const navigate = useNavigate();

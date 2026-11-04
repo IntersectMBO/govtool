@@ -168,11 +168,11 @@ script path nor any governance action builder. Check those on tests/devnet.
 ## pdf-ui
 
 src/pdf-ui is vendored plain JavaScript with two entry points. App.jsx is the
-proposal discussion forum, lazy-loaded at /proposal_discussion only when the
+proposal discussion forum, lazy-loaded at /proposals only when the
 forum flag is on; it talks to govtool/govtool-pdf-backend through
 VITE_PDF_API_URL. BudgetArchiveApp.jsx is the read-only 2025 budget proposals
-archive, lazy-loaded by pages/BudgetProposalsArchive.tsx at /budget_discussion
-with no flag.
+archive, lazy-loaded by pages/BudgetProposalsArchive.tsx at /budget with no
+flag.
 
 Lint skips its .js and .jsx (--ext ts,tsx), and tsc compiles them without
 type-checking (allowJs, no checkJs). App.d.ts and BudgetArchiveApp.d.ts type

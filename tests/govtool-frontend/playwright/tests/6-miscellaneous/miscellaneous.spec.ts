@@ -25,20 +25,20 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
 
   const navbarLinks = [
     { testId: "dashboard-link", url: `${environments.frontendUrl}/` },
-    { testId: "drep-directory-link", urlPattern: /\/drep_directory/ },
+    { testId: "drep-directory-link", urlPattern: /\/dreps/ },
     {
       testId: "proposed-governance-actions-link",
-      urlPattern: /\/proposal_discussion/,
+      urlPattern: /\/proposals/,
       isDropdownContent: true,
     },
     {
       testId: "governance-actions-link",
-      urlPattern: /\/governance_actions/,
+      urlPattern: /\/actions/,
       isDropdownContent: true,
     },
     {
       testId: "governance-actions-governance-actions-link",
-      urlPattern: /\/governance_actions\/history/,
+      urlPattern: /\/actions\/history/,
       isDropdownContent: true,
     },
   ];

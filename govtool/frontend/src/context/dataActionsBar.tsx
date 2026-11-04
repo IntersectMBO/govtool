@@ -69,20 +69,20 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     isAdjusting.current = false;
   }, []);
 
-  const gADetailsPathnameRegexp = /^.*\/governance_actions\/[a-fA-F0-9]{64}$/;
+  const gADetailsPathnameRegexp = /^.*\/actions\/[a-fA-F0-9]{64}$/;
   const userMovedToDifferentAppArea =
     pathname !== lastPath &&
     (!pathname.startsWith(lastPath) || lastPath === "" || lastPath === "/");
   const userOpenedGADetails = gADetailsPathnameRegexp.test(pathname);
   const userOpenedGADetailsFromCategoryPage =
-    userOpenedGADetails && lastPath.includes("governance_actions/category");
+    userOpenedGADetails && lastPath.includes("/actions/category");
   const userMovedFromGAListToCategoryPage =
-    lastPath.endsWith("governance_actions") &&
-    pathname.includes("governance_actions/category");
+    lastPath.endsWith("/actions") &&
+    pathname.includes("/actions/category");
   const userMovedFromGADetailsToListOrCategoryPage =
     (gADetailsPathnameRegexp.test(lastPath) &&
-      pathname.includes("governance_actions")) ||
-    pathname.includes("governance_actions/category");
+      pathname.includes("/actions")) ||
+    pathname.includes("/actions/category");
   const isSearchOrFilterSet =
     debouncedSearchText.length > 0 ||
     chosenSorting !== "" ||
@@ -100,7 +100,7 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     }
 
     if (
-      (!pathname.includes("drep_directory") &&
+      (!pathname.includes("/dreps") &&
         userMovedToDifferentAppArea &&
         !userOpenedGADetailsFromCategoryPage) ||
       userMovedFromGAListToCategoryPage

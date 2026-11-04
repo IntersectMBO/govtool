@@ -16,7 +16,7 @@ export default class DRepRegistrationPage extends DRepForm {
   }
 
   async goto() {
-    await this.page.goto(`${environments.frontendUrl}/register_drep`);
+    await this.page.goto(`${environments.frontendUrl}/register-drep`);
     await this.continueBtn.click(); // BUG: testId -> continue-register-button
   }
 }

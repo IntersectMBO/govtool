@@ -53,7 +53,7 @@ const ProposalCard = ({
     useEffect(() => {
         let domain = new URL(window.location.href);
         let origin = domain.origin;
-        setProposalLink(`${origin}/proposal_discussion/`);
+        setProposalLink(`${origin}/proposals/`);
     }, [proposalLink]);
 
     const handleEditProposal = () => {
@@ -381,7 +381,7 @@ const ProposalCard = ({
                         </Button>
                     ) : (
                         <Link
-                            to={`/proposal_discussion/${proposal?.id}`}
+                            to={`/proposals/${proposal?.id}`}
                             data-testid={`proposal-${proposal?.id}-view-details-link-wrapper`}
                             style={{ display: 'block', textDecoration: 'none' }}
                         >
@@ -472,7 +472,7 @@ const ProposalCard = ({
                     handleCloseEditDialog={handleCloseEditDialog}
                     setMounted={() => {}}
                     onUpdate={() =>
-                        navigate(`/proposal_discussion/${proposal?.id}`)
+                        navigate(`/proposals/${proposal?.id}`)
                     }
                     setShouldRefresh={setShouldRefresh}
                 />

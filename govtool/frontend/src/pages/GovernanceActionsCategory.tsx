@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useMemo, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 
 import { Background, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
-import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
+import { GOVERNANCE_ACTION_TYPE_PARAM, ICONS, PATHS } from "@consts";
+import { useDataActionsBar, useFeatureFlag } from "@context";
 import {
   DataActionsBar,
   EmptyStateGovernanceActionsCategory,
@@ -20,19 +20,17 @@ import {
   useGetVoterInfo,
 } from "@hooks";
 import {
-  WALLET_LS_KEY,
-  getItemFromLocalStorage,
   getProposalTypeLabel,
   removeDuplicatedProposals,
 } from "@utils";
 
 export const GovernanceActionsCategory = () => {
-  const { category } = useParams();
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get(GOVERNANCE_ACTION_TYPE_PARAM) ?? "";
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
   const { governanceActionsSort } = useFeatureFlag();
   const { chosenSorting } = dataActionsBarProps;
   const { isMobile, pagePadding, screenWidth } = useScreenDimension();
-  const { isEnabled } = useCardano();
   const navigate = useNavigate();
   const { voter } = useGetVoterInfo();
   const { t } = useTranslation();
@@ -67,13 +65,6 @@ export const GovernanceActionsCategory = () => {
     () => removeDuplicatedProposals(proposals),
     [voter?.isRegisteredAsDRep, isProposalsFetchingNextPage, proposals],
   );
-
-  useEffect(() => {
-    if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
-      const { pathname } = window.location;
-      navigate(`/connected${pathname}`);
-    }
-  }, [isEnabled]);
 
   return (
     <Background>

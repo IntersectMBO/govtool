@@ -28,7 +28,7 @@ export const WalletOptionButton: FC<WalletOption> = ({
   cip95Available,
   pathToNavigate,
 }) => {
-  const { pathname, hash, state } = useLocation();
+  const { pathname, state } = useLocation();
   const { enable, isEnableLoading } = useCardano();
   const {
     palette: { lightBlue },
@@ -58,15 +58,13 @@ export const WalletOptionButton: FC<WalletOption> = ({
         isGovernanceGovernanceActionHistoryPillar
       )
         return;
-      navigate(
-        // eslint-disable-next-line no-unneeded-ternary
-        pathToNavigate
-          ? pathToNavigate
-          : pathname === "/"
-          ? "/dashboard"
-          : `connected${pathname}${hash ?? ""}`,
-        { state },
-      );
+      // Any other page stays where it is: the same URL turns into the
+      // dashboard's view of it.
+      if (pathToNavigate) {
+        navigate(pathToNavigate, { state });
+      } else if (pathname === PATHS.home) {
+        navigate(PATHS.dashboard, { state });
+      }
       return;
     }
     navigate(PATHS.stakeKeys);

@@ -2,6 +2,7 @@ import { matchPath } from "react-router";
 
 import {
   BUDGET_DISCUSSION_PATHS,
+  GOVERNANCE_ACTION_TYPE_PARAM,
   GOV_ACTION_HISTORY_PATHS,
   PATHS,
   PDF_PATHS,
@@ -12,48 +13,26 @@ const PAGE_TITLES = [
   { path: PATHS.home, title: "Home" },
   { path: PATHS.dashboard, title: "Dashboard" },
 
-  // Before the action paths: "/governance_actions/:proposalId" also matches
-  // the history list, taking "history" for an action id.
+  // Before the action paths: "/actions/:proposalId" also matches the
+  // history list and the new action form, taking "history" or "new" for an
+  // action id.
   {
     path: `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`,
     title: "Historical Actions",
   },
+  {
+    path: PATHS.createGovernanceAction,
+    title: "Create Governance Action",
+  },
   { path: PATHS.governanceActions, title: "Governance Actions" },
-  {
-    path: PATHS.governanceActionsCategory,
-    title: "Governance Action Category",
-  },
-  {
-    path: PATHS.governanceActionsCategoryAction,
-    title: "Governance Action Details",
-  },
   {
     path: PATHS.governanceActionsAction,
     title: "Governance Action Details",
   },
 
-  {
-    path: PATHS.dashboardGovernanceActions,
-    title: "Governance Actions",
-  },
-  {
-    path: PATHS.dashboardGovernanceActionsCategory,
-    title: "Governance Action Category",
-  },
-  {
-    path: PATHS.dashboardGovernanceActionsAction,
-    title: "Governance Action Details",
-  },
-
   { path: PATHS.dRepDirectory, title: "DRep Directory" },
   { path: PATHS.dRepDirectoryDRep, title: "DRep Details" },
-  { path: PATHS.dashboardDRepDirectory, title: "DRep Directory" },
-  { path: PATHS.dashboardDRepDirectoryDRep, title: "DRep Details" },
 
-  {
-    path: PATHS.createGovernanceAction,
-    title: "Create Governance Action",
-  },
   { path: PATHS.registerAsdRep, title: "Become a DRep" },
   { path: PATHS.retireAsDrep, title: "Retire as a DRep" },
   {
@@ -83,6 +62,15 @@ const PAGE_TITLES = [
   { path: PATHS.error, title: "Page Not Found" },
 ];
 
-export const getPageTitle = (pathname: string): string =>
-  PAGE_TITLES.find(({ path }) => matchPath({ path, end: true }, pathname))
-    ?.title ?? "Page Not Found";
+export const getPageTitle = (pathname: string, search = ""): string => {
+  if (
+    pathname === PATHS.governanceActions &&
+    new URLSearchParams(search).has(GOVERNANCE_ACTION_TYPE_PARAM)
+  ) {
+    return "Governance Action Category";
+  }
+  return (
+    PAGE_TITLES.find(({ path }) => matchPath({ path, end: true }, pathname))
+      ?.title ?? "Page Not Found"
+  );
+};

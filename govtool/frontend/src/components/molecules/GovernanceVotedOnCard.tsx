@@ -2,11 +2,11 @@ import { useNavigate } from "react-router";
 import { Box } from "@mui/material";
 
 import { Button } from "@atoms";
-import { PATHS } from "@consts";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
   encodeCIP129Identifier,
   getFullGovActionId,
+  getGovActionPath,
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
 } from "@utils";
@@ -166,10 +166,7 @@ export const GovernanceVotedOnCard = ({
           data-testid={`govaction-${govActionId}-change-your-vote`}
           onClick={() =>
             navigate(
-              PATHS.dashboardGovernanceActionsAction.replace(
-                ":proposalId",
-                govActionId,
-              ),
+              getGovActionPath(txHash, index),
               {
                 state: {
                   proposal,

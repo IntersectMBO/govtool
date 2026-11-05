@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Box, Skeleton } from "@mui/material";
-import { Link, useLocation } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { Button } from "@atoms";
 import {
@@ -13,10 +13,12 @@ import { useScreenDimension, useTranslation } from "@hooks";
 import {
   encodeCIP129Identifier,
   getFullGovActionId,
+  getGovActionPath,
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
 } from "@utils";
 import { MetadataIssue, MetadataValidationStatus, ProposalData } from "@models";
+import { GOVERNANCE_ACTION_TYPE_PARAM } from "@consts";
 
 type ActionTypeProps = Omit<
   ProposalData,
@@ -56,8 +58,8 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
     bech32Prefix: "gov_action",
   });
 
-  const pathname = useLocation().pathname.replace(/governance_actions.*/g, "governance_actions");
-  const isCategoryView = useLocation().pathname.includes("category");
+  const [searchParams] = useSearchParams();
+  const isCategoryView = searchParams.has(GOVERNANCE_ACTION_TYPE_PARAM);
 
   return (
     <Box
@@ -154,7 +156,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
           <Button
             onClick={onClick}
             component={Link}
-            to={`${pathname}/${govActionId}`}
+            to={getGovActionPath(txHash, index)}
             state={{
               proposal: {
                 abstract,

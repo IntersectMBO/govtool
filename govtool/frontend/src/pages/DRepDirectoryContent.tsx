@@ -85,7 +85,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const [sortingSeed, setSortingSeed] = useState<string>(() => getStoredSeed());
 
   useEffect(() => {
-    if (lastPath && !lastPath.includes("drep_directory")) {
+    if (lastPath && !lastPath.includes("/dreps")) {
       const newSeed = makeSeed();
       setSortingSeed(newSeed);
       sessionStorage.setItem(SEED_STORAGE_KEY, newSeed);
@@ -101,7 +101,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     useState<DRepData | undefined>(undefined);
 
   useEffect(() => {
-    if (!lastPath.includes("drep_directory")) {
+    if (!lastPath.includes("/dreps")) {
       setChosenFilters([DRepStatus.Active]);
       setSearchText("");
     }

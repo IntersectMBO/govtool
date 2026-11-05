@@ -103,7 +103,7 @@ test.describe("Logged in DReps", () => {
   });
 
   test("3S. Should restrict dRep registration for dRep", async ({ page }) => {
-    await page.goto(`${environments.frontendUrl}/register_drep`);
+    await page.goto(`${environments.frontendUrl}/my/drep/register`);
 
     await expect(page.getByText("You already are a DRep")).toBeVisible({
       timeout: 60_000,

@@ -16,7 +16,7 @@ export const ListGovActionsDashboardCards = () => {
         {
           children: t("dashboard.cards.govActions.title"),
           dataTestId: "view-governance-actions-button",
-          onClick: () => navigate(PATHS.dashboardGovernanceActions),
+          onClick: () => navigate(PATHS.governanceActions),
           variant: "contained",
         },
         {

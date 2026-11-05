@@ -45,7 +45,7 @@ const ProposalSubmissionDialog = ({
                 <FlowHeader title='Create a Governance Action' />
                 <FlowPage sx={{ pb: 4 }}>
                     <FlowBackLink
-                        onClick={() => navigate(`/proposal_discussion`)}
+                        onClick={() => navigate(`/proposals`)}
                         data-testid='back-button'
                     >
                         Show all

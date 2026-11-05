@@ -85,19 +85,19 @@ const GlobalWrapper = ({ ...props }) => {
             //             return null;
             //         }
             //     }
-            if (path.includes('propose')) {
+            if (path.includes('proposals/new')) {
                 return <ProposedGovernanceActions />;
             } else if (
-                path.includes('proposal_discussion/proposal_comment_review/') &&
+                path.includes('proposals/comment-review/') &&
                 getReviewHash(path)
             ) {
                 return <CommentReviewPage reportHash={getReviewHash(path)} />;
             } else if (
-                path.includes('proposal_discussion/') &&
+                path.includes('proposals/') &&
                 getProposalID(path)
             ) {
                 return <SingleGovernanceAction id={getProposalID(path)} />;
-            } else if (path.includes('proposal_discussion')) {
+            } else if (path.includes('proposals')) {
                 return <ProposedGovernanceActions />;
             } else {
                 return <ProposedGovernanceActions />;

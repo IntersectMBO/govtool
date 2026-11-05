@@ -191,7 +191,7 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
                         setShowDraftSuccessfulModal(true);
                     } else {
                         navigate(
-                            `/proposal_discussion/${data?.attributes?.proposal_id}`
+                            `/proposals/${data?.attributes?.proposal_id}`
                         );
                     }
 
@@ -243,8 +243,8 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
                     <FlowBackLink
                         onClick={() => {
                             onClose();
-                            if (location.pathname.includes('propose')) {
-                                navigate('/proposal_discussion');
+                            if (location.pathname.includes('proposals/new')) {
+                                navigate('/proposals');
                             }
                         }}
                         data-testid='show-all-button'
@@ -258,8 +258,8 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
                                 setProposalData={setProposalData}
                                 onClose={() => {
                                     onClose();
-                                    if (location.pathname.includes('propose')) {
-                                        navigate('/proposal_discussion');
+                                    if (location.pathname.includes('proposals/new')) {
+                                        navigate('/proposals');
                                     }
                                 }}
                                 setSelectedDraftId={setSelectedDraftId}

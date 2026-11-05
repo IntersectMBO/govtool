@@ -51,7 +51,7 @@ export default class DRepDirectoryPage {
 
   async goto() {
     await this.page.goto(
-      `${environments.frontendUrl}/connected/drep_directory`
+      `${environments.frontendUrl}/dreps`
     );
   }
 

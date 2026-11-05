@@ -1,47 +1,24 @@
 import { useLocation, useNavigate } from "react-router";
 import { Box, Button, Typography } from "@mui/material";
 
-import {
-  PDF_PATHS,
-  PATHS,
-  gray,
-  GOV_ACTION_HISTORY_PATHS,
-  BUDGET_DISCUSSION_PATHS,
-} from "@consts";
+import { PATHS, gray } from "@consts";
 import { useCardano } from "@context";
 import { useTranslation } from "@hooks";
+import { isWalletOptionalPath } from "@utils";
 import { Card } from "./Card";
 
 export const WalletInfoCard = () => {
   const { address, disconnectWallet } = useCardano();
   const navigate = useNavigate();
-  const { pathname, hash } = useLocation();
+  const { pathname } = useLocation();
   const { t } = useTranslation();
 
   const onClickDisconnect = async () => {
     await disconnectWallet();
 
-    const isBudgetDiscussion = window.location.pathname.includes(
-      BUDGET_DISCUSSION_PATHS.budgetDiscussion.replace("/", ""),
-    );
-
-    const isProposalDiscussionForum = window.location.pathname.includes(
-      PDF_PATHS.proposalDiscussion.replace("/", ""),
-    );
-
-    const isGovernanceGovernanceActionHistoryPillar = window.location.pathname.includes(
-      GOV_ACTION_HISTORY_PATHS.governanceActionHistory.replace("/", ""),
-    );
-    if (
-      !isBudgetDiscussion &&
-      !isProposalDiscussionForum &&
-      !isGovernanceGovernanceActionHistoryPillar
-    ) {
-      navigate(
-        pathname.includes("/connected")
-          ? `${pathname.replace("/connected", "")}${hash ?? ""}`
-          : PATHS.home,
-      );
+    // A page that works without a wallet stays; the rest need one.
+    if (!isWalletOptionalPath(pathname)) {
+      navigate(PATHS.home);
     }
 
     window.location.reload();

@@ -190,7 +190,7 @@ test.describe("DRep dependent tests", () => {
       navigator.clipboard.readText()
     );
     expect(copiedText).toEqual(
-      `${environments.frontendUrl}/drep_directory/${dRepId}`
+      `${environments.frontendUrl}/dreps/${dRepId}`
     );
   });
 
@@ -255,7 +255,7 @@ Object.values(["script drep", "drep"]).forEach((type, index) => {
       type === "drep" ? false : true
     );
 
-    await page.goto(`/drep_directory/${dRepId}`);
+    await page.goto(`/dreps/${dRepId}`);
     await responsePromise;
 
     await expect(

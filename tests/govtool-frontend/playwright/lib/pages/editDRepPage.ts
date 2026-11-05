@@ -14,6 +14,6 @@ export default class EditDRepPage extends DRepForm {
   }
 
   async goto() {
-    await this.page.goto(`${environments.frontendUrl}/edit_dRep`);
+    await this.page.goto(`${environments.frontendUrl}/my/drep/edit`);
   }
 }

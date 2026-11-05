@@ -1,4 +1,11 @@
-import { getShortenedGovActionId, getFullGovActionId } from "..";
+import {
+  getShortenedGovActionId,
+  getFullGovActionId,
+  getGovActionCIP129Id,
+  getGovActionPath,
+  getGovActionsTypePath,
+  parseGovActionCIP129Id,
+} from "..";
 
 describe("getShortenedGovActionId", () => {
   it("should return the correct shortened id for long hashes", () => {
@@ -50,5 +57,30 @@ describe("getFullGovActionId", () => {
     const index = 5;
     const result = getFullGovActionId(txHash, index);
     expect(result).toBe("gov_action_1234567890abcdef");
+  });
+});
+
+describe("governance action URLs", () => {
+  const TX = "ab".repeat(32);
+
+  it("round-trips a transaction and index through the CIP-129 id", () => {
+    const id = getGovActionCIP129Id(TX, 3);
+    expect(id.startsWith("gov_action1")).toBe(true);
+    expect(parseGovActionCIP129Id(id)).toEqual({ txHash: TX, index: 3 });
+  });
+
+  it("refuses what is not a gov_action id", () => {
+    expect(parseGovActionCIP129Id(TX)).toBeNull();
+    expect(parseGovActionCIP129Id("gov_action1notbech32")).toBeNull();
+    expect(parseGovActionCIP129Id("drep1abc")).toBeNull();
+  });
+
+  it("builds an action's page and a type's list", () => {
+    expect(getGovActionPath(TX, 0)).toBe(
+      `/actions/${getGovActionCIP129Id(TX, 0)}`,
+    );
+    expect(getGovActionsTypePath("InfoAction")).toBe(
+      "/actions?type=InfoAction",
+    );
   });
 });

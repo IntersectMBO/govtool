@@ -82,7 +82,7 @@ export const RegisterAsdRep = () => {
           onPrimaryButton={() => {
             if (dRep) {
               navigate(
-                PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRep.view),
+                PATHS.dRepDirectoryDRep.replace(":dRepId", dRep.view),
                 { state: { enteredFromWithinApp: true } },
               );
             }

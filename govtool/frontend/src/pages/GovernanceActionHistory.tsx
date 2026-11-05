@@ -13,7 +13,7 @@ import {
   TopNav,
 } from "@organisms";
 
-const GOVERNANCE_ACTION_SEGMENT = "governance_actions/history/";
+const GOVERNANCE_ACTION_SEGMENT = "actions/history/";
 
 const GovernanceActionHistoryListPage = () => {
   const { isEnabled } = useCardano();

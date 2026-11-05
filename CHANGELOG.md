@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A concluded action is tallied from the state the ledger decided it from, the start of its ratified or expired epoch, so a vote, committee resignation, hot-key authorisation, DRep retirement or vote delegation during that epoch no longer changes it. Treasury withdrawal 03f67179, ratified on mainnet, no longer shows the committee failing
 - The DRep directory dates a DRep by its newest registration or update certificate (`latestRegistrationDate`, `latestTxHash`, and the registration transaction on the DRep dashboard card), as GovTool did before 3.0
 - Importing the proposal discussion forum from Strapi merges accounts that share a username into one, keeping each one's comments, likes and poll votes, instead of keeping the first account and skipping the others' content. The backup taken before the import leaves out the copied Strapi tables, which hold emails and password hashes
+- A delegator viewing their DRep's details page sees "You have delegated ₳ X to this DRep" again, as the DRep Directory shows; a DRep's own page still leaves out what it delegated to itself
 
 ## [v3.0.0](https://github.com/IntersectMBO/govtool/compare/v2.1.0-beta.1...v3.0.0) 2026-10-17
 

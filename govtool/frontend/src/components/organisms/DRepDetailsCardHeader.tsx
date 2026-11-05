@@ -1,10 +1,17 @@
 import { useNavigate } from "react-router";
-import { Box } from "@mui/material";
+import { Trans } from "react-i18next";
+import { Box, Chip } from "@mui/material";
 
 import { Button } from "@atoms";
 import { ICONS, PATHS } from "@consts";
-import { useScreenDimension, useTranslation } from "@hooks";
+import { useCardano } from "@context";
+import {
+  useGetAdaHolderVotingPowerQuery,
+  useScreenDimension,
+  useTranslation,
+} from "@hooks";
 import { DataMissingHeader } from "@molecules";
+import { correctDRepDirectoryFormat } from "@utils";
 import { DRepData, MetadataValidationStatus } from "@/models";
 
 type DRepDetailsProps = {
@@ -25,8 +32,12 @@ export const DRepDetailsCardHeader = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { screenWidth } = useScreenDimension();
+  const { stakeKey } = useCardano();
+  const { votingPower } = useGetAdaHolderVotingPowerQuery(stakeKey);
 
   const { givenName, image } = dRepData;
+  // A DRep's own page leaves out what it delegated to itself (#3082).
+  const showMyDelegation = isMyDrep && !isMe && votingPower !== undefined;
 
   const navigateToEditDRep = () => {
     navigate(PATHS.editDrepMetadata, {
@@ -50,6 +61,25 @@ export const DRepDetailsCardHeader = ({
             }),
           }}
         >
+          {showMyDelegation && (
+            <Chip
+              color="primary"
+              data-testid="my-delegation-chip"
+              label={
+                <Trans
+                  i18nKey="dRepDirectory.myDRep"
+                  values={{ ada: correctDRepDirectoryFormat(votingPower) }}
+                />
+              }
+              sx={{
+                boxShadow: (theme) => theme.shadows[2],
+                color: (theme) => theme.palette.text.primary,
+                px: 3,
+                py: 0.5,
+                width: "100%",
+              }}
+            />
+          )}
           {isMe && (
             <Box
               sx={{

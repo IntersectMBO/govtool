@@ -13,6 +13,7 @@ import React, {
 import { useLocation } from "react-router";
 
 import { useDebounce } from "@hooks";
+import { GOVERNANCE_ACTION_TYPE_PARAM, PATHS } from "@/consts/paths";
 
 interface DataActionsBarContextType {
   isAdjusting: boolean;
@@ -52,7 +53,12 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
   const [chosenSorting, setChosenSorting] = useState<string>("");
   const [lastPath, setLastPath] = useState<string>("");
 
-  const { pathname } = useLocation();
+  // One type's list (/actions?type=…) counts as a page of its own.
+  const { pathname: locationPathname, search } = useLocation();
+  const type = new URLSearchParams(search).get(GOVERNANCE_ACTION_TYPE_PARAM);
+  const pathname = type
+    ? `${locationPathname}?${GOVERNANCE_ACTION_TYPE_PARAM}=${type}`
+    : locationPathname;
 
   const closeFilters = useCallback(() => {
     setFiltersOpen(false);
@@ -69,20 +75,20 @@ const DataActionsBarProvider: FC<ProviderProps> = ({ children }) => {
     isAdjusting.current = false;
   }, []);
 
-  const gADetailsPathnameRegexp = /^.*\/actions\/[a-fA-F0-9]{64}$/;
+  const gADetailsPathnameRegexp = /^\/actions\/gov_action1[0-9a-z]+$/;
+  const typeListPath = `${PATHS.governanceActions}?${GOVERNANCE_ACTION_TYPE_PARAM}=`;
   const userMovedToDifferentAppArea =
     pathname !== lastPath &&
     (!pathname.startsWith(lastPath) || lastPath === "" || lastPath === "/");
   const userOpenedGADetails = gADetailsPathnameRegexp.test(pathname);
   const userOpenedGADetailsFromCategoryPage =
-    userOpenedGADetails && lastPath.includes("/actions/category");
+    userOpenedGADetails && lastPath.startsWith(typeListPath);
   const userMovedFromGAListToCategoryPage =
-    lastPath.endsWith("/actions") &&
-    pathname.includes("/actions/category");
+    lastPath === PATHS.governanceActions && pathname.startsWith(typeListPath);
   const userMovedFromGADetailsToListOrCategoryPage =
     (gADetailsPathnameRegexp.test(lastPath) &&
-      pathname.includes("/actions")) ||
-    pathname.includes("/actions/category");
+      pathname.startsWith(PATHS.governanceActions)) ||
+    pathname.startsWith(typeListPath);
   const isSearchOrFilterSet =
     debouncedSearchText.length > 0 ||
     chosenSorting !== "" ||

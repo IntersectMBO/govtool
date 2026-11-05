@@ -9,6 +9,7 @@ import {
   type Question,
 } from "../../../../../govtool/frontend/node_modules/cip-179/dist/index.js";
 import { metadatumCodec } from "../../../../../govtool/frontend/src/cip179/csl";
+import { getGovActionCIP129Id } from "../../lib/helpers/encodeDecode";
 
 export { CSL };
 export const actionHash = "44".repeat(32);
@@ -291,7 +292,7 @@ export async function setup(
 }
 
 export async function openVote(page: Page) {
-  await page.goto(`/connected/actions/${actionHash}#0`);
+  await page.goto(`/actions/${getGovActionCIP129Id(actionHash, 0)}`);
   await expect(page.getByTestId("yes-radio")).toBeVisible();
   await page.getByTestId("yes-radio").click();
 }

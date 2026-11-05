@@ -70,11 +70,7 @@ export const DRepDetails = ({ isConnected = false }: DRepDetailsProps) => {
         <LinkWithIcon
           data-testid="go-to-drep-directory-button"
           label={t("dRepDirectory.goToDRepDirectory")}
-          onClick={() =>
-            navigate(
-              isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory,
-            )
-          }
+          onClick={() => navigate(PATHS.dRepDirectory)}
           sx={{ mb: 2 }}
         />
       )}

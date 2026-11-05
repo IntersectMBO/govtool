@@ -15,6 +15,7 @@ import {
   envelope,
   actionHash,
 } from "./fixtures";
+import { getGovActionCIP129Id } from "../../lib/helpers/encodeDecode";
 
 test("179-2A: public survey answers survive wallet signing", async ({
   page,
@@ -431,9 +432,7 @@ for (const connected of [false, true]) {
     page,
   }) => {
     const fixture = await setup(page, { connected, registered: false });
-    await page.goto(
-      `/${connected ? "connected/" : ""}actions/${actionHash}#0`
-    );
+    await page.goto(`/actions/${getGovActionCIP129Id(actionHash, 0)}`);
     await expect(
       page.getByRole("heading", {
         name: "Survey-linked Info Action",

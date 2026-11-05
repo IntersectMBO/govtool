@@ -36,7 +36,7 @@ export const ProposeGovActionDashboardCard = ({
               {
                 children: t("dashboard.cards.proposeGovernanceAction.view"),
                 dataTestId: "propose-governance-actions-button",
-                onClick: () => navigate(PATHS.dashboardGovernanceActions),
+                onClick: () => navigate(PATHS.governanceActions),
                 variant: "contained",
               } as const,
             ]

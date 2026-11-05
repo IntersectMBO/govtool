@@ -193,9 +193,7 @@ test("4M. Should show view-all categorized governance actions", async ({
 
   // The categorized view is reached by URL (e.g. the details page "Back" link
   // when opened from a category); the list page no longer links to it.
-  await page.goto(
-    `/actions/category/${GovernanceActionType.InfoAction}`
-  );
+  await page.goto(`/actions?type=${GovernanceActionType.InfoAction}`);
 
   await expect(page.getByTestId("back-to-list-link")).toBeVisible();
   // Category heading renders above the cards, which repeat the type label

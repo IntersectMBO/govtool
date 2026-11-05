@@ -61,7 +61,7 @@ export const DRepCard = ({
     openModal({
       type: "chooseWallet",
       state: {
-        pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+        pathToNavigate: PATHS.dRepDirectoryDRep.replace(
           ":dRepId",
           view,
         ),
@@ -374,10 +374,7 @@ export const DRepCard = ({
                 variant="outlined"
                 onClick={() =>
                   navigate(
-                    (isConnected
-                      ? PATHS.dashboardDRepDirectoryDRep
-                      : PATHS.dRepDirectoryDRep
-                    ).replace(":dRepId", view),
+                    PATHS.dRepDirectoryDRep.replace(":dRepId", view),
                     { state: { enteredFromWithinApp: true } },
                   )
                 }

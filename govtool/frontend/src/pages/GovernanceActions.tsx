@@ -1,29 +1,19 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
 import { Box, Divider } from "@mui/material";
 
 import { Background, ScrollToManage, Typography } from "@atoms";
-import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
-import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
+import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
+import { useDataActionsBar, useFeatureFlag } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { DataActionsBar } from "@molecules";
 import { Footer, TopNav, GovernanceActionsToVote } from "@organisms";
-import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
 
 export const GovernanceActions = () => {
   const { ...dataActionsBarProps } = useDataActionsBar();
   const { chosenSorting, setChosenSorting } = dataActionsBarProps;
   const { governanceActionsSort } = useFeatureFlag();
   const { isMobile, pagePadding } = useScreenDimension();
-  const { isEnabled } = useCardano();
-  const navigate = useNavigate();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
-      navigate(PATHS.dashboardGovernanceActions);
-    }
-  }, [isEnabled]);
 
   // `MostYesVotes` is the key Koios refuses. A selection carried in from an
   // earlier page must not survive into a provider that cannot honour it.

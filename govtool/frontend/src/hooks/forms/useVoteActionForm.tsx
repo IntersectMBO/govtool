@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 import { PATHS } from "@consts";
 import { useCardano, useSnackbar } from "@context";
@@ -11,6 +11,7 @@ import { encodeMetadata, type SurveyResponse } from "cip-179";
 import { ProposalVote, Vote } from "@/models";
 import type { Cip179Participation } from "@/cip179/Cip179Survey";
 import { metadatumCodec } from "@/cip179/csl";
+import { parseGovActionCIP129Id } from "@/utils/getGovActionId";
 
 export interface VoteActionFormValues {
   vote: string;
@@ -50,9 +51,9 @@ export const useVoteActionForm = ({
     useCardano();
   const { addSuccessAlert } = useSnackbar();
   const navigate = useNavigate();
-  const { hash } = useLocation();
-  const index = +hash.slice(1);
-  const { proposalId: txHash } = useParams();
+  // The page's CIP-129 gov_action1… id names the transaction and index.
+  const { proposalId = "" } = useParams();
+  const { txHash, index } = parseGovActionCIP129Id(proposalId) ?? {};
   const openWalletErrorModal = useWalletErrorModal();
 
   const {
@@ -138,7 +139,7 @@ export const useVoteActionForm = ({
 
       if (result) {
         addSuccessAlert("Vote submitted");
-        navigate(PATHS.dashboardGovernanceActions, {
+        navigate(PATHS.governanceActions, {
           state: {
             isVotedListOnLoad: !!previousVote?.vote,
           },

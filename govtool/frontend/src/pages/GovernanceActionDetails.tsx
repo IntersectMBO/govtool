@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  useNavigate,
-  useLocation,
-  useParams,
-  generatePath,
-} from "react-router";
+import { useNavigate, useLocation, useParams } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 import { AxiosError } from "axios";
 
 import { Background, Typography } from "@atoms";
 import { ICONS, GOV_ACTION_HISTORY_PATHS, PATHS } from "@consts";
-import { useCardano } from "@context";
 import {
   useGetProposalQuery,
   useScreenDimension,
@@ -18,10 +12,10 @@ import {
 } from "@hooks";
 import { Footer, TopNav, GovernanceActionDetailsCard } from "@organisms";
 import {
-  WALLET_LS_KEY,
   getFullGovActionId,
-  getItemFromLocalStorage,
+  getGovActionsTypePath,
   getShortenedGovActionId,
+  parseGovActionCIP129Id,
 } from "@utils";
 import { Breadcrumbs } from "@molecules";
 import {
@@ -40,17 +34,20 @@ type GovernanceActionDetailsState = {
 // TODO: Refactor: GovernanceActionDetals and DashboardGovernanceActionDetails are almost identical
 // and should be unified
 export const GovernanceActionDetails = () => {
-  const { state: untypedState, hash } = useLocation();
+  const { state: untypedState } = useLocation();
   const state = untypedState as GovernanceActionDetailsState | null;
-  const index = hash.slice(1);
   const navigate = useNavigate();
   const { pagePadding, isMobile } = useScreenDimension();
-  const { isEnabled } = useCardano();
   const { t } = useTranslation();
-  const { proposalId: txHash } = useParams();
+  // The CIP-129 gov_action1… id.
+  const { proposalId = "" } = useParams();
+  const parsedId = parseGovActionCIP129Id(proposalId);
 
-  const fullProposalId = txHash && getFullGovActionId(txHash, +index);
-  const shortenedGovActionId = txHash && getShortenedGovActionId(txHash, +index);
+  const fullProposalId =
+    parsedId && getFullGovActionId(parsedId.txHash, parsedId.index);
+  const shortenedGovActionId = parsedId
+    ? getShortenedGovActionId(proposalId, "")
+    : proposalId;
 
   // A row opened from a list carries its document, and so its authors, only
   // when the backend held it. Without one the action is read again for it,
@@ -58,7 +55,7 @@ export const GovernanceActionDetails = () => {
   const needsDocument = !!state?.proposal && state.proposal.json == null;
   const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
-    !state?.proposal || needsDocument,
+    !!fullProposalId && (!state?.proposal || needsDocument),
   );
   // TODO: Refactor this mess with proposals and metadata validation
   // once authors are existing in all CIP-108 metadata
@@ -121,21 +118,13 @@ export const GovernanceActionDetails = () => {
       error.response?.data.message.match(/Proposal with id: .* not found/);
     if (isProposalNotFound && fullProposalId) {
       navigate(
-        GOV_ACTION_HISTORY_PATHS.governanceActionHistoryDetail.replace(":id", fullProposalId),
+        GOV_ACTION_HISTORY_PATHS.governanceActionHistoryDetail.replace(
+          ":id",
+          proposalId,
+        ),
       );
-    } else if (
-      isEnabled &&
-      getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)
-    ) {
-      // The effect can run again before this page unmounts (StrictMode runs
-      // it twice in development), so only redirect once, and keep the hash:
-      // it carries the action index.
-      const { pathname, search, hash: locationHash } = window.location;
-      if (!pathname.startsWith("/connected")) {
-        navigate(`/connected${pathname}${search}${locationHash}`);
-      }
     }
-  }, [isEnabled, error]);
+  }, [error]);
 
   return (
     <Background opacity={0.7}>
@@ -183,10 +172,8 @@ export const GovernanceActionDetails = () => {
               }}
               onClick={() =>
                 navigate(
-                  state?.openedFromCategoryPage
-                    ? generatePath(PATHS.governanceActionsCategory, {
-                        category: state?.proposal?.type,
-                      })
+                  state?.openedFromCategoryPage && state.proposal?.type
+                    ? getGovActionsTypePath(state.proposal.type)
                     : PATHS.governanceActions,
                 )
               }

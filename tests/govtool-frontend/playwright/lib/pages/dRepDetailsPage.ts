@@ -8,7 +8,7 @@ export default class DRepDetailsPage {
   constructor(private readonly page: Page) {}
 
   async goto(dRepId: string) {
-    await this.page.goto(`/connected/dreps/${dRepId}`);
+    await this.page.goto(`/dreps/${dRepId}`);
   }
 
   async shareLink() {

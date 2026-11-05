@@ -243,7 +243,7 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
                     <FlowBackLink
                         onClick={() => {
                             onClose();
-                            if (location.pathname.includes('propose')) {
+                            if (location.pathname.includes('proposals/new')) {
                                 navigate('/proposals');
                             }
                         }}
@@ -258,7 +258,7 @@ const CreateGovernanceActionDialog = ({ open = false, onClose = false }) => {
                                 setProposalData={setProposalData}
                                 onClose={() => {
                                     onClose();
-                                    if (location.pathname.includes('propose')) {
+                                    if (location.pathname.includes('proposals/new')) {
                                         navigate('/proposals');
                                     }
                                 }}

@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { setup, surveyHash } from "./fixtures";
 
 async function openForm(page: Page) {
-  await page.goto("/create-action");
+  await page.goto("/actions/new");
   await page.getByTestId("continue-button").click();
   await page.getByTestId("InfoAction-radio").click();
   await page.getByTestId("continue-button").click();

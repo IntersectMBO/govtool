@@ -19,7 +19,7 @@ import { checkIsWalletConnected } from "@utils";
 export const Dashboard = () => {
   const { isEnabled, stakeKey } = useCardano();
   const { isMobile } = useScreenDimension();
-  const { pathname, hash } = useLocation();
+  const { pathname } = useLocation();
   const divRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -27,13 +27,9 @@ export const Dashboard = () => {
   const getPageTitle = (path: string) => {
     if (path === PATHS.dashboard) return t("dashboard.title");
 
+    // Before /actions, which is a prefix of the history path.
     if (path.startsWith(GOV_ACTION_HISTORY_PATHS.governanceActionHistory)) {
-      const governanceActionHistoryNavItem = findNavItem(
-        CONNECTED_NAV_ITEMS,
-        GOV_ACTION_HISTORY_PATHS.governanceActionHistory,
-      );
-
-      return governanceActionHistoryNavItem ?? "";
+      return t("govActions.history.title");
     }
 
     // Linked from Useful links, not the sidebar.
@@ -50,7 +46,7 @@ export const Dashboard = () => {
       return proposalDiscussionNavItem ?? "";
     }
 
-    if (path.startsWith(PATHS.dashboardGovernanceActions)) {
+    if (path.startsWith(PATHS.governanceActions)) {
       return t("govActions.title");
     }
 
@@ -70,20 +66,19 @@ export const Dashboard = () => {
     );
 
   useEffect(() => {
-    if (divRef.current && pathname !== PATHS.dashboardGovernanceActions) {
+    if (divRef.current && pathname !== PATHS.governanceActions) {
       divRef.current.scrollTo({ top: 0 });
     }
   }, [pathname, divRef]);
 
+  // Pages other than /dashboard switch to their public layout on their own
+  // when the wallet goes; the dashboard has none.
   useEffect(() => {
-    if (!checkIsWalletConnected()) {
-      if (window.location.pathname === PATHS.dashboard) {
-        navigate(PATHS.home);
-      } else {
-        navigate(
-          window.location.pathname.replace("connected/", "") + hash || "",
-        );
-      }
+    if (
+      !checkIsWalletConnected() &&
+      window.location.pathname === PATHS.dashboard
+    ) {
+      navigate(PATHS.home);
     }
   }, [isEnabled, stakeKey]);
 

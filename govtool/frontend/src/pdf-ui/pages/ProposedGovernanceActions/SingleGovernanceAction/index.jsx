@@ -13,6 +13,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ICONS } from '@/consts/icons';
+import { getGovActionPath } from '@/utils/getGovActionId';
 import {
     Badge,
     Box,
@@ -765,7 +766,7 @@ const SingleGovernanceAction = ({ id }) => {
                                                         data-testid='review-and-vote-button'
                                                         onClick={() =>
                                                             navigate(
-                                                                `/connected/actions/${proposal?.attributes?.content?.attributes?.prop_submission_tx_hash}#0`
+                                                                getGovActionPath(proposal?.attributes?.content?.attributes?.prop_submission_tx_hash, 0)
                                                             )
                                                         }
                                                         endIcon={
@@ -1713,7 +1714,7 @@ const SingleGovernanceAction = ({ id }) => {
                                                     data-testid='review-and-vote-link'
                                                     onClick={() =>
                                                         navigate(
-                                                            `/connected/actions/${proposal?.attributes?.content?.attributes?.prop_submission_tx_hash}#0`
+                                                            getGovActionPath(proposal?.attributes?.content?.attributes?.prop_submission_tx_hash, 0)
                                                         )
                                                     }
                                                     sx={textLinkSx}

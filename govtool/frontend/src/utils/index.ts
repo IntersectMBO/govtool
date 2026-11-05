@@ -46,6 +46,7 @@ export * from "./parseBoolean";
 export * from "./validateSignature";
 export * from "./cip8verification";
 export * from "./clipboard";
-export * from "./getCurrentPath";
+export * from "./getCurrentUrl";
+export * from "./walletOptionalPath";
 export * from "./getPageTitle";
 export * from "./metadataReportHighlight";

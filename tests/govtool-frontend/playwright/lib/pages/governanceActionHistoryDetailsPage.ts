@@ -2,6 +2,7 @@ import environments from "@constants/environments";
 import { Browser, expect, Page } from "@playwright/test";
 import { actionRecordProposal, actionRecordType } from "@types";
 import GovernanceActionHistoryPage from "./governanceActionHistoryPage";
+import { toGovActionUrlId } from "@helpers/encodeDecode";
 
 export default class GovernanceActionHistoryDetailsPage {
   readonly dRepYesVotes = this.page.getByTestId("DReps-yes-votes-submitted");
@@ -41,9 +42,10 @@ export default class GovernanceActionHistoryDetailsPage {
     return this.page;
   }
 
+  /** Takes "txHash#index" or a gov_action1… id. */
   async goto(proposalId: string) {
     await this.page.goto(
-      `${environments.frontendUrl}/actions/history/${proposalId}`
+      `${environments.frontendUrl}/actions/history/${toGovActionUrlId(proposalId)}`
     );
   }
 

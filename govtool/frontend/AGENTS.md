@@ -124,18 +124,23 @@ diagnostic; Sentry is.
 fixtures (tests/govtool-frontend/playwright/tests/cip179/fixtures.ts) seed the
 same keys, so renaming one breaks the E2E suite and the CIP-179 check.
 
-Pages take one of two shapes. Governance actions and the DRep directory have a
-separate "/connected" path, and PublicRoute, GovernanceActionDetails and
-Dashboard rewrite between the two by string. Newer pages keep one path: App.tsx
-mounts the public route only while no wallet is enabled and the Dashboard route
-always, and the page switches its layout on isEnabled, as
-BudgetProposalsArchive.tsx does.
+Every page has one URL, with or without a wallet; there is no "/connected"
+path. App.tsx mounts a page's Dashboard route while a wallet is enabled
+(isEnabled) and its public route otherwise, and utils/walletOptionalPath.ts
+lists the pages that work without one. URLs name resources: an action is
+/actions/gov_action1… (its CIP-129 id; hooks read it with
+parseGovActionCIP129Id), a type's list is /actions?type=…, and intents are
+/actions/new, /proposals/new or under /my.
+
+Old URLs (underscores, /connected, /actions/category/…, txHash#index) are
+rewritten by utils/getCurrentUrl.ts before any route renders; a renamed path
+adds its old segment to LEGACY_PATH_SEGMENTS in src/consts/paths.ts.
 
 Wallet-only pages are top-level routes that redirect from a useEffect when no
 wallet is connected; copy CreateGovernanceAction.tsx.
 
 A new page touches src/consts/paths.ts, src/pages/index.ts, App.tsx (both
-branches when it has both), utils/getPageTitle.ts and en.json. It also needs the
+branches when it has both, and utils/walletOptionalPath.ts), utils/getPageTitle.ts and en.json. It also needs the
 title function in pages/Dashboard.tsx when it renders in the Dashboard without a
 CONNECTED_NAV_ITEMS entry, and NAV_ITEMS and CONNECTED_NAV_ITEMS in
 src/consts/navItems.tsx when it is in the nav.

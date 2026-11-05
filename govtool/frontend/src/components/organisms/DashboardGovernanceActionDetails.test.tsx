@@ -3,6 +3,7 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProposalData, ProposalVote } from "@/models";
+import { getGovActionCIP129Id } from "@/utils/getGovActionId";
 import { DashboardGovernanceActionDetails } from "./DashboardGovernanceActionDetails";
 
 const useGetProposalQuery = vi.fn();
@@ -74,7 +75,10 @@ const openWith = (proposal: ProposalData) =>
   render(
     <MemoryRouter
       initialEntries={[
-        { pathname: `/ga/${TX}`, hash: "#0", state: { proposal, vote: myVote } },
+        {
+          pathname: `/ga/${getGovActionCIP129Id(TX, 0)}`,
+          state: { proposal, vote: myVote },
+        },
       ]}
     >
       <Routes>

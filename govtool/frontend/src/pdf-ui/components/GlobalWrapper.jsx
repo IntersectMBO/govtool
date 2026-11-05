@@ -85,7 +85,7 @@ const GlobalWrapper = ({ ...props }) => {
             //             return null;
             //         }
             //     }
-            if (path.includes('propose')) {
+            if (path.includes('proposals/new')) {
                 return <ProposedGovernanceActions />;
             } else if (
                 path.includes('proposals/comment-review/') &&

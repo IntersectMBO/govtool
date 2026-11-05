@@ -120,7 +120,7 @@ export const GovernanceActionHistoryCard = ({ action }: GovernanceActionHistoryC
       >
         <Button
           component={Link}
-          to={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${fullGovActionId}`}
+          to={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${idCIP129}`}
           size="large"
           sx={{ width: "100%" }}
           data-testid={`${fullGovActionId}-view-details`}

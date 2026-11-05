@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import metadataBucketService from "@services/metadataBucketService";
 import { IProposal } from "@types";
 import { withTxConfirmation } from "lib/transaction.decorator";
+import { toGovActionUrlId } from "@helpers/encodeDecode";
 
 export default class GovernanceActionDetailsPage {
   readonly voteBtn = this.page.getByTestId("vote-button");
@@ -72,9 +73,10 @@ export default class GovernanceActionDetailsPage {
     return this.page;
   }
 
+  /** Takes "txHash#index" or a gov_action1… id. */
   async goto(proposalId: string) {
     await this.page.goto(
-      `${environments.frontendUrl}/actions/${proposalId}`
+      `${environments.frontendUrl}/actions/${toGovActionUrlId(proposalId)}`
     );
   }
 

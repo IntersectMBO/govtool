@@ -8,7 +8,6 @@ import {
 } from "@/utils";
 import { ICONS } from "@/consts";
 import { Share } from "./Share";
-import { useScreenDimension } from "@/hooks";
 
 type DataMissingHeaderProps = {
   isDataMissing?: MetadataValidationStatus;
@@ -30,7 +29,6 @@ export const DataMissingHeader = ({
   shareLink,
 }: DataMissingHeaderProps) => {
   const base64Image = getBase64ImageDetails(image ?? "");
-  const { screenWidth } = useScreenDimension();
 
   return (
     <Box
@@ -96,9 +94,7 @@ export const DataMissingHeader = ({
           </Typography>
         )}
       </Box>
-      {screenWidth >= 1020 && (
-        <Share link={shareLink ?? window.location.href} />
-      )}
+      <Share link={shareLink ?? window.location.href} />
     </Box>
   );
 };

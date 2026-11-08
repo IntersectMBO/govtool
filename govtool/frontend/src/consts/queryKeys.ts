@@ -25,6 +25,7 @@ export const QUERY_KEYS = {
   useGetGovernanceActionHistoryKey: "useGetGovernanceActionHistoryKey",
   useGetDecidedActionsKey: "useGetDecidedActionsKey",
   useGetLiveProposalsKey: "useGetLiveProposalsKey",
+  useGetProposalsPageKey: "useGetProposalsPageKey",
   useGetGovernanceActionProposalDiscussionKey: "useGetGovernanceActionProposalDiscussionKey",
   useGovernanceActionVerifySignatureKey: "useGovernanceActionVerifySignatureKey",
 };

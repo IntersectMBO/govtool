@@ -109,6 +109,18 @@ export const theme = createTheme({
         },
       ],
     },
+    MuiTooltip: {
+      styleOverrides: {
+        arrow: { color: ds.gray["900"] },
+        tooltip: {
+          backgroundColor: ds.gray["900"],
+          borderRadius: RADIUS.md,
+          fontSize: 12,
+          lineHeight: "18px",
+          padding: "8px 10px",
+        },
+      },
+    },
     MuiChip: {
       variants: [
         {

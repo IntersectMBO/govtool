@@ -1,15 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { Box, Divider } from "@mui/material";
+import { Box } from "@mui/material";
 
-import { Background, ScrollToManage, Typography } from "@atoms";
-import { GOVERNANCE_ACTIONS_FILTERS, PATHS } from "@consts";
+import { Background, PageContainer, ScrollToManage } from "@atoms";
+import { PATHS } from "@consts";
 import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { DataActionsBar } from "@molecules";
 import {
   Footer,
-  GovernanceActionsTabs,
+  GovernanceActionsHeader,
+  GovernanceActionsListLayout,
   GovernanceActionsToVote,
   TopNav,
 } from "@organisms";
@@ -19,10 +18,8 @@ export const GovernanceActions = () => {
   const { ...dataActionsBarProps } = useDataActionsBar();
   const { chosenSorting, setChosenSorting } = dataActionsBarProps;
   const { governanceActionsSort } = useFeatureFlag();
-  const { isMobile, pagePadding } = useScreenDimension();
   const { isEnabled } = useCardano();
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
@@ -53,53 +50,14 @@ export const GovernanceActions = () => {
         }}
       >
         <TopNav />
-        <Box
-          sx={{
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            pt: isMobile ? 3.25 : 6.25,
-          }}
-        >
-          <Typography
-            sx={{ mb: isMobile ? 3.75 : 6, px: pagePadding }}
-            variant={isMobile ? "title1" : "headline3"}
-          >
-            {t("govActions.title")}
-          </Typography>
-          <Box sx={{ px: pagePadding }}>
-            <GovernanceActionsTabs />
+        <PageContainer sx={{ flex: 1 }}>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <GovernanceActionsHeader />
+            <GovernanceActionsListLayout>
+              <GovernanceActionsToVote onDashboard={false} />
+            </GovernanceActionsListLayout>
           </Box>
-          {isMobile && (
-            <Divider
-              style={{
-                borderColor: "#FFFFFF",
-                borderWidth: 1,
-                marginBottom: 30,
-              }}
-            />
-          )}
-          <Box
-            sx={{
-              display: "flex",
-              flex: 1,
-              flexDirection: "column",
-              px: pagePadding,
-            }}
-          >
-            <DataActionsBar
-              {...dataActionsBarProps}
-              filterOptions={GOVERNANCE_ACTIONS_FILTERS}
-              filtersTitle={t("govActions.filterTitle")}
-              sortOptions={governanceActionsSort.options}
-              isSorting={governanceActionsSort.isAvailable}
-            />
-            <Box height={isMobile ? 60 : 80} />
-            <GovernanceActionsToVote onDashboard={false} />
-          </Box>
-        </Box>
-        {/* FIXME: Footer should be on top of the layout.
-        Should not be rerendered across the pages */}
+        </PageContainer>
         <Footer />
       </Box>
     </Background>

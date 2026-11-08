@@ -66,3 +66,7 @@ export * from "./GovernanceActionHistorySorting";
 export * from "./GovernanceActionStatusChip";
 export * from "./GovernanceActionVoteSection";
 export * from "./PageTabs";
+export * from "./FilterSidebar";
+export * from "./SortSelect";
+export * from "./StatCard";
+export * from "./VoteTallyRow";

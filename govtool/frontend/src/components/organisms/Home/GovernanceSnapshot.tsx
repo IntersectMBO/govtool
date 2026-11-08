@@ -13,7 +13,7 @@ import {
 import { getProposalTypeLabel } from "@utils";
 import { ds, RADIUS } from "@/consts/designTokens";
 
-import { decidedStatus } from "./homeFormat";
+import { decidedStatus } from "@/utils/governanceActionFormat";
 
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 

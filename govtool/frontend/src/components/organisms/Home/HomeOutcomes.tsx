@@ -23,7 +23,7 @@ import {
 } from "@utils";
 import { ds, FONT_FAMILY, PILL_TONES, RADIUS } from "@/consts/designTokens";
 
-import { decidedStatus } from "./homeFormat";
+import { decidedStatus } from "@/utils/governanceActionFormat";
 import { DisplayHeading, Eyebrow, HomeColumn, Lead } from "./homeParts";
 
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;

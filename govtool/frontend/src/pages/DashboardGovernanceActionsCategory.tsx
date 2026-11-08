@@ -29,7 +29,7 @@ export const DashboardGovernanceActionsCategory = () => {
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
   const { governanceActionsSort } = useFeatureFlag();
   const { chosenSorting } = dataActionsBarProps;
-  const { isMobile, screenWidth } = useScreenDimension();
+  const { isMobile } = useScreenDimension();
   const navigate = useNavigate();
   const { pendingTransaction, isEnableLoading } = useCardano();
   const { voter } = useGetVoterInfo();
@@ -132,9 +132,7 @@ export const DashboardGovernanceActionsCategory = () => {
           <Box
             columnGap="20px"
             display="grid"
-            gridTemplateColumns={`repeat(auto-fit, minmax(${
-              screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
-            }, 1fr))`}
+            gridTemplateColumns="minmax(0, 1fr)"
           >
             {mappedData.map((item) => (
               <Box pb={4.25} key={item.txHash + item.index}>

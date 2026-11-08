@@ -19,6 +19,8 @@ type GovernanceActionCardHeaderProps = {
   metadataIssues?: MetadataIssue[];
   isValidating?: boolean;
   dataTestId?: string;
+  /** The list row's smaller title, as a heading, with no bottom margin. */
+  compact?: boolean;
 };
 
 export const GovernanceActionCardHeader = ({
@@ -27,6 +29,7 @@ export const GovernanceActionCardHeader = ({
   metadataIssues,
   isValidating,
   dataTestId = "governance-action-card-header",
+  compact = false,
 }: GovernanceActionCardHeaderProps) => {
   const { t } = useTranslation();
   const errors = getMetadataErrors(metadataIssues);
@@ -37,7 +40,7 @@ export const GovernanceActionCardHeader = ({
       sx={{
         display: "flex",
         alignItems: "center",
-        mb: "20px",
+        mb: compact ? 0 : "20px",
         overflow: "hidden",
       }}
       data-testid={dataTestId}
@@ -46,10 +49,13 @@ export const GovernanceActionCardHeader = ({
         <Skeleton height="24px" width="100px" variant="rounded" />
       ) : (
         <Typography
+          component={compact ? "h3" : "p"}
           sx={{
-            fontSize: 18,
+            fontSize: compact ? 16 : 18,
             fontWeight: 600,
+            letterSpacing: compact ? "-0.18px" : undefined,
             lineHeight: "24px",
+            m: 0,
             display: "-webkit-box",
             WebkitBoxOrient: "vertical",
             WebkitLineClamp: 2,

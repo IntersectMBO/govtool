@@ -615,6 +615,16 @@
       }
     }
   },
+  "listControls": {
+    "sortLabel": "Sort:",
+    "sortDefault": "Default",
+    "filters": "Filters",
+    "allTypes": "All Governance Actions",
+    "allStatuses": "All statuses",
+    "actionType": "Action type",
+    "status": "Status",
+    "searchActions": "Search Governance Actions"
+  },
   "pagination": {
     "next": "Next →",
     "pageOf": "Page {{page}} of {{count}}",
@@ -782,6 +792,18 @@
       }
     },
     "liveVotingTab": "Live Voting",
+    "pageTitle": "Governance actions",
+    "pageDescription": "Explore proposals shaping Cardano. Review the details, follow voting progress and take part in decisions that move the ecosystem forward.",
+    "createAction": "Create Governance Action",
+    "card": {
+      "active": "Active",
+      "submitted": "Submitted",
+      "expires": "Expires",
+      "left": "{{time}} left",
+      "epoch": "Epoch {{epoch}}",
+      "youVoted": "You voted {{vote}}",
+      "untitled": "Untitled governance action"
+    },
     "outcomesTab": "Outcomes",
     "proposedTab": "Proposed Governance Actions",
     "liveVoting": {

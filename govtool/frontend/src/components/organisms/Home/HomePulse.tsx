@@ -19,11 +19,11 @@ import {
 } from "@utils";
 import { ds, FONT_FAMILY, RADIUS } from "@/consts/designTokens";
 
-import { timeLeft, treasuryTotal, voteBar } from "./homeFormat";
+import { VoteTallyRow } from "@/components/molecules/VoteTallyRow";
+import { timeLeft, treasuryTotal } from "@/utils/governanceActionFormat";
 import { DisplayHeading, Eyebrow, HomeColumn } from "./homeParts";
 
 const ROLES: GovernanceActionVoteAggregate["role"][] = ["drep", "spo", "cc"];
-const ROLE_LABELS = { drep: "DRep", spo: "SPO", cc: "CC" };
 
 const mono = {
   fontFamily: FONT_FAMILY.mono,
@@ -34,54 +34,6 @@ const mono = {
 const Dot = ({ color }: { color: string }) => (
   <Box component="span" sx={{ backgroundColor: color, borderRadius: "2px", display: "inline-block", height: 8, width: 8 }} />
 );
-
-const VoteRow = ({
-  role,
-  aggregate,
-}: {
-  role: GovernanceActionVoteAggregate["role"];
-  aggregate?: GovernanceActionVoteAggregate;
-}) => {
-  const { t } = useTranslation();
-  const bar = aggregate ? voteBar(aggregate) : undefined;
-
-  return (
-    <Box data-testid={`pulse-${role}-row`} sx={{ alignItems: "center", display: "grid", gap: 1.5, gridTemplateColumns: "36px 1fr auto" }}>
-      <Box component="span" sx={{ ...mono, color: ds.gray["600"] }}>
-        {ROLE_LABELS[role]}
-      </Box>
-      <Box
-        sx={{
-          backgroundColor: ds.gray["100"],
-          backgroundImage: aggregate
-            ? "none"
-            : `repeating-linear-gradient(135deg, ${ds.gray["200"]} 0 2px, transparent 2px 4px)`,
-          borderRadius: "3px",
-          height: 6,
-          position: "relative",
-        }}
-      >
-        {bar && (
-          <>
-            <Box sx={{ backgroundColor: ds.success["600"], borderRadius: "3px 0 0 3px", height: "100%", left: 0, position: "absolute", width: `${bar.yesPercent}%` }} />
-            <Box sx={{ backgroundColor: ds.error["600"], height: "100%", left: `${bar.yesPercent}%`, position: "absolute", width: `${bar.votedNoPercent}%` }} />
-            <Box aria-hidden sx={{ backgroundColor: ds.gray["500"], height: 12, left: `${bar.thresholdPercent}%`, position: "absolute", top: -3, width: "2px" }} />
-          </>
-        )}
-      </Box>
-      <Box component="span" sx={{ ...mono, color: ds.gray["500"], minWidth: 104, textAlign: "right", whiteSpace: "nowrap" }}>
-        {!aggregate && t("landing.pulse.notEligible").toUpperCase()}
-        {aggregate && !bar && "—"}
-        {bar && (
-          <>
-            <Box component="span" sx={{ fontWeight: 600 }}>{`${bar.yesPercent.toFixed(1)}%`}</Box>
-            <Box component="span" sx={{ color: ds.gray["900"] }}>{` / ${bar.thresholdPercent.toFixed(1)}%`}</Box>
-          </>
-        )}
-      </Box>
-    </Box>
-  );
-};
 
 const voteCount = (proposal: ProposalData) => {
   const p = proposal as ProposalData & Record<string, number | undefined>;
@@ -156,10 +108,11 @@ const PulseRow = ({
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
         {ROLES.map((role) => (
-          <VoteRow
+          <VoteTallyRow
             key={role}
             aggregate={record?.vote_aggregates?.find((aggregate) => aggregate.role === role)}
-            role={role}
+            dataTestId={`pulse-${role}-row`}
+            voterRole={role}
           />
         ))}
         <Box sx={{ ...mono, alignItems: "center", color: ds.gray["600"], display: "flex", flexWrap: "wrap", gap: 1 }}>

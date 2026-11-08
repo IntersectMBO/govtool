@@ -32,3 +32,4 @@ export * from "./VotingPowerChips";
 export * from "./Loader";
 
 export * from "./types";
+export * from "./GovernanceActionTypeIcon";

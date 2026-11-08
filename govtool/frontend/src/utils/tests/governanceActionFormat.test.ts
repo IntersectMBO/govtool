@@ -7,7 +7,7 @@ import {
   timeLeft,
   treasuryTotal,
   voteBar,
-} from "./homeFormat";
+} from "../governanceActionFormat";
 
 const status = (
   over: Partial<GovernanceActionRecord["status"]>,
@@ -80,6 +80,7 @@ describe("voteBar", () => {
       noPercent: 40,
       votedNoPercent: 20,
       thresholdPercent: 67,
+      passing: false,
     });
   });
 

@@ -50,6 +50,7 @@ export const voteBar = (aggregate: GovernanceActionVoteAggregate) => {
         ? Math.round((Number(aggregate.no) / ratification) * 10000) / 100
         : 0,
     thresholdPercent: Math.round((numerator / denominator) * 1000) / 10,
+    passing: result.passing,
   };
 };
 

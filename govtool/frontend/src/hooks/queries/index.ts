@@ -24,3 +24,4 @@ export * from "./useGetGovernanceActionEpochParams";
 export * from "./useGetGovernanceActionProposalDiscussionQuery";
 export * from "./useGetDecidedActionsQuery";
 export * from "./useGetLiveProposalsQuery";
+export * from "./useGetProposalsPageQuery";

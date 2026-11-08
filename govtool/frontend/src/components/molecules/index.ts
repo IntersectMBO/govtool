@@ -26,7 +26,6 @@ export * from "./GovernanceActionCardStatePill";
 export * from "./GovernanceActionCardTreasuryWithdrawalElement";
 export * from "./GovernanceActionDetailsCardLinks";
 export * from "./GovernanceActionDetailsCardOnChainData";
-export * from "./GovernanceActionDetailsCardVotes";
 export * from "./GovernanceActionDetailsDiffView";
 export * from "./GovernanceActionNewConstitutionDetailsTabContent";
 export * from "./GovernanceActionNewCommitteeDetailsTabContent";

@@ -804,6 +804,19 @@
       "youVoted": "You voted {{vote}}",
       "untitled": "Untitled governance action"
     },
+    "details": {
+      "actionInformation": "Action Information",
+      "closesAtEpoch": "Closes at epoch {{epoch}}",
+      "currentEpoch": "Current epoch",
+      "noReasoning": "This action has no abstract, motivation or rationale.",
+      "sections": "Governance action sections",
+      "submittedOn": "Submitted {{date}} (Epoch {{epoch}})",
+      "timeRemaining": "Time remaining",
+      "voteInProgress": "Vote in progress",
+      "voteOnAction": "Vote on this action",
+      "votingEndsIn": "Voting ends in {{time}}",
+      "votingOpen": "Voting open"
+    },
     "outcomesTab": "Outcomes",
     "proposedTab": "Proposed Governance Actions",
     "liveVoting": {

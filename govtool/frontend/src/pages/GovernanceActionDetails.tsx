@@ -7,13 +7,13 @@ import {
 } from "react-router";
 import { Box, CircularProgress, Link } from "@mui/material";
 import { AxiosError } from "axios";
+import { ChevronLeft } from "lucide-react";
 
-import { Background, Typography } from "@atoms";
-import { ICONS, GOV_ACTION_HISTORY_PATHS, PATHS } from "@consts";
+import { Background, PageContainer, Typography } from "@atoms";
+import { GOV_ACTION_HISTORY_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
-  useScreenDimension,
   useTranslation,
 } from "@hooks";
 import { Footer, TopNav, GovernanceActionDetailsCard } from "@organisms";
@@ -31,6 +31,7 @@ import {
   ProposalData,
 } from "@/models";
 import { useValidateMutation } from "@/hooks/mutations";
+import { ds } from "@/consts/designTokens";
 
 type GovernanceActionDetailsState = {
   proposal?: ProposalData;
@@ -44,7 +45,6 @@ export const GovernanceActionDetails = () => {
   const state = untypedState as GovernanceActionDetailsState | null;
   const index = hash.slice(1);
   const navigate = useNavigate();
-  const { pagePadding, isMobile } = useScreenDimension();
   const { isEnabled } = useCardano();
   const { t } = useTranslation();
   const { proposalId: txHash } = useParams();
@@ -146,40 +146,27 @@ export const GovernanceActionDetails = () => {
         minHeight="100vh"
       >
         <TopNav />
-        <Box
-          display="flex"
-          flex={1}
-          flexDirection="row"
-          pt={2}
-          px={pagePadding}
-        >
+        <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column", pt: { xxs: 2, md: 3 } }}>
           <Box display="flex" flex={1} flexDirection="column" width="100%">
-            {isMobile ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "8px 0 24px",
-                  mb: "10px",
-                  borderBottom: "1px solid #FFF",
-                }}
-              >
-                <Typography variant="title1">
-                  {t("govActions.title")}
-                </Typography>
-              </Box>
-            ) : null}
             <Breadcrumbs
-              elementOne={t("govActions.title")}
+              elementOne={t("govActions.pageTitle")}
               elementOnePath={PATHS.governanceActions}
-              elementTwo={extendedProposal?.title ?? ""}
+              elementTwo={extendedProposal?.title || t("govActions.card.untitled")}
               isDataMissing={metadataStatus ?? null}
             />
             <Link
+              data-testid="back-to-list-link"
               sx={{
+                alignItems: "center",
+                alignSelf: "flex-start",
+                color: ds.gray["600"],
                 cursor: "pointer",
                 display: "flex",
+                fontSize: 13,
+                gap: 0.5,
+                mt: 1,
                 textDecoration: "none",
+                "&:hover": { color: ds.primary["600"] },
               }}
               onClick={() =>
                 navigate(
@@ -191,14 +178,8 @@ export const GovernanceActionDetails = () => {
                 )
               }
             >
-              <img
-                alt="arrow"
-                src={ICONS.arrowRightIcon}
-                style={{ marginRight: "12px", transform: "rotate(180deg)" }}
-              />
-              <Typography color="primary" fontWeight={400} variant="body2">
-                {t("back")}
-              </Typography>
+              <ChevronLeft aria-hidden size={16} />
+              {t("back")}
             </Link>
             {isLoading && !state?.proposal ? (
               <Box
@@ -237,9 +218,7 @@ export const GovernanceActionDetails = () => {
               </Box>
             )}
           </Box>
-        </Box>
-        {/* FIXME: Footer should be on top of the layout.
-        Should not be rerendered across the pages */}
+        </PageContainer>
         <Footer />
       </Box>
     </Background>

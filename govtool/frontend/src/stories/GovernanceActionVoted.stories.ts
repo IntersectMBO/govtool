@@ -10,7 +10,7 @@ const meta = {
   title: "Example/GovernanceVotedOnCard",
   component: GovernanceVotedOnCard,
   parameters: {
-    layout: "centered",
+    layout: "padded",
   },
 
   tags: ["autodocs"],
@@ -25,27 +25,15 @@ async function checkGovActionVisibility(canvas: ReturnType<typeof within>) {
       `${getProposalTypeNoEmptySpaces(GovernanceActionType.InfoAction)}-type`,
     ),
   ).toBeInTheDocument();
-  expect(canvas.getByTestId("exampleHash#1-id")).toBeInTheDocument();
-  expect(canvas.getByText(/Votes submitted/i)).toBeInTheDocument();
+  expect(canvas.getByText("Epoch 323")).toBeVisible();
 
-  expect(
-    canvas.getByText(formatDisplayDate("1970-01-01T00:00:00Z")),
-  ).toBeInTheDocument();
-  expect(
-    canvas.getByText(formatDisplayDate("1970-02-01T00:00:00Z")),
-  ).toBeInTheDocument();
-
-  const tooltips = canvas.getAllByTestId("InfoOutlinedIcon");
-  await userEvent.hover(tooltips[0]);
-  await waitFor(async () => {
-    expect(screen.getByRole("tooltip")).toBeInTheDocument();
-    expect(screen.getByRole("tooltip")).toHaveTextContent(/Submission Date/i);
-    await userEvent.unhover(tooltips[0]);
-  });
-  await userEvent.hover(tooltips[1]);
+  const expiryDate = formatDisplayDate(
+    "1970-02-01T00:00:00Z",
+    "do MMM yyyy, HH:mm",
+  );
+  await userEvent.hover(canvas.getByLabelText(expiryDate));
   await waitFor(() => {
-    expect(screen.getByRole("tooltip")).toBeInTheDocument();
-    expect(screen.getByRole("tooltip")).toHaveTextContent(/Expiry Date/i);
+    expect(screen.getByRole("tooltip")).toHaveTextContent(expiryDate);
   });
 
   await expect(

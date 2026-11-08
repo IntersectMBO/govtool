@@ -86,7 +86,6 @@ export const GovernanceActionHistoryCard = ({ action }: GovernanceActionHistoryC
         minWidth: 0,
         p: { xxs: 2, md: 2.5 },
         position: "relative",
-        width: "100%",
         "&:hover": { borderColor: ds.gray["300"], borderLeftColor: style.accent },
         "&:focus-within": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
       }}

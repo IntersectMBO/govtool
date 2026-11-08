@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 import { Box, ButtonBase, InputBase } from "@mui/material";
-import { ListFilter, Search } from "lucide-react";
+import { ListFilter, Search, X } from "lucide-react";
 
 import { GovernanceActionTypeIcon } from "@atoms";
 import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
@@ -14,14 +14,19 @@ type Props = { children: ReactNode };
 export const SearchField = ({
   value,
   onChange,
+  onClear,
   placeholder,
 }: {
   value: string;
   onChange: (next: string) => void;
+  /** Shows a clear button while there is text. */
+  onClear?: () => void;
   placeholder: string;
-}) => (
-  <Box
-    sx={{
+}) => {
+  const { t } = useTranslation();
+  return (
+    <Box
+      sx={{
       alignItems: "center",
       backgroundColor: "#FFFFFF",
       border: `1px solid ${ds.gray["200"]}`,
@@ -34,17 +39,28 @@ export const SearchField = ({
       px: 1.5,
       "&:focus-within": { borderColor: ds.primary["600"] },
     }}
-  >
-    <Search aria-hidden color={ds.gray["500"]} size={16} />
-    <InputBase
-      inputProps={{ "aria-label": placeholder, "data-testid": "search-input" }}
-      onChange={(event) => onChange(event.target.value)}
-      placeholder={placeholder}
-      sx={{ flex: 1, fontSize: 14, "& input": { p: 0 } }}
-      value={value}
-    />
-  </Box>
-);
+    >
+      <Search aria-hidden color={ds.gray["500"]} size={16} />
+      <InputBase
+        inputProps={{ "aria-label": placeholder, "data-testid": "search-input" }}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        sx={{ flex: 1, fontSize: 14, "& input": { p: 0 } }}
+        value={value}
+      />
+      {onClear && value && (
+      <ButtonBase
+        aria-label={t("governanceActionHistoryList.clearSearchInput")}
+        data-testid="clear-search-input"
+        onClick={onClear}
+        sx={{ borderRadius: "50%", color: ds.gray["500"], height: 24, width: 24 }}
+      >
+        <X aria-hidden size={14} />
+      </ButtonBase>
+    )}
+    </Box>
+  );
+};
 
 /** Counts per type from the cached live list, only when it holds every action. */
 const useLiveTypeCounts = () => {

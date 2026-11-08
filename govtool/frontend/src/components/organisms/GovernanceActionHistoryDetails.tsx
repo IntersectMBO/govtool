@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import { Typography } from "@atoms";
-import { GOV_ACTION_HISTORY_PATHS, GOV_ACTION_HISTORY_TYPE_FILTERS, primaryBlue } from "@consts";
+import { GOV_ACTION_HISTORY_PATHS, GOV_ACTION_HISTORY_TYPE_FILTERS } from "@consts";
 import {
   useGetGovernanceActionMetadata,
   useGetGovernanceActionRecordQuery,
@@ -33,7 +33,6 @@ import {
   GovernanceActionNewCommitteeDetails,
   GovernanceActionProposalDiscussion,
   GovernanceActionHistoryEmptyState,
-  GovernanceActionStatusChip,
   Share,
 } from "@molecules";
 import { GovernanceActionRecord } from "@models";
@@ -46,6 +45,7 @@ import {
   mapArrayToObjectByKeys,
 } from "@utils";
 import { GovernanceActionType } from "@/types/governanceAction";
+import { ds, FONT_FAMILY, RADIUS, SHADOWS } from "@/consts/designTokens";
 
 import { GovernanceActionVoting } from "./GovernanceActionVoting";
 
@@ -61,20 +61,23 @@ const StyledTab = styled(({ isMobile, ...props }: StyledTabProps) => (
   <Tab disableRipple {...props} />
 ))(({ isMobile }) => ({
   textTransform: "none",
-  fontWeight: 600,
-  fontSize: 16,
+  fontWeight: 500,
+  fontSize: 14,
+  minHeight: 48,
   width: !isMobile ? "auto" : "50%",
-  color: "rgba(36, 34, 50, 0.5)",
+  color: ds.gray["500"],
   "&.Mui-selected": {
-    color: "rgba(38, 37, 45, 1)",
+    color: ds.primary["600"],
+    fontWeight: 600,
   },
 }));
 
 const cardSx = {
-  backgroundColor: "white",
-  borderRadius: "16px",
-  boxShadow: "0px 4px 15px 0px #DDE3F5",
-  paddingX: 2,
+  backgroundColor: "#FFFFFF",
+  border: `1px solid ${ds.gray["200"]}`,
+  borderRadius: `${RADIUS.lg}px`,
+  boxShadow: SHADOWS.card,
+  paddingX: { xxs: 2, md: 2.75 },
   paddingY: 2.75,
 };
 
@@ -264,13 +267,13 @@ const GovernanceActionHistoryDetailsContent = ({
       flexDirection="column"
     >
       <Breadcrumbs
-        elementOne={t("governanceActionHistoryList.title")}
+        elementOne={t("govActions.outcomesTab")}
         elementOnePath={GOV_ACTION_HISTORY_PATHS.governanceActionHistory}
-        elementTwo={title ?? ""}
-        isMetadataLoading={isMetadataLoading || (!isDataMissing && !title)}
+        elementTwo={title || (isMetadataLoading ? "" : t("govActions.card.untitled"))}
+        isMetadataLoading={isMetadataLoading}
         isDataMissing={isDataMissing ?? null}
       />
-      <Box className="outcome-details-grid" mt={0.5}>
+      <Box className="outcome-details-grid" mt={2}>
         <Box
           className="outcome-details"
           data-testid={`single-action-${idCIP129}-description`}
@@ -291,18 +294,23 @@ const GovernanceActionHistoryDetailsContent = ({
                 <Skeleton variant="rounded" width="75%" height={32} />
               ) : (
                 <Typography
+                  component="h1"
                   data-testid="single-action-title"
                   sx={{
-                    fontSize: 22,
+                    color: ds.gray["900"],
+                    fontSize: { xxs: 24, md: 28 },
                     fontWeight: 600,
-                    lineHeight: "24px",
+                    letterSpacing: "-0.5px",
+                    lineHeight: { xxs: "30px", md: "36px" },
+                    m: 0,
                     wordBreak: "break-word",
                     ...(isDataMissing && { color: "errorRed" }),
                   }}
                 >
                   {(isDataMissing &&
                     getMetadataDataMissingStatusTranslation(isDataMissing)) ||
-                    title}
+                    title ||
+                    t("govActions.card.untitled")}
                 </Typography>
               )}
               <Share link={window.location.href} />
@@ -317,16 +325,10 @@ const GovernanceActionHistoryDetailsContent = ({
               gap={0.5}
             >
               <Typography
-                sx={{ color: "neutralGray", fontWeight: 600, fontSize: 14 }}
+                sx={{ color: ds.gray["500"], fontFamily: FONT_FAMILY.mono, fontSize: 12, letterSpacing: "0.2px", textTransform: "uppercase" }}
               >
-                {t("actionRecord.governanceActionType")}
+                {typeLabel}
               </Typography>
-              <Box display="inline-flex">
-                <GovernanceActionStatusChip
-                  label={typeLabel}
-                  bgColor={primaryBlue.c100}
-                />
-              </Box>
             </Box>
             <GovernanceActionDatesBox action={governanceAction} />
             <GovernanceActionStatus

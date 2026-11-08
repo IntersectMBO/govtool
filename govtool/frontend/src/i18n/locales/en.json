@@ -569,6 +569,13 @@
     }
   },
   "governanceActionHistoryList": {
+    "outcome": {
+      "Enacted": "Enacted",
+      "Expired": "Expired",
+      "Live": "Live",
+      "NotRatified": "Not ratified",
+      "Ratified": "Ratified"
+    },
     "title": "Historical Actions",
     "noResults": {
       "title": "No governance actions found",
@@ -816,6 +823,15 @@
       "voteOnAction": "Vote on this action",
       "votingEndsIn": "Voting ends in {{time}}",
       "votingOpen": "Voting open"
+    },
+    "proposeBanner": {
+      "cta": "Propose Action",
+      "description": "Create and submit a governance action for the community",
+      "stepCreate": "Create Proposal",
+      "stepReview": "Review",
+      "stepSubmit": "Submit On-chain",
+      "tag": "Create governance action",
+      "title": "Have an idea for Cardano governance?"
     },
     "outcomesTab": "Outcomes",
     "proposedTab": "Proposed Governance Actions",

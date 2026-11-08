@@ -1,20 +1,29 @@
-import { useEffect, useState } from "react";
-import { Box, Chip, IconButton, InputBase } from "@mui/material";
+import { ReactNode, useEffect, useState } from "react";
+import { Box, ButtonBase } from "@mui/material";
 import { useSearchParams } from "react-router";
-import { IconSearch, IconX } from "@intersect.mbo/intersectmbo.org-icons-set";
+import { AlarmClock, Check, CircleCheck, CircleDot, ListFilter } from "lucide-react";
 
+import { GovernanceActionTypeIcon } from "@atoms";
 import {
-  orange,
   GOV_ACTION_HISTORY_FILTERS_STORAGE_KEY,
   GOV_ACTION_HISTORY_SORT_OPTIONS,
   GOV_ACTION_HISTORY_SORT_STORAGE_KEY,
   GOV_ACTION_HISTORY_STATUS_FILTERS,
   GOV_ACTION_HISTORY_TYPE_FILTERS,
-  primaryBlue,
 } from "@consts";
-import { GovernanceActionHistoryFilters, GovernanceActionHistorySorting } from "@molecules";
-import { useScreenDimension, useTranslation } from "@hooks";
+import { FilterSidebar, SortSelect } from "@molecules";
+import { useTranslation } from "@hooks";
 import { getCurrentSearchParams } from "@utils";
+import { ds, RADIUS } from "@/consts/designTokens";
+
+import { SearchField } from "./GovernanceActionsListLayout";
+
+const STATUS_ICONS: Record<string, ReactNode> = {
+  live: <CircleDot aria-hidden color={ds.primary["600"]} size={16} />,
+  enacted: <Check aria-hidden color={ds.success["600"]} size={16} />,
+  ratified: <CircleCheck aria-hidden color={ds.success["600"]} size={16} />,
+  expired: <AlarmClock aria-hidden color={ds.error["600"]} size={16} />,
+};
 
 type FilterParam = "type" | "status";
 
@@ -39,13 +48,18 @@ const writeStorage = (key: string, value: string | null) => {
 };
 
 /**
- * Search, filters and sort of the governanceActionHistory list. State lives in the URL
- * (`q`, `type`, `status`, `sort`); filters and sort are also remembered in
- * localStorage and restored when the URL carries none.
+ * Search, filters and sort of the governanceActionHistory list, around the
+ * list itself: search and sort above, type and status filters in a sidebar.
+ * State lives in the URL (`q`, `type`, `status`, `sort`); filters and sort are
+ * also remembered in localStorage and restored when the URL carries none.
  */
-export const GovernanceActionHistorySearchFiltersSortBar = () => {
-  const { isMobile } = useScreenDimension();
+export const GovernanceActionHistorySearchFiltersSortBar = ({
+  children,
+}: {
+  children?: ReactNode;
+}) => {
   const { t } = useTranslation();
+  const [areFiltersOpen, setAreFiltersOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [isInitializing, setIsInitializing] = useState(true);
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
@@ -117,108 +131,112 @@ export const GovernanceActionHistorySearchFiltersSortBar = () => {
     return () => clearTimeout(timer);
   }, [searchTerm, searchParams, setSearchParams, isInitializing]);
 
-  const removeFilter = (name: FilterParam, value: string) => {
+  const setFilter = (name: FilterParam, values: string[]) => {
     const newParams = getCurrentSearchParams();
-    const updated = (newParams.get(name) ?? "")
-      .split(",")
-      .filter((item) => item && item !== value);
-    if (updated.length) {
-      newParams.set(name, updated.join(","));
+    if (values.length) {
+      newParams.set(name, values.join(","));
     } else {
       newParams.delete(name);
     }
     setSearchParams(newParams);
   };
 
-  const getFilterLabel = (name: FilterParam, value: string) =>
-    (name === "type" ? GOV_ACTION_HISTORY_TYPE_FILTERS : GOV_ACTION_HISTORY_STATUS_FILTERS).find(
-      (filter) => filter.value === value,
-    )?.label ?? value;
+  const setSort = (value: string) => {
+    const newParams = getCurrentSearchParams();
+    newParams.set("sort", value);
+    setSearchParams(newParams);
+  };
 
-  const renderChip = (name: FilterParam, value: string) => (
-    <Chip
-      key={`${name}-${value}`}
-      label={getFilterLabel(name, value)}
-      onDelete={() => removeFilter(name, value)}
-      data-testid={`${name}-chip-${value}`}
-      size="small"
-      deleteIcon={
-        <IconButton sx={{ padding: "4px" }}>
-          <IconX style={{ width: 16, height: 16 }} />
-        </IconButton>
-      }
-      sx={{
-        backgroundColor: name === "type" ? "#B8CDFF" : orange.c200,
-        borderRadius: 100,
-        flexDirection: "row-reverse",
-        gap: 0.5,
-        height: "auto",
-        py: 0.75,
-        pl: 1.75,
-        pr: 2.25,
-        "& .MuiChip-label": {
-          color: "textBlack",
-          fontSize: 12,
-          fontWeight: 400,
-          px: 0,
-        },
-      }}
-    />
+  const sidebar = (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <FilterSidebar
+        allIcon={<ListFilter aria-hidden color={ds.primary["600"]} size={16} />}
+        allLabel={t("listControls.allTypes")}
+        dataTestId="history-type-filter"
+        onChange={(values) => setFilter("type", values)}
+        options={GOV_ACTION_HISTORY_TYPE_FILTERS.map((filter) => ({
+          key: filter.value,
+          label: filter.label,
+          icon: <GovernanceActionTypeIcon type={filter.value} />,
+        }))}
+        selected={typeFilters}
+        title={t("listControls.actionType")}
+      />
+      <FilterSidebar
+        allIcon={<ListFilter aria-hidden color={ds.gray["600"]} size={16} />}
+        allLabel={t("listControls.allStatuses")}
+        dataTestId="history-status-filter"
+        onChange={(values) => setFilter("status", values)}
+        options={GOV_ACTION_HISTORY_STATUS_FILTERS.map((filter) => ({
+          key: filter.value,
+          label: filter.label,
+          icon: STATUS_ICONS[filter.value],
+        }))}
+        selected={statusFilters}
+        title={t("listControls.status")}
+      />
+    </Box>
   );
 
+  const chosenCount = typeFilters.length + statusFilters.length;
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      <Box
-        display="flex"
-        flexDirection={isMobile ? "column" : "row"}
-        alignItems={isMobile ? "stretch" : "center"}
-        justifyContent="space-between"
-        gap={isMobile ? 1 : 1.5}
-      >
-        <InputBase
-          id="search-input"
-          inputProps={{ "data-testid": "search-input" }}
-          onChange={(e) => setSearchTerm(e.target.value)}
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+      <Box sx={{ alignItems: "center", display: "flex", flexWrap: { xxs: "wrap", md: "nowrap" }, gap: 1.5 }}>
+        <SearchField
+          onChange={setSearchTerm}
+          onClear={() => setSearchTerm("")}
           placeholder={t("governanceActionHistoryList.searchPlaceholder")}
           value={searchTerm}
-          startAdornment={
-            <IconSearch width={20} height={18} fill={primaryBlue.c200} />
-          }
-          endAdornment={
-            searchTerm && (
-              <IconButton
-                onClick={() => setSearchTerm("")}
-                data-testid="clear-search-input"
-                aria-label={t("governanceActionHistoryList.clearSearchInput")}
-              >
-                <IconX width={18} height={18} />
-              </IconButton>
-            )
-          }
-          sx={{
-            bgcolor: "white",
-            border: 1,
-            borderColor: "#BFC8D961",
-            borderRadius: 1,
-            fontSize: 15,
-            fontWeight: 400,
-            height: 48,
-            paddingLeft: 2.5,
-            "& .MuiInputBase-input": { paddingLeft: 1 },
-          }}
         />
-        <Box display="flex" gap={isMobile ? 1 : 1.5}>
-          <GovernanceActionHistoryFilters />
-          <GovernanceActionHistorySorting />
-        </Box>
+        <ButtonBase
+          aria-expanded={areFiltersOpen}
+          data-testid="filters-button"
+          onClick={() => setAreFiltersOpen((open) => !open)}
+          sx={{
+            alignItems: "center",
+            backgroundColor: "#FFFFFF",
+            border: `1px solid ${chosenCount ? ds.primary["600"] : ds.gray["200"]}`,
+            borderRadius: `${RADIUS.md}px`,
+            color: ds.gray["700"],
+            display: { xxs: "inline-flex", md: "none" },
+            flex: { xxs: 1, md: "none" },
+            fontFamily: "inherit",
+            fontSize: 14,
+            gap: 0.75,
+            height: 40,
+            px: 1.5,
+          }}
+        >
+          <ListFilter aria-hidden size={16} />
+          {t("listControls.filters")}
+          {chosenCount > 0 && ` (${chosenCount})`}
+        </ButtonBase>
+        <SortSelect
+          onChange={setSort}
+          options={GOV_ACTION_HISTORY_SORT_OPTIONS.map((option) => ({
+            key: option.value,
+            label: option.label,
+          }))}
+          value={currentSort}
+        />
       </Box>
 
-      {(typeFilters.length > 0 || statusFilters.length > 0) && (
-        <Box display="flex" flexWrap="wrap" gap={1} data-testid="filter-chips">
-          {typeFilters.map((value) => renderChip("type", value))}
-          {statusFilters.map((value) => renderChip("status", value))}
+      {areFiltersOpen && <Box sx={{ display: { md: "none" } }}>{sidebar}</Box>}
+
+      <Box
+        sx={{
+          alignItems: "start",
+          display: "grid",
+          gap: 2.5,
+          gridTemplateColumns: { xxs: "1fr", md: "230px minmax(0, 1fr)" },
+        }}
+      >
+        <Box sx={{ display: { xxs: "none", md: "block" }, position: "sticky", top: 88 }}>
+          {sidebar}
         </Box>
-      )}
+        <Box sx={{ minWidth: 0 }}>{children}</Box>
+      </Box>
     </Box>
   );
 };

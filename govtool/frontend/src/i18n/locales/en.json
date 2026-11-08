@@ -576,6 +576,11 @@
       "NotRatified": "Not ratified",
       "Ratified": "Ratified"
     },
+    "roles": {
+      "cc": "CC",
+      "drep": "DReps",
+      "spo": "SPOs"
+    },
     "title": "Historical Actions",
     "noResults": {
       "title": "No governance actions found",

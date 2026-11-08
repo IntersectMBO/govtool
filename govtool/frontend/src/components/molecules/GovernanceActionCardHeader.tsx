@@ -92,7 +92,8 @@ export const GovernanceActionCardHeader = ({
             style={{
               color: "#ADAEAD",
             }}
-            sx={{ ml: 0.7 }}
+            // Above a list card's stretched link, so the tooltip opens.
+            sx={{ ml: 0.7, position: "relative", zIndex: 1 }}
             fontSize="small"
           />
         </Tooltip>
@@ -106,7 +107,7 @@ export const GovernanceActionCardHeader = ({
         >
           <WarningAmberRoundedIcon
             data-testid="metadata-warning-icon"
-            sx={{ ml: 0.7, color: "orangeDark" }}
+            sx={{ ml: 0.7, color: "orangeDark", position: "relative", zIndex: 1 }}
             fontSize="small"
           />
         </Tooltip>

@@ -1,17 +1,16 @@
-import { Box } from "@mui/material";
-import { Link } from "react-router";
+import { Box, ButtonBase } from "@mui/material";
 import { ArrowRight } from "lucide-react";
 
 import { useTranslation } from "@hooks";
 import { FONT_FAMILY } from "@/consts/designTokens";
 
 type Props = {
-  /** Where "Propose Action" leads: the forum's propose flow or the on-chain form. */
-  to: string;
+  /** Called by "Propose Action". */
+  onPropose: () => void;
 };
 
 /** The orange "Have an idea for Cardano governance?" call to action. */
-export const ProposeActionBanner = ({ to }: Props) => {
+export const ProposeActionBanner = ({ onPropose }: Props) => {
   const { t } = useTranslation();
   const steps = [
     t("govActions.proposeBanner.stepCreate"),
@@ -70,10 +69,9 @@ export const ProposeActionBanner = ({ to }: Props) => {
           {t("govActions.proposeBanner.description")}
         </Box>
       </Box>
-      <Box
-        component={Link}
+      <ButtonBase
         data-testid="propose-action-banner-button"
-        to={to}
+        onClick={onPropose}
         sx={{
           alignItems: "center",
           alignSelf: { xxs: "flex-start", md: "center" },
@@ -83,6 +81,7 @@ export const ProposeActionBanner = ({ to }: Props) => {
           color: "#E9682F",
           display: "inline-flex",
           flexShrink: 0,
+          fontFamily: "inherit",
           fontSize: 16,
           fontWeight: 600,
           gap: 1,
@@ -91,12 +90,12 @@ export const ProposeActionBanner = ({ to }: Props) => {
           position: "relative",
           px: 2.5,
           textDecoration: "none",
-          "&:focus-visible": { outline: "2px solid #FFFFFF", outlineOffset: 2 },
+          "&.Mui-focusVisible": { outline: "2px solid #FFFFFF", outlineOffset: 2 },
         }}
       >
         {t("govActions.proposeBanner.cta")}
         <ArrowRight aria-hidden size={18} strokeWidth={2} />
-      </Box>
+      </ButtonBase>
     </Box>
   );
 };

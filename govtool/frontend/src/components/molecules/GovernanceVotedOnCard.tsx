@@ -1,4 +1,5 @@
 import { PATHS } from "@consts";
+import { useAppContext } from "@context";
 import { getFullGovActionId } from "@utils";
 import { GovernanceActionCard } from "./GovernanceActionCard";
 import {
@@ -24,6 +25,7 @@ export const GovernanceVotedOnCard = ({
   metadataIssues,
 }: Props) => {
   const { proposal, vote } = votedProposal;
+  const { cExplorerBaseUrl } = useAppContext();
   const govActionId = getFullGovActionId(proposal.txHash, proposal.index);
 
   return (
@@ -42,6 +44,7 @@ export const GovernanceVotedOnCard = ({
       metadataIssues={metadataIssues}
       metadataStatus={metadataStatus}
       myVote={vote?.vote}
+      myVoteTxUrl={vote?.txHash ? `${cExplorerBaseUrl}/tx/${vote.txHash}` : undefined}
     />
   );
 };

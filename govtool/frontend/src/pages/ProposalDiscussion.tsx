@@ -1,11 +1,12 @@
 import React, { ComponentProps, Suspense } from "react";
 import { Box, CircularProgress } from "@mui/material";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   useAppContext,
   useCardano,
   useGovernanceActions,
   useProposalDiscussion,
+  useModal,
   useSnackbar,
 } from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
@@ -42,9 +43,26 @@ export const ProposalDiscussionPillar = () => {
   const { username, setUsername } = useProposalDiscussion();
   const snackbarContext = useSnackbar();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { openModal } = useModal();
   // Computed on every render: it also reads the saved wallet name.
   const walletStatus = getPdfWalletStatus(context);
-  const isListPage = pathname === PDF_PATHS.proposalDiscussion;
+  // The propose path is the list with pdf-ui's propose dialog over it.
+  const isListPage =
+    pathname === PDF_PATHS.proposalDiscussion ||
+    pathname === PDF_PATHS.proposalDiscussionPropose;
+
+  // Disconnected: connect first. Connected: open the forum's propose flow,
+  // which needs a forum sign-in; its sign-in prompt sits by the forum's own
+  // Propose button at the top of the list.
+  const onPropose = () => {
+    if (!context.isEnabled) {
+      openModal({ type: "chooseWallet" });
+      return;
+    }
+    navigate(PDF_PATHS.proposalDiscussionPropose);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const content = (
     <Box
@@ -100,7 +118,7 @@ export const ProposalDiscussionPillar = () => {
           />
         </Suspense>
         {isListPage && (
-          <ProposeActionBanner to={PDF_PATHS.proposalDiscussionPropose} />
+          <ProposeActionBanner onPropose={onPropose} />
         )}
       </PageContainer>
       {!context.isEnabled && <Footer />}

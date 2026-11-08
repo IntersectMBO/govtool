@@ -19,6 +19,8 @@ type Props = {
   variant?: "inline" | "stacked";
   /** The tally is still loading or could not be read: no bar, no "not eligible". */
   isUnknown?: boolean;
+  /** False for actions without pass or fail (Info actions): no green yes share. */
+  showPassing?: boolean;
   dataTestId?: string;
 };
 
@@ -31,6 +33,7 @@ export const VoteTallyRow = ({
   aggregate,
   variant = "inline",
   isUnknown = false,
+  showPassing = true,
   dataTestId,
 }: Props) => {
   const { t } = useTranslation();
@@ -72,7 +75,7 @@ export const VoteTallyRow = ({
       {((aggregate && !bar) || (!aggregate && isUnknown)) && "—"}
       {bar && (
         <>
-          <Box component="span" sx={{ color: bar.passing ? ds.success["600"] : ds.gray["900"], fontWeight: 600 }}>
+          <Box component="span" sx={{ color: showPassing && bar.passing ? ds.success["600"] : ds.gray["900"], fontWeight: 600 }}>
             {`${bar.yesPercent.toFixed(1)}%`}
           </Box>
           <Box component="span" sx={{ color: ds.gray["900"] }}>

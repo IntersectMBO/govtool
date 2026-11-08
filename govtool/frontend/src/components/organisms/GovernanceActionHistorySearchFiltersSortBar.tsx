@@ -232,7 +232,7 @@ export const GovernanceActionHistorySearchFiltersSortBar = ({
           gridTemplateColumns: { xxs: "1fr", md: "230px minmax(0, 1fr)" },
         }}
       >
-        <Box sx={{ display: { xxs: "none", md: "block" }, position: "sticky", top: 88 }}>
+        <Box sx={{ display: { xxs: "none", md: "block" }, maxHeight: "calc(100vh - 104px)", overflowY: "auto", position: "sticky", top: 88 }}>
           {sidebar}
         </Box>
         <Box sx={{ minWidth: 0 }}>{children}</Box>

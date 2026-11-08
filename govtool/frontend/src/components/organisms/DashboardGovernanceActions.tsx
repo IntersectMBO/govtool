@@ -64,7 +64,7 @@ export const DashboardGovernanceActions = () => {
   return (
     <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
       <GovernanceActionsHeader />
-      <GovernanceActionsListLayout>
+      <GovernanceActionsListLayout showCounts={!isVoter}>
         {!voter || isEnableLoading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
             <CircularProgress />

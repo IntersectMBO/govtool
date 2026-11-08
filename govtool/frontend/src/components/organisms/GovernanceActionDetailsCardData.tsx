@@ -290,7 +290,7 @@ export const GovernanceActionDetailsCardData = ({
           isValidating={isValidating}
           shareLink={govActionLinkToShare}
           title={title || t("govActions.card.untitled")}
-          titleStyle={{ color: ds.gray["900"], fontSize: { xxs: 26, md: 32 }, letterSpacing: "-0.6px", lineHeight: { xxs: "32px", md: "40px" } }}
+          titleStyle={{ ...(!isDataMissing && { color: ds.gray["900"] }), fontSize: { xxs: 26, md: 32 }, letterSpacing: "-0.6px", lineHeight: { xxs: "32px", md: "40px" } }}
         />
         <Box sx={{ alignItems: "center", color: ds.gray["600"], display: "flex", flexWrap: "wrap", fontSize: 13, gap: 0.75, lineHeight: "18px", mt: -1.5 }}>
           {left && (

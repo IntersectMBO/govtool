@@ -34,3 +34,15 @@ describe("VoteTallyRow", () => {
     expect(screen.getByTestId("row")).not.toHaveTextContent(/not eligible/i);
   });
 });
+
+describe("VoteTallyRow pass colouring", () => {
+  it("colours a passing yes share green", () => {
+    render(<VoteTallyRow aggregate={aggregate} voterRole="drep" />);
+    expect(screen.getByText("70.0%")).toHaveStyle({ color: "#039855" });
+  });
+
+  it("keeps the yes share neutral when pass or fail does not apply", () => {
+    render(<VoteTallyRow aggregate={aggregate} showPassing={false} voterRole="drep" />);
+    expect(screen.getByText("70.0%")).toHaveStyle({ color: "#101828" });
+  });
+});

@@ -8,6 +8,7 @@ import { SearchNotReady } from "@molecules";
 import { ValidatedGovernanceActionCard } from "@organisms";
 import { PaginationFooter } from "@/components/molecules/PaginationFooter";
 import { ds } from "@/consts/designTokens";
+import { clampPage } from "@/utils/clampPage";
 
 const PAGE_SIZE = 10;
 
@@ -41,6 +42,14 @@ export const GovernanceActionsToVote = ({
     searchPhrase: debouncedSearchText,
     sorting: chosenSorting,
   });
+
+  // An action can expire, or be voted on, while its last page is open; move
+  // back to a page that still has rows rather than strand the user.
+  useEffect(() => {
+    if (!proposals) return;
+    const lastPage = clampPage(page, proposalsTotal, PAGE_SIZE);
+    if (lastPage !== page) setPage(lastPage);
+  }, [proposals, proposalsTotal, page]);
 
   if (isSearchNotReady) return <SearchNotReady />;
 

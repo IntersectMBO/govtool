@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, fn, userEvent, within } from "storybook/test";
 
 import { ProposeActionBanner } from "@organisms";
 
@@ -14,14 +14,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { to: "/proposal_discussion/propose" },
-  play: async ({ canvasElement }) => {
+  args: { onPropose: fn() },
+  play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
       canvas.getByRole("heading", { name: "Have an idea for Cardano governance?" }),
     ).toBeVisible();
-    await expect(
-      canvas.getByTestId("propose-action-banner-button"),
-    ).toHaveAttribute("href", "/proposal_discussion/propose");
+    await userEvent.click(canvas.getByTestId("propose-action-banner-button"));
+    await expect(args.onPropose).toHaveBeenCalled();
   },
 };

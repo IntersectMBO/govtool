@@ -9,7 +9,14 @@ import { useGetLiveProposalsQuery, useTranslation } from "@hooks";
 import { FilterSidebar, SortSelect } from "@molecules";
 import { ds, RADIUS } from "@/consts/designTokens";
 
-type Props = { children: ReactNode };
+type Props = {
+  children: ReactNode;
+  /**
+   * Type counts describe the whole live list; off where the list below is
+   * narrower (a DRep's To vote and Voted on lists).
+   */
+  showCounts?: boolean;
+};
 
 export const SearchField = ({
   value,
@@ -76,7 +83,10 @@ const useLiveTypeCounts = () => {
  * The Live Voting frame: search and sort above, the action type filter in a
  * sidebar (behind a Filters button on small screens), the list beside it.
  */
-export const GovernanceActionsListLayout = ({ children }: Props) => {
+export const GovernanceActionsListLayout = ({
+  children,
+  showCounts = true,
+}: Props) => {
   const { t } = useTranslation();
   const {
     searchText,
@@ -87,7 +97,8 @@ export const GovernanceActionsListLayout = ({ children }: Props) => {
     setChosenSorting,
   } = useDataActionsBar();
   const { governanceActionsSort } = useFeatureFlag();
-  const counts = useLiveTypeCounts();
+  const liveCounts = useLiveTypeCounts();
+  const counts = showCounts ? liveCounts : undefined;
   const [areFiltersOpen, setAreFiltersOpen] = useState(false);
 
   const sidebar = (
@@ -159,7 +170,7 @@ export const GovernanceActionsListLayout = ({ children }: Props) => {
           gridTemplateColumns: { xxs: "1fr", md: "230px minmax(0, 1fr)" },
         }}
       >
-        <Box sx={{ display: { xxs: "none", md: "block" }, position: "sticky", top: 88 }}>
+        <Box sx={{ display: { xxs: "none", md: "block" }, maxHeight: "calc(100vh - 104px)", overflowY: "auto", position: "sticky", top: 88 }}>
           {sidebar}
         </Box>
         <Box sx={{ minWidth: 0 }}>{children}</Box>

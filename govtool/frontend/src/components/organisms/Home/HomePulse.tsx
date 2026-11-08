@@ -53,9 +53,11 @@ const voteCount = (proposal: ProposalData) => {
 const PulseRow = ({
   proposal,
   record,
+  isRecordUnknown = false,
 }: {
   proposal: ProposalData;
   record?: GovernanceActionRecord;
+  isRecordUnknown?: boolean;
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -112,6 +114,8 @@ const PulseRow = ({
             key={role}
             aggregate={record?.vote_aggregates?.find((aggregate) => aggregate.role === role)}
             dataTestId={`pulse-${role}-row`}
+            isUnknown={isRecordUnknown}
+            showPassing={proposal.type !== "InfoAction"}
             voterRole={role}
           />
         ))}
@@ -168,7 +172,15 @@ export const HomePulse = () => {
             </Box>
           )}
           {shown.map((proposal, index) => (
-            <PulseRow key={proposal.id} proposal={proposal} record={records[index]?.data} />
+            <PulseRow
+              key={proposal.id}
+              isRecordUnknown={
+                !records[index]?.data &&
+                (records[index]?.isLoading || records[index]?.isError)
+              }
+              proposal={proposal}
+              record={records[index]?.data}
+            />
           ))}
         </Box>
       </HomeColumn>

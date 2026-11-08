@@ -4,7 +4,7 @@ import { AlarmClock, Check, CircleDot, CircleX } from "lucide-react";
 
 import { GOV_ACTION_HISTORY_PATHS, GOV_ACTION_HISTORY_TYPE_FILTERS } from "@consts";
 import { useGetGovernanceActionMetadata, useTranslation } from "@hooks";
-import { GovernanceActionRecord, GovernanceActionVoteAggregate } from "@models";
+import { GovernanceActionRecord } from "@models";
 import {
   formatDisplayDate,
   getFullGovActionId,
@@ -19,12 +19,6 @@ type GovernanceActionHistoryCardProps = {
   action: GovernanceActionRecord;
 };
 
-const ROLE_LABELS: Record<GovernanceActionVoteAggregate["role"], string> = {
-  drep: "DReps",
-  spo: "SPOs",
-  cc: "CC",
-};
-
 const OUTCOME_STYLE = {
   Enacted: { tone: PILL_TONES.success, accent: ds.success["300"], Icon: Check },
   Ratified: { tone: PILL_TONES.success, accent: ds.success["300"], Icon: Check },
@@ -37,16 +31,19 @@ const mono = { fontFamily: FONT_FAMILY.mono, fontSize: 11, letterSpacing: "0.2px
 
 type DateItemProps = { label: string; date: string | null; epoch: number | null };
 
-const DateItem = ({ label, date, epoch }: DateItemProps) => (
-  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
-    <Box component="span" sx={{ color: ds.gray["500"], fontSize: 11, fontWeight: 500, lineHeight: "16px", textTransform: "uppercase" }}>
-      {label}
+const DateItem = ({ label, date, epoch }: DateItemProps) => {
+  const { t } = useTranslation();
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+      <Box component="span" sx={{ color: ds.gray["500"], fontSize: 11, fontWeight: 500, lineHeight: "16px", textTransform: "uppercase" }}>
+        {label}
+      </Box>
+      <Box component="span" sx={{ color: ds.gray["900"], fontSize: 13, fontWeight: 500, lineHeight: "18px" }}>
+        {[formatDisplayDate(date, "MMM d, yyyy"), epoch !== null ? t("govActions.card.epoch", { epoch }) : ""].filter(Boolean).join(" · ")}
+      </Box>
     </Box>
-    <Box component="span" sx={{ color: ds.gray["900"], fontSize: 13, fontWeight: 500, lineHeight: "18px" }}>
-      {[formatDisplayDate(date, "MMM d, yyyy"), epoch !== null ? `Epoch ${epoch}` : ""].filter(Boolean).join(" · ")}
-    </Box>
-  </Box>
-);
+  );
+};
 
 /** A concluded (or live) action in the Outcomes list. */
 export const GovernanceActionHistoryCard = ({ action }: GovernanceActionHistoryCardProps) => {
@@ -65,6 +62,12 @@ export const GovernanceActionHistoryCard = ({ action }: GovernanceActionHistoryC
   const typeLabel =
     GOV_ACTION_HISTORY_TYPE_FILTERS.find((filter) => filter.value === action.type)
       ?.label || action.type;
+  const isInfoAction = action.type === "InfoAction";
+  // An enacted action's vote ended at ratification, an epoch earlier.
+  const voteEndLabel =
+    voteEnd?.outcome === "Enacted" && action.status.ratified_epoch !== null
+      ? "Ratified"
+      : voteEnd?.outcome.replace(" ", "");
   const tallies = (action.vote_aggregates ?? [])
     .map((aggregate) => ({ aggregate, bar: voteBar(aggregate) }))
     .filter(({ bar }) => bar !== undefined);
@@ -150,8 +153,8 @@ export const GovernanceActionHistoryCard = ({ action }: GovernanceActionHistoryC
             <Box key={aggregate.role} component="span" sx={{ alignItems: "center", display: "inline-flex", gap: 1 }}>
               {position > 0 && <Box aria-hidden component="span" sx={{ borderLeft: `1px solid ${ds.gray["300"]}`, height: 10 }} />}
               <Box component="span" data-testid={`${idCIP129}-${aggregate.role}-tally`} sx={{ ...mono, alignItems: "center", color: ds.gray["700"], display: "inline-flex", gap: 0.75 }}>
-                <Box aria-hidden component="span" sx={{ backgroundColor: bar?.passing ? ds.success["600"] : ds.error["600"], borderRadius: "2px", height: 8, width: 8 }} />
-                {`${ROLE_LABELS[aggregate.role].toUpperCase()} ${bar?.yesPercent.toFixed(1)}%`}
+                <Box aria-hidden component="span" sx={{ backgroundColor: isInfoAction ? ds.gray["400"] : bar?.passing ? ds.success["600"] : ds.error["600"], borderRadius: "2px", height: 8, width: 8 }} />
+                {`${t(`governanceActionHistoryList.roles.${aggregate.role}`).toUpperCase()} ${bar?.yesPercent.toFixed(1)}%`}
               </Box>
             </Box>
           ))}
@@ -167,7 +170,7 @@ export const GovernanceActionHistoryCard = ({ action }: GovernanceActionHistoryC
           <DateItem
             date={voteEnd.time}
             epoch={voteEnd.epoch}
-            label={t(`governanceActionHistoryList.outcome.${voteEnd.outcome.replace(" ", "")}`)}
+            label={t(`governanceActionHistoryList.outcome.${voteEndLabel}`)}
           />
         ) : (
           <DateItem date={action.expiry_date} epoch={action.expiration} label={t("govActions.card.expires")} />

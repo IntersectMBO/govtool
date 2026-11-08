@@ -125,11 +125,11 @@ export const GovernanceActionDetailsCard = ({
         {showVoteForm && (
           <Button
             dataTestId="vote-on-action-button"
-            onClick={() =>
-              document
-                .getElementById(VOTE_PANEL_ID)
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
+            onClick={() => {
+              const panel = document.getElementById(VOTE_PANEL_ID);
+              panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+              panel?.focus({ preventScroll: true });
+            }}
             size="large"
             sx={{ alignSelf: { xxs: "flex-start", md: "center" }, flexShrink: 0 }}
           >
@@ -181,8 +181,10 @@ export const GovernanceActionDetailsCard = ({
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, minWidth: 0 }}>
           {showVoteForm && (
             <Box
+              aria-label={t("govActions.details.voteOnAction")}
               component="section"
               id={VOTE_PANEL_ID}
+              tabIndex={-1}
               sx={{
                 backgroundColor: "#FFFFFF",
                 border: `1px solid ${isInProgress ? "#FFCBAD" : ds.gray["200"]}`,
@@ -190,6 +192,7 @@ export const GovernanceActionDetailsCard = ({
                 boxShadow: SHADOWS.card,
                 p: { xxs: 2, md: 2.75 },
                 scrollMarginTop: "96px",
+                "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
               }}
             >
               <VoteActionForm

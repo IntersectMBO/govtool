@@ -9,11 +9,11 @@ import {
   useSnackbar,
 } from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
-import { useScreenDimension } from "@/hooks/useScreenDimension";
-import { Background } from "@/components/atoms";
+import { Background, PageContainer } from "@/components/atoms";
 import {
   Footer,
-  GovernanceActionsTabs,
+  GovernanceActionsHeader,
+  ProposeActionBanner,
   TopNav,
 } from "@/components/organisms";
 import { PDF_PATHS } from "@/consts/paths";
@@ -34,7 +34,6 @@ const isTestMode = ["development", "test"].includes(env.VITE_APP_ENV ?? "");
 
 export const ProposalDiscussionPillar = () => {
   const { epochParams } = useAppContext();
-  const { pagePadding } = useScreenDimension();
   const { validateMetadata } = useValidateMutation();
   const { walletApi, ...context } = useCardano();
   const { voter } = useGetVoterInfo();
@@ -45,6 +44,7 @@ export const ProposalDiscussionPillar = () => {
   const { pathname } = useLocation();
   // Computed on every render: it also reads the saved wallet name.
   const walletStatus = getPdfWalletStatus(context);
+  const isListPage = pathname === PDF_PATHS.proposalDiscussion;
 
   const content = (
     <Box
@@ -56,18 +56,8 @@ export const ProposalDiscussionPillar = () => {
       }}
     >
       {!context.isEnabled && <TopNav />}
-      <Box
-        sx={{
-          // Connected: the dashboard's PagePaddingBox values. Public: the
-          // pagePadding every public GovTool page uses.
-          px: context.isEnabled ? { xxs: 2, md: 5 } : pagePadding,
-          py: 3,
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-        }}
-      >
-        {pathname === PDF_PATHS.proposalDiscussion && <GovernanceActionsTabs />}
+      <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+        {isListPage && <GovernanceActionsHeader />}
         <Suspense
           fallback={
             <Box
@@ -109,7 +99,10 @@ export const ProposalDiscussionPillar = () => {
             {...snackbarContext}
           />
         </Suspense>
-      </Box>
+        {isListPage && (
+          <ProposeActionBanner to={PDF_PATHS.proposalDiscussionPropose} />
+        )}
+      </PageContainer>
       {!context.isEnabled && <Footer />}
     </Box>
   );

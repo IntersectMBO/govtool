@@ -263,17 +263,10 @@ const ProposedGovernanceActions = () => {
     }, [location.pathname]);
 
     return (
-        <Box sx={{ mt: 3 }}>
+        <Box>
             <Box display={'flex'} flexDirection={'column'}>
-                {!walletAPI?.address && (
-                    <Typography
-                        variant={isMobile ? 'title1' : 'headline3'}
-                        component='h1'
-                        sx={{ mb: isMobile ? 3.75 : 6 }}
-                    >
-                        Proposed Governance Actions
-                    </Typography>
-                )}
+                {/* GovTool's page header above the forum carries the title
+                    and the Proposed / Live Voting / Outcomes tabs. */}
 
                 {showAllActivated?.is_activated && (
                     <Box mb={2}>

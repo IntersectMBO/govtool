@@ -155,7 +155,11 @@ with the new values. The type scale is src/consts/typography.ts, used by the
 Typography atom: the Figma names (paragraphSM, tagline...) plus the old names
 mapped to the nearest size. Geist and Geist Mono are self-hosted through
 src/fonts.ts; nothing loads Google Fonts. Icons come from lucide-react, pinned to
-an exact version. Rebuilt pages sit in the PageContainer atom (1180px). Import
+an exact version. Rebuilt pages sit in the PageContainer atom (1180px). The
+governance action lists share GovernanceActionsHeader (title, Create Governance
+Action, tabs) and a search, sort and filter-sidebar frame:
+GovernanceActionsListLayout for Live Voting, GovernanceActionHistorySearchFiltersSortBar
+for Outcomes, whose state lives in the URL. Import
 tokens from @/consts/designTokens rather than @consts in components that tests
 render with a mocked @consts barrel.
 

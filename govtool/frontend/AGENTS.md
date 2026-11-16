@@ -185,6 +185,12 @@ array. A new transaction type also goes in context/pendingTransaction/types.ts,
 usePendingTransaction.ts, pendingTransaction/utils.tsx (getDesiredResult,
 getQueryKey, refetchData) and the alerts.<type> strings in en.json.
 
+Delegating to a DRep goes through organisms/DelegationReviewDialog: it calls
+useDelegateTodRep's delegate on "Continue to wallet", then follows
+pendingTransaction.delegate and reads the delegation query entry keyed by that
+transaction to tell confirmed from not confirmed. The Abstain and No Confidence
+options still call delegate directly.
+
 wallet.test.tsx covers vote and certificate submission, but not the guardrail
 script path nor any governance action builder. Check those on tests/devnet.
 

@@ -26,30 +26,13 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
   const navbarLinks = [
     { testId: "dashboard-link", url: `${environments.frontendUrl}/` },
     { testId: "drep-directory-link", urlPattern: /\/drep_directory/ },
-    {
-      testId: "proposed-governance-actions-link",
-      urlPattern: /\/proposal_discussion/,
-      isDropdownContent: true,
-    },
-    {
-      testId: "governance-actions-link",
-      urlPattern: /\/governance_actions/,
-      isDropdownContent: true,
-    },
-    {
-      testId: "governance-actions-governance-actions-link",
-      urlPattern: /\/governance_actions\/history/,
-      isDropdownContent: true,
-    },
+    { testId: "governance-actions", urlPattern: /\/governance_actions(\?|$)/ },
+    { testId: "governance-activity-link", urlPattern: /\/governance_activity/ },
   ];
 
   for (const link of navbarLinks) {
     if (isMobile(page)) {
       await openDrawer(page);
-    }
-
-    if (!isMobile(page) && !!link.isDropdownContent) {
-      await page.getByTestId("governance-actions").click();
     }
     await page.getByTestId(link.testId).click();
 
@@ -60,13 +43,34 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
     }
   }
 
+  // Governance Actions is one nav item; its Proposed, Live Voting and
+  // Outcomes pages are tabs on the page, with the old dropdown's test ids.
+  const governanceActionTabs = [
+    {
+      testId: "proposed-governance-actions-link",
+      urlPattern: /\/proposal_discussion/,
+    },
+    { testId: "governance-actions-link", urlPattern: /\/governance_actions(\?|$)/ },
+    {
+      testId: "governance-actions-governance-actions-link",
+      urlPattern: /\/governance_actions\/history/,
+    },
+  ];
+
+  await page.goto("/governance_actions");
+  for (const tab of governanceActionTabs) {
+    await page.getByTestId(tab.testId).click();
+    await expect(page).toHaveURL(tab.urlPattern);
+  }
+
+  // Guides is in the nav (the drawer on phones); FAQs is in the footer.
   const externalLinks = [
-    { testId: "guides-link", url: GUIDES_DOC_URL },
-    { testId: "faqs-link", url: FAQS_DOC_URL },
+    { testId: "guides-link", url: GUIDES_DOC_URL, inNav: true },
+    { testId: "faqs-link", url: FAQS_DOC_URL, inNav: false },
   ];
 
   for (const link of externalLinks) {
-    if (isMobile(page)) {
+    if (isMobile(page) && link.inNav) {
       await openDrawer(page);
     }
     const [newPage] = await Promise.all([

@@ -9,6 +9,7 @@ import {
 } from "@helpers/cardano";
 import { createNewPageWithWallet } from "@helpers/page";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
+import LoginPage from "@pages/loginPage";
 import { Page, expect } from "@playwright/test";
 import { invalid as mockInvalid, valid as mockValid } from "@mock/index";
 import { GovernanceActionType, IProposal } from "@types";
@@ -225,7 +226,7 @@ test("4F. Should Disable DRep functionality upon wallet disconnection on governa
   const governanceActionsPage = new GovernanceActionsPage(dRepPage);
   await governanceActionsPage.goto();
 
-  await dRepPage.getByTestId("disconnect-button").click();
+  await new LoginPage(dRepPage).logout();
 
   await expect(dRepPage).toHaveURL("/governance_actions");
 

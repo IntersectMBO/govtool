@@ -7,6 +7,7 @@ import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
+import LoginPage from "@pages/loginPage";
 import { expect } from "@playwright/test";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { GovernanceActionType } from "@types";
@@ -157,7 +158,7 @@ test.describe("Temporary DReps", () => {
     await dRepDirectoryPage.verifyDRepInList(wallet.dRepId);
 
     // disconnected state
-    await dRepPage.getByTestId("disconnect-button").click();
+    await new LoginPage(dRepPage).logout();
     await dRepDirectoryPage.verifyDRepInList(wallet.dRepId);
   });
 

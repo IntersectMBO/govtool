@@ -87,6 +87,7 @@ test.describe("DRep dependent tests", () => {
   }) => {
     await dRepDirectoryPage.searchInput.fill(dRepId);
     await page.getByTestId(`${dRepId}-delegate-button`).click();
+    await page.getByTestId("continue-to-wallet-button").click();
 
     await expect(dRepDirectoryPage.delegationErrorModal).toBeVisible({
       timeout: 60_000,

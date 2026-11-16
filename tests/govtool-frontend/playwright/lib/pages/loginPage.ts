@@ -52,17 +52,25 @@ export default class LoginPage {
     }
   }
 
-  async logout() {
+  // Disconnect lives in the wallet menu on desktop and the drawer on phones.
+  async openWalletMenu() {
     if (isMobile(this.page)) {
       await openDrawer(this.page);
+      return;
     }
+    await this.page.getByTestId("wallet-menu-button").click();
+  }
+
+  async logout() {
+    await this.openWalletMenu();
     await this.disconnectWalletBtn.click();
   }
 
   async isLoggedIn() {
-    if (isMobile(this.page)) {
-      await openDrawer(this.page);
-    }
+    await this.openWalletMenu();
     await expect(this.disconnectWalletBtn).toBeVisible();
+    if (!isMobile(this.page)) {
+      await this.page.keyboard.press("Escape");
+    }
   }
 }

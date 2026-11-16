@@ -46,11 +46,11 @@ test("4A_2. Should access Governance Actions page without connecting wallet", as
   await page.goto("/");
   await page.getByTestId("move-to-governance-actions-button").click();
 
-  if (!isMobile(page)) {
-    await page.getByTestId("governance-actions").click();
-  }
-
-  await expect(page.getByText(/Live Voting/i)).toHaveCount(2);
+  await expect(page).toHaveURL(/\/governance_actions(\?|$)/);
+  await expect(page.getByTestId("governance-actions-link")).toHaveAttribute(
+    "aria-current",
+    "page"
+  );
 });
 
 test("4B_2. Should restrict voting for users who are not registered as DReps (without wallet connected)", async ({
@@ -71,7 +71,7 @@ test("4C_1. Should filter Governance Action Type on governance actions page", as
   const govActionsPage = new GovernanceActionsPage(page);
   await govActionsPage.goto();
 
-  await govActionsPage.filterBtn.click();
+  await govActionsPage.openFilters();
 
   // Single filter
   for (const option of filterOptionNames) {
@@ -124,7 +124,7 @@ test("4C_3. Should filter and sort Governance Action Type on governance actions 
   const govActionsPage = new GovernanceActionsPage(page);
   await govActionsPage.goto();
 
-  await govActionsPage.filterBtn.click();
+  await govActionsPage.openFilters();
 
   const choice = Math.floor(Math.random() * filterOptionNames.length);
   await govActionsPage.filterProposalByNames([filterOptionNames[choice]]);

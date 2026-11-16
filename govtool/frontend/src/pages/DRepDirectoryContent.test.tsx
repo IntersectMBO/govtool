@@ -3,6 +3,8 @@ import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { useEffect } from "react";
 
+import { DRepDirectoryContent } from "./DRepDirectoryContent";
+
 const mocks = vi.hoisted(() => ({
   mounts: 0,
   currentDelegation: { dRepView: null, dRepHash: null } as unknown,
@@ -44,7 +46,7 @@ vi.mock("@consts", () => ({
 
 vi.mock("@utils", () => ({
   isSameDRep: () => false,
-  uniqBy: <T,>(items: T[]) => items,
+  uniqBy: <T, >(items: T[]) => items,
   parseBoolean: () => false,
   correctDRepDirectoryFormat: () => "0",
 }));
@@ -89,8 +91,6 @@ vi.mock("@hooks", () => ({
     isSearchNotReady: false,
   }),
 }));
-
-import { DRepDirectoryContent } from "./DRepDirectoryContent";
 
 const renderPage = () => (
   <MemoryRouter>

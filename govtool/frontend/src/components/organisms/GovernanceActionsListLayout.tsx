@@ -5,7 +5,7 @@ import { ListFilter } from "lucide-react";
 import { GovernanceActionTypeIcon } from "@atoms";
 import { GOVERNANCE_ACTIONS_FILTERS } from "@consts";
 import { useDataActionsBar, useFeatureFlag } from "@context";
-import { useGetLiveProposalsQuery, useTranslation } from "@hooks";
+import { useGetLiveProposalsQuery, useScreenDimension, useTranslation } from "@hooks";
 import { FilterSidebar, SearchField, SortSelect } from "@molecules";
 import { ds, RADIUS } from "@/consts/designTokens";
 
@@ -49,6 +49,8 @@ export const GovernanceActionsListLayout = ({
   const liveCounts = useLiveTypeCounts();
   const counts = showCounts ? liveCounts : undefined;
   const [areFiltersOpen, setAreFiltersOpen] = useState(false);
+  // One sidebar in the DOM at a time, so its row ids stay unique.
+  const { isMobile } = useScreenDimension();
 
   const sidebar = (
     <FilterSidebar
@@ -109,7 +111,7 @@ export const GovernanceActionsListLayout = ({
         )}
       </Box>
 
-      {areFiltersOpen && <Box sx={{ display: { md: "none" } }}>{sidebar}</Box>}
+      {isMobile && areFiltersOpen && sidebar}
 
       <Box
         sx={{
@@ -119,9 +121,11 @@ export const GovernanceActionsListLayout = ({
           gridTemplateColumns: { xxs: "1fr", md: "230px minmax(0, 1fr)" },
         }}
       >
-        <Box sx={{ display: { xxs: "none", md: "block" }, maxHeight: "calc(100vh - 104px)", overflowY: "auto", position: "sticky", top: 88 }}>
-          {sidebar}
-        </Box>
+        {!isMobile && (
+          <Box sx={{ maxHeight: "calc(100vh - 104px)", overflowY: "auto", position: "sticky", top: 88 }}>
+            {sidebar}
+          </Box>
+        )}
         <Box sx={{ minWidth: 0 }}>{children}</Box>
       </Box>
     </Box>

@@ -12,7 +12,7 @@ import {
   GOV_ACTION_HISTORY_TYPE_FILTERS,
 } from "@consts";
 import { FilterSidebar, SearchField, SortSelect } from "@molecules";
-import { useTranslation } from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { getCurrentSearchParams } from "@utils";
 import { ds, RADIUS } from "@/consts/designTokens";
 
@@ -58,6 +58,8 @@ export const GovernanceActionHistorySearchFiltersSortBar = ({
 }) => {
   const { t } = useTranslation();
   const [areFiltersOpen, setAreFiltersOpen] = useState(false);
+  // One set of filters in the DOM at a time, so their row ids stay unique.
+  const { isMobile } = useScreenDimension();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isInitializing, setIsInitializing] = useState(true);
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
@@ -220,7 +222,7 @@ export const GovernanceActionHistorySearchFiltersSortBar = ({
         />
       </Box>
 
-      {areFiltersOpen && <Box sx={{ display: { md: "none" } }}>{sidebar}</Box>}
+      {isMobile && areFiltersOpen && sidebar}
 
       <Box
         sx={{
@@ -230,9 +232,11 @@ export const GovernanceActionHistorySearchFiltersSortBar = ({
           gridTemplateColumns: { xxs: "1fr", md: "230px minmax(0, 1fr)" },
         }}
       >
-        <Box sx={{ display: { xxs: "none", md: "block" }, maxHeight: "calc(100vh - 104px)", overflowY: "auto", position: "sticky", top: 88 }}>
-          {sidebar}
-        </Box>
+        {!isMobile && (
+          <Box sx={{ maxHeight: "calc(100vh - 104px)", overflowY: "auto", position: "sticky", top: 88 }}>
+            {sidebar}
+          </Box>
+        )}
         <Box sx={{ minWidth: 0 }}>{children}</Box>
       </Box>
     </Box>

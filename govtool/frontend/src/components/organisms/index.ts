@@ -39,3 +39,4 @@ export * from "./Home";
 export * from "./GovernanceActionsHeader";
 export * from "./GovernanceActionsListLayout";
 export * from "./ProposeActionBanner";
+export * from "./DelegationReviewDialog";

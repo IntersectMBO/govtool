@@ -27,7 +27,12 @@ import {
   SearchNotReady,
   SortSelect,
 } from "@molecules";
-import { AutomatedVotingOptions, DRepBanner, DRepCard } from "@organisms";
+import {
+  AutomatedVotingOptions,
+  DelegationReviewDialog,
+  DRepBanner,
+  DRepCard,
+} from "@organisms";
 import {
   isSameDRep,
   uniqBy,
@@ -107,6 +112,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
 
   const [inProgressDelegationDRepData, setInProgressDelegationDRepData] =
     useState<DRepData | undefined>(undefined);
+  // The DRep whose delegation is being reviewed, before and while it is signed.
+  const [reviewDRep, setReviewDRep] = useState<DRepData | undefined>();
 
   useEffect(() => {
     if (!lastPath.includes("drep_directory")) {
@@ -453,10 +460,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                   }
                   isMe={isSameDRep(dRep, myDRepId)}
                   isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
-                  onDelegate={() => {
-                    setInProgressDelegationDRepData(dRep);
-                    delegate(dRep.drepId);
-                  }}
+                  onDelegate={() => setReviewDRep(dRep)}
                 />
               </Box>
             ))}
@@ -481,6 +485,21 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       <Box sx={{ mt: 3 }}>
         <DRepBanner withGutters={false} />
       </Box>
+      <DelegationReviewDialog
+        dRep={reviewDRep}
+        onClose={() => setReviewDRep(undefined)}
+        onConfirm={async () => {
+          if (!reviewDRep) return;
+          setInProgressDelegationDRepData(reviewDRep);
+          await delegate(reviewDRep.drepId);
+        }}
+        onViewDRep={() =>
+          reviewDRep &&
+          navigate(
+            PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", reviewDRep.view),
+          )
+        }
+      />
     </Box>
   );
 };

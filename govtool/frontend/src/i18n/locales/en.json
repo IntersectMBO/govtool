@@ -300,6 +300,38 @@
       "title": "Delegate to myself"
     }
   },
+  "delegationReview": {
+    "adaTransferred": "ADA transferred",
+    "back": "Back",
+    "confirmedSubtitle": "Cardano has confirmed {{name}} as your DRep. Your ADA remains in your wallet.",
+    "confirmedTitle": "Voting delegation confirmed",
+    "continue": "Continue to wallet",
+    "copyTransactionId": "Copy transaction ID",
+    "destination": "Destination",
+    "hide": "Close",
+    "none": "None",
+    "note": "This delegation applies to all voting power associated with the selected stake credential. Funds are not transferred; only voting rights are delegated.",
+    "progress": {
+      "confirming": "Waiting for on-chain confirmation",
+      "signed": "Wallet signed",
+      "submitted": "Transaction submitted",
+      "title": "Progress"
+    },
+    "signingSubtitle": "Confirm the delegation in your wallet. The fee is shown there.",
+    "signingTitle": "Waiting for your wallet",
+    "subtitle": "Check these details before requesting your wallet signature.",
+    "summary": "Delegation summary",
+    "takingLongerSubtitle": "We have not received definitive confirmation or failure. A delay does not mean the transaction failed.",
+    "takingLongerTitle": "Taking longer than usual",
+    "title": "Review voting delegation",
+    "transactionId": "Transaction ID",
+    "viewDRep": "View your DRep",
+    "votingPower": "Voting power",
+    "waitingSubtitle": "Your signed delegation transaction has been submitted. We are checking for confirmation on Cardano.",
+    "waitingTitle": "Waiting for Cardano",
+    "wallet": "{{name}} wallet",
+    "walletHint": "Your wallet shows the transaction and its fee before you sign."
+  },
   "dRepProfile": {
     "about": "About {{name}}",
     "activity": {

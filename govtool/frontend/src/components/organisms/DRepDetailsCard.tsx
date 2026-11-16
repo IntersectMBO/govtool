@@ -43,6 +43,7 @@ import { useValidateMutation } from "@/hooks/mutations";
 import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
 import { avatarTone, dRepInitials } from "./DRepCard";
 import { DRepActivityTable } from "./DRepActivityTable";
+import { DelegationReviewDialog } from "./DelegationReviewDialog";
 
 type DRepDetailsProps = {
   dRepData: DRepData;
@@ -64,6 +65,7 @@ export const DRepDetailsCard = ({
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { delegate, isDelegating } = useDelegateTodRep();
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
   const { dRepVotes, areDRepVotesLoading, isDRepVotesError } =
     useGetDRepVotesByIdQuery(dRepData.view);
 
@@ -220,7 +222,7 @@ export const DRepDetailsCard = ({
               isLoading={
                 isDelegating === dRepData.view || isDelegating === dRepData.drepId
               }
-              onClick={() => delegate(dRepData.drepId)}
+              onClick={() => setIsReviewOpen(true)}
               size="large"
             >
               {t("dRepProfile.delegate")}
@@ -249,6 +251,12 @@ export const DRepDetailsCard = ({
           <Share link={window.location.href} />
         </Box>
       </Box>
+
+      <DelegationReviewDialog
+        dRep={isReviewOpen ? dRepData : undefined}
+        onClose={() => setIsReviewOpen(false)}
+        onConfirm={() => delegate(dRepData.drepId)}
+      />
 
       {/* STATS */}
       <Box

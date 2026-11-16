@@ -1,12 +1,14 @@
 import { Box, CircularProgress } from "@mui/material";
 
-import { useCardano, useFeatureFlag } from "@context";
+import { useAppContext, useCardano, useFeatureFlag } from "@context";
 import {
   useGetAdaHolderVotingPowerQuery,
-  useScreenDimension,
   useGetAdaHolderCurrentDelegationQuery,
   useGetVoterInfo,
+  useTranslation,
 } from "@hooks";
+import { ds, RADIUS } from "@/consts/designTokens";
+import { DashboardWalletCard } from "./DashboardWalletCard";
 import { DelegateDashboardCard } from "./DashboardCards/DelegateDashboardCard";
 import { DRepDashboardCard } from "./DashboardCards/DRepDashboardCard";
 import { DirectVoterDashboardCard } from "./DashboardCards/DirectVoterDashboardCard";
@@ -15,7 +17,8 @@ import { ProposeGovActionDashboardCard } from "./DashboardCards/ProposeGovAction
 
 export const DashboardCards = () => {
   const { dRepID, pendingTransaction, stakeKey } = useCardano();
-  const { screenWidth } = useScreenDimension();
+  const { t } = useTranslation();
+  const { epochParams } = useAppContext();
   const { isFeatureAvailable } = useFeatureFlag();
 
   // Whole-feature gate on the delegation surface. The card states, as fact,
@@ -54,44 +57,76 @@ export const DashboardCards = () => {
     );
   }
 
+  const role = voter.isRegisteredAsDRep
+    ? "dRep"
+    : voter.isRegisteredAsSoleVoter
+      ? "directVoter"
+      : "notRegistered";
+
   return (
-    <Box
-      sx={{
-        columnGap: 3,
-        display: "grid",
-        gridTemplateColumns:
-          screenWidth < 1280
-            ? "repeat(1, minmax(300px, 530px))"
-            : screenWidth >= 1728
-            ? "repeat(3, minmax(300px, 570px))"
-            : "repeat(2, minmax(300px, 530px))",
-        justifyContent: screenWidth < 1024 ? "center" : "flex-start",
-        rowGap: 3,
-      }}
-    >
-      {isDelegationStateAvailable && (
-        <DelegateDashboardCard
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 1.25 }}>
+          <Box component="h1" sx={{ color: ds.gray["900"], fontSize: { xxs: 26, md: 32 }, fontWeight: 600, letterSpacing: "-0.6px", lineHeight: { xxs: "32px", md: "40px" }, m: 0 }}>
+            {voter.givenName
+              ? t("dashboard.welcomeName", { name: voter.givenName })
+              : t("dashboard.welcome")}
+          </Box>
+          <Box
+            component="span"
+            data-testid="dashboard-role-pill"
+            sx={{ backgroundColor: role === "notRegistered" ? ds.gray["100"] : ds.primary["50"], borderRadius: `${RADIUS.xs}px`, color: role === "notRegistered" ? ds.gray["700"] : ds.primary["700"], fontSize: 11, fontWeight: 600, letterSpacing: "0.3px", lineHeight: "18px", px: 0.75, textTransform: "uppercase" }}
+          >
+            {t(`dashboard.role.${role}`)}
+          </Box>
+        </Box>
+        {typeof epochParams?.epoch_no === "number" && (
+          <Box sx={{ color: ds.gray["500"], fontSize: 13 }}>
+            {t("dashboard.currentEpoch", { epoch: epochParams.epoch_no })}
+          </Box>
+        )}
+      </Box>
+      <Box
+        sx={{
+          alignItems: "start",
+          display: "grid",
+          gap: 2.5,
+          gridTemplateColumns: { xxs: "minmax(0, 1fr)", lg: "360px minmax(0, 1fr)" },
+        }}
+      >
+        <DashboardWalletCard
           currentDelegation={currentDelegation}
-          delegateTx={pendingTransaction.delegate}
           dRepID={dRepID}
-          voter={voter}
+          isDelegationKnown={isDelegationStateAvailable}
+          stakeKey={stakeKey}
           votingPower={votingPower}
         />
-      )}
-      <DRepDashboardCard
-        dRepID={dRepID}
-        pendingTransaction={pendingTransaction}
-        voter={voter}
-      />
-      <DirectVoterDashboardCard
-        pendingTransaction={pendingTransaction}
-        voter={voter}
-        votingPower={voter.votingPower}
-      />
-      <ListGovActionsDashboardCards />
-      <ProposeGovActionDashboardCard
-        createGovActionTx={pendingTransaction.createGovAction}
-      />
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
+          {isDelegationStateAvailable && (
+            <DelegateDashboardCard
+              currentDelegation={currentDelegation}
+              delegateTx={pendingTransaction.delegate}
+              dRepID={dRepID}
+              voter={voter}
+              votingPower={votingPower}
+            />
+          )}
+          <DRepDashboardCard
+            dRepID={dRepID}
+            pendingTransaction={pendingTransaction}
+            voter={voter}
+          />
+          <DirectVoterDashboardCard
+            pendingTransaction={pendingTransaction}
+            voter={voter}
+            votingPower={voter.votingPower}
+          />
+          <ListGovActionsDashboardCards />
+          <ProposeGovActionDashboardCard
+            createGovActionTx={pendingTransaction.createGovAction}
+          />
+        </Box>
+      </Box>
     </Box>
   );
 };

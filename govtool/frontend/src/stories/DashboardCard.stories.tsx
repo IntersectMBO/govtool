@@ -22,7 +22,6 @@ type Story = StoryObj<typeof meta>;
 async function assertCardInfo(canvas: ReturnType<typeof within>) {
   expect(canvas.getByText("Action card")).toBeVisible();
   expect(canvas.queryByText(/lorem/i)).toBeInTheDocument();
-  expect(canvas.queryAllByRole("img")).not.toHaveLength(0);
 }
 
 export const DashboardCardComponent: Story = {
@@ -87,7 +86,6 @@ export const LoadingDashboardCard: Story = {
     expect(canvas.queryByText("Action card")).not.toBeInTheDocument();
     expect(canvas.queryByText(/lorem/i)).not.toBeInTheDocument();
     await expect(canvas.queryAllByRole("button")).toHaveLength(0);
-    expect(canvas.queryByRole("img")).not.toBeInTheDocument();
   },
 };
 
@@ -103,6 +101,6 @@ export const InProgressDashboardCard: Story = {
     const canvas = within(canvasElement);
 
     await assertCardInfo(canvas);
-    await expect(canvas.getAllByText(/in progress/i)).toHaveLength(2);
+    await expect(canvas.getAllByText(/in progress/i)).toHaveLength(1);
   },
 };

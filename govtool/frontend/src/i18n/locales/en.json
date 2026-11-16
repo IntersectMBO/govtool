@@ -301,6 +301,29 @@
     }
   },
   "dRepDirectory": {
+    "activeFilters": "Active filters:",
+    "becomeADRep": "Become a DRep",
+    "card": {
+      "copyId": "Copy DRep ID",
+      "moreActions": "More actions",
+      "noSummary": "This DRep has not published a profile summary.",
+      "registered": "Registered",
+      "yourDRep": "Your DRep"
+    },
+    "clearAll": "Clear all",
+    "delegationInProgress": "Delegation in progress",
+    "empty": {
+      "browseAll": "Browse all DReps",
+      "clearSearch": "Clear search",
+      "noMatchAfter": ". Try adjusting your search terms or removing some filters.",
+      "noMatchBefore": "We couldn't find any representatives matching "
+    },
+    "pageTitle": "Find your Delegate Representatives",
+    "pageDescription": "Find your designated Representative and explore their role, responsibilities, and representation of your constituency.",
+    "removeFilter": "Remove filter {{name}}",
+    "sortLabel": "Sort by:",
+    "statusAll": "All",
+    "statusLabel": "Status:",
     "abstainCardDefaultDescription": "Select this to vote ABSTAIN to every vote.",
     "abstainCardDefaultTitle": "Abstain from Every Vote",
     "automatedVotingOptions": "Automated Voting Options",

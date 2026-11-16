@@ -69,3 +69,4 @@ export * from "./FilterSidebar";
 export * from "./SortSelect";
 export * from "./StatCard";
 export * from "./VoteTallyRow";
+export * from "./SearchField";

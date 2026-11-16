@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { Box, ButtonBase, Divider, Avatar, Skeleton } from "@mui/material";
+import { Link } from "react-router";
+import { Avatar, Box, IconButton, Menu, MenuItem, Skeleton } from "@mui/material";
+import { EllipsisVertical } from "lucide-react";
 
-import { Button, StatusPill, Typography } from "@atoms";
-import { ICONS, PATHS } from "@consts";
+import { Button, StatusPill } from "@atoms";
+import { PATHS } from "@consts";
 import { useModal, useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
 import {
@@ -12,15 +13,50 @@ import {
   MetadataStandard,
   MetadataValidationStatus,
 } from "@models";
-import { Card } from "@molecules";
 import {
   correctDRepDirectoryFormat,
-  ellipsizeText,
   encodeCIP129Identifier,
+  formatDisplayDate,
   getBase64ImageDetails,
   getMetadataDataMissingStatusTranslation,
 } from "@utils";
 import { useValidateMutation } from "@/hooks/mutations";
+import { ds, FONT_FAMILY, RADIUS, SHADOWS } from "@/consts/designTokens";
+
+/** Up to two initials from a name, or "DR" when there is none. */
+export const dRepInitials = (name?: string | null) => {
+  const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return "DR";
+  return (words.length === 1 ? words[0].slice(0, 2) : `${words[0][0]}${words[1][0]}`).toUpperCase();
+};
+
+const AVATAR_TONES = [
+  { bg: ds.error["50"], text: ds.error["600"] },
+  { bg: ds.success["50"], text: ds.success["600"] },
+  { bg: ds.primary["50"], text: ds.primary["600"] },
+  { bg: ds.orange["50"], text: ds.orange["600"] },
+];
+
+/** A stable colour for a DRep's initials avatar. */
+export const avatarTone = (seed: string) =>
+  AVATAR_TONES[[...seed].reduce((sum, char) => sum + char.charCodeAt(0), 0) % AVATAR_TONES.length];
+
+const statLabelSx = {
+  color: ds.gray["500"],
+  fontSize: 11,
+  fontWeight: 500,
+  letterSpacing: "0.2px",
+  lineHeight: "16px",
+  textTransform: "uppercase" as const,
+};
+
+const statValueSx = {
+  color: ds.gray["900"],
+  fontSize: 14,
+  fontWeight: 500,
+  lineHeight: "20px",
+  whiteSpace: "nowrap" as const,
+};
 
 type DRepCardProps = {
   dRep: DRepData;
@@ -44,6 +80,10 @@ export const DRepCard = ({
     isScriptBased,
     url,
     metadataHash,
+    objectives,
+    motivations,
+    qualifications,
+    latestRegistrationDate,
   },
   isConnected,
   isDelegationLoading,
@@ -52,8 +92,8 @@ export const DRepCard = ({
   isMyDrep,
   onDelegate,
 }: DRepCardProps) => {
-  const navigate = useNavigate();
   const { t } = useTranslation();
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const { addSuccessAlert } = useSnackbar();
   const { openModal } = useModal();
 
@@ -98,330 +138,210 @@ export const DRepCard = ({
     validate();
   }, [url]);
 
+  const detailsPath = (
+    isConnected ? PATHS.dashboardDRepDirectoryDRep : PATHS.dRepDirectoryDRep
+  ).replace(":dRepId", view);
+  const name = givenName || `${view.slice(0, 10)}…${view.slice(-6)}`;
+  const summary = objectives || motivations || qualifications;
+  const tone = avatarTone(view);
+  const imageSrc = image
+    ? base64Image.isValidBase64Image
+      ? `${base64Image.base64Prefix}${image}`
+      : image
+    : undefined;
+  const canDelegate = ["Active", "Inactive"].includes(status);
+
+  const copyId = () => {
+    navigator.clipboard.writeText(cip129Identifier);
+    addSuccessAlert(t("alerts.copiedToClipboard"));
+    setMenuAnchor(null);
+  };
+
   return (
-    <Card
-      {...(isMe && {
-        variant: "primary",
-      })}
-      {...(!!metadataStatus && {
-        variant: "error",
-      })}
-      {...(isInProgress && {
-        variant: "warning",
-        label: t("inProgress"),
-      })}
-      dataTestId={`${view}-${
+    <Box
+      component="article"
+      data-testid={`${view}-${
         onDelegate
           ? "drep"
           : isInProgress
-          ? "delegation-in-progress"
-          : "delegated"
+            ? "delegation-in-progress"
+            : "delegated"
       }-card`}
-      sx={{ container: "root / inline-size", py: 2.5 }}
+      sx={{
+        backgroundColor: "#FFFFFF",
+        border: `1px solid ${
+          isInProgress
+            ? "#FFCBAD"
+            : metadataStatus
+              ? "#F6D5D5"
+              : isMe || isMyDrep
+                ? ds.primary["200"]
+                : ds.gray["200"]
+        }`,
+        borderRadius: `${RADIUS.lg}px`,
+        boxShadow: SHADOWS.card,
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        gap: 2,
+        minWidth: 0,
+        p: 2.5,
+        position: "relative",
+      }}
     >
-      {isMe && (
-        <StatusPill
-          status={DRepStatus.Yourself}
-          sx={{ mb: 1.5, display: { lg: "none" } }}
-        />
-      )}
-      <Box
-        display="flex"
-        flexDirection="column"
-        rowGap={4}
-        columnGap={6}
-        sx={{
-          "@container root (min-width: 480px)": {
-            flexDirection: "row",
-          },
-        }}
-      >
-        <Box flex={2} minWidth={0} sx={{ containerType: "inline-size" }}>
-          <Box
-            display="flex"
-            flexDirection="column"
-            rowGap={3}
-            columnGap={10}
+      <Box sx={{ alignItems: "flex-start", display: "flex", gap: 1.5 }}>
+        {isValidating ? (
+          <Skeleton height={40} variant="circular" width={40} />
+        ) : (
+          <Avatar
+            alt=""
+            data-testid="drep-image"
+            src={imageSrc}
             sx={{
-              "@container (min-width: 480px)": {
-                flexDirection: "row",
-                alignItems: "center",
-              },
-              containerType: "inline-size",
+              backgroundColor: tone.bg,
+              color: tone.text,
+              fontSize: 14,
+              fontWeight: 600,
+              height: 40,
+              width: 40,
             }}
           >
-            <Box flexDirection="row" minWidth={0} display="flex">
-              {isValidating ? (
-                <Skeleton variant="circular" width={40} height={40} />
-              ) : (
-                <Avatar
-                  alt="drep-image"
-                  src={
-                    (base64Image.isValidBase64Image
-                      ? `${base64Image.base64Prefix}${image}`
-                      : image) ?? ICONS.defaultDRepIcon
-                  }
-                  data-testid="drep-image"
-                />
-              )}
-              <Box
-                sx={{
-                  marginLeft: {
-                    xxs: 1,
-                    xs: 2,
-                    sm: 3,
-                  },
-                }}
-              >
-                {isValidating ? (
-                  <Skeleton
-                    variant="text"
-                    width={100}
-                    height={24}
-                    sx={{ mb: 1 }}
-                  />
-                ) : (
-                  <Typography
-                    sx={{
-                      ellipsisStyles,
-                      color: metadataStatus && "errorRed",
-                    }}
-                  >
-                    {metadataStatus
-                      ? getMetadataDataMissingStatusTranslation(metadataStatus)
-                      : ellipsizeText(givenName ?? "", 25)}
-                  </Typography>
-                )}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  {isValidating ? (
-                    <Skeleton variant="text" width="250px" height="20px" />
-                  ) : (
-                    <ButtonBase
-                      data-testid={`${cip129Identifier}-copy-id-button`}
-                      onClick={(e) => {
-                        navigator.clipboard.writeText(cip129Identifier);
-                        addSuccessAlert(t("alerts.copiedToClipboard"));
-                        e.stopPropagation();
-                      }}
-                      sx={{
-                        gap: 1,
-                        width: "250px",
-                        maxWidth: {
-                          xxs: "200px",
-                          xs: "100%",
-                        },
-                        "&:hover": {
-                          opacity: 0.6,
-                          transition: "opacity 0.3s",
-                        },
-                        display: "flex",
-                        flexDirection: "row",
-                      }}
-                    >
-                      <Typography
-                        color="primary"
-                        variant="body2"
-                        sx={ellipsisStyles}
-                      >
-                        {cip129Identifier}
-                      </Typography>
-                      <img alt="" src={ICONS.copyBlueIcon} />
-                    </ButtonBase>
-                  )}
-                  {isValidating ? (
-                    <Skeleton variant="text" width="250px" height="20px" />
-                  ) : (
-                    <ButtonBase
-                      data-testid={`${view}-copy-id-button`}
-                      onClick={(e) => {
-                        navigator.clipboard.writeText(view);
-                        addSuccessAlert(t("alerts.copiedToClipboard"));
-                        e.stopPropagation();
-                      }}
-                      sx={{
-                        gap: 1,
-                        width: "250px",
-                        maxWidth: {
-                          xxs: "200px",
-                          xs: "100%",
-                        },
-                        "&:hover": {
-                          opacity: 0.6,
-                          transition: "opacity 0.3s",
-                        },
-                      }}
-                    >
-                      <Typography variant="body2" sx={ellipsisStyles}>
-                        (CIP-105){" "}
-                        <Typography
-                          color="primary"
-                          variant="body2"
-                          component="span"
-                        >
-                          {view}
-                        </Typography>
-                      </Typography>
-                      <img alt="" src={ICONS.copyBlueIcon} />
-                    </ButtonBase>
-                  )}
-                </Box>
-              </Box>
-            </Box>
-
+            {dRepInitials(givenName)}
+          </Avatar>
+        )}
+        <Box sx={{ display: "flex", flex: 1, flexDirection: "column", gap: 0.5, minWidth: 0 }}>
+          {isValidating ? (
+            <Skeleton height={22} variant="text" width={120} />
+          ) : (
             <Box
+              component={type === "DRep" ? Link : "span"}
+              data-testid={type === "DRep" ? `${view}-view-details-button` : undefined}
+              state={{ enteredFromWithinApp: true }}
+              to={detailsPath}
               sx={{
-                display: "flex",
-                flex: { xl: 1 },
-                gap: 3,
+                color: metadataStatus ? ds.error["600"] : ds.gray["900"],
+                fontSize: 15,
+                fontWeight: 600,
+                lineHeight: "22px",
+                overflow: "hidden",
+                textDecoration: "none",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                "&:hover": { color: ds.primary["600"] },
               }}
             >
-              <Box
-                sx={{
-                  width: { lg: "128px" },
-                  display: "flex",
-                  alignItems: "flex-end",
-                  flexDirection: "column",
-                }}
-              >
-                {isValidating ? (
-                  <Skeleton variant="text" width="80px" height="12px" />
-                ) : (
-                  <Typography
-                    data-testid={`${view}-voting-power-label`}
-                    variant="caption"
-                    color="textSecondary"
-                    sx={{ mb: 0.5 }}
-                  >
-                    {t("votingPower")}
-                  </Typography>
-                )}
-                {isValidating ? (
-                  <Skeleton variant="text" width="24px" height="24px" />
-                ) : (
-                  <Typography
-                    data-testid={`${view}-voting-power`}
-                    sx={{ whiteSpace: "nowrap" }}
-                  >
-                    ₳ {correctDRepDirectoryFormat(votingPower)}
-                  </Typography>
-                )}
-              </Box>
-              <Divider
-                orientation="vertical"
-                flexItem
-                sx={({ palette }) => ({ borderColor: palette.lightBlue })}
-              />
-              <Box>
-                {isValidating ? (
-                  <Skeleton variant="text" />
-                ) : (
-                  <Typography
-                    data-testid={`${view}-status-label`}
-                    variant="caption"
-                    color="textSecondary"
-                    sx={{ mb: 0.5 }}
-                  >
-                    {t("status")}
-                  </Typography>
-                )}
-                <Box display="flex" flexDirection="row">
-                  {isValidating ? (
-                    <Skeleton variant="rounded" width="54px" height="18px" />
-                  ) : (
-                    <StatusPill
-                      dataTestId={`${view}-${status}-pill`}
-                      status={status}
-                    />
-                  )}
-                  {isMe && (
-                    <StatusPill
-                      dataTestId={`${view}-yourself-pill`}
-                      status={DRepStatus.Yourself}
-                      sx={{ ml: 0.75, display: { lg: "flex", xxs: "none" } }}
-                    />
-                  )}
-                </Box>
-              </Box>
+              {metadataStatus ? getMetadataDataMissingStatusTranslation(metadataStatus) : name}
             </Box>
+          )}
+          <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+            <StatusPill dataTestId={`${view}-${status}-pill`} status={status} />
+            {isMe && <StatusPill dataTestId={`${view}-yourself-pill`} status={DRepStatus.Yourself} />}
+            {isMyDrep && !isMe && (
+              <Box component="span" data-testid={`${view}-my-drep-pill`} sx={{ color: ds.primary["600"], fontSize: 12, fontWeight: 600 }}>
+                {t("dRepDirectory.card.yourDRep")}
+              </Box>
+            )}
+            {isInProgress && (
+              <Box component="span" sx={{ color: ds.orange["600"], fontSize: 12, fontWeight: 600 }}>
+                {t("inProgress")}
+              </Box>
+            )}
           </Box>
         </Box>
-
-        <Box
-          display="flex"
-          gap={2.5}
-          sx={{
-            "@container root (min-width: 480px)": {
-              justifyContent: "flex-end",
-              alignItems: "center",
-            },
-            minWidth: {
-              xxs: "233px",
-              xs: isConnected ? "233px" : "310px",
-            },
-          }}
+        <IconButton
+          aria-expanded={Boolean(menuAnchor)}
+          aria-haspopup="menu"
+          aria-label={t("dRepDirectory.card.moreActions")}
+          data-testid={`${view}-menu-button`}
+          onClick={(event) => setMenuAnchor(event.currentTarget)}
+          size="small"
+          sx={{ border: `1px solid ${ds.gray["200"]}`, color: ds.gray["700"], height: 32, width: 32 }}
         >
-          {type === "DRep" &&
-            (isValidating ? (
-              <Skeleton variant="rounded" width="140px" height="40px" />
-            ) : (
-              <Button
-                data-testid={`${view}-view-details-button`}
-                variant="outlined"
-                onClick={() =>
-                  navigate(
-                    (isConnected
-                      ? PATHS.dashboardDRepDirectoryDRep
-                      : PATHS.dRepDirectoryDRep
-                    ).replace(":dRepId", view),
-                    { state: { enteredFromWithinApp: true } },
-                  )
-                }
-              >
-                {t("viewDetails")}
-              </Button>
-            ))}
-          {["Active", "Inactive"].includes(status) &&
-            isConnected &&
-            onDelegate &&
-            !isMyDrep &&
-            !isInProgress &&
-            (isValidating ? (
-              <Skeleton variant="rounded" width="140px" height="40px" />
-            ) : (
-              <Button
-                data-testid={`${view}-delegate-button`}
-                onClick={onDelegate}
-                isLoading={isDelegationLoading}
-              >
-                {t("delegate")}
-              </Button>
-            ))}
-          {["Active", "Inactive"].includes(status) &&
-            !isConnected &&
-            (isValidating ? (
-              <Skeleton variant="rounded" width="140px" height="40px" />
-            ) : (
-              <Button
-                data-testid={`${view}-connect-to-delegate-button`}
-                onClick={openChooseWalletModal}
-              >
-                {t("connectToDelegate")}
-              </Button>
-            ))}
-        </Box>
+          <EllipsisVertical aria-hidden size={16} />
+        </IconButton>
+        <Menu
+          anchorEl={menuAnchor}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          onClose={() => setMenuAnchor(null)}
+          open={Boolean(menuAnchor)}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+        >
+          {type === "DRep" && (
+            <MenuItem
+              component={Link}
+              onClick={() => setMenuAnchor(null)}
+              state={{ enteredFromWithinApp: true }}
+              to={detailsPath}
+            >
+              {t("viewDetails")}
+            </MenuItem>
+          )}
+          <MenuItem data-testid={`${cip129Identifier}-copy-id-button`} onClick={copyId}>
+            {t("dRepDirectory.card.copyId")}
+          </MenuItem>
+        </Menu>
       </Box>
-    </Card>
+
+      <Box
+        sx={{
+          color: summary ? ds.gray["600"] : ds.gray["400"],
+          display: "-webkit-box",
+          fontSize: 14,
+          lineHeight: "20px",
+          minHeight: 60,
+          overflow: "hidden",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: 3,
+          wordBreak: "break-word",
+        }}
+      >
+        {isValidating ? <Skeleton variant="text" /> : summary || t("dRepDirectory.card.noSummary")}
+      </Box>
+
+      <Box sx={{ borderTop: `1px dashed ${ds.gray["200"]}`, mt: "auto" }} />
+
+      <Box sx={{ alignItems: "flex-end", display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", gap: 2.5 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+            <Box component="span" data-testid={`${view}-voting-power-label`} sx={statLabelSx}>
+              {t("votingPower")}
+            </Box>
+            <Box component="span" data-testid={`${view}-voting-power`} sx={{ ...statValueSx, fontFamily: FONT_FAMILY.sans }}>
+              {`₳ ${correctDRepDirectoryFormat(votingPower)}`}
+            </Box>
+          </Box>
+          {latestRegistrationDate && (
+            <Box sx={{ borderLeft: `1px solid ${ds.gray["200"]}`, display: "flex", flexDirection: "column", gap: 0.25, pl: 2.5 }}>
+              <Box component="span" sx={statLabelSx}>
+                {t("dRepDirectory.card.registered")}
+              </Box>
+              <Box component="span" sx={statValueSx}>
+                {formatDisplayDate(latestRegistrationDate, "MMM d, yyyy")}
+              </Box>
+            </Box>
+          )}
+        </Box>
+        {canDelegate && isConnected && onDelegate && !isMyDrep && !isInProgress && (
+          <Button
+            data-testid={`${view}-delegate-button`}
+            isLoading={isDelegationLoading}
+            onClick={onDelegate}
+            size="small"
+          >
+            {t("delegate")}
+          </Button>
+        )}
+        {canDelegate && !isConnected && (
+          <Button
+            data-testid={`${view}-connect-to-delegate-button`}
+            onClick={openChooseWalletModal}
+            size="small"
+            variant="outlined"
+          >
+            {t("connectToDelegate")}
+          </Button>
+        )}
+      </Box>
+    </Box>
   );
 };
-
-const ellipsisStyles = {
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-  maxWidth: { xxs: "200px", xs: "100%" },
-} as const;

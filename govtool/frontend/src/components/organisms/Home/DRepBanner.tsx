@@ -5,12 +5,17 @@ import { useTranslation } from "@hooks";
 import { ds } from "@/consts/designTokens";
 import { LINKS } from "@/consts/links";
 
+type DRepBannerProps = {
+  /** False inside a page that already has the 1180px column and its gutters. */
+  withGutters?: boolean;
+};
+
 /** The blue "What is a DRep?" call to action, linking to the DRep guide. */
-export const DRepBanner = () => {
+export const DRepBanner = ({ withGutters = true }: DRepBannerProps) => {
   const { t } = useTranslation();
 
   return (
-    <Box sx={{ boxSizing: "border-box", maxWidth: 1180, mx: "auto", px: { xxs: 2, md: 3, xl: 0 }, width: "100%" }}>
+    <Box sx={{ boxSizing: "border-box", maxWidth: 1180, mx: "auto", px: withGutters ? { xxs: 2, md: 3, xl: 0 } : 0, width: "100%" }}>
       <Box
         data-testid="drep-banner"
         sx={{

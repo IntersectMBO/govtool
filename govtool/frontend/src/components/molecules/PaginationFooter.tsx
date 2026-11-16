@@ -104,7 +104,7 @@ export const PaginationFooter: FC<Props> = ({
         </Typography>
         {showPageSize && (
           <Box sx={{ alignItems: "center", display: "flex", gap: 1 }}>
-            <Typography sx={{ color: ds.gray["600"], fontSize: 14 }}>
+            <Typography sx={{ color: ds.gray["600"], fontSize: 14, whiteSpace: "nowrap" }}>
               {t("pagination.rowsPerPage")}
             </Typography>
             <Select

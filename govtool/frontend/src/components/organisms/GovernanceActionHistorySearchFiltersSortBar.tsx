@@ -11,12 +11,10 @@ import {
   GOV_ACTION_HISTORY_STATUS_FILTERS,
   GOV_ACTION_HISTORY_TYPE_FILTERS,
 } from "@consts";
-import { FilterSidebar, SortSelect } from "@molecules";
+import { FilterSidebar, SearchField, SortSelect } from "@molecules";
 import { useTranslation } from "@hooks";
 import { getCurrentSearchParams } from "@utils";
 import { ds, RADIUS } from "@/consts/designTokens";
-
-import { SearchField } from "./GovernanceActionsListLayout";
 
 const STATUS_ICONS: Record<string, ReactNode> = {
   live: <CircleDot aria-hidden color={ds.primary["600"]} size={16} />,

@@ -19,11 +19,27 @@ type Props = {
   /** The chosen key; "" is the backend's default order. */
   value: string;
   onChange: (next: string) => void;
+  /** The prefix before the choice; "Sort:" by default. */
+  label?: string;
+  /** Shown when no option matches `value`; "Default" by default. */
+  placeholder?: string;
+  dataTestId?: string;
 };
 
-/** "Sort: Newest" button opening a radio list; keeps the old sort test ids. */
-export const SortSelect = ({ options, value, onChange }: Props) => {
+/**
+ * "Sort: Newest" button opening a radio list; keeps the old sort test ids.
+ * With `label` it serves other single-choice filters ("Status: All").
+ */
+export const SortSelect = ({
+  options,
+  value,
+  onChange,
+  label,
+  placeholder,
+  dataTestId = "sort-button",
+}: Props) => {
   const { t } = useTranslation();
+  const prefix = label ?? t("listControls.sortLabel");
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const current = options.find((option) => option.key === value);
 
@@ -32,7 +48,7 @@ export const SortSelect = ({ options, value, onChange }: Props) => {
       <ButtonBase
         aria-expanded={Boolean(anchor)}
         aria-haspopup="true"
-        data-testid="sort-button"
+        data-testid={dataTestId}
         onClick={(event) => setAnchor(event.currentTarget)}
         sx={{
           alignItems: "center",
@@ -52,9 +68,9 @@ export const SortSelect = ({ options, value, onChange }: Props) => {
           "&.Mui-focusVisible": { outline: `2px solid ${ds.primary["600"]}` },
         }}
       >
-        {t("listControls.sortLabel")}
+        {prefix}
         <Box component="span" sx={{ color: ds.gray["900"], fontWeight: 500 }}>
-          {current?.label ?? t("listControls.sortDefault")}
+          {current?.label ?? placeholder ?? t("listControls.sortDefault")}
         </Box>
         <ChevronDown aria-hidden color={ds.gray["700"]} size={16} />
       </ButtonBase>
@@ -78,7 +94,7 @@ export const SortSelect = ({ options, value, onChange }: Props) => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
         <RadioGroup
-          aria-label={t("listControls.sortLabel")}
+          aria-label={prefix}
           onChange={(event) => {
             onChange(event.target.value);
             setAnchor(null);

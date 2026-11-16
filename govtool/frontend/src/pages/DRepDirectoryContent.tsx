@@ -1,13 +1,16 @@
 import React, { FC, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { Box, CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router";
+import { Box, ButtonBase, CircularProgress } from "@mui/material";
+import { UserRoundPlus, X } from "lucide-react";
 
-import { Typography } from "@atoms";
-import { DREP_DIRECTORY_FILTERS } from "@consts";
+import { Button, Typography } from "@atoms";
+import { DREP_DIRECTORY_FILTERS, PATHS } from "@consts";
 import {
   useCardano,
   useDataActionsBar,
   useFeatureFlag,
+  useModal,
   usePagination,
 } from "@context";
 import {
@@ -18,11 +21,13 @@ import {
   useGetDRepListPaginatedQuery,
 } from "@hooks";
 import {
-  DataActionsBar,
   EmptyStateDrepDirectory,
+  PageTitle,
+  SearchField,
   SearchNotReady,
+  SortSelect,
 } from "@molecules";
-import { AutomatedVotingOptions, DRepCard } from "@organisms";
+import { AutomatedVotingOptions, DRepBanner, DRepCard } from "@organisms";
 import {
   isSameDRep,
   uniqBy,
@@ -37,6 +42,7 @@ import {
 import usePrevious from "@/hooks/usePrevious";
 import { PaginationFooter } from "@/components/molecules/PaginationFooter";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
+import { ds, RADIUS } from "@/consts/designTokens";
 
 interface DRepDirectoryContentProps {
   isConnected?: boolean;
@@ -62,6 +68,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const { dRepID: myDRepId, pendingTransaction, stakeKey } = useCardano();
   const { dRepDirectorySort } = useFeatureFlag();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { openModal } = useModal();
 
   const {
     searchText,
@@ -200,67 +208,87 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       currentDelegation?.dRepView ===
         AutomatedVotingOptionCurrentDelegation.drep_always_no_confidence);
 
-  const scaleWrapSx = isConnected
-    ? ({
-        width: "100%",
-        transform: { xs: "scale(0.9)", sm: "scale(0.9)", md: "none" },
-        transformOrigin: { xs: "top center", sm: "top center", md: "initial" },
-        ml: { xs: 0.25, sm: 0.25, md: 0 },
-      } as const)
-    : ({
-        width: "100%",
-        transform: { xs: "scale(0.9)", sm: "scale(0.9)", md: "none" },
-        transformOrigin: { xs: "top left", sm: "top left", md: "initial" },
-        ml: { xs: 0.25, sm: 0.25, md: 0 },
-      } as const);
+  const statusFilter = chosenFilters.length === 1 ? chosenFilters[0] : "";
+  const activeFilterCount =
+    (chosenFilters.length ? 1 : 0) + (debouncedSearchText ? 1 : 0);
+  const clearAll = () => {
+    setChosenFilters([]);
+    setSearchText("");
+  };
+  const showMyDelegation =
+    !!myDrep &&
+    !inProgressDelegation &&
+    !!currentDelegation &&
+    currentDelegation?.dRepHash !== myDRepId;
 
   return (
     <Box
       display="flex"
       flex={1}
       flexDirection="column"
-      gap={4}
-      sx={{ width: "100%", maxWidth: "100vw" }}
+      gap={3}
+      sx={{ width: "100%" }}
     >
-      {myDrep &&
-        !inProgressDelegation &&
-        currentDelegation &&
-        currentDelegation?.dRepHash !== myDRepId && (
-          <div>
-            <Typography variant="title2" sx={{ mb: 2 }}>
-              <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
-            </Typography>
-            <Box>
-              <Box sx={scaleWrapSx}>
-                <DRepCard
-                  dRep={myDrep}
-                  isConnected={!!isConnected}
-                  isInProgress={isSameDRep(myDrep, inProgressDelegation)}
-                  isMe={isSameDRep(myDrep, myDRepId)}
-                />
-              </Box>
-            </Box>
-          </div>
-        )}
+      <PageTitle
+        action={
+          <Button
+            dataTestId="become-a-drep-button"
+            onClick={() =>
+              (isConnected
+                ? navigate(PATHS.registerAsdRep)
+                : openModal({ type: "chooseWallet" }))
+            }
+            size="large"
+            startIcon={<UserRoundPlus aria-hidden size={18} />}
+            sx={{
+              backgroundColor: ds.orange["600"],
+              "&:hover": { backgroundColor: ds.orange["700"] },
+            }}
+          >
+            {t("dRepDirectory.becomeADRep")}
+          </Button>
+        }
+        description={t("dRepDirectory.pageDescription")}
+        title={t("dRepDirectory.pageTitle")}
+      />
 
-      {inProgressDelegation &&
-        inProgressDelegation !== myDRepId &&
-        inProgressDelegationDRepData && (
-          <Box>
-            <Box sx={scaleWrapSx}>
+      {(showMyDelegation ||
+        (inProgressDelegation &&
+          inProgressDelegation !== myDRepId &&
+          inProgressDelegationDRepData)) && (
+          <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            <Typography component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600 }}>
+              {showMyDelegation ? (
+                <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
+            ) : (
+              t("dRepDirectory.delegationInProgress")
+            )}
+            </Typography>
+            <Box sx={gridSx}>
+              {showMyDelegation && myDrep && (
+              <DRepCard
+                dRep={myDrep}
+                isConnected={!!isConnected}
+                isInProgress={isSameDRep(myDrep, inProgressDelegation)}
+                isMe={isSameDRep(myDrep, myDRepId)}
+                isMyDrep
+              />
+            )}
+              {!showMyDelegation && inProgressDelegationDRepData && (
               <DRepCard
                 dRep={inProgressDelegationDRepData}
                 isConnected={!!isConnected}
                 isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
                 isInProgress
               />
+            )}
             </Box>
           </Box>
-        )}
+      )}
 
       {isConnected && (
-        <div>
-          <Typography variant="title2" sx={{ mb: 2 }}>
+        <Box component="section">
+          <Typography component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600, mb: 1.5 }}>
             {t("dRepDirectory.delegationOptions")}
           </Typography>
           <AutomatedVotingOptions
@@ -289,26 +317,99 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                 : undefined
             }
           />
-        </div>
+        </Box>
       )}
 
-      <>
-        <Typography fontSize={18} fontWeight={500} sx={{ mb: 3 }}>
-          {t("dRepDirectory.listTitle")}
-        </Typography>
-        <DataActionsBar
-          {...dataActionsBarProps}
-          searchText={searchText}
-          setSearchText={setSearchText}
-          filterOptions={DREP_DIRECTORY_FILTERS}
-          filtersTitle={t("dRepDirectory.filterTitle")}
-          sortOptions={dRepDirectorySort.options}
-          isSorting={dRepDirectorySort.isAvailable}
-          placeholder={t("dRepDirectory.searchBarPlaceholder")}
-        />
+      <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {isConnected && (
+          <Typography component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600 }}>
+            {t("dRepDirectory.listTitle")}
+          </Typography>
+        )}
+        <Box sx={{ alignItems: "center", display: "flex", flexWrap: { xxs: "wrap", md: "nowrap" }, gap: 1.5 }}>
+          <SearchField
+            onChange={setSearchText}
+            onClear={() => setSearchText("")}
+            placeholder={t("dRepDirectory.searchBarPlaceholder")}
+            value={searchText}
+          />
+          <SortSelect
+            dataTestId="status-filter-button"
+            label={t("dRepDirectory.statusLabel")}
+            onChange={(next) => setChosenFilters(next ? [next] : [])}
+            options={[
+              { key: "", label: t("dRepDirectory.statusAll") },
+              ...DREP_DIRECTORY_FILTERS,
+            ]}
+            value={statusFilter}
+          />
+          {dRepDirectorySort.isAvailable && (
+            <SortSelect
+              label={t("dRepDirectory.sortLabel")}
+              onChange={setChosenSorting}
+              options={dRepDirectorySort.options}
+              value={chosenSorting}
+            />
+          )}
+        </Box>
+
+        {activeFilterCount > 0 && (
+          <Box
+            data-testid="active-filters"
+            sx={{
+              alignItems: "center",
+              backgroundColor: ds.primary["25"],
+              border: `1px solid ${ds.primary["100"]}`,
+              borderRadius: `${RADIUS.md}px`,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              px: 1.5,
+              py: 1,
+            }}
+          >
+            <Box component="span" sx={{ alignItems: "center", color: ds.gray["700"], display: "inline-flex", fontSize: 13, fontWeight: 500, gap: 0.75 }}>
+              {t("dRepDirectory.activeFilters")}
+              <Box component="span" sx={{ backgroundColor: ds.primary["600"], borderRadius: "50%", color: "#FFFFFF", fontSize: 11, fontWeight: 600, height: 18, lineHeight: "18px", textAlign: "center", width: 18 }}>
+                {activeFilterCount}
+              </Box>
+            </Box>
+            {statusFilter && (
+              <FilterChip
+                dataTestId={`${statusFilter}-filter-chip`}
+                label={statusFilter}
+                onRemove={() => setChosenFilters([])}
+                removeLabel={t("dRepDirectory.removeFilter", { name: statusFilter })}
+              />
+            )}
+            {chosenFilters.length > 1 && (
+              <FilterChip
+                dataTestId="status-filter-chip"
+                label={chosenFilters.join(", ")}
+                onRemove={() => setChosenFilters([])}
+                removeLabel={t("dRepDirectory.removeFilter", { name: chosenFilters.join(", ") })}
+              />
+            )}
+            {debouncedSearchText && (
+              <FilterChip
+                dataTestId="search-filter-chip"
+                label={`"${debouncedSearchText}"`}
+                onRemove={() => setSearchText("")}
+                removeLabel={t("dRepDirectory.removeFilter", { name: debouncedSearchText })}
+              />
+            )}
+            <ButtonBase
+              data-testid="clear-all-filters-button"
+              onClick={clearAll}
+              sx={{ color: ds.error["600"], fontFamily: "inherit", fontSize: 13, fontWeight: 600, px: 0.5 }}
+            >
+              {t("dRepDirectory.clearAll")}
+            </ButtonBase>
+          </Box>
+        )}
 
         {showSearchSummary && (
-          <Typography fontSize={16} fontWeight={500}>
+          <Typography sx={{ color: ds.gray["600"], fontSize: 14 }}>
             <Trans
               i18nKey="dRepDirectory.searchSummary"
               defaults="Found {{found}} DRep{{multiple}} out of a total of <total>{{total}}</total>"
@@ -331,73 +432,105 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
             />
           </Typography>
         )}
-        <Box
-          component="ul"
-          display="flex"
-          flexDirection="column"
-          gap={3}
-          mt={showSearchSummary ? 0 : 4}
-          p={0}
-          sx={{
-            flex: 1,
-            width: "100%",
-            maxWidth: "100%",
-          }}
-        >
-          {isSearchNotReady ? (
-            <SearchNotReady />
-          ) : (
-            filteredDoNotListDReps?.length === 0 && <EmptyStateDrepDirectory />
-          )}
-          {filteredDoNotListDReps?.map((dRep) => (
-            <Box key={dRep.view} component="li" sx={{ listStyle: "none" }}>
-              <Box>
-                <Box sx={scaleWrapSx}>
-                  <DRepCard
-                    dRep={dRep}
-                    isConnected={!!isConnected}
-                    isDelegationLoading={
-                      isDelegating === dRep.view || isDelegating === dRep.drepId
-                    }
-                    isMe={isSameDRep(dRep, myDRepId)}
-                    isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
-                    onDelegate={() => {
-                      setInProgressDelegationDRepData(dRep);
-                      delegate(dRep.drepId);
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Box>
-          ))}
-        </Box>
 
-        <Box
-          sx={{
-            width: "100%",
-            transform: { xs: "scale(0.85)", sm: "scale(0.85)", md: "none" },
-            transformOrigin: {
-              xs: "top rigth",
-              sm: "top rigth",
-              md: "initial",
-            },
-          }}
-        >
-          <PaginationFooter
-            // Mainnet lists about a thousand DReps; keep the page size choice
-            // until the directory's redesign settles its own pagination.
-            showPageSize
-            page={page}
-            total={total || 0}
-            pageSize={pageSize}
-            onPageChange={setPage}
-            onPageSizeChange={(n) => {
-              setPageSize(n);
-              setPage(1);
-            }}
+        {isSearchNotReady && <SearchNotReady />}
+        {!isSearchNotReady && filteredDoNotListDReps.length === 0 && (
+          <EmptyStateDrepDirectory
+            onBrowseAll={clearAll}
+            onClearSearch={() => setSearchText("")}
+            searchTerm={debouncedSearchText}
           />
-        </Box>
-      </>
+        )}
+        {!isSearchNotReady && filteredDoNotListDReps.length > 0 && (
+          <Box component="ul" sx={{ ...gridSx, m: 0, p: 0 }}>
+            {filteredDoNotListDReps.map((dRep) => (
+              <Box key={dRep.view} component="li" sx={{ display: "flex", listStyle: "none", minWidth: 0 }}>
+                <DRepCard
+                  dRep={dRep}
+                  isConnected={!!isConnected}
+                  isDelegationLoading={
+                    isDelegating === dRep.view || isDelegating === dRep.drepId
+                  }
+                  isMe={isSameDRep(dRep, myDRepId)}
+                  isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
+                  onDelegate={() => {
+                    setInProgressDelegationDRepData(dRep);
+                    delegate(dRep.drepId);
+                  }}
+                />
+              </Box>
+            ))}
+          </Box>
+        )}
+
+        <PaginationFooter
+          // Mainnet lists about a thousand DReps; keep the page size choice.
+          showPageSize
+          pageSizeOptions={[6, 12, 24, 48]}
+          page={page}
+          total={total || 0}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(n) => {
+            setPageSize(n);
+            setPage(1);
+          }}
+        />
+      </Box>
+
+      <Box sx={{ mt: 3 }}>
+        <DRepBanner withGutters={false} />
+      </Box>
     </Box>
   );
 };
+
+const gridSx = {
+  display: "grid",
+  gap: 2.5,
+  gridTemplateColumns: {
+    xxs: "minmax(0, 1fr)",
+    sm: "repeat(2, minmax(0, 1fr))",
+    lg: "repeat(3, minmax(0, 1fr))",
+  },
+};
+
+const FilterChip = ({
+  label,
+  onRemove,
+  removeLabel,
+  dataTestId,
+}: {
+  label: string;
+  onRemove: () => void;
+  removeLabel: string;
+  dataTestId: string;
+}) => (
+  <Box
+    component="span"
+    data-testid={dataTestId}
+    sx={{
+      alignItems: "center",
+      backgroundColor: "#FFFFFF",
+      border: `1px solid ${ds.gray["200"]}`,
+      borderRadius: `${RADIUS.pill}px`,
+      color: ds.gray["900"],
+      display: "inline-flex",
+      fontSize: 13,
+      gap: 0.5,
+      lineHeight: "18px",
+      pl: 1.25,
+      pr: 0.5,
+      py: 0.25,
+    }}
+  >
+    {label}
+    <ButtonBase
+      aria-label={removeLabel}
+      onClick={onRemove}
+      sx={{ borderRadius: "50%", color: ds.gray["600"], height: 20, width: 20 }}
+    >
+      <X aria-hidden size={12} />
+    </ButtonBase>
+  </Box>
+);

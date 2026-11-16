@@ -4,6 +4,7 @@ export const QUERY_KEYS = {
   useGetDRepInfoKey: "useGetDRepInfoKey",
   useGetDRepListInfiniteKey: "useGetDRepListInfiniteKey",
   useGetDRepVotesKey: "useGetDRepVotesKey",
+  useGetDRepVotesByIdKey: "useGetDRepVotesByIdKey",
   useGetDRepVotingPowerKey: "useGetDRepVotingPowerKey",
   useGetEpochParamsKey: "useGetEpochParamsKey",
   useGetNetworkMetricsKey: "useGetNetworkMetricsKey",

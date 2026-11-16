@@ -25,3 +25,4 @@ export * from "./useGetGovernanceActionProposalDiscussionQuery";
 export * from "./useGetDecidedActionsQuery";
 export * from "./useGetLiveProposalsQuery";
 export * from "./useGetProposalsPageQuery";
+export * from "./useGetDRepVotesByIdQuery";

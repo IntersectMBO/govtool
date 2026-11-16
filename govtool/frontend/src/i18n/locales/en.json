@@ -300,6 +300,44 @@
       "title": "Delegate to myself"
     }
   },
+  "dRepProfile": {
+    "about": "About {{name}}",
+    "activity": {
+      "action": "Governance action",
+      "empty": "This DRep has not voted yet.",
+      "error": "Votes could not be loaded right now.",
+      "subtitle": "The governance actions this DRep voted on, newest first.",
+      "title": "Activity",
+      "type": "Type",
+      "vote": "Vote",
+      "votedOnEpoch": "Voted on Epoch {{epoch}}"
+    },
+    "delegate": "Delegate voting power",
+    "delegatedTo": "Your voting power is currently delegated to {{name}}.",
+    "delegationInProgress": "Your delegation to {{name}} is being confirmed on Cardano.",
+    "delegationNote": "Delegating moves voting rights only; your ADA stays in your wallet.",
+    "howDelegationWorks": "How delegation works",
+    "howDelegationWorksBody": "Your DRep votes on governance actions on your behalf. You keep control of your wallet and can choose another DRep later.",
+    "identity": "Identity",
+    "keyBased": "Key based",
+    "readGuide": "Read the delegation guide ↗",
+    "registeredOn": "Registered {{date}}",
+    "scriptBased": "Script based",
+    "trend": {
+      "dayTooltip": "{{total}} votes · Yes {{yes}} · No {{no}} · Abstain {{abstain}}",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "empty_one": "No votes in the last day.",
+      "empty_other": "No votes in the last {{count}} days.",
+      "range": "Time range",
+      "subtitle_one": "Votes cast in the last day",
+      "subtitle_other": "Votes cast across the last {{count}} days",
+      "title": "Daily voting trend",
+      "total": "Total votes"
+    },
+    "type": "Credential",
+    "votesCast": "Votes cast"
+  },
   "dRepDirectory": {
     "activeFilters": "Active filters:",
     "becomeADRep": "Become a DRep",

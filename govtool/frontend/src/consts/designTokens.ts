@@ -40,6 +40,7 @@ const success: ColorScale = {
   50: "#E3F8EA",
   100: "#D1FADF",
   200: "#A6F4C5",
+  300: "#6CE9A6",
   400: "#32D583",
   500: "#12B76A",
   600: "#039855",
@@ -51,6 +52,7 @@ const warning: ColorScale = {
   50: "#FFFAEB",
   100: "#FEF0C7",
   400: "#FDB022",
+  500: "#F79009",
   600: "#DC6803",
   700: "#B54708",
 };
@@ -60,6 +62,7 @@ const error: ColorScale = {
   50: "#FEF3F2",
   100: "#FEE4E2",
   200: "#FECDCA",
+  300: "#FDA29B",
   400: "#F97066",
   500: "#F04438",
   600: "#D92D20",

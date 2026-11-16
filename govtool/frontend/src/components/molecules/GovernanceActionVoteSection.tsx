@@ -21,10 +21,10 @@ import { primaryBlue, successGreen } from "@consts";
 import { useTranslation } from "@hooks";
 import { formatVoteAggregateValue, voteAggregateResult } from "@utils";
 import type { GovernanceActionVoteAggregate } from "@models";
-import { FONT_FAMILY } from "@/consts/designTokens";
+import { ds, FONT_FAMILY } from "@/consts/designTokens";
 
-const THRESHOLD_COLOR = "#45458A";
-const NO_BAR_COLOR = "#D84444";
+const THRESHOLD_COLOR = ds.gray["700"];
+const NO_BAR_COLOR = ds.error["600"];
 
 type VoteMetric = {
   label: string;
@@ -120,11 +120,11 @@ const VoteMetricsTable = ({
         <Table
           sx={{
             boxShadow: "0px 10px 10px -5px rgba(33, 42, 61, 0.08)",
-            border: "1px solid #F1F1F4",
+            border: `1px solid ${ds.gray["100"]}`,
           }}
         >
           <TableHead>
-            <TableRow sx={{ backgroundColor: "#FCFCFC", py: 1, px: 2 }}>
+            <TableRow sx={{ backgroundColor: ds.gray["25"], py: 1, px: 2 }}>
               <TableCell
                 sx={{
                   p: "inherit",
@@ -152,7 +152,7 @@ const VoteMetricsTable = ({
               <TableRow
                 key={metric.label}
                 sx={{
-                  backgroundColor: metric.isHighlighted ? "#F9F9FB" : "inherit",
+                  backgroundColor: metric.isHighlighted ? ds.gray["50"] : "inherit",
                   py: metric.isHighlighted ? 1 : 2,
                   px: 2,
                 }}

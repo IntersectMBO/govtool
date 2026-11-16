@@ -15,6 +15,8 @@ import type { ConnectAttempt, FetchHop, MetadataReport } from "@models";
 import { MetadataReportBody } from "./MetadataReportBody";
 import { REPORT_BORDER, REPORT_LABEL } from "./metadataReportStyles";
 
+import { ds } from "@/consts/designTokens";
+
 const formatTimestamp = (value: string) => {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
@@ -70,7 +72,7 @@ const Section = ({
       py: 2.5,
       borderBottom: REPORT_BORDER,
       "&:last-child": { borderBottom: 0 },
-      ...(shaded && { bgcolor: "#F5F7FC" }),
+      ...(shaded && { bgcolor: ds.gray["50"] }),
     }}
   >
     {children}

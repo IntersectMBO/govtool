@@ -12,6 +12,8 @@ import {
 } from "@/utils";
 import { MetadataIssue, MetadataValidationStatus } from "@/models";
 
+import { ds } from "@/consts/designTokens";
+
 type GovernanceActionCardHeaderProps = {
   title?: string;
   isDataMissing?: MetadataValidationStatus;
@@ -90,7 +92,7 @@ export const GovernanceActionCardHeader = ({
         >
           <InfoOutlinedIcon
             style={{
-              color: "#ADAEAD",
+              color: ds.gray["400"],
             }}
             // Above a list card's stretched link, so the tooltip opens.
             sx={{ ml: 0.7, position: "relative", zIndex: 1 }}

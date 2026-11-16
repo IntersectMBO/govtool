@@ -7,6 +7,8 @@ import { DataActionsFilters, DataActionsSorting } from "@molecules";
 import { OrderActionsChip } from "./OrderActionsChip";
 import ChipButton from "../atoms/ChipButton";
 
+import { ds } from "@/consts/designTokens";
+
 type DataActionsBarProps = {
   chosenFilters?: string[];
   chosenFiltersLength?: number;
@@ -100,7 +102,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
           startAdornment={
             <Search
               style={{
-                color: "#99ADDE",
+                color: ds.primary["300"],
                 height: 16,
                 marginRight: 4,
                 width: 16,
@@ -121,7 +123,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
           sx={{
             bgcolor: "white",
             border: 1,
-            borderColor: "#6E87D9",
+            borderColor: ds.primary["400"],
             borderRadius: 50,
             boxShadow: "2px 2px 20px 0 rgba(0,0,0,0.05)",
             fontSize: { xs: 16, sm: 11 },
@@ -190,7 +192,7 @@ export const DataActionsBar: FC<DataActionsBarProps> = ({
               label={label}
               onDelete={() => handleRemoveFilter(key)}
               deleteIconPosition="left"
-              bgColor="#B9CCF5"
+              bgColor={ds.primary["200"]}
               size="small"
             />
           ))}

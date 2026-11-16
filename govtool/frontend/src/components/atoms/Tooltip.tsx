@@ -3,6 +3,8 @@ import * as TooltipMUI from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { TooltipProps } from "@atoms";
 
+import { ds } from "@/consts/designTokens";
+
 const StyledTooltip = styled(
   ({ className, ...props }: TooltipMUI.TooltipProps) => (
     // eslint-disable-next-line react/jsx-pascal-case
@@ -31,7 +33,7 @@ export const Tooltip = ({
     title={
       <>
         {heading && (
-          <Typography fontSize={16} fontWeight={400} color="#FBFBFF">
+          <Typography fontSize={16} fontWeight={400} color={ds.gray["25"]}>
             {heading}
           </Typography>
         )}

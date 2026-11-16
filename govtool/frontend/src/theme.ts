@@ -200,7 +200,7 @@ export const theme = createTheme({
   palette: {
     accentOrange: ds.orange["600"],
     accentYellow: "#F2D9A9",
-    arcticWhite: "#FBFBFF",
+    arcticWhite: ds.gray["25"],
     boxShadow1: "rgba(0, 18, 61, 0.37)",
     boxShadow2: "rgba(47, 98, 220, 0.2)",
     darkPurple: ds.gray["900"],

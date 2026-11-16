@@ -1,3 +1,4 @@
+import { ds } from "@/consts/designTokens";
 /** The small upper-case caption over each value in a fetch report. */
 export const REPORT_LABEL = {
   fontSize: "12px",
@@ -5,8 +6,8 @@ export const REPORT_LABEL = {
   lineHeight: "16px",
   letterSpacing: "0.04em",
   textTransform: "uppercase",
-  color: "#6B6F80",
+  color: ds.gray["600"],
 } as const;
 
 /** The rule between a fetch report's sections. */
-export const REPORT_BORDER = "1px solid #E6E6F0";
+export const REPORT_BORDER = `1px solid ${ds.gray["200"]}`;

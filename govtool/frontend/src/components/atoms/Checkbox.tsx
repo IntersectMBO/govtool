@@ -3,6 +3,8 @@ import { Checkbox as MUICheckbox } from "@mui/material";
 
 import { CheckboxProps } from "./types";
 
+import { ds } from "@/consts/designTokens";
+
 export const Checkbox = ({
   dataTestId,
   errorMessage,
@@ -21,7 +23,7 @@ export const Checkbox = ({
       }
       sx={{
         "& .MuiSvgIcon-root": { fontSize: 18 },
-        color: errorMessage ? "red" : "#0033AD",
+        color: errorMessage ? "red" : ds.primary["600"],
         ...sx,
       }}
       {...props}

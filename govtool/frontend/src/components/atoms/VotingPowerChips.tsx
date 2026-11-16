@@ -5,6 +5,8 @@ import { Typography, Tooltip } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { correctVoteAdaFormat } from "@utils";
 
+import { ds } from "@/consts/designTokens";
+
 type VotingPowerChipsProps = {
   votingPower?: number;
   isLoading?: boolean;
@@ -27,7 +29,7 @@ export const VotingPowerChips = ({
           alignItems: "center",
           bgcolor: "textBlack",
           border: isMobile ? 2 : 0,
-          borderColor: "#FBFBFF",
+          borderColor: ds.gray["25"],
           borderRadius: 100,
           display: "flex",
           height: isMobile ? 16 : 24,
@@ -46,7 +48,7 @@ export const VotingPowerChips = ({
           >
             <InfoOutlinedIcon
               style={{
-                color: "#ADAEAD",
+                color: ds.gray["400"],
                 marginRight: "12px",
               }}
               fontSize="small"
@@ -54,7 +56,7 @@ export const VotingPowerChips = ({
           </Tooltip>
         )}
         {screenWidth >= 1024 && (
-          <Typography color="#A5A6A5" sx={{ mr: 1.5 }} variant="body2">
+          <Typography color={ds.gray["400"]} sx={{ mr: 1.5 }} variant="body2">
             {t("votingPower")}:
           </Typography>
         )}

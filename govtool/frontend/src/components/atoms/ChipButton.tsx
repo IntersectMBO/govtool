@@ -2,6 +2,8 @@ import * as React from "react";
 import { Chip, ChipProps, IconButton } from "@mui/material";
 import { IconX } from "@intersect.mbo/intersectmbo.org-icons-set";
 
+import { ds } from "@/consts/designTokens";
+
 interface ChipButtonProps
   extends Omit<ChipProps, "color" | "variant" | "deleteIcon"> {
   label: React.ReactNode;
@@ -15,7 +17,7 @@ interface ChipButtonProps
 const ChipButton: React.FC<ChipButtonProps> = ({
   label,
   onDelete,
-  bgColor = "#B9CCF5",
+  bgColor = ds.primary["200"],
   deleteIconPosition = "left",
   iconSize = 14,
   testId,

@@ -12,7 +12,7 @@ import {
 } from "@utils";
 import { LINKS } from "@/consts/links";
 import { errorRed } from "@/consts/colors";
-import { FONT_FAMILY } from "@/consts/designTokens";
+import { ds, FONT_FAMILY } from "@/consts/designTokens";
 
 export const DataMissingInfoBox = ({
   isDataMissing,
@@ -110,7 +110,7 @@ export const DataMissingInfoBox = ({
             flexWrap: "wrap",
             gap: 1.5,
             borderTop: `1px dashed ${errorRed.c200}`,
-            bgcolor: "#FFF7F6",
+            bgcolor: ds.error["25"],
           }}
         >
           {/* The explanation of each error lives in the docs. */}

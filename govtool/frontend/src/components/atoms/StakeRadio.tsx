@@ -10,6 +10,8 @@ import {
 import { theme } from "@/theme";
 import { correctVoteAdaFormat } from "@/utils";
 
+import { ds } from "@/consts/designTokens";
+
 type StakeRadioProps = {
   isChecked?: boolean;
   stakeKey: string;
@@ -33,7 +35,7 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
       border={isChecked ? 2 : 1}
       p="2px"
       bgcolor="white"
-      borderColor={isChecked ? "specialCyanBorder" : "#D6E2FF"}
+      borderColor={isChecked ? "specialCyanBorder" : ds.primary["100"]}
       borderRadius="15px"
       boxShadow={`1px 2px 11px 0px ${boxShadow1}`}
       onClick={() => onChange(stakeKey)}
@@ -75,16 +77,16 @@ export const StakeRadio: FC<StakeRadioProps> = ({ ...props }) => {
           </IconButton>
         </Box>
         <Box alignItems="center" display="flex">
-          <Typography color={isChecked ? "white" : "#8E908E"} variant="body2">
+          <Typography color={isChecked ? "white" : ds.gray["500"]} variant="body2">
             {t("votingPower")}:
           </Typography>
           {powerIsLoading ? (
-            <Typography color={isChecked ? "white" : "#8E908E"} variant="body2">
+            <Typography color={isChecked ? "white" : ds.gray["500"]} variant="body2">
               {t("loading")}
             </Typography>
           ) : (
             <Typography
-              color={isChecked ? "white" : "#001A57"}
+              color={isChecked ? "white" : ds.primary["900"]}
               fontWeight={600}
               marginLeft="4px"
             >

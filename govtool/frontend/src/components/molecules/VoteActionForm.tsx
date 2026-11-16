@@ -20,6 +20,8 @@ import {
   type Cip179Participation,
 } from "@/cip179/Cip179Survey";
 
+import { ds } from "@/consts/designTokens";
+
 type VoteActionFormProps = {
   setIsVoteSubmitted: Dispatch<SetStateAction<boolean>>;
   isInProgress?: boolean;
@@ -290,7 +292,7 @@ export const VoteActionForm = ({
               position: "relative",
               width: "100%",
               mt: 2,
-              border: !showWholeVoteContext ? "1px solid #E1E1E1" : "none",
+              border: !showWholeVoteContext ? `1px solid ${ds.gray["200"]}` : "none",
               borderRadius: "4px",
               backgroundColor: !showWholeVoteContext ? fadedPurple.c50 : "transparent",
               padding: 2

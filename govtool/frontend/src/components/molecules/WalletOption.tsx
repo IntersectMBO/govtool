@@ -11,6 +11,8 @@ import {
 import { useCardano } from "@context";
 import { theme } from "@/theme";
 
+import { ds } from "@/consts/designTokens";
+
 export interface WalletOption {
   icon: string;
   label: string;
@@ -78,7 +80,7 @@ export const WalletOptionButton: FC<WalletOption> = ({
       sx={{
         alignItems: "center",
         border: isEnableLoading ? "none" : `1px solid ${lightBlue}`,
-        bgcolor: isEnableLoading ? "#EAE9F0" : "white",
+        bgcolor: isEnableLoading ? ds.gray["200"] : "white",
         borderRadius: "100px",
         boxShadow: isEnableLoading ? undefined : "0px 0px 11px 0px #24223230",
         boxSizing: "border-box",
@@ -113,7 +115,7 @@ export const WalletOptionButton: FC<WalletOption> = ({
         }}
       />
       <Typography
-        color={isEnableLoading ? "#C1BED3" : "primaryBlue"}
+        color={isEnableLoading ? ds.gray["300"] : "primaryBlue"}
         sx={{
           fontSize: "16px",
           fontWeight: "500",

@@ -6,6 +6,8 @@ import { ICONS } from "@consts";
 import { useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
 
+import { ds } from "@/consts/designTokens";
+
 export const Share = ({ link }: { link: string }) => {
   const { addSuccessAlert } = useSnackbar();
   const { t } = useTranslation();
@@ -38,7 +40,7 @@ export const Share = ({ link }: { link: string }) => {
         onClick={handleClick}
         sx={(theme) => ({
           alignItems: "center",
-          bgcolor: open ? "#F7F9FB" : "transparent",
+          bgcolor: open ? ds.gray["50"] : "transparent",
           borderRadius: 50,
           boxShadow: open ? theme.shadows[1] : "none",
           cursor: "pointer",
@@ -48,7 +50,7 @@ export const Share = ({ link }: { link: string }) => {
           transition: "all 0.3s",
           "&:hover": {
             boxShadow: theme.shadows[1],
-            bgcolor: "#F7F9FB",
+            bgcolor: ds.gray["50"],
           },
         })}
       >

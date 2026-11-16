@@ -12,7 +12,7 @@ import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 import { removeMarkdown } from "@/utils";
 import { ICONS } from "@/consts";
 import { useModal } from "@/context";
-import { FONT_FAMILY } from "@/consts/designTokens";
+import { ds, FONT_FAMILY } from "@/consts/designTokens";
 
 type BaseProps = {
   label: string;
@@ -62,7 +62,7 @@ export const GovernanceActionCardElement = ({
         {...tooltipProps}
       >
         <InfoOutlinedIcon
-          sx={{ ml: 0.7, mb: 0.1, color: "#ADAEAD", fontSize: "small" }}
+          sx={{ ml: 0.7, mb: 0.1, color: ds.gray["400"], fontSize: "small" }}
         />
       </Tooltip>
     );

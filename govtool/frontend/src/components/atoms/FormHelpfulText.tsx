@@ -2,6 +2,8 @@ import { Typography } from "@mui/material";
 
 import { FormHelpfulTextProps } from "./types";
 
+import { ds } from "@/consts/designTokens";
+
 export const FormHelpfulText = ({
   dataTestId,
   helpfulText,
@@ -10,7 +12,7 @@ export const FormHelpfulText = ({
 }: FormHelpfulTextProps) =>
   helpfulText && (
     <Typography
-      color="#9792B5"
+      color={ds.gray["500"]}
       data-testid={
         dataTestId ?? `${helpfulText.replace(/\s+/g, "-").toLowerCase()}-error`
       }

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A Governance Activity page (`/governance_activity`, in the top navigation): counts of open actions, deadlines in the next 7 days and the past 30 days' ratifications and enactments, the stages an action moves through, a feed of actions opening for voting and being decided, the latest ratifications with each voter group's yes share, and a searchable, filterable list of live actions with their deadlines
 - Once a develop build's images are on GHCR, CI asks the GitOps repository (the `k8s-dev` environment's `GOVTOOL_ARGO_REPO` variable) to deploy that commit to k8s.dev.gov.tools
 
 ### Changed
@@ -18,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The governance action pages follow the new design: Live Voting as rows with DRep, SPO and CC tallies, a type filter sidebar and numbered pages; a new action details layout with vote group cards and an action information panel; Outcomes rows with type and status filters; and a "Have an idea" banner under the forum list
 - The DRep directory and DRep profiles follow the new design: a card grid with status and sort controls, filter chips and a new empty state; profiles with stat cards, an identity panel, a daily voting trend and an activity table of the DRep's votes. Delegating to a DRep now shows a review of the delegation before the wallet asks to sign, and follows the transaction until Cardano confirms it
 - The wallet flows (DRep registration, edit and retirement, direct voter registration and retirement, create governance action) share a new frame with the top navigation, a step indicator and one card, and leaving a flow from the navigation asks first; the connected dashboard has a welcome header, a wallet card and row-style action cards; modals follow the new design
+
+- The redesigned pages meet WCAG AA text contrast (the active nav item, orange buttons and links, and some green labels are a shade darker), every page has a main landmark and a "Skip to main content" link, navigation regions are labelled, the dashboard's To vote and Voted on tabs work with the arrow keys, and pagination buttons are named without their arrows; leftover colours from the old palette now use the new scale
 
 ### Fixed
 

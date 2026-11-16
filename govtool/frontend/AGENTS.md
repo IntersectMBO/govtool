@@ -144,12 +144,24 @@ nav, Connect Wallet or the wallet menu that holds disconnect-button), the page,
 Footer. Below 1024px the nav moves into the mobile drawer. Governance Actions is
 one nav link; its three destinations are the Proposed, Live Voting and Outcomes
 tabs (organisms/GovernanceActionsTabs.tsx), which reuse the old dropdown's test
-ids, public or connected. FAQ is a footer link (faqs-link).
+ids, public or connected. Governance Activity (pages/GovernanceActivity.tsx,
+organisms/GovernanceActivity/) is one public URL for everyone, built from the
+live list and the newest decided actions. FAQ is a footer link (faqs-link).
+
+Each page has one main landmark, which TopNav's skip link focuses: public page
+shells pass component="main" to PageContainer (or a Box), while the Dashboard
+layout wraps its outlet in main, so a page rendered inside Dashboard must not
+add another. A filter sidebar renders once per breakpoint (the phone panel or
+the desktop column), never both, because Playwright's strict getByTestId fails
+on a duplicated row id.
 
 ## Design system
 
 The redesign's values live in src/consts/designTokens.ts (colour scales ds.*,
-RADIUS, SHADOWS, FONT_FAMILY, PILL_TONES) and feed src/theme.ts; the palette
+RADIUS, SHADOWS, FONT_FAMILY, PILL_TONES) and feed src/theme.ts; text colours
+must reach 4.5:1 on their background (designTokens.test.ts pins the pairs the
+design gets wrong: orange text uses 700, or 750 on the nav's orange tint, and
+green or amber text uses 700, never 600); the palette
 exposes them as theme.palette.ds, and the older palette keys keep their names
 with the new values. The type scale is src/consts/typography.ts, used by the
 Typography atom: the Figma names (paragraphSM, tagline...) plus the old names

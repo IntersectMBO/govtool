@@ -62,7 +62,7 @@ export const FlowStepper = ({ title, steps, current }: FlowStepperProps) => {
                 component="span"
                 sx={{
                   color: index === step - 1 ? ds.gray["900"] : ds.gray["600"],
-                  display: { xxs: index === step - 1 ? "block" : "none", sm: "block" },
+                  display: { xxs: index === step - 1 ? "block" : "none", md: "block" },
                   fontSize: 12,
                   fontWeight: index === step - 1 ? 600 : 400,
                   overflow: "hidden",

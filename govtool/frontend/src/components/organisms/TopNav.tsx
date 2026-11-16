@@ -22,7 +22,16 @@ import { isNavEntryActive, NavEntry, NavEntryLink } from "./topNavItems";
 // line, so the nav collapses into the drawer.
 const DESKTOP_MIN_WIDTH = 1024;
 
-export const TopNav = ({ isConnectButton = true }) => {
+type TopNavProps = {
+  isConnectButton?: boolean;
+  /**
+   * Set inside a wallet flow: in-app links (logo and nav) call it instead of
+   * navigating, so the flow can confirm before its form is lost.
+   */
+  onNavigateAway?: () => void;
+};
+
+export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) => {
   const { openModal } = useModal();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { screenWidth } = useScreenDimension();
@@ -38,6 +47,12 @@ export const TopNav = ({ isConnectButton = true }) => {
   const navEntries = (
     isConnected ? CONNECTED_NAV_ITEMS : NAV_ITEMS
   ) as NavEntry[];
+
+  const guardNavigation = (event: React.MouseEvent<HTMLElement>) => {
+    if (!onNavigateAway) return;
+    event.preventDefault();
+    onNavigateAway();
+  };
 
   const onClickConnectButton = () => {
     if (isEnabled && stakeKey) {
@@ -104,6 +119,7 @@ export const TopNav = ({ isConnectButton = true }) => {
             key={entry.dataTestId}
             entry={entry}
             isActive={isNavEntryActive(entry, pathname)}
+            onClick={entry.newTabLink ? undefined : guardNavigation}
           />
         ))}
       </Box>
@@ -135,6 +151,7 @@ export const TopNav = ({ isConnectButton = true }) => {
         isDrawerOpen={isDrawerOpen}
         navEntries={navEntries}
         onConnect={onClickConnectButton}
+        onNavigateAway={onNavigateAway}
         setIsDrawerOpen={setIsDrawerOpen}
       />
     </Box>
@@ -170,7 +187,11 @@ export const TopNav = ({ isConnectButton = true }) => {
           data-testid="logo-button"
           // Only leaving wallet setup (ChooseStakeKey, no stake key chosen
           // yet) disconnects; a connected wallet goes to its dashboard.
-          onClick={() => {
+          onClick={(event) => {
+            if (onNavigateAway) {
+              guardNavigation(event);
+              return;
+            }
             if (!isConnectButton && !isConnected) disconnectWallet();
           }}
           style={{ display: "flex" }}

@@ -12,15 +12,15 @@ import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
 import { FlowStepper, FlowStepperProps } from "./FlowStepper";
 
 interface Props {
-  /** The browser title is set per route; kept for callers and future use. */
+  /** The flow's name: the stepper's title, or a label above the card. */
   pageTitle: string;
   onClickBackToDashboard?: () => void;
   /** Unused since the shared top nav shows voting power itself. */
   showVotingPower?: boolean;
   /** Centre the content without the card, for loaders. */
   hideBox?: boolean;
-  /** The flow's progress above the card. */
-  stepper?: FlowStepperProps;
+  /** The flow's progress above the card, titled with `pageTitle`. */
+  stepper?: Omit<FlowStepperProps, "title">;
 }
 
 /**
@@ -28,6 +28,7 @@ interface Props {
  * action): the shared top nav, a back link, the flow's stepper and its card.
  */
 export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
+  pageTitle,
   onClickBackToDashboard,
   hideBox,
   stepper,
@@ -39,7 +40,7 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
   return (
     <Background>
       <Box display="flex" minHeight="100vh" flexDirection="column">
-        <TopNav />
+        <TopNav onNavigateAway={onClickBackToDashboard} />
         <Box
           component="main"
           sx={{
@@ -80,7 +81,19 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
             <ChevronLeft aria-hidden size={16} />
             {t("backToDashboard")}
           </Box>
-          {stepper && <FlowStepper {...stepper} />}
+          {stepper ? (
+            <FlowStepper {...stepper} title={pageTitle} />
+          ) : (
+            !hideBox && (
+              <Box
+                component="p"
+                data-testid="flow-title"
+                sx={{ color: ds.gray["700"], fontSize: 13, fontWeight: 600, m: 0 }}
+              >
+                {pageTitle}
+              </Box>
+            )
+          )}
           {hideBox ? (
             <Box
               sx={{

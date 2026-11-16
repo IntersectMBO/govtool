@@ -7,7 +7,7 @@ import { useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
 import type { CurrentDelegation } from "@models";
 import {
-  correctDRepDirectoryFormat,
+  correctVoteAdaFormat,
   getItemFromLocalStorage,
   WALLET_LS_KEY,
 } from "@utils";
@@ -78,13 +78,13 @@ export const DashboardWalletCard = ({
           </Box>
           {stakeKey && (
             <ButtonBase
-              aria-label={t("dashboard.wallet.copyStakeKey")}
+              aria-label={t("dashboard.wallet.copyStakeKey", { key: stakeKey })}
               data-testid="dashboard-wallet-stake-key"
               onClick={() => {
                 navigator.clipboard.writeText(stakeKey);
                 addSuccessAlert(t("alerts.copiedToClipboard"));
               }}
-              sx={{ color: ds.gray["600"], fontFamily: "inherit", fontSize: 13, gap: 0.5 }}
+              sx={{ borderRadius: `${RADIUS.xs}px`, color: ds.gray["600"], fontFamily: "inherit", fontSize: 13, gap: 0.5, "&.Mui-focusVisible": { outline: `2px solid ${ds.primary["600"]}` } }}
             >
               {short(stakeKey)}
               <Copy aria-hidden size={13} />
@@ -96,7 +96,7 @@ export const DashboardWalletCard = ({
       <Box>
         <Box sx={{ color: ds.gray["600"], fontSize: 13 }}>{t("dashboard.wallet.votingPower")}</Box>
         <Box data-testid="dashboard-wallet-voting-power" sx={{ color: ds.gray["900"], fontSize: 26, fontWeight: 600, letterSpacing: "-0.5px" }}>
-          {votingPower === undefined ? "—" : `₳\u00a0${correctDRepDirectoryFormat(votingPower)}`}
+          {votingPower === undefined ? "—" : `₳\u00a0${correctVoteAdaFormat(votingPower)}`}
         </Box>
       </Box>
       {isDelegationKnown && (

@@ -16,9 +16,8 @@ type Story = StoryObj<typeof meta>;
 
 export const DRepRegistrationFirstStep: Story = {
   args: {
-    pageTitle: "Become a DRep",
+    pageTitle: "DRep registration",
     stepper: {
-      title: "DRep registration",
       steps: ["Understand", "Profile", "Prepare file", "Publish"],
       current: 1,
     },

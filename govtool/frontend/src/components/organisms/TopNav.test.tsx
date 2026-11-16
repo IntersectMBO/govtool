@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useLocation } from "react-router";
 
 import "@/i18n";
 
@@ -177,5 +177,50 @@ describe("TopNav (mobile)", () => {
     expect(screen.getByTestId("wallet-menu-button")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("open-drawer-button"));
     expect(screen.getByTestId("disconnect-button")).toBeInTheDocument();
+  });
+});
+
+describe("TopNav in a wallet flow", () => {
+  const LocationProbe = () => <span data-testid="location">{useLocation().pathname}</span>;
+  const renderInFlow = (onNavigateAway: () => void) =>
+    render(
+      <MemoryRouter initialEntries={["/create_governance_action"]}>
+        <TopNav onNavigateAway={onNavigateAway} />
+        <LocationProbe />
+      </MemoryRouter>,
+    );
+
+  beforeEach(() => {
+    mocks.cardano.isEnabled = true;
+    mocks.cardano.stakeKey = "stake1u9abcdefghijklmnopqrstuvwxyz";
+    mocks.voter = undefined;
+  });
+
+  it("asks before the logo leaves the flow", () => {
+    window.innerWidth = 1440;
+    const onNavigateAway = vi.fn();
+    renderInFlow(onNavigateAway);
+    fireEvent.click(screen.getByTestId("logo-button"));
+    expect(onNavigateAway).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("location")).toHaveTextContent("/create_governance_action");
+  });
+
+  it("asks before a nav link leaves the flow", () => {
+    window.innerWidth = 1440;
+    const onNavigateAway = vi.fn();
+    renderInFlow(onNavigateAway);
+    fireEvent.click(screen.getByTestId("drep-directory-link"));
+    expect(onNavigateAway).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("location")).toHaveTextContent("/create_governance_action");
+  });
+
+  it("asks before a drawer link leaves the flow", () => {
+    window.innerWidth = 375;
+    const onNavigateAway = vi.fn();
+    renderInFlow(onNavigateAway);
+    fireEvent.click(screen.getByTestId("open-drawer-button"));
+    fireEvent.click(screen.getByTestId("drep-directory-link"));
+    expect(onNavigateAway).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("location")).toHaveTextContent("/create_governance_action");
   });
 });

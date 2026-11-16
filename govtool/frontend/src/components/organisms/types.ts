@@ -8,4 +8,6 @@ export type DrawerMobileProps = {
   isConnected: boolean;
   navEntries: NavEntry[];
   onConnect: () => void;
+  /** In a wallet flow: called instead of following an in-app link. */
+  onNavigateAway?: () => void;
 };

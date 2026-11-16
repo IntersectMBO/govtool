@@ -64,7 +64,6 @@ export const EditDRepMetadata = () => {
       onClickBackToDashboard={onClickBackToDashboard}
       showVotingPower
       stepper={{
-        title: t("flow.editDRepProfile"),
         steps: [
           t("flow.steps.profile"),
           t("flow.steps.prepareFile"),

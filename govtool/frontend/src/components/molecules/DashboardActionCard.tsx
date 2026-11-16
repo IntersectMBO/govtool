@@ -93,7 +93,7 @@ export const DashboardActionCard: FC<DashboardActionCardProps> = ({
         <Box sx={{ display: "flex", flex: 1, flexDirection: "column", gap: 0.75, minWidth: 0 }}>
           {title && (
             <Box component="h2" sx={{ alignItems: "center", color: ds.gray["900"], display: "flex", flexWrap: "wrap", fontSize: 17, fontWeight: 600, gap: 1, lineHeight: "24px", m: 0 }}>
-              {isLoading ? <Skeleton variant="text" width={180} /> : title}
+              {isLoading ? <Skeleton variant="text" width={180} /> : <span>{title}</span>}
               {isInProgress && !isLoading && (
                 <Box
                   component="span"

@@ -189,7 +189,7 @@ export const CreateGovernanceActionForm = ({
         />
       )}
       <InfoText label={t("optional")} sx={{ mb: 0.75 }} />
-      <Typography component="h1" variant="headline4">
+      <Typography component="h2" variant="headline4">
         {t("createGovernanceAction.references")}
       </Typography>
       <Spacer y={4.25} />

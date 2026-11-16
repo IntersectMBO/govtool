@@ -19,6 +19,7 @@ export const DrawerMobile = ({
   isDrawerOpen,
   navEntries,
   onConnect,
+  onNavigateAway,
   setIsDrawerOpen,
 }: DrawerMobileProps) => {
   const { t } = useTranslation();
@@ -85,7 +86,13 @@ export const DrawerMobile = ({
                 key={entry.dataTestId}
                 entry={entry}
                 isActive={isNavEntryActive(entry, pathname)}
-                onClick={close}
+                onClick={(event) => {
+                  close();
+                  if (onNavigateAway && !entry.newTabLink) {
+                    event.preventDefault();
+                    onNavigateAway();
+                  }
+                }}
                 variant="drawer"
               />
             ))}

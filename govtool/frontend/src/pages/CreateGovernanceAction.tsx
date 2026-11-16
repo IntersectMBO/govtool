@@ -57,7 +57,6 @@ export const CreateGovernanceAction = () => {
       onClickBackToDashboard={onClickBackToDashboard}
       showVotingPower
       stepper={{
-        title: t("flow.createGovernanceAction"),
         steps: [
           t("flow.steps.understand"),
           t("flow.steps.type"),

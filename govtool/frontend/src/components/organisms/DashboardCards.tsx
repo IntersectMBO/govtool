@@ -67,7 +67,7 @@ export const DashboardCards = () => {
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
         <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 1.25 }}>
-          <Box component="h1" sx={{ color: ds.gray["900"], fontSize: { xxs: 26, md: 32 }, fontWeight: 600, letterSpacing: "-0.6px", lineHeight: { xxs: "32px", md: "40px" }, m: 0 }}>
+          <Box component="h1" sx={{ color: ds.gray["900"], fontSize: { xxs: 26, md: 32 }, fontWeight: 600, letterSpacing: "-0.6px", lineHeight: { xxs: "32px", md: "40px" }, m: 0, overflowWrap: "anywhere" }}>
             {voter.givenName
               ? t("dashboard.welcomeName", { name: voter.givenName })
               : t("dashboard.welcome")}
@@ -91,7 +91,7 @@ export const DashboardCards = () => {
           alignItems: "start",
           display: "grid",
           gap: 2.5,
-          gridTemplateColumns: { xxs: "minmax(0, 1fr)", lg: "360px minmax(0, 1fr)" },
+          gridTemplateColumns: { xxs: "minmax(0, 1fr)", xl: "340px minmax(0, 1fr)" },
         }}
       >
         <DashboardWalletCard

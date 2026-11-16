@@ -68,26 +68,20 @@ export const WrongRouteInfo = ({
           display: "flex",
           flexDirection: isMobile ? "column-reverse" : "row",
           gap: 3,
-          justifyContent: secondaryButtonProps ? "space-between" : "center",
+          justifyContent: secondaryButtonProps ? "space-between" : "flex-start",
         }}
       >
         {!hideSecondaryButton && secondaryButtonProps && (
           <Button
             data-testid="secondary-button"
-            size="extraLarge"
-            sx={{
-              px: 6,
-            }}
+            size="large"
             variant="outlined"
             {...secondaryButtonProps}
           />
         )}
         <Button
           data-testid="primary-button"
-          size="extraLarge"
-          sx={{
-            px: 6,
-          }}
+          size="large"
           variant="contained"
           {...primaryButtonProps}
         />

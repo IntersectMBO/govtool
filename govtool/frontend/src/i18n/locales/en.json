@@ -52,13 +52,13 @@
     "wallet": {
       "abstain": "Abstain from every vote",
       "change": "Change",
-      "copyStakeKey": "Copy stake key",
+      "copyStakeKey": "Copy stake key {{key}}",
       "delegateNow": "Delegate now",
       "delegation": "Delegation",
       "noConfidence": "No confidence on every vote",
       "notDelegated": "Not delegated",
       "title": "Your connected wallet",
-      "votingPower": "Voting power",
+      "votingPower": "Wallet voting power",
       "walletName": "{{name}} wallet",
       "yourself": "Yourself"
     },
@@ -499,9 +499,6 @@
     }
   },
   "flow": {
-    "createGovernanceAction": "Create governance action",
-    "dRepRegistration": "DRep registration",
-    "editDRepProfile": "Edit DRep profile",
     "progress": "{{title}}, step {{step}} of {{count}}",
     "stepOf": "Step {{step}} of {{count}}",
     "steps": {

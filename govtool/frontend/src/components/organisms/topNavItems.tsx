@@ -62,7 +62,7 @@ type NavEntryLinkProps = {
   entry: NavEntry;
   isActive: boolean;
   variant?: "bar" | "drawer";
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 };
 
 /** One nav item: a pill in the top bar or a row in the mobile drawer. */

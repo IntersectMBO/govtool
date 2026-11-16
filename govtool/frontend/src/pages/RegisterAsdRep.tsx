@@ -96,7 +96,6 @@ export const RegisterAsdRep = () => {
       pageTitle={pageTitle}
       onClickBackToDashboard={onClickBackToDashboard}
       stepper={{
-        title: t("flow.dRepRegistration"),
         // A returning DRep starts at the form; the steps count from there.
         steps: (voter?.wasRegisteredAsDRep
           ? []

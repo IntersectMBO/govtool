@@ -7,6 +7,9 @@ const meta = {
   title: "Example/TopNav",
   component: TopNav,
   tags: ["autodocs"],
+  // The actions addon would otherwise hand onNavigateAway a spy, which turns
+  // every link into the flow's "leave?" prompt.
+  args: { onNavigateAway: undefined },
 } satisfies Meta<typeof TopNav>;
 
 export default meta;

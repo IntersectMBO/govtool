@@ -15,23 +15,25 @@ interface Props {
 }
 
 export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
-  box-shadow: 1px 2px 11px 0px #00123d5e;
+  box-shadow: 0px 24px 48px -12px rgba(16, 24, 40, 0.18);
+  border: 1px solid #e5e9f0;
   max-height: 90vh;
   position: fixed;
   top: 50%;
   left: 50%;
   display: flex;
   flex-direction: column;
-  background: #fbfbff;
-  border-radius: 24px;
+  background: #ffffff;
+  border-radius: 16px;
   transform: translate(-50%, -50%);
 
   ${({ variant }) => {
     if (variant === "modal") {
       return `
-        width: 80vw;
-        max-width: 510px;
-        padding: 52px 24px 34px 24px;
+        width: calc(100vw - 32px);
+        max-width: 520px;
+        padding: 40px 32px 32px 32px;
+        box-sizing: border-box;
         max-height: 80vh;
         overflow: auto;
       `;
@@ -48,8 +50,11 @@ export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
 export const CloseButton = styled("img")`
   cursor: pointer;
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 20px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
 `;
 
 export const ModalWrapper = forwardRef<HTMLDivElement, Props>(

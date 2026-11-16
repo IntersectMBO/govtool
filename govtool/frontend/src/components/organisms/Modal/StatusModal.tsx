@@ -1,8 +1,8 @@
 import { forwardRef } from "react";
 import { Box, Button, Link, Typography } from "@mui/material";
+import { CircleCheck, Clock, TriangleAlert } from "lucide-react";
 
 import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
-import { ICONS, IMAGES } from "@consts";
 import { useModal, useChatwoot } from "@context";
 import { openInNewTab } from "@utils";
 import { useScreenDimension, useTranslation } from "@hooks";
@@ -34,6 +34,12 @@ export interface StatusModalState {
   metadataError?: string;
 }
 
+const STATUS_TONES = {
+  success: { bg: "#ECFDF3", text: "#039855" },
+  warning: { bg: "#FFFAEB", text: "#DC6803" },
+  info: { bg: "#EEF3FF", text: "#1447E6" },
+};
+
 export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { state, closeModal } = useModal<StatusModalState>();
   const { isMobile } = useScreenDimension();
@@ -50,26 +56,39 @@ export const StatusModal = forwardRef<HTMLDivElement>((_, ref) => {
       dataTestId={state ? state.dataTestId : "status-modal"}
       ref={ref}
     >
-      <img
-        alt="Status icon"
-        src={
-          state?.status === "warning"
-            ? IMAGES.warningImage
-            : state?.status === "success"
-            ? IMAGES.successImage
-            : ICONS.timerIcon
-        }
-        style={{ height: "84px", margin: "0 auto", width: "84px" }}
-      />
-      <ModalHeader sx={{ marginTop: "34px", px: isMobile ? 0 : 3 }}>
+      <Box
+        aria-hidden
+        sx={{
+          alignItems: "center",
+          alignSelf: "center",
+          backgroundColor: STATUS_TONES[state?.status ?? "info"].bg,
+          borderRadius: "50%",
+          color: STATUS_TONES[state?.status ?? "info"].text,
+          display: "flex",
+          height: 56,
+          justifyContent: "center",
+          width: 56,
+        }}
+      >
+        {state?.status === "success" ? (
+          <CircleCheck size={28} />
+        ) : state?.status === "warning" ? (
+          <TriangleAlert size={28} />
+        ) : (
+          <Clock size={28} />
+        )}
+      </Box>
+      <ModalHeader sx={{ marginTop: "20px", px: isMobile ? 0 : 3 }}>
         {state?.title}
       </ModalHeader>
       <ModalContents>
         <Typography
           textAlign="center"
           sx={{
-            fontSize: "16px",
+            color: "#475467",
+            fontSize: "15px",
             fontWeight: "400",
+            lineHeight: "22px",
             overflow: "hidden",
             display: "-webkit-box",
             WebkitBoxOrient: "vertical",

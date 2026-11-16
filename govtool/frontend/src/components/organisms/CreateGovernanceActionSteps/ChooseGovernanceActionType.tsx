@@ -61,7 +61,7 @@ export const ChooseGovernanceActionType = ({
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("createGovernanceAction.chooseGATypeTitle")}
       </Typography>
       <Spacer y={isMobile ? 4.25 : 7.5} />

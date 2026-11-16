@@ -32,7 +32,7 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("createGovernanceAction.storeDataTitle")}
       </Typography>
       <Link
@@ -44,7 +44,6 @@ export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
           fontWeight: 500,
           fontFamily: FONT_FAMILY.sans,
           my: 4,
-          textAlign: "center",
           textDecoration: "none",
         }}
       >

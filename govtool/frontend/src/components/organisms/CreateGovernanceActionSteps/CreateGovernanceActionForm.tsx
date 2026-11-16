@@ -158,8 +158,8 @@ export const CreateGovernanceActionForm = ({
 
   return (
     <>
-      <InfoText label={t("required")} sx={{ mb: 0.75, textAlign: "center" }} />
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <InfoText label={t("required")} sx={{ mb: 0.75 }} />
+      <Typography component="h1" variant="headline4">
         {t("createGovernanceAction.formTitle")}
       </Typography>
       <Spacer y={4.25} />
@@ -188,8 +188,8 @@ export const CreateGovernanceActionForm = ({
           }}
         />
       )}
-      <InfoText label={t("optional")} sx={{ mb: 0.75, textAlign: "center" }} />
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <InfoText label={t("optional")} sx={{ mb: 0.75 }} />
+      <Typography component="h1" variant="headline4">
         {t("createGovernanceAction.references")}
       </Typography>
       <Spacer y={4.25} />

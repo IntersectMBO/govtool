@@ -101,7 +101,7 @@ export const ReviewCreatedGovernanceAction = ({
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("createGovernanceAction.reviewSubmission")}
       </Typography>
       <Spacer y={4.25} />

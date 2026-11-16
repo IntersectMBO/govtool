@@ -52,7 +52,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("createGovernanceAction.storingInformationTitle")}
       </Typography>
       <Button
@@ -73,7 +73,7 @@ export const StorageInformation = ({ setStep }: StorageInformationProps) => {
       >
         {t("createGovernanceAction.storingInformationStep2Link")}
       </Button>
-      <Typography fontWeight={400} sx={{ textAlign: "center" }} variant="body1">
+      <Typography fontWeight={400} variant="body1">
         {t("createGovernanceAction.storingInformationDescription")}
       </Typography>
       <Box sx={{ my: 4 }}>

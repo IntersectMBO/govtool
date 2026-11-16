@@ -25,7 +25,7 @@ export const WhatGovernanceActionIsAbout = ({
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("createGovernanceAction.creatingAGovernanceAction")}
       </Typography>
       <Typography
@@ -33,7 +33,6 @@ export const WhatGovernanceActionIsAbout = ({
         sx={{
           pb: isMobile ? 6 : 4,
           pt: 4,
-          textAlign: "center",
           whiteSpace: "pre-line",
         }}
         variant="body1"

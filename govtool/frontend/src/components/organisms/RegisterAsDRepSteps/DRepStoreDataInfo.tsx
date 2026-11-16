@@ -33,7 +33,7 @@ export const DRepStoreDataInfo = ({
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("registration.storeDataTitle")}
       </Typography>
       <Link
@@ -44,7 +44,6 @@ export const DRepStoreDataInfo = ({
           fontWeight: 500,
           fontFamily: FONT_FAMILY.sans,
           my: 4,
-          textAlign: "center",
           textDecoration: "none",
         }}
       >

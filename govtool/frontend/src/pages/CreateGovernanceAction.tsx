@@ -56,6 +56,18 @@ export const CreateGovernanceAction = () => {
       pageTitle={t("createGovernanceAction.title")}
       onClickBackToDashboard={onClickBackToDashboard}
       showVotingPower
+      stepper={{
+        title: t("flow.createGovernanceAction"),
+        steps: [
+          t("flow.steps.understand"),
+          t("flow.steps.type"),
+          t("flow.steps.details"),
+          t("flow.steps.review"),
+          t("flow.steps.prepareFile"),
+          t("flow.steps.publish"),
+        ],
+        current: step,
+      }}
     >
       <FormProvider {...methods}>
         {step === 1 && (

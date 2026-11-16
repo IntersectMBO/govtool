@@ -95,6 +95,19 @@ export const RegisterAsdRep = () => {
     <CenteredBoxPageWrapper
       pageTitle={pageTitle}
       onClickBackToDashboard={onClickBackToDashboard}
+      stepper={{
+        title: t("flow.dRepRegistration"),
+        // A returning DRep starts at the form; the steps count from there.
+        steps: (voter?.wasRegisteredAsDRep
+          ? []
+          : [t("flow.steps.understand")]
+        ).concat([
+          t("flow.steps.profile"),
+          t("flow.steps.prepareFile"),
+          t("flow.steps.publish"),
+        ]),
+        current: voter?.wasRegisteredAsDRep ? step - 1 : step,
+      }}
     >
       {step === 1 && !voter?.wasRegisteredAsDRep && (
         <RolesAndResponsibilities setStep={setStep} />

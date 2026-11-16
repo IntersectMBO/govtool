@@ -43,6 +43,27 @@
     "walletConnected": "Wallet connected"
   },
   "dashboard": {
+    "currentEpoch": "Current epoch: {{epoch}}",
+    "role": {
+      "dRep": "DRep",
+      "directVoter": "Direct voter",
+      "notRegistered": "Not registered"
+    },
+    "wallet": {
+      "abstain": "Abstain from every vote",
+      "change": "Change",
+      "copyStakeKey": "Copy stake key",
+      "delegateNow": "Delegate now",
+      "delegation": "Delegation",
+      "noConfidence": "No confidence on every vote",
+      "notDelegated": "Not delegated",
+      "title": "Your connected wallet",
+      "votingPower": "Voting power",
+      "walletName": "{{name}} wallet",
+      "yourself": "Yourself"
+    },
+    "welcome": "Welcome back",
+    "welcomeName": "Welcome back, {{name}}",
     "headingOne": "Your Participation",
     "headingTwo": "See Active Governance Actions",
     "title": "Home",
@@ -475,6 +496,22 @@
         "internalError": "GovTool could not check the data for this Governance Action."
       },
       "title": {}
+    }
+  },
+  "flow": {
+    "createGovernanceAction": "Create governance action",
+    "dRepRegistration": "DRep registration",
+    "editDRepProfile": "Edit DRep profile",
+    "progress": "{{title}}, step {{step}} of {{count}}",
+    "stepOf": "Step {{step}} of {{count}}",
+    "steps": {
+      "details": "Details",
+      "prepareFile": "Prepare file",
+      "profile": "Profile",
+      "publish": "Publish",
+      "review": "Review",
+      "type": "Type",
+      "understand": "Understand"
     }
   },
   "footer": {

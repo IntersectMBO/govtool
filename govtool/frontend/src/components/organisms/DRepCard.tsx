@@ -66,6 +66,8 @@ type DRepCardProps = {
   isMe?: boolean;
   isMyDrep?: boolean;
   onDelegate?: () => void;
+  /** Another delegation is being signed or is pending. */
+  isDelegateDisabled?: boolean;
 };
 
 export const DRepCard = ({
@@ -91,6 +93,7 @@ export const DRepCard = ({
   isMe,
   isMyDrep,
   onDelegate,
+  isDelegateDisabled,
 }: DRepCardProps) => {
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
@@ -142,7 +145,10 @@ export const DRepCard = ({
     isConnected ? PATHS.dashboardDRepDirectoryDRep : PATHS.dRepDirectoryDRep
   ).replace(":dRepId", view);
   const name = givenName || `${view.slice(0, 10)}…${view.slice(-6)}`;
-  const summary = objectives || motivations || qualifications;
+  // Text from a document that failed validation is not shown.
+  const summary = metadataStatus
+    ? undefined
+    : objectives || motivations || qualifications;
   const tone = avatarTone(view);
   const imageSrc = image
     ? base64Image.isValidBase64Image
@@ -251,7 +257,7 @@ export const DRepCard = ({
         <IconButton
           aria-expanded={Boolean(menuAnchor)}
           aria-haspopup="menu"
-          aria-label={t("dRepDirectory.card.moreActions")}
+          aria-label={t("dRepDirectory.card.moreActionsFor", { name })}
           data-testid={`${view}-menu-button`}
           onClick={(event) => setMenuAnchor(event.currentTarget)}
           size="small"
@@ -301,13 +307,13 @@ export const DRepCard = ({
       <Box sx={{ borderTop: `1px dashed ${ds.gray["200"]}`, mt: "auto" }} />
 
       <Box sx={{ alignItems: "flex-end", display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", gap: 2.5 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2.5 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
             <Box component="span" data-testid={`${view}-voting-power-label`} sx={statLabelSx}>
               {t("votingPower")}
             </Box>
             <Box component="span" data-testid={`${view}-voting-power`} sx={{ ...statValueSx, fontFamily: FONT_FAMILY.sans }}>
-              {`₳ ${correctDRepDirectoryFormat(votingPower)}`}
+              {`₳\u00a0${correctDRepDirectoryFormat(votingPower)}`}
             </Box>
           </Box>
           {latestRegistrationDate && (
@@ -324,6 +330,7 @@ export const DRepCard = ({
         {canDelegate && isConnected && onDelegate && !isMyDrep && !isInProgress && (
           <Button
             data-testid={`${view}-delegate-button`}
+            disabled={isDelegateDisabled && !isDelegationLoading}
             isLoading={isDelegationLoading}
             onClick={onDelegate}
             size="small"

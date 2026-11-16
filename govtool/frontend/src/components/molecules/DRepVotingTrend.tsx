@@ -45,10 +45,11 @@ export const groupVotesByDay = (
 type Props = {
   votes?: VotedProposal[];
   isLoading?: boolean;
+  isError?: boolean;
 };
 
 /** Daily yes / no / abstain counts of a DRep's votes over 7, 30 or 90 days. */
-export const DRepVotingTrend = ({ votes = [], isLoading }: Props) => {
+export const DRepVotingTrend = ({ votes = [], isLoading, isError }: Props) => {
   const { t } = useTranslation();
   const [range, setRange] = useState<Range>(30);
   const days = useMemo(() => groupVotesByDay(votes, range), [votes, range]);
@@ -147,9 +148,9 @@ export const DRepVotingTrend = ({ votes = [], isLoading }: Props) => {
         ))}
       </Box>
 
-      {!isLoading && total === 0 ? (
+      {!isLoading && (isError || total === 0) ? (
         <Box data-testid="drep-voting-trend-empty" sx={{ color: ds.gray["500"], fontSize: 14, py: 4, textAlign: "center" }}>
-          {t("dRepProfile.trend.empty", { count: range })}
+          {isError ? t("dRepProfile.activity.error") : t("dRepProfile.trend.empty", { count: range })}
         </Box>
       ) : (
         <Box>
@@ -176,8 +177,9 @@ export const DRepVotingTrend = ({ votes = [], isLoading }: Props) => {
               return (
                 <Tooltip key={day.date.getTime()} arrow title={label}>
                   <Box
-                    aria-label={label}
-                    role="img"
+                    aria-hidden={!dayTotal}
+                    aria-label={dayTotal ? label : undefined}
+                    role={dayTotal ? "img" : undefined}
                     sx={{ alignItems: "stretch", display: "flex", flex: 1, flexDirection: "column", height: "100%", justifyContent: "flex-end", minWidth: 0 }}
                     tabIndex={dayTotal ? 0 : -1}
                   >

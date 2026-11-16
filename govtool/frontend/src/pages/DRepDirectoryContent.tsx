@@ -188,12 +188,38 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     }
   }, [prevInProgressDelegation, inProgressDelegation]);
 
+  // The dialog follows a delegation across the loader that shows while the
+  // delegation query refetches after signing, so it sits at the same place
+  // in both returns and keeps its step.
+  const reviewDialog = (
+    <DelegationReviewDialog
+      dRep={reviewDRep}
+      onClose={() => setReviewDRep(undefined)}
+      onConfirm={async () => {
+        if (!reviewDRep) return;
+        setInProgressDelegationDRepData(reviewDRep);
+        await delegate(reviewDRep.drepId);
+      }}
+      onViewDRep={() =>
+        reviewDRep &&
+        navigate(
+          PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", reviewDRep.view),
+        )
+      }
+    />
+  );
+
   if (
     (stakeKey && votingPower === undefined) ||
     (!dRepList && !isSearchNotReady) ||
     (isConnected && currentDelegation === undefined)
   ) {
-    return <Loader />;
+    return (
+      <>
+        <Loader />
+        {reviewDialog}
+      </>
+    );
   }
 
   const ada = correctDRepDirectoryFormat(votingPower);
@@ -222,6 +248,12 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     setChosenFilters([]);
     setSearchText("");
   };
+  // Only the DRep actually pending: a rejected attempt leaves the data behind.
+  const showInProgressCard =
+    !!inProgressDelegation &&
+    inProgressDelegation !== myDRepId &&
+    !!inProgressDelegationDRepData &&
+    isSameDRep(inProgressDelegationDRepData, inProgressDelegation);
   const showMyDelegation =
     !!myDrep &&
     !inProgressDelegation &&
@@ -229,71 +261,69 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
     currentDelegation?.dRepHash !== myDRepId;
 
   return (
-    <Box
-      display="flex"
-      flex={1}
-      flexDirection="column"
-      gap={3}
-      sx={{ width: "100%" }}
-    >
-      <PageTitle
-        action={
-          <Button
-            dataTestId="become-a-drep-button"
-            onClick={() =>
+    <>
+      <Box
+        display="flex"
+        flex={1}
+        flexDirection="column"
+        gap={3}
+        sx={{ width: "100%" }}
+      >
+        <PageTitle
+          action={
+            <Button
+              dataTestId="become-a-drep-button"
+              onClick={() =>
               (isConnected
                 ? navigate(PATHS.registerAsdRep)
                 : openModal({ type: "chooseWallet" }))
             }
-            size="large"
-            startIcon={<UserRoundPlus aria-hidden size={18} />}
-            sx={{
+              size="large"
+              startIcon={<UserRoundPlus aria-hidden size={18} />}
+              sx={{
               backgroundColor: ds.orange["600"],
               "&:hover": { backgroundColor: ds.orange["700"] },
             }}
-          >
-            {t("dRepDirectory.becomeADRep")}
-          </Button>
+            >
+              {t("dRepDirectory.becomeADRep")}
+            </Button>
         }
-        description={t("dRepDirectory.pageDescription")}
-        title={t("dRepDirectory.pageTitle")}
-      />
+          description={t("dRepDirectory.pageDescription")}
+          title={t("dRepDirectory.pageTitle")}
+        />
 
-      {(showMyDelegation ||
-        (inProgressDelegation &&
-          inProgressDelegation !== myDRepId &&
-          inProgressDelegationDRepData)) && (
-          <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-            <Typography component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600 }}>
-              {showMyDelegation ? (
-                <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
+        {(showMyDelegation || showInProgressCard) && (
+        <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+          <Typography component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600 }}>
+            {showMyDelegation ? (
+              <Trans i18nKey="dRepDirectory.myDelegation" values={{ ada }} />
             ) : (
               t("dRepDirectory.delegationInProgress")
             )}
-            </Typography>
-            <Box sx={gridSx}>
-              {showMyDelegation && myDrep && (
-              <DRepCard
-                dRep={myDrep}
-                isConnected={!!isConnected}
-                isInProgress={isSameDRep(myDrep, inProgressDelegation)}
-                isMe={isSameDRep(myDrep, myDRepId)}
-                isMyDrep
-              />
+          </Typography>
+          <Box sx={gridSx}>
+            {showMyDelegation && myDrep && (
+            <DRepCard
+              dRep={myDrep}
+              isConnected={!!isConnected}
+              isInProgress={isSameDRep(myDrep, inProgressDelegation)}
+              isMe={isSameDRep(myDrep, myDRepId)}
+              isMyDrep
+            />
             )}
-              {!showMyDelegation && inProgressDelegationDRepData && (
-              <DRepCard
-                dRep={inProgressDelegationDRepData}
-                isConnected={!!isConnected}
-                isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
-                isInProgress
-              />
+            {!showMyDelegation && showInProgressCard && inProgressDelegationDRepData && (
+            <DRepCard
+              dRep={inProgressDelegationDRepData}
+              isConnected={!!isConnected}
+              isMe={isSameDRep(inProgressDelegationDRepData, myDRepId)}
+              isInProgress
+            />
             )}
-            </Box>
           </Box>
+        </Box>
       )}
 
-      {isConnected && (
+        {isConnected && (
         <Box component="section">
           <Typography component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600, mb: 1.5 }}>
             {t("dRepDirectory.delegationOptions")}
@@ -327,30 +357,30 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
         </Box>
       )}
 
-      <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        {isConnected && (
+        <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {isConnected && (
           <Typography component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600 }}>
             {t("dRepDirectory.listTitle")}
           </Typography>
         )}
-        <Box sx={{ alignItems: "center", display: "flex", flexWrap: { xxs: "wrap", md: "nowrap" }, gap: 1.5 }}>
-          <SearchField
-            onChange={setSearchText}
-            onClear={() => setSearchText("")}
-            placeholder={t("dRepDirectory.searchBarPlaceholder")}
-            value={searchText}
-          />
-          <SortSelect
-            dataTestId="status-filter-button"
-            label={t("dRepDirectory.statusLabel")}
-            onChange={(next) => setChosenFilters(next ? [next] : [])}
-            options={[
+          <Box sx={{ alignItems: "center", display: "flex", flexWrap: { xxs: "wrap", md: "nowrap" }, gap: 1.5 }}>
+            <SearchField
+              onChange={setSearchText}
+              onClear={() => setSearchText("")}
+              placeholder={t("dRepDirectory.searchBarPlaceholder")}
+              value={searchText}
+            />
+            <SortSelect
+              dataTestId="status-filter-button"
+              label={t("dRepDirectory.statusLabel")}
+              onChange={(next) => setChosenFilters(next ? [next] : [])}
+              options={[
               { key: "", label: t("dRepDirectory.statusAll") },
               ...DREP_DIRECTORY_FILTERS,
             ]}
-            value={statusFilter}
-          />
-          {dRepDirectorySort.isAvailable && (
+              value={statusFilter}
+            />
+            {dRepDirectorySort.isAvailable && (
             <SortSelect
               label={t("dRepDirectory.sortLabel")}
               onChange={setChosenSorting}
@@ -358,9 +388,9 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
               value={chosenSorting}
             />
           )}
-        </Box>
+          </Box>
 
-        {activeFilterCount > 0 && (
+          {activeFilterCount > 0 && (
           <Box
             data-testid="active-filters"
             sx={{
@@ -415,7 +445,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           </Box>
         )}
 
-        {showSearchSummary && (
+          {showSearchSummary && (
           <Typography sx={{ color: ds.gray["600"], fontSize: 14 }}>
             <Trans
               i18nKey="dRepDirectory.searchSummary"
@@ -440,15 +470,15 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           </Typography>
         )}
 
-        {isSearchNotReady && <SearchNotReady />}
-        {!isSearchNotReady && filteredDoNotListDReps.length === 0 && (
+          {isSearchNotReady && <SearchNotReady />}
+          {!isSearchNotReady && filteredDoNotListDReps.length === 0 && (
           <EmptyStateDrepDirectory
             onBrowseAll={clearAll}
             onClearSearch={() => setSearchText("")}
             searchTerm={debouncedSearchText}
           />
         )}
-        {!isSearchNotReady && filteredDoNotListDReps.length > 0 && (
+          {!isSearchNotReady && filteredDoNotListDReps.length > 0 && (
           <Box component="ul" sx={{ ...gridSx, m: 0, p: 0 }}>
             {filteredDoNotListDReps.map((dRep) => (
               <Box key={dRep.view} component="li" sx={{ display: "flex", listStyle: "none", minWidth: 0 }}>
@@ -458,6 +488,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                   isDelegationLoading={
                     isDelegating === dRep.view || isDelegating === dRep.drepId
                   }
+                  isDelegateDisabled={!!isDelegating || !!pendingTransaction.delegate}
                   isMe={isSameDRep(dRep, myDRepId)}
                   isMyDrep={isSameDRep(dRep, currentDelegation?.dRepView)}
                   onDelegate={() => setReviewDRep(dRep)}
@@ -467,40 +498,27 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
           </Box>
         )}
 
-        <PaginationFooter
+          <PaginationFooter
           // Mainnet lists about a thousand DReps; keep the page size choice.
-          showPageSize
-          pageSizeOptions={[6, 12, 24, 48]}
-          page={page}
-          total={total || 0}
-          pageSize={pageSize}
-          onPageChange={setPage}
-          onPageSizeChange={(n) => {
+            showPageSize
+            pageSizeOptions={[6, 12, 24, 48]}
+            page={page}
+            total={total || 0}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(n) => {
             setPageSize(n);
             setPage(1);
           }}
-        />
-      </Box>
+          />
+        </Box>
 
-      <Box sx={{ mt: 3 }}>
-        <DRepBanner withGutters={false} />
+        <Box sx={{ mt: 3 }}>
+          <DRepBanner withGutters={false} />
+        </Box>
       </Box>
-      <DelegationReviewDialog
-        dRep={reviewDRep}
-        onClose={() => setReviewDRep(undefined)}
-        onConfirm={async () => {
-          if (!reviewDRep) return;
-          setInProgressDelegationDRepData(reviewDRep);
-          await delegate(reviewDRep.drepId);
-        }}
-        onViewDRep={() =>
-          reviewDRep &&
-          navigate(
-            PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", reviewDRep.view),
-          )
-        }
-      />
-    </Box>
+      {reviewDialog}
+    </>
   );
 };
 
@@ -509,7 +527,7 @@ const gridSx = {
   gap: 2.5,
   gridTemplateColumns: {
     xxs: "minmax(0, 1fr)",
-    sm: "repeat(2, minmax(0, 1fr))",
+    md: "repeat(2, minmax(0, 1fr))",
     lg: "repeat(3, minmax(0, 1fr))",
   },
 };
@@ -538,12 +556,16 @@ const FilterChip = ({
       fontSize: 13,
       gap: 0.5,
       lineHeight: "18px",
+      maxWidth: "100%",
+      minWidth: 0,
       pl: 1.25,
       pr: 0.5,
       py: 0.25,
     }}
   >
-    {label}
+    <Box component="span" sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      {label}
+    </Box>
     <ButtonBase
       aria-label={removeLabel}
       onClick={onRemove}

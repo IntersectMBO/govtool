@@ -56,7 +56,7 @@ export const EmptyStateDrepDirectory = ({
       <Box component="h2" sx={{ color: ds.gray["900"], fontSize: 20, fontWeight: 600, lineHeight: "28px", m: 0 }}>
         {t("dRepDirectory.noResultsForTheSearchTitle")}
       </Box>
-      <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0, maxWidth: 440 }}>
+      <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0, maxWidth: 440, overflowWrap: "anywhere" }}>
         {searchTerm ? (
           <>
             {t("dRepDirectory.empty.noMatchBefore")}

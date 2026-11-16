@@ -29,7 +29,8 @@ export const DRepActivityTable = ({ votes = [], isLoading, isError }: Props) => 
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const sorted = [...votes].sort(
-    (a, b) => new Date(b.vote?.date ?? 0).getTime() - new Date(a.vote?.date ?? 0).getTime(),
+    (a, b) =>
+      new Date(b.vote?.date || 0).getTime() - new Date(a.vote?.date || 0).getTime(),
   );
   const rows = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -49,7 +50,7 @@ export const DRepActivityTable = ({ votes = [], isLoading, isError }: Props) => 
       }}
     >
       <Box>
-        <Box component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600, lineHeight: "24px", m: 0 }}>
+        <Box component="h2" id="drep-activity-title" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600, lineHeight: "24px", m: 0 }}>
           {t("dRepProfile.activity.title")}
         </Box>
         <Box component="p" sx={{ color: ds.gray["500"], fontSize: 13, m: 0 }}>
@@ -66,7 +67,7 @@ export const DRepActivityTable = ({ votes = [], isLoading, isError }: Props) => 
       {!isLoading && !isError && votes.length > 0 && (
         <>
           <Box sx={{ overflowX: "auto" }}>
-            <Box component="table" sx={{ borderCollapse: "collapse", minWidth: 520, width: "100%" }}>
+            <Box aria-labelledby="drep-activity-title" component="table" sx={{ borderCollapse: "collapse", minWidth: 520, width: "100%" }}>
               <Box component="thead">
                 <Box component="tr" sx={{ backgroundColor: ds.gray["50"] }}>
                   {[t("dRepProfile.activity.action"), t("dRepProfile.activity.type"), t("dRepProfile.activity.vote")].map(

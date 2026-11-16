@@ -29,8 +29,15 @@ describe("nextDelegationStep", () => {
     expect(nextDelegationStep({ ...base, step: "waiting", isNowDelegated: true })).toBe("confirmed");
   });
 
-  it("says taking longer when the pending transaction clears without a match", () => {
-    expect(nextDelegationStep({ ...base, step: "waiting" })).toBe("takingLonger");
+  it("ends at not confirmed when the pending transaction clears without a match", () => {
+    expect(nextDelegationStep({ ...base, step: "waiting" })).toBe("notConfirmed");
+    expect(nextDelegationStep({ ...base, step: "takingLonger" })).toBe("notConfirmed");
+  });
+
+  it("says taking longer after a minute of waiting", () => {
+    const pending = { pendingResourceId: "abc", pendingTxHash: "tx" };
+    expect(nextDelegationStep({ ...base, ...pending, step: "waiting", waitedMs: 30_000 })).toBe("waiting");
+    expect(nextDelegationStep({ ...base, ...pending, step: "waiting", waitedMs: 61_000 })).toBe("takingLonger");
   });
 
   it("ignores a pending transaction for another DRep", () => {
@@ -39,7 +46,7 @@ describe("nextDelegationStep", () => {
     ).toBe("close");
   });
 
-  it("confirms late if the delegation shows up after taking longer", () => {
+  it("confirms after taking longer when the delegation shows up", () => {
     expect(nextDelegationStep({ ...base, step: "takingLonger", isNowDelegated: true })).toBe("confirmed");
   });
 });

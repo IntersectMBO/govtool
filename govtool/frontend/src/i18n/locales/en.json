@@ -303,14 +303,20 @@
   "delegationReview": {
     "adaTransferred": "ADA transferred",
     "back": "Back",
+    "checkExplorer": "Check the transaction in an explorer ↗",
     "confirmedSubtitle": "Cardano has confirmed {{name}} as your DRep. Your ADA remains in your wallet.",
     "confirmedTitle": "Voting delegation confirmed",
     "continue": "Continue to wallet",
     "copyTransactionId": "Copy transaction ID",
     "destination": "Destination",
+    "directVoterNote": "You are registered as a direct voter. Delegating also retires that registration and returns its deposit.",
+    "dRepId": "DRep ID",
     "hide": "Close",
+    "keyDeposit": "₳ {{amount}} stake key deposit (refundable)",
     "none": "None",
-    "note": "This delegation applies to all voting power associated with the selected stake credential. Funds are not transferred; only voting rights are delegated.",
+    "notConfirmedSubtitle": "GovTool stopped waiting before Cardano confirmed this delegation. If the transaction did not go through, your delegation is unchanged and you can try again.",
+    "notConfirmedTitle": "We could not confirm your delegation",
+    "note": "This delegation applies to all voting power associated with the selected stake credential. Only voting rights are delegated; your ADA stays in your wallet.",
     "progress": {
       "confirming": "Waiting for on-chain confirmation",
       "signed": "Wallet signed",
@@ -376,6 +382,7 @@
     "card": {
       "copyId": "Copy DRep ID",
       "moreActions": "More actions",
+      "moreActionsFor": "More actions for {{name}}",
       "noSummary": "This DRep has not published a profile summary.",
       "registered": "Registered",
       "yourDRep": "Your DRep"

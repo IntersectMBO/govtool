@@ -218,7 +218,7 @@ export const DRepDetailsCard = ({
           {!isValidating && isConnected && canDelegate && !isMyDrep && (
             <Button
               data-testid="delegate-button"
-              disabled={!!pendingTransaction?.delegate}
+              disabled={!!pendingTransaction?.delegate || !!isDelegating}
               isLoading={
                 isDelegating === dRepData.view || isDelegating === dRepData.drepId
               }
@@ -269,7 +269,7 @@ export const DRepDetailsCard = ({
         <StatCard
           dataTestId="drep-voting-power"
           label={t("votingPower")}
-          value={<span data-testid="voting-power">{`₳ ${correctDRepDirectoryFormat(votingPower)}`}</span>}
+          value={<span data-testid="voting-power">{`₳\u00a0${correctDRepDirectoryFormat(votingPower)}`}</span>}
           valueColor={ds.orange["600"]}
         />
         <StatCard
@@ -434,7 +434,11 @@ export const DRepDetailsCard = ({
               <DRepDetailsInfoItem label={t("forms.dRepData.qualifications")} text={qualifications} dataTestId="qualifications" />
             </Box>
           )}
-          <DRepVotingTrend isLoading={areDRepVotesLoading} votes={dRepVotes} />
+          <DRepVotingTrend
+            isError={isDRepVotesError}
+            isLoading={areDRepVotesLoading}
+            votes={dRepVotes}
+          />
           <DRepActivityTable
             isError={isDRepVotesError}
             isLoading={areDRepVotesLoading}

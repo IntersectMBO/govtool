@@ -15,7 +15,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Review: Story = {
   args: {
-    dRep: { drepId: "abc123", view: "drep1examplexyz000000", givenName: "Jordan Dyer" },
+    dRep: {
+      drepId: "abc123",
+      view: "drep1examplexyz000000",
+      givenName: "Jordan Dyer",
+      isScriptBased: false,
+    },
     onClose: fn(),
     onConfirm: fn(async () => {}),
   },

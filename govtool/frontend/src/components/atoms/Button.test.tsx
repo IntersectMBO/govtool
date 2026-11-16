@@ -31,10 +31,10 @@ describe("Button", () => {
     });
   });
 
-  it("is orange with the secondary colour", () => {
+  it("is orange with the secondary colour, dark enough for white text", () => {
     renderInTheme(<Button color="secondary">Become a DRep</Button>);
     expect(screen.getByRole("button", { name: "Become a DRep" })).toHaveStyle({
-      backgroundColor: "#E9682F",
+      backgroundColor: "#C94F22",
     });
   });
 

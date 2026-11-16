@@ -85,6 +85,7 @@ export const BudgetProposalsArchive = () => {
       {!isEnabled && <TopNav />}
       <ArchiveBanner />
       <Box
+        component={isEnabled ? "div" : "main"}
         sx={{
           px: isEnabled ? { xxs: 2, md: 5 } : pagePadding,
           py: 3,

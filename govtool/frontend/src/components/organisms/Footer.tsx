@@ -20,6 +20,11 @@ const linkSx = {
   p: 0,
   textDecoration: "none",
   "&:hover": { color: ds.gray["900"] },
+  "&:focus-visible, &.Mui-focusVisible": {
+    borderRadius: "2px",
+    outline: `2px solid ${ds.primary["600"]}`,
+    outlineOffset: 2,
+  },
 };
 
 type FooterLinkProps = {

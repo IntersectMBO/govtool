@@ -85,6 +85,7 @@ export const GovernanceActionsCategory = () => {
       >
         <TopNav />
         <Box
+          component="main"
           flex={1}
           pt={isMobile ? 3.25 : 6.25}
           overflow="hidden"

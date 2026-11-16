@@ -201,6 +201,7 @@ export const DRepCard = ({
         ) : (
           <Avatar
             alt=""
+            aria-hidden
             data-testid="drep-image"
             src={imageSrc}
             sx={{
@@ -248,7 +249,7 @@ export const DRepCard = ({
               </Box>
             )}
             {isInProgress && (
-              <Box component="span" sx={{ color: ds.orange["600"], fontSize: 12, fontWeight: 600 }}>
+              <Box component="span" sx={{ color: ds.orange["700"], fontSize: 12, fontWeight: 600 }}>
                 {t("inProgress")}
               </Box>
             )}

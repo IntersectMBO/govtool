@@ -19,6 +19,13 @@ const renderFooter = (page: number, onPageChange = vi.fn()) => {
 };
 
 describe("PaginationFooter", () => {
+  it("is a labelled navigation whose arrows are not read out", () => {
+    renderFooter(2);
+    const nav = screen.getByRole("navigation", { name: "Pagination" });
+    expect(nav).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /→|←/ })).toBeNull();
+  });
+
   it("highlights the current page", () => {
     renderFooter(2);
     const current = screen.getByRole("button", { name: "2" });
@@ -31,8 +38,8 @@ describe("PaginationFooter", () => {
 
   it("disables Next on the last page", () => {
     renderFooter(3);
-    expect(screen.getByRole("button", { name: "Next →" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "← Previous" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Previous" })).toBeEnabled();
   });
 
   it("goes to a page when its number is clicked", () => {
@@ -75,7 +82,7 @@ describe("PaginationFooter", () => {
       renderFooter(2);
       expect(screen.getByText("Page 2 of 3")).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "1" })).toBeNull();
-      expect(screen.getByRole("button", { name: "Next →" })).toHaveStyle({
+      expect(screen.getByRole("button", { name: "Next" })).toHaveStyle({
         whiteSpace: "nowrap",
         flexShrink: "0",
       });

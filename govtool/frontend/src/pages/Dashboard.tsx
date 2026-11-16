@@ -42,7 +42,7 @@ export const Dashboard = () => {
       >
         <TopNav />
         <ScrollToManage />
-        <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+        <Box component="main" sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
           <Outlet />
         </Box>
         <Footer />

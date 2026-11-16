@@ -76,14 +76,14 @@ export const HomeDRepLeaderboard = () => {
                 }}
               >
                 <Box sx={{ alignItems: "center", display: "flex", gap: 1.5 }}>
-                  <Box sx={{ alignItems: "center", backgroundColor: tint.bg, borderRadius: "50%", color: tint.text, display: "flex", flexShrink: 0, fontSize: 18, fontWeight: 700, height: 44, justifyContent: "center", width: 44 }}>
+                  <Box aria-hidden sx={{ alignItems: "center", backgroundColor: tint.bg, borderRadius: "50%", color: tint.text, display: "flex", flexShrink: 0, fontSize: 18, fontWeight: 700, height: 44, justifyContent: "center", width: 44 }}>
                     {initials(name)}
                   </Box>
                   <Box sx={{ minWidth: 0 }}>
                     <Box component="p" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600, letterSpacing: "-0.18px", lineHeight: "24px", m: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {name}
                     </Box>
-                    <Box component="span" sx={{ alignItems: "center", backgroundColor: ds.success["50"], borderRadius: `${RADIUS.pill}px`, color: ds.success["600"], display: "inline-flex", fontSize: 10, fontWeight: 700, gap: 0.5, lineHeight: "13px", px: 0.75, py: 0.25, textTransform: "uppercase" }}>
+                    <Box component="span" sx={{ alignItems: "center", backgroundColor: ds.success["50"], borderRadius: `${RADIUS.pill}px`, color: ds.success["700"], display: "inline-flex", fontSize: 10, fontWeight: 700, gap: 0.5, lineHeight: "13px", px: 0.75, py: 0.25, textTransform: "uppercase" }}>
                       <Box component="span" sx={{ backgroundColor: ds.success["600"], borderRadius: "50%", height: 5, width: 5 }} />
                       {dRep.status}
                     </Box>

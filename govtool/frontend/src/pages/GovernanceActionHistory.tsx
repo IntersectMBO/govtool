@@ -53,7 +53,7 @@ export const GovernanceActionHistoryPage = () => {
         }}
       >
         {!isEnabled && <TopNav />}
-        <PageContainer sx={{ display: "flex", flex: 1 }}>
+        <PageContainer component={isEnabled ? "div" : "main"} sx={{ display: "flex", flex: 1 }}>
           <Box
             component="section"
             className="governance-actions-container"

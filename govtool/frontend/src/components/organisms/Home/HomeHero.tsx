@@ -107,7 +107,7 @@ export const HomeHero = () => {
           <Box sx={{ flex: 1, maxWidth: 546, width: "100%" }}>
             <Box sx={{ alignItems: "center", display: "flex", gap: 1.25 }}>
               <Box sx={{ backgroundColor: ds.success["600"], borderRadius: "50%", height: 8, width: 8 }} />
-              <Eyebrow color={ds.success["600"]}>{t("landing.eyebrow")}</Eyebrow>
+              <Eyebrow color={ds.success["700"]}>{t("landing.eyebrow")}</Eyebrow>
             </Box>
             <DisplayHeading component="h1" size="hero" sx={{ mt: 2 }}>
               {t("landing.titleLine1")}

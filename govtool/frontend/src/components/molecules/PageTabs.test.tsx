@@ -31,6 +31,13 @@ describe("PageTabs", () => {
     expect(screen.getByRole("navigation")).toHaveStyle({ overflowY: "hidden" });
   });
 
+  it("names its navigation", () => {
+    render(<PageTabs label="Governance Actions" tabs={tabs} />, { wrapper: at("/b") });
+    expect(
+      screen.getByRole("navigation", { name: "Governance Actions" }),
+    ).toBeInTheDocument();
+  });
+
   it("links each tab to its route", () => {
     render(<PageTabs tabs={tabs} />, { wrapper: at("/b") });
     expect(screen.getByTestId("tab-a")).toHaveAttribute("href", "/a");

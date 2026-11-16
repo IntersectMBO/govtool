@@ -6,10 +6,13 @@ import type { PageTab } from "@/hooks/useGovernanceActionTabs";
 
 type PageTabsProps = {
   tabs: PageTab[];
+  /** Names the navigation, e.g. "Governance Actions". */
+  label?: string;
 };
 
-export const PageTabs = ({ tabs }: PageTabsProps) => (
+export const PageTabs = ({ tabs, label }: PageTabsProps) => (
   <Box
+    aria-label={label}
     component="nav"
     sx={{
       // The row's line is an inset shadow, so the active tab's underline sits

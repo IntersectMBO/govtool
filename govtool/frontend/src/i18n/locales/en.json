@@ -865,9 +865,10 @@
     "searchActions": "Search Governance Actions"
   },
   "pagination": {
-    "next": "Next →",
+    "label": "Pagination",
+    "next": "Next",
     "pageOf": "Page {{page}} of {{count}}",
-    "previous": "← Previous",
+    "previous": "Previous",
     "rowsPerPage": "Rows per page:",
     "showing": "Showing {{from}}–{{to}} of {{total}} results"
   },
@@ -1250,6 +1251,8 @@
     "governanceActivity": "Governance Activity",
     "guides": "Guides",
     "help": "Help",
+    "mainNav": "Main",
+    "skipToContent": "Skip to main content",
     "open": "Open menu"
   },
   "metadataUpdate": {

@@ -74,11 +74,12 @@ export const theme = createTheme({
           },
         },
         containedSecondary: {
-          backgroundColor: ds.orange["600"],
+          // Orange 600 gives white text 3.2:1; 700 reaches 4.5:1.
+          backgroundColor: ds.orange["700"],
           boxShadow: SHADOWS.innerAccent,
           color: "#FFFFFF",
           "&:hover": {
-            backgroundColor: ds.orange["700"],
+            backgroundColor: ds.orange["750"],
             boxShadow: SHADOWS.innerAccent,
           },
         },

@@ -81,6 +81,9 @@ const orange: ColorScale = {
   500: "#FF640A",
   600: "#E9682F",
   700: "#C94F22",
+  // Not in the file: orange 700 darkened 5%, the lightest that reaches 4.5:1
+  // on the nav's orange tint (#FFF3EC). Text on the tint uses it.
+  750: "#BF4B20",
   800: "#401903",
 };
 

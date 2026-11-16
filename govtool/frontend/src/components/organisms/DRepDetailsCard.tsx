@@ -150,6 +150,7 @@ export const DRepDetailsCard = ({
           ) : (
             <Avatar
               alt=""
+              aria-hidden
               data-testid="drep-image"
               src={imageSrc}
               sx={{
@@ -270,7 +271,7 @@ export const DRepDetailsCard = ({
           dataTestId="drep-voting-power"
           label={t("votingPower")}
           value={<span data-testid="voting-power">{`₳\u00a0${correctDRepDirectoryFormat(votingPower)}`}</span>}
-          valueColor={ds.orange["600"]}
+          valueColor={ds.orange["700"]}
         />
         <StatCard
           dataTestId="drep-votes-cast"

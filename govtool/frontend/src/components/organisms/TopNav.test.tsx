@@ -63,6 +63,24 @@ describe("TopNav (desktop)", () => {
     expect(screen.queryByTestId("faqs-link")).toBeNull();
   });
 
+  it("starts with a link that moves focus to the main content", () => {
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <TopNav />
+        <main>content</main>
+      </MemoryRouter>,
+    );
+    const skip = screen.getByRole("link", { name: "Skip to main content" });
+    expect(document.querySelectorAll("a, button")[0]).toBe(skip);
+    fireEvent.click(skip);
+    expect(document.activeElement).toBe(screen.getByRole("main"));
+  });
+
+  it("labels its navigation", () => {
+    renderAt("/");
+    expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
+  });
+
   it("opens the wallet chooser from Connect Wallet", () => {
     renderAt("/");
     fireEvent.click(screen.getByTestId("connect-wallet-button"));
@@ -72,7 +90,7 @@ describe("TopNav (desktop)", () => {
   it("highlights Governance Actions in orange on its pages", () => {
     renderAt("/governance_actions");
     expect(screen.getByTestId("governance-actions")).toHaveStyle({
-      color: "#E9682F",
+      color: "#BF4B20",
     });
     expect(screen.getByTestId("drep-directory-link")).toHaveStyle({
       color: "#667085",
@@ -86,7 +104,7 @@ describe("TopNav (desktop)", () => {
       "/governance_activity",
     );
     expect(screen.getByTestId("governance-activity-link")).toHaveStyle({
-      color: "#E9682F",
+      color: "#BF4B20",
     });
     expect(screen.getByTestId("governance-actions")).toHaveStyle({
       color: "#667085",
@@ -96,7 +114,7 @@ describe("TopNav (desktop)", () => {
   it("highlights Governance Actions on forum pages too", () => {
     renderAt("/proposal_discussion");
     expect(screen.getByTestId("governance-actions")).toHaveStyle({
-      color: "#E9682F",
+      color: "#BF4B20",
     });
   });
 
@@ -125,6 +143,18 @@ describe("TopNav (desktop)", () => {
       renderAt("/dashboard");
       fireEvent.click(screen.getByTestId("wallet-menu-button"));
       expect(screen.getByTestId("disconnect-button")).toBeInTheDocument();
+    });
+
+    it("points the wallet pill at the menu it opens", () => {
+      renderAt("/dashboard");
+      const pill = screen.getByTestId("wallet-menu-button");
+      expect(pill).not.toHaveAttribute("aria-controls");
+      fireEvent.click(pill);
+      const id = pill.getAttribute("aria-controls");
+      expect(id).toBeTruthy();
+      expect(document.getElementById(id as string)).toContainElement(
+        screen.getByTestId("disconnect-button"),
+      );
     });
 
     it("keeps the wallet connected when the logo is clicked", () => {
@@ -186,7 +216,7 @@ describe("TopNav (mobile)", () => {
     renderAt("/drep_directory");
     fireEvent.click(screen.getByTestId("open-drawer-button"));
     expect(screen.getByTestId("drep-directory-link")).toHaveStyle({
-      color: "#E9682F",
+      color: "#BF4B20",
     });
     expect(screen.getByTestId("guides-link")).toBeInTheDocument();
     expect(screen.getByTestId("governance-actions")).toBeInTheDocument();

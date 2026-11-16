@@ -82,6 +82,8 @@ export const PaginationFooter: FC<Props> = ({
 
   return (
     <Box
+      aria-label={t("pagination.label")}
+      component="nav"
       sx={{
         alignItems: "center",
         display: "flex",
@@ -129,6 +131,7 @@ export const PaginationFooter: FC<Props> = ({
           onClick={() => onPageChange(Math.max(clampedPage - 1, 1))}
           sx={stepButtonSx}
         >
+          <span aria-hidden>←&nbsp;</span>
           {t("pagination.previous")}
         </ButtonBase>
         {isMobile ? (
@@ -168,6 +171,7 @@ export const PaginationFooter: FC<Props> = ({
           sx={stepButtonSx}
         >
           {t("pagination.next")}
+          <span aria-hidden>&nbsp;→</span>
         </ButtonBase>
       </Box>
     </Box>

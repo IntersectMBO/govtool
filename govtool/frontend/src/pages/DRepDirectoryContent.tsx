@@ -281,8 +281,8 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
               size="large"
               startIcon={<UserRoundPlus aria-hidden size={18} />}
               sx={{
-              backgroundColor: ds.orange["600"],
-              "&:hover": { backgroundColor: ds.orange["700"] },
+              backgroundColor: ds.orange["700"],
+              "&:hover": { backgroundColor: ds.orange["750"] },
             }}
             >
               {t("dRepDirectory.becomeADRep")}

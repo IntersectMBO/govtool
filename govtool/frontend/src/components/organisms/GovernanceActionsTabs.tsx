@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 
 import { useCardano, useFeatureFlag } from "@context";
+import { useTranslation } from "@hooks";
 import { PageTabs } from "@molecules";
 import { PDF_PATHS } from "@/consts/paths";
 import { useGovernanceActionTabs } from "@/hooks/useGovernanceActionTabs";
@@ -9,6 +10,7 @@ import { useGovernanceActionTabs } from "@/hooks/useGovernanceActionTabs";
 export const GovernanceActionsTabs = () => {
   const { isEnabled, stakeKey } = useCardano();
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
+  const { t } = useTranslation();
   const tabs = useGovernanceActionTabs(Boolean(isEnabled && stakeKey)).filter(
     (tab) =>
       isProposalDiscussionForumEnabled ||
@@ -17,7 +19,7 @@ export const GovernanceActionsTabs = () => {
 
   return (
     <Box sx={{ mb: 3 }}>
-      <PageTabs tabs={tabs} />
+      <PageTabs label={t("govActions.categoryTitle")} tabs={tabs} />
     </Box>
   );
 };

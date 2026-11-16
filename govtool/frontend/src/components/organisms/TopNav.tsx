@@ -54,6 +54,22 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
     onNavigateAway();
   };
 
+  // The page's main landmark, or its heading when a page has none.
+  const skipToMain = (event: React.MouseEvent<HTMLElement>) => {
+    const target =
+      document.querySelector<HTMLElement>("main") ??
+      document.querySelector<HTMLElement>("h1");
+    if (!target) return;
+    event.preventDefault();
+    if (!target.hasAttribute("tabindex")) {
+      target.setAttribute("tabindex", "-1");
+      // A focused region needs no ring; the skip already moved the reader.
+      target.style.outline = "none";
+    }
+    target.focus();
+    target.scrollIntoView?.({ block: "start" });
+  };
+
   const onClickConnectButton = () => {
     if (isEnabled && stakeKey) {
       navigate(PATHS.dashboard);
@@ -104,6 +120,7 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
   const renderDesktopNav = () => (
     <>
       <Box
+        aria-label={t("menu.mainNav")}
         component="nav"
         sx={{
           alignItems: "center",
@@ -173,6 +190,30 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
         zIndex: 100,
       }}
     >
+      <Box
+        component="a"
+        data-testid="skip-to-content-link"
+        href="#main-content"
+        onClick={skipToMain}
+        sx={{
+          backgroundColor: "#FFFFFF",
+          border: `2px solid ${ds.primary["600"]}`,
+          borderRadius: "8px",
+          color: ds.primary["700"],
+          fontSize: 14,
+          fontWeight: 600,
+          left: 16,
+          p: "8px 12px",
+          position: "absolute",
+          textDecoration: "none",
+          top: 8,
+          transform: "translateY(-200%)",
+          zIndex: 101,
+          "&:focus": { transform: "none" },
+        }}
+      >
+        {t("menu.skipToContent")}
+      </Box>
       <Box
         sx={{
           alignItems: "center",

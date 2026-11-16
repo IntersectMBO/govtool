@@ -50,7 +50,7 @@ export const GovernanceActions = () => {
         }}
       >
         <TopNav />
-        <PageContainer sx={{ flex: 1 }}>
+        <PageContainer component="main" sx={{ flex: 1 }}>
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <GovernanceActionsHeader />
             <GovernanceActionsListLayout>

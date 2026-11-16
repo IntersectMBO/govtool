@@ -146,7 +146,7 @@ export const GovernanceActionDetails = () => {
         minHeight="100vh"
       >
         <TopNav />
-        <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column", pt: { xxs: 2, md: 3 } }}>
+        <PageContainer component="main" sx={{ display: "flex", flex: 1, flexDirection: "column", pt: { xxs: 2, md: 3 } }}>
           <Box display="flex" flex={1} flexDirection="column" width="100%">
             <Breadcrumbs
               elementOne={t("govActions.pageTitle")}

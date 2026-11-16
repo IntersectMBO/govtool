@@ -74,7 +74,10 @@ export const ProposalDiscussionPillar = () => {
       }}
     >
       {!context.isEnabled && <TopNav />}
-      <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+      <PageContainer
+        component={context.isEnabled ? "div" : "main"}
+        sx={{ display: "flex", flex: 1, flexDirection: "column" }}
+      >
         {isListPage && <GovernanceActionsHeader />}
         <Suspense
           fallback={

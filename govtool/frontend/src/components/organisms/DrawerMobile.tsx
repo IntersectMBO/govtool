@@ -80,7 +80,11 @@ export const DrawerMobile = ({
               {t("wallet.connectYourWalletButton")}
             </Button>
           )}
-          <Box component="nav" sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+          <Box
+            aria-label={t("menu.mainNav")}
+            component="nav"
+            sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+          >
             {navEntries.map((entry) => (
               <NavEntryLink
                 key={entry.dataTestId}

@@ -20,7 +20,7 @@ export const DRepDirectory = () => {
         sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
       >
         <TopNav />
-        <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+        <PageContainer component="main" sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
           <Outlet />
         </PageContainer>
         <Footer />

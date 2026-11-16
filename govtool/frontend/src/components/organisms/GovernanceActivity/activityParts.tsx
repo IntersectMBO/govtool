@@ -89,7 +89,7 @@ export const TextLink = ({
           const target = document.getElementById(anchor);
           if (!target) return;
           event.preventDefault();
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          target.scrollIntoView?.({ behavior: "smooth", block: "start" });
           target.focus({ preventScroll: true });
         }}
         sx={sx}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Box, ButtonBase, Popover } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 
@@ -21,10 +21,12 @@ export const WalletMenu = () => {
   const { isMobile } = useScreenDimension();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const isOpen = Boolean(anchorEl);
+  const menuId = useId();
 
   return (
     <>
       <ButtonBase
+        aria-controls={isOpen ? menuId : undefined}
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         data-testid="wallet-menu-button"
@@ -83,6 +85,7 @@ export const WalletMenu = () => {
         open={isOpen}
         slotProps={{
           paper: {
+            id: menuId,
             sx: {
               border: `1px solid ${ds.gray["200"]}`,
               borderRadius: `${RADIUS.lg}px`,

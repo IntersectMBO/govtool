@@ -61,6 +61,7 @@ describe("Dashboard layout", () => {
     expect(screen.getByText("page")).toBeInTheDocument();
     expect(screen.getByTestId("wallet-menu-button")).toBeInTheDocument();
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+    expect(screen.getByRole("main")).toBeInTheDocument();
     expect(screen.getAllByTestId("logo-button")).toHaveLength(1);
     expect(screen.queryByTestId("disconnect-button")).toBeNull();
   });

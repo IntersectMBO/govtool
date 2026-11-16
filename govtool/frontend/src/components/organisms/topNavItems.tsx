@@ -31,7 +31,7 @@ const pillSx = (isActive: boolean) => ({
   backgroundColor: isActive ? "#FF640A14" : "transparent",
   border: `1px solid ${isActive ? "#FF640A29" : "transparent"}`,
   borderRadius: "30px",
-  color: isActive ? ds.orange["600"] : ds.gray["500"],
+  color: isActive ? ds.orange["750"] : ds.gray["500"],
   display: "inline-flex",
   fontSize: 14,
   fontWeight: isActive ? 600 : 400,
@@ -41,13 +41,13 @@ const pillSx = (isActive: boolean) => ({
   px: "13px",
   textDecoration: "none",
   whiteSpace: "nowrap",
-  "&:hover": { color: isActive ? ds.orange["600"] : ds.gray["900"] },
+  "&:hover": { color: isActive ? ds.orange["750"] : ds.gray["900"] },
 });
 
 const drawerSx = (isActive: boolean) => ({
   backgroundColor: isActive ? "#FF640A14" : "transparent",
   borderRadius: "8px",
-  color: isActive ? ds.orange["600"] : ds.gray["700"],
+  color: isActive ? ds.orange["750"] : ds.gray["700"],
   display: "block",
   fontSize: 16,
   fontWeight: 500,

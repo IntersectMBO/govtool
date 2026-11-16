@@ -112,7 +112,7 @@ export const DashboardWalletCard = ({
             <Box
               component={Link}
               to={PATHS.dashboardDRepDirectory}
-              sx={{ alignItems: "center", color: ds.orange["600"], display: "inline-flex", flexShrink: 0, fontSize: 13, fontWeight: 600, gap: 0.5, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+              sx={{ alignItems: "center", color: ds.orange["700"], display: "inline-flex", flexShrink: 0, fontSize: 13, fontWeight: 600, gap: 0.5, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
             >
               {delegation ? t("dashboard.wallet.change") : t("dashboard.wallet.delegateNow")}
               <ArrowRight aria-hidden size={14} />

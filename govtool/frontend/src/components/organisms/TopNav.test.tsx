@@ -47,11 +47,17 @@ describe("TopNav (desktop)", () => {
     mocks.voter = undefined;
   });
 
-  it("shows the logo, the four nav items and Connect Wallet", () => {
+  it("shows the logo, the five nav items and Connect Wallet", () => {
     renderAt("/");
     expect(screen.getByTestId("logo-button")).toBeInTheDocument();
     expect(screen.getByTestId("connect-wallet-button")).toBeInTheDocument();
-    ["Home", "DRep Directory", "Governance Actions", "Guides"].forEach(
+    [
+      "Home",
+      "DRep Directory",
+      "Governance Actions",
+      "Governance Activity",
+      "Guides",
+    ].forEach(
       (label) => expect(screen.getByText(label)).toBeInTheDocument(),
     );
     expect(screen.queryByTestId("faqs-link")).toBeNull();
@@ -69,6 +75,20 @@ describe("TopNav (desktop)", () => {
       color: "#E9682F",
     });
     expect(screen.getByTestId("drep-directory-link")).toHaveStyle({
+      color: "#667085",
+    });
+  });
+
+  it("links Governance Activity and highlights only it on its page", () => {
+    renderAt("/governance_activity");
+    expect(screen.getByTestId("governance-activity-link")).toHaveAttribute(
+      "href",
+      "/governance_activity",
+    );
+    expect(screen.getByTestId("governance-activity-link")).toHaveStyle({
+      color: "#E9682F",
+    });
+    expect(screen.getByTestId("governance-actions")).toHaveStyle({
       color: "#667085",
     });
   });
@@ -136,6 +156,10 @@ describe("TopNav (desktop)", () => {
       expect(screen.getByTestId("dashboard-link")).toHaveAttribute(
         "href",
         "/dashboard",
+      );
+      expect(screen.getByTestId("governance-activity-link")).toHaveAttribute(
+        "href",
+        "/governance_activity",
       );
     });
   });

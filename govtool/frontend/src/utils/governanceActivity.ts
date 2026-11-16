@@ -55,6 +55,8 @@ export type ActivityKind = "votingOpened" | "ratified" | "enacted" | "expired";
 
 export type ActivityEvent = {
   key: string;
+  /** `txHash#index`. */
+  actionId: string;
   kind: ActivityKind;
   time: string;
   type: string;
@@ -71,6 +73,7 @@ export const activityEvents = (
     const id = getFullGovActionId(action.txHash, action.index);
     return {
       key: `votingOpened-${id}`,
+      actionId: id,
       kind: "votingOpened",
       time: action.createdDate,
       type: action.type,
@@ -91,6 +94,7 @@ export const activityEvents = (
       .map(
         ([kind, time]): ActivityEvent => ({
           key: `${kind}-${action.tx_hash}#${action.index}`,
+          actionId: `${action.tx_hash}#${action.index}`,
           kind,
           time,
           type: action.type,

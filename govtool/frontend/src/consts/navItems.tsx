@@ -64,6 +64,12 @@ export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
     ],
   },
   {
+    dataTestId: "governance-activity-link",
+    navTo: PATHS.governanceActivity,
+    label: i18n.t("menu.governanceActivity"),
+    newTabLink: null,
+  },
+  {
     dataTestId: "guides-link",
     navTo: "",
     label: i18n.t("menu.guides"),
@@ -143,6 +149,14 @@ export const CONNECTED_NAV_ITEMS = [
       //   newTabLink: null,
       // },
     ],
+  },
+  {
+    dataTestId: "governance-activity-link",
+    label: i18n.t("menu.governanceActivity"),
+    navTo: PATHS.governanceActivity,
+    activeIcon: ICONS.governanceActionsActiveIcon,
+    icon: ICONS.governanceActionsIcon,
+    newTabLink: null,
   },
   {
     dataTestId: "guides-link",

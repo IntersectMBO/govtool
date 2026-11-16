@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { GovernanceActionType } from "@/types/governanceAction";
+
 import {
   activityCounts,
   activityEvents,
@@ -21,7 +23,7 @@ const live = (over: Partial<ActivityLive> = {}): ActivityLive => ({
   index: 0,
   title: "Live action",
   txHash: "aa".repeat(32),
-  type: "InfoAction",
+  type: GovernanceActionType.InfoAction,
   ...over,
 });
 
@@ -97,6 +99,7 @@ describe("activityEvents", () => {
       "ratified",
     ]);
     expect(events[0].path).toBe("/governance_actions/history/7");
+    expect(events[0].actionId).toBe(`${"bb".repeat(32)}#0`);
     expect(events[2].path).toBe(`/governance_actions/${"aa".repeat(32)}#0`);
   });
 

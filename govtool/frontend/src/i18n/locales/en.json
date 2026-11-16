@@ -42,6 +42,99 @@
     "transactionInProgress": "Transaction in progress. Please wait.",
     "walletConnected": "Wallet connected"
   },
+  "activity": {
+    "title": "Governance Activity",
+    "description": "See how Cardano governance decisions progress, from proposal and voting to ratification and enactment.",
+    "howGovernanceWorks": "How governance works",
+    "updated": "Updated {{ago}} · {{at}}",
+    "justNow": "just now",
+    "overview": {
+      "title": "Governance overview",
+      "description": "A quick view of where attention is needed across Cardano governance.",
+      "viewAll": "View all Governance Actions",
+      "open": "Open Governance Actions",
+      "openDetail": "Open for voting now",
+      "openLink": "View open actions",
+      "deadlines": "Deadlines approaching",
+      "deadlinesDetail": "Within the next 7 days",
+      "deadlinesLink": "Review deadlines",
+      "ratified": "Recently ratified",
+      "ratifiedDetail": "In the past 30 days",
+      "ratifiedLink": "See ratified actions",
+      "enacted": "Recently enacted",
+      "enactedDetail": "Now in effect, past 30 days",
+      "enactedLink": "See enactments",
+      "unknown": "Not available while more than 50 actions are open"
+    },
+    "timeline": {
+      "eyebrow": "Ecosystem-wide record",
+      "heading": "What’s happening now",
+      "headingDescription": "A chronological view of Governance Actions as they open for voting and are decided. Times are shown in UTC.",
+      "title": "Governance decision timeline",
+      "description": "Actions move through defined stages. Thresholds and constitutional checks determine whether they advance.",
+      "submitted": "Submitted",
+      "voting": "Voting",
+      "ratified": "Ratified",
+      "enacted": "Enacted",
+      "alternate": "If thresholds or checks are not met, an action may be Expired or Rejected."
+    },
+    "feed": {
+      "label": "Recent governance activity",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "loadMore": "Load earlier activity",
+      "empty": "No governance activity to show yet.",
+      "viewAction": "View action",
+      "ago": "{{ago}} · {{time}} UTC",
+      "kinds": {
+        "votingOpened": "Voting opened",
+        "ratified": "Ratified",
+        "enacted": "Enacted",
+        "expired": "Expired"
+      },
+      "details": {
+        "votingOpened": "DReps, SPOs and the Constitutional Committee can now vote on this action.",
+        "ratified": "The action met its voting thresholds and will be enacted at the next epoch boundary.",
+        "enacted": "The approved change is now in effect on the Cardano network.",
+        "expired": "The action closed without being ratified, so it will not take effect."
+      }
+    },
+    "ratified": {
+      "title": "Recently ratified",
+      "description": "Governance Actions that have passed the required voting thresholds and constitutional checks.",
+      "viewAll": "View ratified actions",
+      "label": "Ratified",
+      "enacted": "Enacted",
+      "outcome": "Vote outcome",
+      "yes": "{{role}} {{value}} Yes",
+      "viewAction": "View action"
+    },
+    "active": {
+      "eyebrow": "Decisions in progress",
+      "title": "Active Governance Actions",
+      "description": "Search and filter actions currently open for voting. Deadlines are shown in UTC.",
+      "explore": "Explore all actions",
+      "search": "Search title or Governance Action ID",
+      "all": "All",
+      "filtersLabel": "Filter by action type",
+      "count_one": "{{count}} active action",
+      "count_other": "{{count}} active actions",
+      "sortSoonest": "Deadline soonest",
+      "sortNewest": "Newest",
+      "voting": "Voting",
+      "submitted": "Submitted",
+      "deadline": "Voting deadline",
+      "daysLeft_one": "{{count}} day left",
+      "daysLeft_other": "{{count}} days left",
+      "lessThanDay": "Less than a day left",
+      "details": "Details",
+      "showing": "Showing {{from}}–{{to}} of {{total}}",
+      "previous": "Previous",
+      "next": "Next",
+      "empty": "No active Governance Actions match your search.",
+      "searchNotReady": "Search is not available yet. Try again in a moment."
+    }
+  },
   "dashboard": {
     "currentEpoch": "Current epoch: {{epoch}}",
     "role": {
@@ -1154,6 +1247,7 @@
   "menu": {
     "close": "Close menu",
     "faqs": "FAQs",
+    "governanceActivity": "Governance Activity",
     "guides": "Guides",
     "help": "Help",
     "open": "Open menu"

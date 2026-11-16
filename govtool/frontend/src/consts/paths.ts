@@ -17,6 +17,7 @@ export const PATHS = {
   governanceActionsCategory: "/governance_actions/category/:category",
   governanceActionsCategoryAction:
     "/governance_actions/category/:category/:proposalId",
+  governanceActivity: "/governance_activity",
   guides: "/guides",
   home: "/",
   registerAsdRep: "/register_drep",

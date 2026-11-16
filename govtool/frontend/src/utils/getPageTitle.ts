@@ -19,6 +19,7 @@ const PAGE_TITLES = [
     title: "Historical Actions",
   },
   { path: PATHS.governanceActions, title: "Governance Actions" },
+  { path: PATHS.governanceActivity, title: "Governance Activity" },
   {
     path: PATHS.governanceActionsCategory,
     title: "Governance Action Category",

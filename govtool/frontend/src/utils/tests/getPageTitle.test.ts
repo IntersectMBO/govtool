@@ -17,4 +17,8 @@ describe("getPageTitle", () => {
       "Governance Action Details",
     );
   });
+
+  it("names the Governance Activity page", () => {
+    expect(getPageTitle("/governance_activity")).toBe("Governance Activity");
+  });
 });

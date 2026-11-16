@@ -64,7 +64,8 @@
       "enacted": "Recently enacted",
       "enactedDetail": "Now in effect, past 30 days",
       "enactedLink": "See enactments",
-      "unknown": "Not available while more than 50 actions are open"
+      "unknown": "Not available while more than 50 actions are open",
+      "capped": "Not available: there are more decisions in the past 30 days than this page loads"
     },
     "timeline": {
       "eyebrow": "Ecosystem-wide record",
@@ -107,6 +108,11 @@
       "enacted": "Enacted",
       "outcome": "Vote outcome",
       "yes": "{{role}} {{value}} Yes",
+      "roles": {
+        "drep": "DReps",
+        "spo": "SPOs",
+        "cc": "CC"
+      },
       "viewAction": "View action"
     },
     "active": {

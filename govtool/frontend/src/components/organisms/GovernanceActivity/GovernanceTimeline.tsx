@@ -79,7 +79,7 @@ export const GovernanceTimeline = () => {
             alignItems: "center",
             backgroundColor: ds.gray["100"],
             borderRadius: `${RADIUS.sm}px`,
-            // Gray 500 is 4.4:1 on gray 100; 600 passes AA.
+            // 600 rather than the design's 500 (4.5:1 here) for 12px text.
             color: ds.gray["600"],
             display: "flex",
             fontSize: 12,

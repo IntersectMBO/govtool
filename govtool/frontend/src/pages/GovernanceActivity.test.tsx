@@ -172,6 +172,17 @@ describe("GovernanceActivity", () => {
     expect(value).toHaveAccessibleName(/more than 50 actions/);
   });
 
+  it("does not claim exact ratification counts from a full, recent decided list", () => {
+    mocks.decidedActions = Array.from({ length: 20 }, (_, n) =>
+      decided(n + 10, { ratified_time: daysAgo(1), enacted_time: daysAgo(0.5) }),
+    );
+    renderPage();
+    const value = screen.getByTestId("activity-stat-ratified-value");
+    expect(value).toHaveTextContent("—");
+    expect(value).toHaveAccessibleName(/more decisions/);
+    expect(screen.getByTestId("activity-stat-enacted-value")).toHaveTextContent("—");
+  });
+
   it("lists openings and decisions in the feed, newest first", () => {
     renderPage();
     const events = screen.getAllByTestId("activity-event");
@@ -195,6 +206,10 @@ describe("GovernanceActivity", () => {
     fireEvent.click(screen.getByTestId("load-earlier-activity"));
     expect(screen.getAllByTestId("activity-event")).toHaveLength(14);
     expect(screen.queryByTestId("load-earlier-activity")).toBeNull();
+    // Focus moves to the first revealed row, not to the page.
+    expect(
+      within(screen.getAllByTestId("activity-event")[10]).getByRole("link"),
+    ).toHaveFocus();
   });
 
   it("shows the latest ratifications with their decision date", () => {
@@ -216,6 +231,21 @@ describe("GovernanceActivity", () => {
       filters: ["TreasuryWithdrawals"],
       page: 1,
     });
+  });
+
+  it("never asks for a later page of a filter it just changed", () => {
+    mocks.liveProposals = Array.from({ length: 12 }, (_, n) =>
+      proposal(n + 1, { type: n % 2 ? "InfoAction" : "TreasuryWithdrawals" }),
+    );
+    mocks.pageTotal = 12;
+    renderPage();
+    fireEvent.click(screen.getByTestId("activity-next-page"));
+    mocks.pageArgs = [];
+    fireEvent.click(screen.getByTestId("activity-type-InfoAction"));
+    expect(mocks.pageArgs.length).toBeGreaterThan(0);
+    mocks.pageArgs.forEach((args) =>
+      expect(args).toMatchObject({ filters: ["InfoAction"], page: 1 }),
+    );
   });
 
   it("hides type counts when the live list is incomplete", () => {

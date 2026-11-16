@@ -24,17 +24,36 @@ const within = (time: string | null | undefined, from: number, to: number) => {
   return at > from && at <= to;
 };
 
+const latestTime = ({ status_times: times }: ActivityDecided) =>
+  Math.max(
+    ...[times.ratified_time, times.enacted_time, times.expired_time, times.dropped_time]
+      .filter((time): time is string => !!time)
+      .map((time) => new Date(time).getTime()),
+  );
+
 /**
- * The overview figures. `deadlines` is undefined when the live list is only
- * part of the total, since the count would then be a guess.
+ * The overview figures. A figure is undefined when the list it counts is only
+ * part of the whole: `deadlines` when the live list is short of its total,
+ * `ratified` and `enacted` when the decided list is full (`decidedLimit`)
+ * and nothing in it is older than the 30-day window.
  */
 export const activityCounts = (
   live: ActivityLive[],
   liveTotal: number,
   decided: ActivityDecided[],
   now: Date,
+  decidedLimit = Infinity,
 ) => {
   const at = now.getTime();
+  const isDecidedWhole =
+    decided.length < decidedLimit ||
+    decided.some((action) => latestTime(action) <= at - 30 * DAY);
+  const recent = (key: "ratified_time" | "enacted_time") =>
+    (isDecidedWhole
+      ? decided.filter(({ status_times: times }) =>
+        within(times[key], at - 30 * DAY, at),
+      ).length
+      : undefined);
   return {
     open: liveTotal,
     deadlines:
@@ -42,12 +61,8 @@ export const activityCounts = (
         ? undefined
         : live.filter(({ expiryDate }) => within(expiryDate, at, at + 7 * DAY))
             .length,
-    ratified: decided.filter(({ status_times: times }) =>
-      within(times.ratified_time, at - 30 * DAY, at),
-    ).length,
-    enacted: decided.filter(({ status_times: times }) =>
-      within(times.enacted_time, at - 30 * DAY, at),
-    ).length,
+    ratified: recent("ratified_time"),
+    enacted: recent("enacted_time"),
   };
 };
 
@@ -144,7 +159,8 @@ export const daysLeft = (expiry: string | undefined, now: Date) => {
   if (!(remaining > 0)) return undefined;
   const days = Math.floor(remaining / DAY);
   const tone: "error" | "warning" | "neutral" =
-    (days <= 3 && "error") || (days <= 7 && "warning") || "neutral";
+    // Warning matches the overview's "within 7 days" count.
+    (days <= 3 && "error") || (remaining < 7 * DAY && "warning") || "neutral";
   return { days, tone };
 };
 

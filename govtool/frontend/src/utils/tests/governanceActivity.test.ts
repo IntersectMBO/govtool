@@ -80,6 +80,27 @@ describe("activityCounts", () => {
   });
 });
 
+describe("activityCounts with a capped decided list", () => {
+  const full = (time: string) =>
+    Array.from({ length: 3 }, () => decided({ ratified_time: time, enacted_time: time }));
+
+  it("does not claim exact counts when every loaded decision is recent", () => {
+    const counts = activityCounts([], 0, full(ago(DAY)), now, 3);
+    expect(counts.ratified).toBeUndefined();
+    expect(counts.enacted).toBeUndefined();
+  });
+
+  it("counts once the list reaches past the 30-day window", () => {
+    const list = [...full(ago(DAY)).slice(0, 2), decided({ expired_time: ago(40 * DAY) })];
+    const counts = activityCounts([], 0, list, now, 3);
+    expect(counts.ratified).toBe(2);
+  });
+
+  it("counts a list shorter than the limit as whole", () => {
+    expect(activityCounts([], 0, full(ago(DAY)), now, 20).ratified).toBe(3);
+  });
+});
+
 describe("activityEvents", () => {
   it("lists voting openings and decisions newest first", () => {
     const events = activityEvents(
@@ -141,13 +162,13 @@ describe("daysLeft", () => {
     expect(daysLeft(ahead(3 * DAY + 60_000), now)).toEqual({ days: 3, tone: "error" });
   });
 
-  it("warns from 4 to 7 days", () => {
+  it("warns inside the 7 days the deadline count uses", () => {
     expect(daysLeft(ahead(4 * DAY + 60_000), now)?.tone).toBe("warning");
-    expect(daysLeft(ahead(7 * DAY + 60_000), now)?.tone).toBe("warning");
+    expect(daysLeft(ahead(7 * DAY - 60_000), now)?.tone).toBe("warning");
   });
 
-  it("is neutral beyond 7 days", () => {
-    expect(daysLeft(ahead(8 * DAY + 60_000), now)?.tone).toBe("neutral");
+  it("is neutral from 7 days out, as the deadline count is", () => {
+    expect(daysLeft(ahead(7 * DAY + 60_000), now)?.tone).toBe("neutral");
   });
 
   it("is undefined once the deadline passed or when there is none", () => {

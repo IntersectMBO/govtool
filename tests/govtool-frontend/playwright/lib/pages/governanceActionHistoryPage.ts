@@ -290,7 +290,7 @@ export default class GovernanceActionHistoryPage {
       this.page.getByTestId("governance-actions-governance-actions-link")
     ).toHaveAttribute("aria-current", "page");
     await expect(
-      this.page.getByRole("heading", { name: "Governance actions" })
+      this.page.getByRole("heading", { name: "Governance actions", exact: true })
     ).toBeVisible();
   }
 

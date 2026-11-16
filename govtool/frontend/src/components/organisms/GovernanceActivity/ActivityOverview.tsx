@@ -10,6 +10,7 @@ import {
   useTranslation,
 } from "@hooks";
 import { LINKS } from "@/consts/links";
+import { DECIDED_ACTIONS_LIMIT } from "@/hooks/queries/useGetDecidedActionsQuery";
 import { ds, RADIUS } from "@/consts/designTokens";
 import { activityCounts, formatUtc } from "@/utils/governanceActivity";
 
@@ -81,7 +82,17 @@ export const ActivityOverview = () => {
   const { liveProposals, liveProposalsTotal, areLiveProposalsLoading, liveProposalsUpdatedAt } =
     useGetLiveProposalsQuery();
   const { decidedActions, areDecidedActionsLoading } = useGetDecidedActionsQuery();
-  const counts = activityCounts(liveProposals, liveProposalsTotal, decidedActions, new Date());
+  const counts = activityCounts(
+    liveProposals,
+    liveProposalsTotal,
+    decidedActions,
+    new Date(),
+    DECIDED_ACTIONS_LIMIT,
+  );
+  const cappedLabel = (value: number | undefined) =>
+    (!areDecidedActionsLoading && value === undefined
+      ? t("activity.overview.capped")
+      : undefined);
   const figure = (value: number | undefined, isLoading: boolean) =>
     (isLoading || value === undefined ? "—" : String(value));
 
@@ -214,6 +225,7 @@ export const ActivityOverview = () => {
             }
             title={t("activity.overview.ratified")}
             value={figure(counts.ratified, areDecidedActionsLoading)}
+            valueLabel={cappedLabel(counts.ratified)}
           />
           <OverviewCard
             detail={t("activity.overview.enactedDetail")}
@@ -226,6 +238,7 @@ export const ActivityOverview = () => {
             }
             title={t("activity.overview.enacted")}
             value={figure(counts.enacted, areDecidedActionsLoading)}
+            valueLabel={cappedLabel(counts.enacted)}
           />
         </Box>
       </Box>

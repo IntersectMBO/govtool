@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Box, ButtonBase } from "@mui/material";
 import { formatDistanceToNowStrict } from "date-fns";
 import { BadgeCheck, ChevronDown, CircleCheckBig, CircleX, Vote } from "lucide-react";
@@ -139,6 +139,16 @@ const EventRow = ({
 export const ActivityFeed = () => {
   const { t } = useTranslation();
   const [shown, setShown] = useState(PAGE);
+  const feedRef = useRef<HTMLDivElement>(null);
+  // Set by "Load earlier activity": the row whose link takes focus next, as
+  // the button may disappear once everything is shown.
+  const focusRow = useRef<number | null>(null);
+  useEffect(() => {
+    if (focusRow.current === null) return;
+    const rows = feedRef.current?.querySelectorAll<HTMLElement>("[data-testid=activity-event]");
+    rows?.[focusRow.current]?.querySelector<HTMLElement>("a")?.focus();
+    focusRow.current = null;
+  }, [shown]);
   const { liveProposals, areLiveProposalsLoading } = useGetLiveProposalsQuery();
   const { decidedActions, areDecidedActionsLoading } = useGetDecidedActionsQuery();
   const events = activityEvents(liveProposals, decidedActions);
@@ -163,14 +173,14 @@ export const ActivityFeed = () => {
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
         <GovernanceTimeline />
         <ActivityCard dataTestId="activity-feed" sx={{ py: 1 }}>
-          <Box aria-busy={isLoading} aria-label={t("activity.feed.label")} role="region">
+          <Box ref={feedRef} aria-busy={isLoading} aria-label={t("activity.feed.label")} role="region">
             {!isLoading && events.length === 0 && (
               <Box component="p" sx={{ color: ds.gray["500"], fontSize: 14, m: 0, py: 4, textAlign: "center" }}>
                 {t("activity.feed.empty")}
               </Box>
             )}
             {groups.map((group) => (
-              <Box key={group.day} component="section" aria-label={formatUtc(`${group.day}T00:00:00Z`, "longDate")}>
+              <Box key={group.day}>
                 <Box sx={{ alignItems: "center", display: "flex", justifyContent: "space-between", pb: 1.25, pt: 2.25 }}>
                   <Box component="h3" sx={{ color: ds.gray["900"], fontSize: 14, fontWeight: 600, letterSpacing: "-0.09px", lineHeight: "20px", m: 0 }}>
                     {group.label
@@ -195,7 +205,10 @@ export const ActivityFeed = () => {
             <Box sx={{ borderTop: `1px solid ${ds.gray["200"]}`, display: "flex", justifyContent: "center", py: 2 }}>
               <ButtonBase
                 data-testid="load-earlier-activity"
-                onClick={() => setShown((count) => count + PAGE)}
+                onClick={() => {
+                  focusRow.current = shown;
+                  setShown(shown + PAGE);
+                }}
                 sx={{
                   borderRadius: "4px",
                   color: ds.primary["600"],

@@ -74,9 +74,16 @@ export default class DRepDirectoryPage {
     await this.dRepInput.clear();
   }
   // Status is a single choice in a "Status:" menu; "" is All.
+  // Choosing the status already selected changes nothing and leaves the
+  // menu open over the page, so close it instead.
   async filterByStatus(status: string) {
     await this.statusFilterBtn.click();
-    await this.page.getByTestId(`${status}-radio`).check();
+    const radio = this.page.getByTestId(`${status}-radio`);
+    if (await radio.isChecked()) {
+      await this.page.keyboard.press("Escape");
+      return;
+    }
+    await radio.check();
   }
 
   async validateFilters(filters: string[]) {

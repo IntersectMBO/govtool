@@ -123,8 +123,13 @@ export const ActiveActionsList = () => {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [sorting, setSorting] = useState("SoonestToExpire");
-  const [page, setPage] = useState(1);
   const searchPhrase = useDebounce(search.trim(), 400);
+  // The page belongs to the filters it was chosen under; new filters start
+  // on page 1 in the same render, so no request goes out for the old page.
+  const filterKey = `${searchPhrase}|${type}|${sorting}`;
+  const [pageState, setPageState] = useState({ key: filterKey, page: 1 });
+  const page = pageState.key === filterKey ? pageState.page : 1;
+  const setPage = (next: number) => setPageState({ key: filterKey, page: next });
 
   const { liveProposals, liveProposalsTotal } = useGetLiveProposalsQuery();
   const { proposals, proposalsTotal, isProposalsLoading, isSearchNotReady } =
@@ -135,8 +140,6 @@ export const ActiveActionsList = () => {
       searchPhrase,
       sorting,
     });
-
-  useEffect(() => setPage(1), [searchPhrase, type, sorting]);
 
   // A filter that shrinks the list must not leave the page past its end.
   useEffect(() => {
@@ -288,7 +291,7 @@ export const ActiveActionsList = () => {
         {proposalsTotal > 0 && (
           <Box
             component="nav"
-            aria-label={t("activity.active.title")}
+            aria-label={t("pagination.label")}
             sx={{
               alignItems: "center",
               borderTop: `1px solid ${ds.gray["200"]}`,
@@ -306,7 +309,7 @@ export const ActiveActionsList = () => {
               <ButtonBase
                 data-testid="activity-previous-page"
                 disabled={page <= 1}
-                onClick={() => setPage((current) => current - 1)}
+                onClick={() => setPage(page - 1)}
                 sx={pagerSx(page > 1)}
               >
                 <ArrowLeft aria-hidden size={16} />
@@ -315,7 +318,7 @@ export const ActiveActionsList = () => {
               <ButtonBase
                 data-testid="activity-next-page"
                 disabled={page >= lastPage}
-                onClick={() => setPage((current) => current + 1)}
+                onClick={() => setPage(page + 1)}
                 sx={pagerSx(page < lastPage)}
               >
                 {t("activity.active.next")}

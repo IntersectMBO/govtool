@@ -29,7 +29,6 @@ import {
 } from "./activityParts";
 
 const SHOWN = 3;
-const ROLE_LABELS = { drep: "DReps", spo: "SPOs", cc: "CC" } as const;
 
 /** "gov_action1…8f2c", short enough for a table row. */
 export const shortActionId = (id: string) =>
@@ -44,7 +43,7 @@ const outcomeText = (
     .map((aggregate) => {
       const bar = voteBar(aggregate);
       return bar && Number(aggregate.totalEligible) > 0
-        ? yes(ROLE_LABELS[aggregate.role], `${Math.round(bar.yesPercent)}%`)
+        ? yes(aggregate.role, `${Math.round(bar.yesPercent)}%`)
         : undefined;
     })
     .filter(Boolean);
@@ -99,7 +98,8 @@ const RatifiedRow = ({
       </LabelledValue>
       <LabelledValue label={t("activity.ratified.outcome")}>
         <Box component="span" sx={{ color: ds.gray["900"], fontSize: 13, fontWeight: 600, lineHeight: "19.5px" }}>
-          {outcomeText(record, (role, value) => t("activity.ratified.yes", { role, value }))}
+          {outcomeText(record, (role, value) =>
+            t("activity.ratified.yes", { role: t(`activity.ratified.roles.${role}`), value }))}
         </Box>
       </LabelledValue>
       <Box sx={{ display: "flex", gridColumn: { xxs: "1 / -1", md: "auto" }, justifyContent: { md: "flex-end" } }}>

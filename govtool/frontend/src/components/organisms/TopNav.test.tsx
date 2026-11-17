@@ -32,6 +32,13 @@ vi.mock("@hooks", async (importOriginal) => ({
   useGetDRepVotingPowerQuery: () => ({ dRepVotingPower: 1_234_000_000 }),
 }));
 
+// The bell reads notifications through React Query; it has its own tests.
+vi.mock("./Notifications/NotificationBell", () => ({
+  NotificationBell: () => (
+    <button aria-label="Notifications" data-testid="notifications-bell" type="button" />
+  ),
+}));
+
 const renderAt = (path: string) =>
   render(
     <MemoryRouter initialEntries={[path]}>
@@ -177,6 +184,21 @@ describe("TopNav (desktop)", () => {
       expect(screen.queryByTestId("voting-power-chips")).toBeNull();
     });
 
+    it("shows the notifications bell to a connected wallet", () => {
+      renderAt("/dashboard");
+      expect(screen.getByTestId("notifications-bell")).toBeInTheDocument();
+    });
+
+    it("hides the bell and the search inside a wallet flow", () => {
+      render(
+        <MemoryRouter initialEntries={["/register_drep"]}>
+          <TopNav onNavigateAway={vi.fn()} />
+        </MemoryRouter>,
+      );
+      expect(screen.queryByTestId("notifications-bell")).toBeNull();
+      expect(screen.queryByTestId("global-search-button")).toBeNull();
+    });
+
     it("uses the connected nav ids", () => {
       renderAt("/dashboard");
       expect(screen.getByTestId("governance-actions-link")).toHaveAttribute(
@@ -224,13 +246,22 @@ describe("TopNav (mobile)", () => {
     expect(screen.queryByTestId("governance-actions-link")).toBeNull();
   });
 
-  it("shows the wallet card in the drawer when connected", () => {
+  it("keeps a phone's bar to search, bell and menu; the wallet is in the drawer", () => {
+    mocks.cardano.isEnabled = true;
+    mocks.cardano.stakeKey = "stake1u9abcdefghijklmnopqrstuvwxyz";
+    renderAt("/dashboard");
+    expect(screen.queryByTestId("wallet-menu-button")).toBeNull();
+    expect(screen.getByTestId("notifications-bell")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("open-drawer-button"));
+    expect(screen.getByTestId("disconnect-button")).toBeInTheDocument();
+  });
+
+  it("shows the wallet pill in the bar on a tablet", () => {
+    window.innerWidth = 600;
     mocks.cardano.isEnabled = true;
     mocks.cardano.stakeKey = "stake1u9abcdefghijklmnopqrstuvwxyz";
     renderAt("/dashboard");
     expect(screen.getByTestId("wallet-menu-button")).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("open-drawer-button"));
-    expect(screen.getByTestId("disconnect-button")).toBeInTheDocument();
   });
 });
 

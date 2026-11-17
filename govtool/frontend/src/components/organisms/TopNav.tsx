@@ -17,11 +17,15 @@ import { ds, SHADOWS } from "@/consts/designTokens";
 
 import { DrawerMobile } from "./DrawerMobile";
 import { GlobalSearchButton } from "./GlobalSearch/GlobalSearchButton";
+import { NotificationBell } from "./Notifications/NotificationBell";
 import { isNavEntryActive, NavEntry, NavEntryLink } from "./topNavItems";
 
 // Below this width the nav items and the wallet control no longer fit on one
 // line, so the nav collapses into the drawer.
 const DESKTOP_MIN_WIDTH = 1024;
+// Below this the bar keeps only search, the bell and the menu: the wallet pill
+// would push the menu button off the screen, and the drawer shows the wallet.
+const PHONE_MAX_WIDTH = 480;
 
 type TopNavProps = {
   isConnectButton?: boolean;
@@ -79,6 +83,9 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
   };
 
   const renderWalletControl = (isCompact = false) => {
+    if (isConnected && isCompact && screenWidth < PHONE_MAX_WIDTH) {
+      return !onNavigateAway && <NotificationBell />;
+    }
     if (isConnected) {
       return (
         <>
@@ -92,6 +99,7 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
             votingPower={dRepVotingPower}
           />
           <WalletMenu />
+          {!onNavigateAway && <NotificationBell />}
         </>
       );
     }

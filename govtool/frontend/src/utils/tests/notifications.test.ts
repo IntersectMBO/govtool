@@ -124,6 +124,19 @@ describe("deriveNotifications", () => {
     expect(again.items.map((item) => item.id)).toEqual([first.items[0].id]);
   });
 
+  it("names the new DRep once its details arrive after the change was recorded", () => {
+    const delegation = { dRepHash: "x", dRepView: "drep1other", isDRepScriptBased: false, txHash: null };
+    const first = derive({ delegation, delegatedDRep: undefined });
+    expect(first.items[0].data).toMatchObject({ target: { dRepName: null } });
+    const later = deriveNotifications(
+      input({ delegation, delegatedDRep: { view: "drep1other", status: DRepStatus.Active, givenName: "Other" } }),
+      first.store,
+      DEFAULT_PREFERENCES,
+      now,
+    );
+    expect(later.items[0].data).toMatchObject({ target: { dRepName: "Other" } });
+  });
+
   it("does not report the delegation it finds on the first visit", () => {
     const fresh = emptyStore(now.toISOString());
     const { items, store } = deriveNotifications(input(), fresh, DEFAULT_PREFERENCES, now);

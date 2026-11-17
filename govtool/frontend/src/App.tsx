@@ -29,6 +29,8 @@ import {
   GovernanceActionsCategory,
   GovernanceActivity,
   Home,
+  NotificationPreferencesPage,
+  NotificationsPage,
   RegisterAsdRep,
   RegisterAsDirectVoter,
   RetireAsDrep,
@@ -165,6 +167,11 @@ export default () => {
         )}
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardHome />} />
+          <Route path={PATHS.notifications} element={<NotificationsPage />} />
+          <Route
+            path={PATHS.notificationPreferences}
+            element={<NotificationPreferencesPage />}
+          />
           {isProposalDiscussionForumEnabled && (
             <Route
               path={`${PDF_PATHS.proposalDiscussion}/*`}

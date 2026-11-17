@@ -254,6 +254,17 @@ export const deriveNotifications = (
     }
     store.lastDelegation = key;
   }
+  // A change recorded before the DRep's details loaded gets its name later.
+  const named = input.delegatedDRep;
+  if (named?.givenName) {
+    store.history = store.history.map((change) =>
+      (change.data.target.dRepId === named.view && !change.data.target.dRepName
+        ? {
+          ...change,
+          data: { ...change.data, target: { ...change.data.target, dRepName: named.givenName } },
+        }
+        : change));
+  }
   items.push(...store.history);
 
   // The delegated DRep retired or went inactive.

@@ -34,6 +34,7 @@ export * from "./GovernanceActionHistoryList";
 export * from "./GovernanceActionHistorySearchFiltersSortBar";
 export * from "./GovernanceActionsTabs";
 export * from "./GlobalSearch";
+export * from "./Notifications";
 export * from "./GovernanceActivity";
 export * from "./Home";
 export * from "./GovernanceActionsHeader";

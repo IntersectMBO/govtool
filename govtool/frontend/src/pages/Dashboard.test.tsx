@@ -34,6 +34,12 @@ vi.mock("react-router", async (importOriginal) => ({
   useNavigate: () => mocks.navigate,
 }));
 
+vi.mock("@/components/organisms/Notifications/NotificationBell", () => ({
+  NotificationBell: () => (
+    <button aria-label="Notifications" data-testid="notifications-bell" type="button" />
+  ),
+}));
+
 const renderDashboard = () =>
   render(
     <MemoryRouter initialEntries={["/connected/drep_directory"]}>

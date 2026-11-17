@@ -20,6 +20,8 @@ export const PATHS = {
   governanceActivity: "/governance_activity",
   guides: "/guides",
   home: "/",
+  notifications: "/notifications",
+  notificationPreferences: "/notifications/preferences",
   registerAsdRep: "/register_drep",
   registerAsDirectVoter: "/register_direct_voter",
   retireAsDrep: "/retire_drep",

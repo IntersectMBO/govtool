@@ -148,6 +148,16 @@ ids, public or connected. Governance Activity (pages/GovernanceActivity.tsx,
 organisms/GovernanceActivity/) is one public URL for everyone, built from the
 live list and the newest decided actions. FAQ is a footer link (faqs-link).
 
+TopNav's search button (organisms/GlobalSearch, Ctrl+K or ⌘K) opens one dialog
+over six result types: live actions (/proposal/list), DReps (/drep/list,
+listed), forum proposals (the forum backend, only while the forum flag is on),
+outcomes (/governance-actions), a pasted address (its stake part through
+/account and the ada-holder routes) and an exact ADA handle (handle.me, as the
+DRep directory search already does). Its reads use GovernanceActionsAPI, so a
+failure stays in the dialog. The forum query (utils/globalSearch.ts) must stay
+within the forum backend's PROPOSALS_ALLOWLIST. The button is hidden inside
+wallet flows.
+
 Each page has one main landmark, which TopNav's skip link focuses: public page
 shells pass component="main" to PageContainer (or a Box), while the Dashboard
 layout wraps its outlet in main, so a page rendered inside Dashboard must not

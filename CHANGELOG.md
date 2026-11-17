@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A global search in the top navigation (the search button, or Ctrl+K / ⌘K): one dialog finds live governance actions, DReps, forum proposals (where the forum is on) and outcomes by keyword or id, shows a pasted stake or payment address's registration, delegation and voting power, and looks up an ADA handle; recent searches stay in the browser
 - A Governance Activity page (`/governance_activity`, in the top navigation): counts of open actions, deadlines in the next 7 days and the past 30 days' ratifications and enactments, the stages an action moves through, a feed of actions opening for voting and being decided, the latest ratifications with each voter group's yes share, and a searchable, filterable list of live actions with their deadlines
 - Once a develop build's images are on GHCR, CI asks the GitOps repository (the `k8s-dev` environment's `GOVTOOL_ARGO_REPO` variable) to deploy that commit to k8s.dev.gov.tools
 

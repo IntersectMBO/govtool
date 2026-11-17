@@ -49,3 +49,4 @@ export * from "./clipboard";
 export * from "./getPageTitle";
 export * from "./metadataReportHighlight";
 export * from "./globalSearch";
+export * from "./notifications";

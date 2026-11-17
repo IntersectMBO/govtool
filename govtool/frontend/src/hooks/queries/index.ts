@@ -26,3 +26,4 @@ export * from "./useGetDecidedActionsQuery";
 export * from "./useGetLiveProposalsQuery";
 export * from "./useGetProposalsPageQuery";
 export * from "./useGetDRepVotesByIdQuery";
+export * from "./useGlobalSearch";

@@ -203,6 +203,79 @@ describe("GlobalSearch", () => {
     expect(screen.getByText("Searching across 5 categories for “treasury”…")).toBeInTheDocument();
   });
 
+  it("keeps the tab it showed first when a slower type brings results", () => {
+    mocks.search = { dreps: category({ isLoading: true }) };
+    mocks.search.outcomes = category({
+      items: [{
+        id: "o1",
+        tx_hash: "aa",
+        index: 0,
+        type: "InfoAction",
+        title: "Old outcome",
+        status: {
+          ratified_epoch: 1,
+          enacted_epoch: null,
+          dropped_epoch: null,
+          expired_epoch: null,
+        },
+        status_times: {
+          ratified_time: "2026-09-01T00:00:00Z",
+          enacted_time: null,
+          dropped_time: null,
+          expired_time: null,
+        },
+      }],
+      total: undefined,
+    });
+    const input = openDialog();
+    fireEvent.change(input, { target: { value: "treasury" } });
+    expect(screen.getByTestId("global-search-category-outcomes")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    mocks.search.dreps = category({ items: [dRep(1)], total: 1 });
+    // Same search text, new render: the slower type has arrived.
+    fireEvent.change(input, { target: { value: "treasury " } });
+    expect(screen.getByTestId("global-search-category-outcomes")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("says search is unavailable when every type that can fail has failed", () => {
+    const failed = category({ isError: true });
+    mocks.search = {
+      actions: failed,
+      dreps: failed,
+      proposals: failed,
+      outcomes: failed,
+      handles: category({ items: [], total: 0 }),
+    };
+    fireEvent.change(openDialog(), { target: { value: "treasury" } });
+    expect(screen.getByTestId("global-search-error")).toBeInTheDocument();
+  });
+
+  it("points the field at the list only while the list is shown", () => {
+    mocks.search = { actions: category({ isLoading: true, total: undefined }) };
+    const input = openDialog();
+    expect(input).not.toHaveAttribute("aria-controls");
+    fireEvent.change(input, { target: { value: "treasury" } });
+    expect(input).not.toHaveAttribute("aria-activedescendant");
+    expect(input).not.toHaveAttribute("aria-controls");
+  });
+
+  it("ignores Ctrl+Shift+K and Ctrl+K while another dialog is open", () => {
+    renderButton();
+    fireEvent.keyDown(window, { key: "K", ctrlKey: true, shiftKey: true });
+    expect(screen.queryByTestId("global-search-dialog")).toBeNull();
+    const other = document.createElement("div");
+    other.setAttribute("role", "dialog");
+    document.body.appendChild(other);
+    fireEvent.keyDown(window, { key: "k", ctrlKey: true });
+    expect(screen.queryByTestId("global-search-dialog")).toBeNull();
+    other.remove();
+  });
+
   it("explains the address and handle tabs for a keyword", () => {
     fireEvent.change(openDialog(), { target: { value: "treasury committee" } });
     fireEvent.click(screen.getByTestId("global-search-category-addresses"));
@@ -212,6 +285,7 @@ describe("GlobalSearch", () => {
   });
 
   it("copies an address that delegates to no DRep", () => {
+    const original = navigator.clipboard;
     Object.assign(navigator, { clipboard: { writeText: vi.fn() } });
     mocks.search = {
       classified: { text: "stake1uabc", kind: "address", stakeAddress: "stake1uabc" },
@@ -228,5 +302,6 @@ describe("GlobalSearch", () => {
     fireEvent.click(screen.getByTestId("global-search-result"));
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("stake1uabc");
     expect(mocks.addSuccessAlert).toHaveBeenCalled();
+    Object.assign(navigator, { clipboard: original });
   });
 });

@@ -13,11 +13,16 @@ export const GlobalSearchButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    // ⌘K on a Mac (where Ctrl+K edits text), Ctrl+K elsewhere; never with
+    // Shift or Alt (browser shortcuts), nor over another open dialog.
+    const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
     const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setIsOpen(true);
-      }
+      const modifier = isMac ? event.metaKey : event.ctrlKey;
+      if (!modifier || event.shiftKey || event.altKey || event.defaultPrevented) return;
+      if (event.key.toLowerCase() !== "k") return;
+      if (document.querySelector('[role="dialog"]')) return;
+      event.preventDefault();
+      setIsOpen(true);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);

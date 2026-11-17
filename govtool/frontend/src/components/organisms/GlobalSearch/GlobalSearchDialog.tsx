@@ -42,12 +42,19 @@ const SearchPanel = ({ onClose }: { onClose: () => void }) => {
 
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<SearchCategory | null>(null);
+  // The default tab, kept once it has shown results for a search text, so a
+  // slower type arriving later does not move the list under the user.
+  const [settled, setSettled] = useState<{ text: string; category: SearchCategory } | null>(
+    null,
+  );
   const [highlight, setHighlight] = useState(0);
   const [showAddressHint, setShowAddressHint] = useState(false);
   const [recent, setRecent] = useState<RecentSearch[]>(readRecentSearches);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const debounced = useDebounce(query, 300);
+  const debouncedQuery = useDebounce(query, 300);
+  // Clearing the field shows browse at once, without waiting out the debounce.
+  const debounced = query.trim() ? debouncedQuery : "";
   const search = useGlobalSearch(debounced, {
     isForumEnabled: isProposalDiscussionForumEnabled,
   });
@@ -56,19 +63,35 @@ const SearchPanel = ({ onClose }: { onClose: () => void }) => {
     (category) => category !== "proposals" || isProposalDiscussionForumEnabled,
   );
   const enabled = categories.filter((category) => search[category].isEnabled);
+  const firstWithResults = enabled.find((category) => results[category].length > 0);
   const active: SearchCategory =
     picked ??
-    enabled.find((category) => results[category].length > 0) ??
+    (settled?.text === search.classified.text ? settled.category : undefined) ??
+    firstWithResults ??
     enabled[0] ??
     "actions";
   const state = search[active];
   const rows = results[active];
-  const allFailed = enabled.length > 0 && enabled.every((category) => search[category].isError);
+  // A handle lookup never fails (a miss and an outage both read as no handle).
+  const failable = enabled.filter((category) => category !== "handles");
+  const allFailed = failable.length > 0 && failable.every((category) => search[category].isError);
   // Until the user picks a type, an empty first type is not "no matches" while
   // another type may still bring results and take over.
   const isWaitingForOthers =
     !picked && rows.length === 0 && enabled.some((category) => search[category].isLoading);
 
+  useEffect(() => {
+    if (!picked && firstWithResults && settled?.text !== search.classified.text) {
+      setSettled({ text: search.classified.text, category: firstWithResults });
+    }
+  }, [picked, firstWithResults, settled, search.classified.text]);
+  // A new kind of query (words, an address, a handle) starts from its own default.
+  const { kind } = search.classified;
+  const lastKind = useRef(kind);
+  useEffect(() => {
+    if (lastKind.current !== kind && picked !== "addresses") setPicked(null);
+    lastKind.current = kind;
+  }, [kind]);
   useEffect(() => setHighlight(0), [debounced, active]);
   useEffect(() => {
     document.getElementById(optionId(highlight))?.scrollIntoView?.({ block: "nearest" });
@@ -102,7 +125,7 @@ const SearchPanel = ({ onClose }: { onClose: () => void }) => {
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
-    if (!rows.length) return;
+    if (!showsList) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       const step = event.key === "ArrowDown" ? 1 : -1;
@@ -112,6 +135,16 @@ const SearchPanel = ({ onClose }: { onClose: () => void }) => {
       open(rows[highlight] ?? rows[0]);
     }
   };
+
+  const showsList =
+    search.isSearching &&
+    !allFailed &&
+    state.isEnabled &&
+    !state.isLoading &&
+    !isWaitingForOthers &&
+    !state.isError &&
+    !state.isSearchNotReady &&
+    rows.length > 0;
 
   const count = (() => {
     if (state.total !== undefined) return t("globalSearch.matches", { count: state.total });
@@ -391,10 +424,10 @@ const SearchPanel = ({ onClose }: { onClose: () => void }) => {
         <InputBase
           autoFocus
           inputProps={{
-            "aria-activedescendant": rows.length && search.isSearching ? optionId(highlight) : undefined,
+            "aria-activedescendant": showsList ? optionId(highlight) : undefined,
             "aria-autocomplete": "list",
-            "aria-controls": LISTBOX_ID,
-            "aria-expanded": rows.length > 0 && search.isSearching,
+            "aria-controls": showsList ? LISTBOX_ID : undefined,
+            "aria-expanded": showsList,
             "aria-label": t("globalSearch.inputLabel"),
             "data-testid": "global-search-input",
             role: "combobox",

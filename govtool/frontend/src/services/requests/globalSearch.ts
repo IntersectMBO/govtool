@@ -11,12 +11,9 @@ import type {
   StakeAddressLookup,
 } from "@/models";
 import {
-  decodeCIP129Identifier,
   dRepSearchPhraseProcessor,
   fixViewForScriptBasedDRep,
   forumSearchQuery,
-  getFullGovActionId,
-  mapDtoToDrep,
 } from "@/utils";
 
 import { GovernanceActionsAPI } from "../GovernanceActionsAPI";
@@ -24,35 +21,40 @@ import { GovernanceActionsAPI } from "../GovernanceActionsAPI";
 // Reads for the header's global search. They go through GovernanceActionsAPI,
 // so a failed search shows in the dialog instead of opening the error page.
 
-/** Live governance actions matching a title, keyword or action id. 0-based page. */
+/**
+ * Live governance actions matching a title, keyword or action id. The backend
+ * matches a CIP-129 id itself, index included. 0-based page.
+ */
 export const searchGovernanceActions = async (
   phrase: string,
   page: number,
   pageSize: number,
 ) => {
-  let search = phrase;
-  if (phrase.startsWith("gov_action")) {
-    try {
-      search = getFullGovActionId(decodeCIP129Identifier(phrase).txID, 0);
-    } catch {
-      search = phrase;
-    }
-  }
   const { data } = await GovernanceActionsAPI.get<Infinite<ProposalData>>("/proposal/list", {
-    params: { page, pageSize, search },
+    params: { page, pageSize, search: phrase },
   });
   return data;
 };
 
-/** Listed DReps matching a name, DRep id or $handle. 0-based page. */
+// Phrases worth turning into a DRep id first: a $handle, a drep1… id or hex.
+const DREP_ID_SHAPED = /^(\$|drep)|^[0-9a-f]{56,58}$/i;
+
+/**
+ * Listed DReps matching a name, DRep id or $handle. 0-based page. Only id- or
+ * handle-shaped phrases go to handle.me, and rows are not run through
+ * mapDtoToDrep, which would fetch every DRep's image from its own host.
+ */
 export const searchDReps = async (phrase: string, page: number, pageSize: number) => {
-  const search = await dRepSearchPhraseProcessor(phrase);
+  const search = DREP_ID_SHAPED.test(phrase) ? await dRepSearchPhraseProcessor(phrase) : phrase;
   const { data } = await GovernanceActionsAPI.get<Infinite<DRepData>>("/drep/list", {
     params: { page, pageSize, search, listed: true },
   });
   return {
     ...data,
-    elements: await Promise.all(data.elements.map((dRep) => mapDtoToDrep(dRep))),
+    elements: data.elements.map((dRep) => ({
+      ...dRep,
+      view: fixViewForScriptBasedDRep(dRep.view, dRep.isScriptBased),
+    })),
   };
 };
 

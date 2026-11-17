@@ -28,6 +28,7 @@ vi.mock("@/hooks/useNotifications", () => ({
   NOTIFICATION_PAGE_SIZE: 7,
   useNotifications: (args: Record<string, unknown> = {}) => {
     mocks.args.push(args);
+    if (mocks.feed.throws) throw new Error("bad service data");
     return mocks.feed;
   },
 }));
@@ -88,6 +89,14 @@ describe("NotificationBell", () => {
     expect((mocks.feed.markAllRead as ReturnType<typeof vi.fn>)).toHaveBeenCalled();
     fireEvent.click(within(popover).getByTestId("notifications-view-all"));
     expect(mocks.navigate).toHaveBeenCalledWith("/notifications");
+  });
+
+  it("renders nothing rather than breaking the header when its data is unusable", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    mocks.feed = { ...feed(), throws: true };
+    const { container } = renderIn(<NotificationBell />);
+    expect(container).toBeEmptyDOMElement();
+    error.mockRestore();
   });
 
   it("goes straight to the Notification Center on a phone", () => {
@@ -176,10 +185,42 @@ describe("NotificationPreferencesPanel", () => {
     );
   });
 
-  it("offers email once the service supports it", () => {
-    mocks.feed = feed({ capabilities: { email: true, crossDevice: true, events: ["drepChange"] } });
-    renderIn(<NotificationPreferencesPanel />);
+  it("offers email once the service supports it, with the address or a setup link", () => {
+    mocks.feed = feed({
+      mode: "remote",
+      capabilities: { email: true, emailSetupUrl: "https://gov.tools/email", crossDevice: true, events: ["drepChange"] },
+    });
+    const { unmount } = renderIn(<NotificationPreferencesPanel />);
     expect(screen.getByTestId("notification-channel-email")).toBeEnabled();
     expect(screen.queryByTestId("notification-event-digest")).toBeNull();
+    expect(screen.getByRole("link", { name: /Add an email address/ })).toHaveAttribute(
+      "href",
+      "https://gov.tools/email",
+    );
+    unmount();
+    mocks.feed = feed({
+      mode: "remote",
+      preferences: {
+        ...DEFAULT_PREFERENCES,
+        channels: { inApp: true, email: { enabled: true, address: "ada@mail.com", status: "verified" } },
+      },
+      capabilities: { email: true, emailSetupUrl: null, crossDevice: true, events: ["drepChange"] },
+    });
+    renderIn(<NotificationPreferencesPanel />);
+    expect(screen.getByText("Send to ada@mail.com.")).toBeInTheDocument();
+  });
+
+  it("describes each switch for screen readers", () => {
+    renderIn(<NotificationPreferencesPanel />);
+    expect(screen.getByTestId("notification-channel-email")).toHaveAccessibleDescription(
+      /Not available yet/,
+    );
+  });
+
+  it("asks to sign in before showing or saving the service's preferences", () => {
+    mocks.feed = feed({ mode: "remote", needsSignIn: true });
+    renderIn(<NotificationPreferencesPanel />);
+    expect(screen.getByTestId("notifications-sign-in-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("notification-preferences-save")).toBeNull();
   });
 });

@@ -52,13 +52,15 @@ export default class LoginPage {
     }
   }
 
-  // Disconnect lives in the wallet menu on desktop and the drawer on phones.
+  // Disconnect lives in the wallet menu on desktop and in the drawer on
+  // phones; below 480px the bar shows no wallet pill at all.
   async openWalletMenu() {
-    if (isMobile(this.page)) {
+    const walletMenu = this.page.getByTestId("wallet-menu-button");
+    if (isMobile(this.page) || !(await walletMenu.isVisible())) {
       await openDrawer(this.page);
       return;
     }
-    await this.page.getByTestId("wallet-menu-button").click();
+    await walletMenu.click();
   }
 
   async logout() {
@@ -69,7 +71,7 @@ export default class LoginPage {
   async isLoggedIn() {
     await this.openWalletMenu();
     await expect(this.disconnectWalletBtn).toBeVisible();
-    if (!isMobile(this.page)) {
+    if (!isMobile(this.page) && (await this.page.getByTestId("wallet-menu-button").isVisible())) {
       await this.page.keyboard.press("Escape");
     }
   }

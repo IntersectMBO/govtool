@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useIsFetching,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Address } from "@emurgo/cardano-serialization-lib-asmjs";
 
 import { useCardano } from "@context";
@@ -12,13 +18,16 @@ import { useGetDRepVotesByIdQuery } from "@/hooks/queries/useGetDRepVotesByIdQue
 import { useGetLiveProposalsQuery } from "@/hooks/queries/useGetLiveProposalsQuery";
 import { useGetVoterInfo } from "@/hooks/queries/useGetVoterInfoQuery";
 import type {
+  GovernanceActionRecord,
   GovToolNotification,
   NotificationEvent,
   NotificationFilter,
-  NotificationKind,
   NotificationPreferences,
+  ProposalData,
 } from "@/models";
+import { getGovernanceActionRecord } from "@/services/requests/governanceActions";
 import {
+  getClosingProposals,
   getNotificationPreferences,
   getNotificationsConfig,
   getNotificationsPage,
@@ -35,6 +44,7 @@ import {
   NOTIFICATION_FILTERS,
   countByFilter,
   deriveNotifications,
+  isValidNotification,
   loadPreferences,
   loadStore,
   matchesFilter,
@@ -46,34 +56,31 @@ import {
 
 export const NOTIFICATION_PAGE_SIZE = 7;
 
-const KNOWN_KINDS = new Set<NotificationKind>([
-  "drepChange",
-  "delegationChange",
-  "actionActivity",
-  "relevantAction",
-  "digest",
-  "system",
-]);
+const DAY = 24 * 60 * 60 * 1000;
+// Votes recent enough that their action may have been decided in the past
+// 30 days (an action is live for at most about 30 days), and a request cap.
+const VOTE_LOOKBACK = 75 * DAY;
+const MAX_VOTE_RECORDS = 40;
 
-const tokenKey = (stakeKey: string) => `govtool_notifications_token_${stakeKey}`;
+type Session = { token: string; expiresAt: string };
 
-const readToken = (stakeKey: string) => {
+const tokenStorageKey = (stakeKey: string) => `govtool_notifications_token_${stakeKey}`;
+
+const readSession = (stakeKey: string): string | null => {
   try {
-    const stored = JSON.parse(sessionStorage.getItem(tokenKey(stakeKey)) ?? "null");
-    return stored?.token && new Date(stored.expiresAt) > new Date()
-      ? (stored.token as string)
-      : undefined;
+    const stored = JSON.parse(sessionStorage.getItem(tokenStorageKey(stakeKey)) ?? "null");
+    return stored?.token && new Date(stored.expiresAt) > new Date() ? stored.token : null;
   } catch {
-    return undefined;
+    return null;
   }
 };
 
-const writeToken = (stakeKey: string, value: { token: string; expiresAt: string } | null) => {
+const writeSession = (stakeKey: string, session: Session | null) => {
   try {
-    if (value) sessionStorage.setItem(tokenKey(stakeKey), JSON.stringify(value));
-    else sessionStorage.removeItem(tokenKey(stakeKey));
+    if (session) sessionStorage.setItem(tokenStorageKey(stakeKey), JSON.stringify(session));
+    else sessionStorage.removeItem(tokenStorageKey(stakeKey));
   } catch {
-    // The token then lasts only as long as this page.
+    // The session then lasts only as long as this page.
   }
 };
 
@@ -98,6 +105,8 @@ const ZERO_COUNTS = Object.fromEntries(NOTIFICATION_FILTERS.map((f) => [f, 0])) 
   number
 >;
 
+const actionKey = (txHash: string, index: number) => `${txHash}#${index}`;
+
 type Options = {
   filter?: NotificationFilter;
   sort?: "newest" | "oldest";
@@ -108,14 +117,15 @@ type Options = {
  * The wallet's notifications, from the notifications service when one runs
  * (docs/api/notifications.md) or worked out in this browser when none does.
  * Both modes give the same shape, so the bell and the Notification Center
- * never need to know which one they read.
+ * never need to know which one they read. Shared state (the session, the local
+ * store, preferences) lives in the query cache, so every instance agrees.
  */
 export const useNotifications = ({
   filter = "all",
   sort = "newest",
   pageSize = NOTIFICATION_PAGE_SIZE,
 }: Options = {}) => {
-  const { isEnabled, stakeKey, dRepID, walletApi } = useCardano();
+  const { isEnabled, stakeKey, dRepID, walletApi, pendingTransaction } = useCardano();
   const queryClient = useQueryClient();
   const isConnected = Boolean(isEnabled && stakeKey);
   const stake = stakeKey ?? "";
@@ -133,16 +143,38 @@ export const useNotifications = ({
   const isLocal = mode === "local";
   const isRemote = mode === "remote";
 
-  const [token, setToken] = useState(() => readToken(stake));
-  useEffect(() => setToken(readToken(stake)), [stake]);
-  const hasToken = isRemote && !!token;
+  // The session, shared by every instance through the cache.
+  const sessionKey = [QUERY_KEYS.notificationsTokenKey, stake];
+  const sessionQuery = useQuery({
+    queryKey: sessionKey,
+    queryFn: () => readSession(stake),
+    enabled: isRemote,
+    staleTime: Infinity,
+  });
+  const token = isRemote ? sessionQuery.data ?? null : null;
+  const hasToken = !!token;
+
+  const resetRemote = () => {
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.notificationsPageKey] });
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.notificationsPreferencesKey] });
+  };
+  const setSession = (session: Session | null) => {
+    writeSession(stake, session);
+    queryClient.setQueryData(sessionKey, session?.token ?? null);
+    resetRemote();
+  };
 
   // What local mode derives from.
   const { voter } = useGetVoterInfo({ enabled: isLocal });
   const isVoter = !!(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter);
-  const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(
+  const { currentDelegation, isCurrentDelegationLoading } = useGetAdaHolderCurrentDelegationQuery(
     isLocal ? stakeKey : undefined,
   );
+  // A refetch can briefly show the previous delegation (the query key has no
+  // stake key, and a delegation in flight changes it): no snapshot meanwhile.
+  const isDelegationFetching =
+    useIsFetching({ queryKey: [QUERY_KEYS.getAdaHolderCurrentDelegationKey] }) > 0;
+  const isDelegationSettled = !isDelegationFetching && !pendingTransaction?.delegate;
   const view = currentDelegation?.dRepView ?? undefined;
   const delegatedView =
     view &&
@@ -152,11 +184,40 @@ export const useNotifications = ({
       : undefined;
   const { dRep } = useGetDRepDetailsQuery(isLocal ? delegatedView : undefined);
   const { votingPower } = useGetAdaHolderVotingPowerQuery(isLocal ? stakeKey : undefined);
+  // Wait for voter info, so the votes read are the right ones from the start.
   const { dRepVotes } = useGetDRepVotesByIdQuery(
-    isLocal ? (isVoter ? dRepID : delegatedView) : undefined,
+    isLocal && voter ? (isVoter ? dRepID : delegatedView) : undefined,
   );
   const { liveProposals } = useGetLiveProposalsQuery();
   const { decidedActions } = useGetDecidedActionsQuery();
+  const closingQuery = useQuery({
+    queryKey: [QUERY_KEYS.notificationsClosingKey],
+    queryFn: getClosingProposals,
+    enabled: isLocal && isVoter,
+  });
+
+  // The outcome of each recent vote whose action is no longer live, read per
+  // action rather than from the capped list of the newest decisions.
+  const liveKeys = new Set(liveProposals.map((p) => actionKey(p.txHash, p.index)));
+  const votedRecordIds = (dRepVotes ?? [])
+    .filter(({ vote, proposal }) => {
+      const at = vote?.date ? new Date(vote.date).getTime() : NaN;
+      const isRecent = !(Date.now() - at > VOTE_LOOKBACK);
+      return isRecent && !liveKeys.has(actionKey(proposal.txHash, proposal.index));
+    })
+    .slice(0, MAX_VOTE_RECORDS)
+    .map(({ proposal }) => actionKey(proposal.txHash, proposal.index));
+  const votedRecords = useQueries({
+    queries: (isLocal ? votedRecordIds : []).map((id) => ({
+      queryKey: [QUERY_KEYS.useGetGovernanceActionRecordKey, id],
+      queryFn: () => getGovernanceActionRecord(id),
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+  const votedRecordData = votedRecords
+    .map((query) => query.data)
+    .filter((record): record is GovernanceActionRecord => !!record);
+  const votedRecordSignature = votedRecordData.map((record) => record.id).join();
 
   const storeKey = [QUERY_KEYS.notificationsLocalStoreKey, stake];
   const storeQuery = useQuery({
@@ -166,21 +227,34 @@ export const useNotifications = ({
     staleTime: Infinity,
   });
 
-  const preferencesKey = [QUERY_KEYS.notificationsPreferencesKey, mode, stake, token];
+  const preferencesKey = [QUERY_KEYS.notificationsPreferencesKey, mode, stake, hasToken];
   const preferencesQuery = useQuery({
     queryKey: preferencesKey,
-    queryFn: () =>
-      (isRemote && token ? getNotificationPreferences(token) : loadPreferences(stake)),
+    queryFn: () => (token ? getNotificationPreferences(token) : loadPreferences(stake)),
     enabled: isLocal || hasToken,
     staleTime: Infinity,
   });
   const preferences = preferencesQuery.data ?? DEFAULT_PREFERENCES;
 
+  const live = useMemo(() => {
+    const byKey = new Map<string, ProposalData>();
+    [...liveProposals, ...(closingQuery.data?.elements ?? [])].forEach((proposal) =>
+      byKey.set(actionKey(proposal.txHash, proposal.index), proposal));
+    return [...byKey.values()];
+  }, [liveProposals, closingQuery.data]);
+
+  const decided = useMemo(() => {
+    const byKey = new Map<string, GovernanceActionRecord>();
+    [...decidedActions, ...votedRecordData].forEach((record) =>
+      byKey.set(actionKey(record.tx_hash, record.index), record));
+    return [...byKey.values()];
+  }, [decidedActions, votedRecordSignature]);
+
   const derived = useMemo(() => {
     if (!isLocal || !storeQuery.data) return undefined;
     return deriveNotifications(
       {
-        delegation: currentDelegation,
+        delegation: isDelegationSettled ? currentDelegation : undefined,
         delegatedDRep: dRep && {
           view: dRep.view,
           status: dRep.status,
@@ -189,8 +263,8 @@ export const useNotifications = ({
         votes: dRepVotes,
         voteRelation: isVoter ? "voted" : "dRepVoted",
         isVoter,
-        live: liveProposals,
-        decided: decidedActions,
+        live,
+        decided,
         votingPower,
       },
       storeQuery.data,
@@ -200,12 +274,13 @@ export const useNotifications = ({
   }, [
     isLocal,
     storeQuery.data,
+    isDelegationSettled,
     currentDelegation,
     dRep,
     dRepVotes,
     isVoter,
-    liveProposals,
-    decidedActions,
+    live,
+    decided,
     votingPower,
     preferences,
   ]);
@@ -222,7 +297,7 @@ export const useNotifications = ({
   useEffect(() => setPages(1), [filter, sort]);
 
   const pageQuery = useInfiniteQuery({
-    queryKey: [QUERY_KEYS.notificationsPageKey, stake, token, filter, sort, pageSize],
+    queryKey: [QUERY_KEYS.notificationsPageKey, stake, hasToken, filter, sort, pageSize],
     queryFn: ({ pageParam }) =>
       getNotificationsPage(token as string, { page: pageParam, pageSize, filter, sort }),
     initialPageParam: 1,
@@ -235,8 +310,7 @@ export const useNotifications = ({
   // An expired session asks for a new signature.
   useEffect(() => {
     if (isUnauthorized(pageQuery.error) || isUnauthorized(preferencesQuery.error)) {
-      writeToken(stake, null);
-      setToken(undefined);
+      setSession(null);
     }
   }, [pageQuery.error, preferencesQuery.error]);
 
@@ -244,16 +318,25 @@ export const useNotifications = ({
   const localFiltered = localItems.filter((item) => matchesFilter(item, filter));
   if (sort === "oldest") localFiltered.reverse();
   const firstPage = pageQuery.data?.pages[0];
-  const counts = isLocal ? countByFilter(localItems) : firstPage?.counts ?? ZERO_COUNTS;
+  const counts = isLocal ? countByFilter(localItems) : { ...ZERO_COUNTS, ...firstPage?.counts };
 
-  const refreshRemote = () =>
-    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.notificationsPageKey] });
+  /** A remote write; an expired session asks to sign in again. */
+  const remote = async (write: () => Promise<unknown>) => {
+    try {
+      await write();
+    } catch (error) {
+      if (isUnauthorized(error)) setSession(null);
+      throw error;
+    } finally {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.notificationsPageKey] });
+    }
+  };
 
   const markRead = useCallback(
     async (ids: string[], read: boolean) => {
-      if (isRemote && token) {
-        await markNotificationsRead(token, ids, read);
-        await refreshRemote();
+      if (isRemote) {
+        if (!token) return;
+        await remote(() => markNotificationsRead(token, ids, read)).catch(() => undefined);
         return;
       }
       const store = queryClient.getQueryData<NotificationStore>(storeKey);
@@ -266,9 +349,9 @@ export const useNotifications = ({
   );
 
   const markAllRead = useCallback(async () => {
-    if (isRemote && token) {
-      await markAllNotificationsRead(token);
-      await refreshRemote();
+    if (isRemote) {
+      if (!token) return;
+      await remote(() => markAllNotificationsRead(token)).catch(() => undefined);
       return;
     }
     await markRead(
@@ -277,12 +360,16 @@ export const useNotifications = ({
     );
   }, [isRemote, token, localItems, markRead]);
 
+  /** Throws when it cannot save; never saves locally while a service runs. */
   const savePreferences = useCallback(
     async (next: NotificationPreferences) => {
-      if (isRemote && token) {
-        const saved = await saveNotificationPreferences(token, next);
+      if (isRemote) {
+        if (!token) throw new Error("Sign in to the notifications service first");
+        let saved = next;
+        await remote(async () => {
+          saved = await saveNotificationPreferences(token, next);
+        });
         queryClient.setQueryData(preferencesKey, saved);
-        await refreshRemote();
         return;
       }
       saveLocalPreferences(stake, next);
@@ -297,17 +384,23 @@ export const useNotifications = ({
     const { nonce } = await requestNotificationsNonce(stakeAddress);
     const { signature, key } = await walletApi.signData(stake, toHex(nonce));
     const session = await signInToNotifications({ stakeAddress, nonce, signature, key });
-    writeToken(stake, session);
-    setToken(session.token);
+    setSession(session);
   }, [walletApi, stake]);
 
-  const remoteItems = (pageQuery.data?.pages ?? [])
-    .flatMap((page) => page.items)
-    .filter((item) => KNOWN_KINDS.has(item.kind));
+  const remoteItems = useMemo(() => {
+    const seen = new Set<string>();
+    return (pageQuery.data?.pages ?? [])
+      .flatMap((page) => page.items)
+      .filter((item) => {
+        if (!isValidNotification(item) || seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+      });
+  }, [pageQuery.data]);
 
   return {
     mode,
-    needsSignIn: isRemote && !token,
+    needsSignIn: isRemote && sessionQuery.isFetched && !token,
     signIn,
     items: (isLocal
       ? localFiltered.slice(0, pages * pageSize)
@@ -321,7 +414,10 @@ export const useNotifications = ({
       else if (pageQuery.hasNextPage) pageQuery.fetchNextPage();
     },
     isLoading:
-      mode === "loading" || (isLocal && !derived) || (hasToken && pageQuery.isLoading),
+      mode === "loading" ||
+      (isLocal && (!derived || !!isCurrentDelegationLoading)) ||
+      (isRemote && !sessionQuery.isFetched) ||
+      (hasToken && pageQuery.isLoading),
     isError: hasToken && pageQuery.isError && !isUnauthorized(pageQuery.error),
     retry: () => {
       pageQuery.refetch();
@@ -332,6 +428,7 @@ export const useNotifications = ({
     savePreferences,
     capabilities: {
       email: isRemote && !!config?.channels.email,
+      emailSetupUrl: isRemote ? config?.emailSetupUrl ?? null : null,
       crossDevice: isRemote,
       events: (config?.events.filter((kind) => kind !== "system") ??
         NOTIFICATION_EVENTS) as NotificationEvent[],

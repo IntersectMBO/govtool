@@ -14,7 +14,8 @@ export type DRepChangeData = {
   dRepName: string | null;
   change: "retired" | "inactive" | "retiring" | "metadataUpdated";
   epoch: number | null;
-  votingPower: number | null;
+  /** Lovelace; the service sends a decimal string, local mode a number. */
+  votingPower: number | string | null;
 };
 
 export type DelegationTarget = {
@@ -26,7 +27,7 @@ export type DelegationTarget = {
 export type DelegationChangeData = {
   change: "delegated" | "removed";
   target: DelegationTarget;
-  votingPower: number | null;
+  votingPower: number | string | null;
 };
 
 export type ActionActivityData = {
@@ -87,14 +88,22 @@ export type NotificationFrequency = "immediate" | "daily" | "weekly" | "off";
 export type NotificationPreferences = {
   channels: {
     inApp: boolean;
-    email: { enabled: boolean; address: string | null };
+    email: {
+      enabled: boolean;
+      address: string | null;
+      status?: "unverified" | "pending" | "verified";
+    };
   };
   events: Record<NotificationEvent, NotificationFrequency>;
 };
 
 /** GET /notifications/config: present only once a notifications service runs. */
 export type NotificationsConfig = {
-  version: 1;
+  version: number;
+  /** Earlier versions this service still serves, so older frontends keep working. */
+  compatible?: number[];
+  /** Where a user adds or confirms an email address, when email is offered. */
+  emailSetupUrl?: string | null;
   channels: { inApp: boolean; email: boolean };
   events: NotificationKind[];
   frequencies: NotificationFrequency[];

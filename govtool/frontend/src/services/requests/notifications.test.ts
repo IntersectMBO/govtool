@@ -22,6 +22,16 @@ describe("getNotificationsConfig", () => {
     await expect(getNotificationsConfig()).resolves.toBeUndefined();
   });
 
+  it("accepts a later version that declares itself compatible with 1, and rejects a malformed one", async () => {
+    api.get.mockResolvedValueOnce({
+      status: 200,
+      data: { version: 2, compatible: [1], channels: { inApp: true, email: false }, events: [] },
+    });
+    await expect(getNotificationsConfig()).resolves.toMatchObject({ version: 2 });
+    api.get.mockResolvedValueOnce({ status: 200, data: { version: 1 } });
+    await expect(getNotificationsConfig()).resolves.toBeUndefined();
+  });
+
   it("returns a version 1 config", async () => {
     const config = {
       version: 1,

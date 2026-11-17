@@ -72,10 +72,10 @@ export const describeNotification = (
 ): NotificationContent => {
   const k = (key: string, options?: Record<string, unknown>) =>
     t(`notifications.kinds.${item.kind}.${key}`, options);
-  const power = (lovelace: number | null) =>
-    (lovelace === null
+  const power = (lovelace: number | string | null) =>
+    (lovelace === null || !Number.isFinite(Number(lovelace))
       ? t("notifications.yourVotingPower")
-      : t("notifications.votingPower", { amount: correctAdaFormatWithSuffix(lovelace) }));
+      : t("notifications.votingPower", { amount: correctAdaFormatWithSuffix(Number(lovelace)) }));
 
   switch (item.kind) {
     case "drepChange": {

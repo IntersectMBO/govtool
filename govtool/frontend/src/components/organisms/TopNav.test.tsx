@@ -256,6 +256,17 @@ describe("TopNav (mobile)", () => {
     expect(screen.getByTestId("disconnect-button")).toBeInTheDocument();
   });
 
+  it("keeps the wallet pill in a phone's bar inside a wallet flow", () => {
+    mocks.cardano.isEnabled = true;
+    mocks.cardano.stakeKey = "stake1u9abcdefghijklmnopqrstuvwxyz";
+    render(
+      <MemoryRouter initialEntries={["/register_drep"]}>
+        <TopNav onNavigateAway={vi.fn()} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByTestId("wallet-menu-button")).toBeInTheDocument();
+  });
+
   it("shows the wallet pill in the bar on a tablet", () => {
     window.innerWidth = 600;
     mocks.cardano.isEnabled = true;

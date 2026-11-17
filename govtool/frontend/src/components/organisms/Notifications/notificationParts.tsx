@@ -1,7 +1,11 @@
+import { Component, ReactNode, useState } from "react";
 import { Box } from "@mui/material";
 import { Link as RouterLink } from "react-router";
-import { ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { ArrowRight, ArrowUpRight, PenLine, type LucideIcon } from "lucide-react";
+
 import { formatDistanceToNowStrict } from "date-fns";
+import { Button } from "@/components/atoms/Button";
 
 import { ds, RADIUS } from "@/consts/designTokens";
 import type { GovToolNotification } from "@/models";
@@ -131,3 +135,115 @@ export const notificationTime = (
   const ago = formatDistanceToNowStrict(date, { addSuffix: !compact });
   return compact ? ago : format("notifications.time", { ago, at: formatUtc(item.createdAt, "dateTime") });
 };
+
+/** An empty, error or sign-in state: an icon, a title, a line and an action. */
+export const StatePanel = ({
+  icon,
+  tone,
+  title,
+  body,
+  action,
+  testId,
+}: {
+  icon: ReactNode;
+  tone: "neutral" | "error";
+  title: string;
+  body: string;
+  action?: ReactNode;
+  testId: string;
+}) => (
+  <Box
+    data-testid={testId}
+    role={tone === "error" ? "alert" : "status"}
+    sx={{
+      alignItems: "center",
+      backgroundColor: "#FFFFFF",
+      border: `1px solid ${ds.gray["200"]}`,
+      borderRadius: `${RADIUS.lg}px`,
+      display: "flex",
+      flexDirection: "column",
+      gap: 1.25,
+      px: 3,
+      py: { xxs: 6, md: 10 },
+      textAlign: "center",
+    }}
+  >
+    <Box
+      aria-hidden
+      sx={{
+        alignItems: "center",
+        backgroundColor: tone === "error" ? ds.error["100"] : ds.gray["100"],
+        borderRadius: tone === "error" ? "50%" : `${RADIUS.lg}px`,
+        color: tone === "error" ? ds.error["600"] : ds.gray["600"],
+        display: "flex",
+        height: 52,
+        justifyContent: "center",
+        width: 52,
+      }}
+    >
+      {icon}
+    </Box>
+    <Box component="h2" sx={{ color: ds.gray["900"], fontSize: 18, fontWeight: 600, lineHeight: "27px", m: 0, mt: 1 }}>
+      {title}
+    </Box>
+    <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0, maxWidth: 340 }}>
+      {body}
+    </Box>
+    {action && <Box sx={{ mt: 1 }}>{action}</Box>}
+  </Box>
+);
+
+/** Asks the wallet to sign in to the notifications service. */
+export const SignInPanel = ({ signIn }: { signIn: () => Promise<void> }) => {
+  const { t } = useTranslation();
+  const [failed, setFailed] = useState(false);
+  return (
+    <StatePanel
+      action={(
+        <Button
+          dataTestId="notifications-sign-in"
+          onClick={async () => {
+            setFailed(false);
+            try {
+              await signIn();
+            } catch {
+              setFailed(true);
+            }
+          }}
+          startIcon={<PenLine aria-hidden size={16} />}
+        >
+          {t("notifications.signIn")}
+        </Button>
+      )}
+      body={failed ? t("notifications.signInFailed") : t("notifications.signInBody")}
+      icon={<PenLine size={22} />}
+      testId="notifications-sign-in-panel"
+      title={t("notifications.signInTitle")}
+      tone="neutral"
+    />
+  );
+};
+
+/**
+ * Keeps a notifications failure (say, data the service sent that the screen
+ * cannot read) to the notifications UI instead of the whole page.
+ */
+export class NotificationBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  { hasFailed: boolean }
+> {
+  constructor(props: { children: ReactNode; fallback?: ReactNode }) {
+    super(props);
+    this.state = { hasFailed: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasFailed: true };
+  }
+
+  render() {
+    const { children, fallback = null } = this.props;
+    const { hasFailed } = this.state;
+    return hasFailed ? fallback : children;
+  }
+}

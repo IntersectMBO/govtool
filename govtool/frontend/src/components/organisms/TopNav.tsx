@@ -83,8 +83,9 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
   };
 
   const renderWalletControl = (isCompact = false) => {
-    if (isConnected && isCompact && screenWidth < PHONE_MAX_WIDTH) {
-      return !onNavigateAway && <NotificationBell />;
+    // Wallet flows show neither search nor the bell, so the pill fits there.
+    if (isConnected && isCompact && screenWidth < PHONE_MAX_WIDTH && !onNavigateAway) {
+      return <NotificationBell />;
     }
     if (isConnected) {
       return (

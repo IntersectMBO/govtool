@@ -30,6 +30,8 @@ export const QUERY_KEYS = {
   notificationsLocalStoreKey: "notificationsLocalStoreKey",
   notificationsPreferencesKey: "notificationsPreferencesKey",
   notificationsPageKey: "notificationsPageKey",
+  notificationsTokenKey: "notificationsTokenKey",
+  notificationsClosingKey: "notificationsClosingKey",
   useGetLiveProposalsKey: "useGetLiveProposalsKey",
   useGetProposalsPageKey: "useGetProposalsPageKey",
   useGetGovernanceActionProposalDiscussionKey: "useGetGovernanceActionProposalDiscussionKey",

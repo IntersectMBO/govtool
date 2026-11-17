@@ -171,6 +171,7 @@ export const withRead = (store: NotificationStore, ids: string[], isRead: boolea
 export type DeriveInput = {
   /** Undefined while unknown: nothing that depends on it is derived. */
   delegation: CurrentDelegation | undefined;
+  /** The DRep the wallet delegates to, when it delegates to one. */
   delegatedDRep?: { view: string; status: DRepStatus; givenName: string | null };
   /** The wallet's own votes (a voter) or its DRep's votes (an ADA holder). */
   votes: VotedProposal[] | undefined;
@@ -235,8 +236,11 @@ export const deriveNotifications = (
   // A delegation change, found against last time's snapshot.
   if (input.delegation !== undefined) {
     const key = delegationKey(input.delegation);
-    if (previous.lastDelegation !== undefined && previous.lastDelegation !== key) {
-      const id = `delegation-${previous.lastDelegation}-${key}-${now.toISOString()}`;
+    // One change per delegation transaction: a stale read of the old
+    // delegation in between cannot add a second card for the same one.
+    const id = `delegation-${input.delegation?.txHash ?? key}`;
+    const isKnown = store.history.some((change) => change.id === id);
+    if (previous.lastDelegation !== undefined && previous.lastDelegation !== key && !isKnown) {
       store.history.unshift({
         id,
         kind: "delegationChange",
@@ -269,11 +273,8 @@ export const deriveNotifications = (
 
   // The delegated DRep retired or went inactive.
   const dRep = input.delegatedDRep;
-  if (
-    dRep &&
-    input.delegation?.dRepView === dRep.view &&
-    (dRep.status === DRepStatus.Retired || dRep.status === DRepStatus.Inactive)
-  ) {
+  // `delegatedDRep` is only ever the DRep the wallet delegates to.
+  if (dRep && (dRep.status === DRepStatus.Retired || dRep.status === DRepStatus.Inactive)) {
     const id = `drep-${dRep.view}-${dRep.status}`;
     items.push({
       id,
@@ -381,9 +382,58 @@ export const deriveNotifications = (
   const visible = preferences.channels.inApp
     ? items
       .filter((item) => item.kind === "system" || preferences.events[item.kind] !== "off")
-      .map((item) => ({ ...item, read: readIds.has(item.id) }) as GovToolNotification)
+      .map(
+        (item) =>
+          ({
+            ...item,
+            // Outcomes from before this browser first looked arrive as read,
+            // so a first visit is not a wall of unread history.
+            read:
+              readIds.has(item.id) ||
+              (item.kind === "actionActivity" && item.createdAt < store.since),
+          }) as GovToolNotification,
+      )
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     : [];
 
   return { items: visible, store };
+};
+
+// ---------------------------------------------------------------- service data
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+const isText = (value: unknown) => typeof value === "string";
+const isTextOrNull = (value: unknown) => value === null || typeof value === "string";
+const isAmount = (value: unknown) =>
+  value === null || typeof value === "number" || (typeof value === "string" && /^\d+$/.test(value));
+
+/**
+ * Whether an item from the notifications service has everything the screen
+ * reads. Anything else (an unknown kind, a missing field) is left out rather
+ * than allowed to break the header.
+ */
+export const isValidNotification = (value: unknown): value is GovToolNotification => {
+  if (!isObject(value) || !isText(value.id) || !isText(value.createdAt)) return false;
+  if (typeof value.read !== "boolean" || !isObject(value.data)) return false;
+  const { data } = value;
+  switch (value.kind) {
+    case "drepChange":
+      return isText(data.dRepId) && isTextOrNull(data.dRepName) && isText(data.change) &&
+        isAmount(data.votingPower);
+    case "delegationChange":
+      return isText(data.change) && isObject(data.target) && isText(data.target.type) &&
+        isTextOrNull(data.target.dRepId ?? null) && isAmount(data.votingPower);
+    case "actionActivity":
+      return isText(data.actionId) && isText(data.actionType) && isText(data.outcome) &&
+        isText(data.relation);
+    case "relevantAction":
+      return isText(data.actionId) && isText(data.actionType) && isText(data.reason);
+    case "digest":
+      return isText(data.from) && isText(data.to) && typeof data.total === "number";
+    case "system":
+      return isText(data.title) && isText(data.body);
+    default:
+      return false;
+  }
 };

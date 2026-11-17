@@ -5,6 +5,7 @@ import { DRepStatus } from "@/models";
 
 import {
   DEFAULT_PREFERENCES,
+  isValidNotification,
   countByFilter,
   deriveNotifications,
   emptyStore,
@@ -137,6 +138,34 @@ describe("deriveNotifications", () => {
     expect(later.items[0].data).toMatchObject({ target: { dRepName: "Other" } });
   });
 
+  it("records one change per delegation transaction, however often it is seen", () => {
+    const other = { dRepHash: "x", dRepView: "drep1other", isDRepScriptBased: false, txHash: "tx-b" };
+    const hazel = { dRepHash: "h", dRepView: "drep1hazel", isDRepScriptBased: false, txHash: "tx-a" };
+    const step = (store: ReturnType<typeof emptyStore>, delegation: typeof other) =>
+      deriveNotifications(input({ delegation }), store, DEFAULT_PREFERENCES, now).store;
+    // A stale read of the old delegation between two reads of the new one.
+    let store = step({ ...emptyStore(ago(10)), lastDelegation: "drep1hazel" }, other);
+    store = step(store, hazel);
+    store = step(store, other);
+    const { items } = deriveNotifications(
+      input({ delegation: other }),
+      store,
+      DEFAULT_PREFERENCES,
+      now,
+    );
+    expect(items.filter((item) => item.id === "delegation-tx-b")).toHaveLength(1);
+  });
+
+  it("counts outcomes from before the first visit as already read", () => {
+    const { items } = deriveNotifications(
+      input({ votes: [vote(1)], decided: [decided(1, { ratified_time: ago(5) })] }),
+      { ...emptyStore(ago(1)), lastDelegation: "drep1hazel" },
+      DEFAULT_PREFERENCES,
+      now,
+    );
+    expect(items[0]).toMatchObject({ kind: "actionActivity", read: true });
+  });
+
   it("does not report the delegation it finds on the first visit", () => {
     const fresh = emptyStore(now.toISOString());
     const { items, store } = deriveNotifications(input(), fresh, DEFAULT_PREFERENCES, now);
@@ -248,5 +277,28 @@ describe("storage", () => {
     savePreferences("stakeA", { ...DEFAULT_PREFERENCES, channels: { ...DEFAULT_PREFERENCES.channels, inApp: false } });
     expect(loadPreferences("stakeA").channels.inApp).toBe(false);
     expect(loadPreferences("stakeB").channels.inApp).toBe(true);
+  });
+});
+
+describe("isValidNotification", () => {
+  const base = { id: "n", createdAt: "2026-10-01T00:00:00Z", read: false };
+
+  it("keeps well-formed items of known kinds", () => {
+    expect(isValidNotification({ ...base, kind: "system", data: { title: "T", body: "B", url: null } })).toBe(true);
+    expect(
+      isValidNotification({
+        ...base,
+        kind: "delegationChange",
+        data: { change: "delegated", target: { type: "drep", dRepId: "d", dRepName: null }, votingPower: "5" },
+      }),
+    ).toBe(true);
+  });
+
+  it("drops unknown kinds and items missing what the screen reads", () => {
+    expect(isValidNotification({ ...base, kind: "poll", data: {} })).toBe(false);
+    expect(isValidNotification({ ...base, kind: "delegationChange", data: { change: "delegated" } })).toBe(false);
+    expect(isValidNotification({ ...base, kind: "actionActivity", data: { actionId: 5 } })).toBe(false);
+    expect(isValidNotification({ kind: "system", data: { title: "T", body: "B" } })).toBe(false);
+    expect(isValidNotification(null)).toBe(false);
   });
 });

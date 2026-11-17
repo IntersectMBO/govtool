@@ -24,8 +24,8 @@ import { useNotifications } from "@/hooks/useNotifications";
 import type { NotificationEvent, NotificationPreferences } from "@/models";
 import { DEFAULT_PREFERENCES, NOTIFICATION_EVENTS, ON_FREQUENCY } from "@/utils/notifications";
 
-import { IconTile } from "./notificationParts";
-import type { Tone } from "./notificationContent";
+import { IconTile, SignInPanel } from "./notificationParts";
+import { safeHref, type Tone } from "./notificationContent";
 
 const EVENT_ICONS: Record<NotificationEvent, { icon: LucideIcon; tone: Tone }> = {
   drepChange: { icon: UserRoundX, tone: "warning" },
@@ -65,7 +65,7 @@ const Row = ({
   icon: LucideIcon;
   tone: Tone;
   title: string;
-  body: string;
+  body: ReactNode;
   checked: boolean;
   disabled?: boolean;
   onChange: (next: boolean) => void;
@@ -73,6 +73,7 @@ const Row = ({
 }) => {
   const { t } = useTranslation();
   const labelId = `${testId}-label`;
+  const descriptionId = `${testId}-description`;
   return (
     <Box
       component="li"
@@ -91,7 +92,7 @@ const Row = ({
         <Box component="span" id={labelId} sx={{ color: disabled ? ds.gray["500"] : ds.gray["900"], display: "block", fontSize: 14, fontWeight: 600, lineHeight: "20px" }}>
           {title}
         </Box>
-        <Box component="span" sx={{ color: ds.gray["600"], display: "block", fontSize: 13, lineHeight: "19.5px", mt: 0.25 }}>
+        <Box component="span" id={descriptionId} sx={{ color: ds.gray["600"], display: "block", fontSize: 13, lineHeight: "19.5px", mt: 0.25 }}>
           {body}
         </Box>
       </Box>
@@ -99,7 +100,13 @@ const Row = ({
         <Switch
           checked={checked}
           disabled={disabled}
-          inputProps={{ "aria-labelledby": labelId, "data-testid": testId } as object}
+          inputProps={
+            {
+              "aria-describedby": descriptionId,
+              "aria-labelledby": labelId,
+              "data-testid": testId,
+            } as object
+          }
           onChange={(event) => onChange(event.target.checked)}
           sx={{
             "& .MuiSwitch-switchBase.Mui-checked": { color: "#FFFFFF" },
@@ -117,7 +124,7 @@ const Row = ({
 /** Which notifications show, per channel and event. */
 export const NotificationPreferencesPanel = () => {
   const { t } = useTranslation();
-  const { preferences, savePreferences, capabilities } = useNotifications();
+  const { preferences, savePreferences, capabilities, needsSignIn, signIn } = useNotifications();
   const [draft, setDraft] = useState<NotificationPreferences>(preferences);
   const [status, setStatus] = useState<"idle" | "saved" | "failed">("idle");
 
@@ -129,6 +136,27 @@ export const NotificationPreferencesPanel = () => {
       ...current,
       events: { ...current.events, [event]: on ? ON_FREQUENCY[event] : "off" },
     }));
+
+  const { address, status: emailStatus } = draft.channels.email;
+  const setupUrl = safeHref(capabilities.emailSetupUrl);
+  let emailBody: ReactNode = t("notifications.preferences.emailUnavailable");
+  if (capabilities.email) {
+    if (address) {
+      emailBody = emailStatus === "pending"
+        ? t("notifications.preferences.emailPending", { address })
+        : t("notifications.preferences.emailTo", { address });
+    } else if (setupUrl) {
+      emailBody = (
+        <Box component="a" href={setupUrl} rel="noopener noreferrer" sx={{ color: ds.primary["600"], fontWeight: 600 }} target="_blank">
+          {t("notifications.preferences.emailAdd")}
+        </Box>
+      );
+    } else {
+      emailBody = t("notifications.preferences.emailAddElsewhere");
+    }
+  }
+
+  const shownEvents = NOTIFICATION_EVENTS.filter((event) => capabilities.events.includes(event));
 
   const save = async () => {
     try {
@@ -159,6 +187,7 @@ export const NotificationPreferencesPanel = () => {
             {t("notifications.preferences.description")}
           </Box>
         </Box>
+        {!needsSignIn && (
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
           <Button
             dataTestId="notification-preferences-reset"
@@ -174,9 +203,12 @@ export const NotificationPreferencesPanel = () => {
             {t("notifications.preferences.save")}
           </Button>
         </Box>
+        )}
       </Box>
 
-      {status !== "idle" && (
+      {needsSignIn && <SignInPanel signIn={signIn} />}
+
+      {!needsSignIn && status !== "idle" && (
         <Box
           data-testid="notification-preferences-status"
           role="status"
@@ -199,55 +231,55 @@ export const NotificationPreferencesPanel = () => {
         </Box>
       )}
 
-      <Card body={t("notifications.preferences.channelsBody")} title={t("notifications.preferences.channels")}>
-        <Row
-          body={t("notifications.preferences.inAppBody")}
-          checked={draft.channels.inApp}
-          icon={Bell}
-          onChange={(on) =>
+      {!needsSignIn && (
+      <>
+        <Card body={t("notifications.preferences.channelsBody")} title={t("notifications.preferences.channels")}>
+          <Row
+            body={t("notifications.preferences.inAppBody")}
+            checked={draft.channels.inApp}
+            icon={Bell}
+            onChange={(on) =>
             setDraft((current) => ({
               ...current,
               channels: { ...current.channels, inApp: on },
             }))}
-          testId="notification-channel-in-app"
-          title={t("notifications.preferences.inApp")}
-          tone="primary"
-        />
-        <Row
-          body={
-            capabilities.email
-              ? t("notifications.preferences.emailBody")
-              : t("notifications.preferences.emailUnavailable")
-          }
-          checked={capabilities.email && draft.channels.email.enabled}
-          disabled={!capabilities.email}
-          icon={Mail}
-          onChange={(on) =>
+            testId="notification-channel-in-app"
+            title={t("notifications.preferences.inApp")}
+            tone="primary"
+          />
+          <Row
+            body={emailBody}
+            checked={capabilities.email && draft.channels.email.enabled}
+            disabled={!capabilities.email}
+            icon={Mail}
+            onChange={(on) =>
             setDraft((current) => ({
               ...current,
               channels: { ...current.channels, email: { ...current.channels.email, enabled: on } },
             }))
           }
-          testId="notification-channel-email"
-          title={t("notifications.preferences.email")}
-          tone="primary"
-        />
-      </Card>
-
-      <Card body={t("notifications.preferences.eventsBody")} title={t("notifications.preferences.events")}>
-        {NOTIFICATION_EVENTS.filter((event) => capabilities.events.includes(event)).map((event) => (
-          <Row
-            key={event}
-            body={t(`notifications.preferences.eventBodies.${event}`)}
-            checked={draft.events[event] !== "off"}
-            icon={EVENT_ICONS[event].icon}
-            onChange={(on) => setEvent(event, on)}
-            testId={`notification-event-${event}`}
-            title={t(`notifications.preferences.eventNames.${event}`)}
-            tone={EVENT_ICONS[event].tone}
+            testId="notification-channel-email"
+            title={t("notifications.preferences.email")}
+            tone="primary"
           />
+        </Card>
+
+        <Card body={t("notifications.preferences.eventsBody")} title={t("notifications.preferences.events")}>
+          {shownEvents.map((event) => (
+            <Row
+              key={event}
+              body={t(`notifications.preferences.eventBodies.${event}`)}
+              checked={draft.events[event] !== "off"}
+              icon={EVENT_ICONS[event].icon}
+              onChange={(on) => setEvent(event, on)}
+              testId={`notification-event-${event}`}
+              title={t(`notifications.preferences.eventNames.${event}`)}
+              tone={EVENT_ICONS[event].tone}
+            />
         ))}
-      </Card>
+        </Card>
+      </>
+      )}
     </PageContainer>
   );
 };

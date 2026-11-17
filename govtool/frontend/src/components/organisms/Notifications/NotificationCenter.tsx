@@ -1,8 +1,8 @@
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { Box, ButtonBase, Skeleton } from "@mui/material";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, ArrowDown, BellOff, PenLine, RefreshCw, Settings } from "lucide-react";
+import { AlertTriangle, ArrowDown, BellOff, RefreshCw, Settings } from "lucide-react";
 
 import { Button } from "@/components/atoms/Button";
 import { PageContainer } from "@/components/atoms/PageContainer";
@@ -15,7 +15,15 @@ import { formatUtc } from "@/utils/governanceActivity";
 import { NOTIFICATION_FILTERS } from "@/utils/notifications";
 
 import { describeNotification } from "./notificationContent";
-import { ActionLink, IconTile, StatusChip, UnreadDot, notificationTime } from "./notificationParts";
+import {
+  ActionLink,
+  IconTile,
+  SignInPanel,
+  StatePanel,
+  StatusChip,
+  UnreadDot,
+  notificationTime,
+} from "./notificationParts";
 
 const DAY = 24 * 60 * 60 * 1000;
 const utcDay = (time: Date | string) => new Date(time).toISOString().slice(0, 10);
@@ -54,62 +62,6 @@ export const groupNotifications = (
   });
   return groups;
 };
-
-const Panel = ({
-  icon,
-  tone,
-  title,
-  body,
-  action,
-  testId,
-}: {
-  icon: ReactNode;
-  tone: "neutral" | "error";
-  title: string;
-  body: string;
-  action?: ReactNode;
-  testId: string;
-}) => (
-  <Box
-    data-testid={testId}
-    role={tone === "error" ? "alert" : "status"}
-    sx={{
-      alignItems: "center",
-      backgroundColor: "#FFFFFF",
-      border: `1px solid ${ds.gray["200"]}`,
-      borderRadius: `${RADIUS.lg}px`,
-      display: "flex",
-      flexDirection: "column",
-      gap: 1.25,
-      px: 3,
-      py: { xxs: 6, md: 10 },
-      textAlign: "center",
-    }}
-  >
-    <Box
-      aria-hidden
-      sx={{
-        alignItems: "center",
-        backgroundColor: tone === "error" ? ds.error["100"] : ds.gray["100"],
-        borderRadius: tone === "error" ? "50%" : `${RADIUS.lg}px`,
-        color: tone === "error" ? ds.error["600"] : ds.gray["600"],
-        display: "flex",
-        height: 52,
-        justifyContent: "center",
-        width: 52,
-      }}
-    >
-      {icon}
-    </Box>
-    <Box component="h2" sx={{ color: ds.gray["900"], fontSize: 18, fontWeight: 600, lineHeight: "27px", m: 0, mt: 1 }}>
-      {title}
-    </Box>
-    <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0, maxWidth: 340 }}>
-      {body}
-    </Box>
-    {action && <Box sx={{ mt: 1 }}>{action}</Box>}
-  </Box>
-);
 
 const NotificationCard = ({
   item,
@@ -191,7 +143,6 @@ export const NotificationCenter = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<NotificationFilter>("all");
   const [sort, setSort] = useState<"newest" | "oldest">("newest");
-  const [signInFailed, setSignInFailed] = useState(false);
   const feed = useNotifications({ filter, sort });
   const settingsButton = (
     <Button
@@ -205,33 +156,7 @@ export const NotificationCenter = () => {
   );
 
   const renderFeed = () => {
-    if (feed.needsSignIn) {
-      return (
-        <Panel
-          action={(
-            <Button
-              dataTestId="notifications-sign-in"
-              onClick={async () => {
-                setSignInFailed(false);
-                try {
-                  await feed.signIn();
-                } catch {
-                  setSignInFailed(true);
-                }
-              }}
-              startIcon={<PenLine aria-hidden size={16} />}
-            >
-              {t("notifications.signIn")}
-            </Button>
-          )}
-          body={signInFailed ? t("notifications.signInFailed") : t("notifications.signInBody")}
-          icon={<PenLine size={22} />}
-          testId="notifications-sign-in-panel"
-          title={t("notifications.signInTitle")}
-          tone="neutral"
-        />
-      );
-    }
+    if (feed.needsSignIn) return <SignInPanel signIn={feed.signIn} />;
     if (feed.isLoading) {
       return (
         <Box aria-busy sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
@@ -243,7 +168,7 @@ export const NotificationCenter = () => {
     }
     if (feed.isError) {
       return (
-        <Panel
+        <StatePanel
           action={(
             <Button onClick={feed.retry} startIcon={<RefreshCw aria-hidden size={16} />}>
               {t("notifications.retry")}
@@ -259,7 +184,7 @@ export const NotificationCenter = () => {
     }
     if (!feed.preferences.channels.inApp) {
       return (
-        <Panel
+        <StatePanel
           action={settingsButton}
           body={t("notifications.offBody")}
           icon={<BellOff size={22} />}
@@ -272,7 +197,7 @@ export const NotificationCenter = () => {
     if (!feed.items.length) {
       const filtered = filter !== "all";
       return (
-        <Panel
+        <StatePanel
           action={filtered ? undefined : settingsButton}
           body={filtered ? t("notifications.emptyFilteredBody") : t("notifications.emptyBody")}
           icon={<BellOff size={22} />}

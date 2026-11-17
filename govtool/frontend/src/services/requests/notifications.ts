@@ -1,8 +1,10 @@
 import type {
+  Infinite,
   NotificationFilter,
   NotificationPage,
   NotificationPreferences,
   NotificationsConfig,
+  ProposalData,
 } from "@/models";
 
 import { GovernanceActionsAPI } from "../GovernanceActionsAPI";
@@ -10,17 +12,43 @@ import { GovernanceActionsAPI } from "../GovernanceActionsAPI";
 // The notifications service of docs/api/notifications.md. None runs yet: the
 // config probe answers 404 and the frontend stays in local mode.
 
-/** The service's config, or undefined when no notifications service runs. */
+/** This frontend speaks version 1; a later service lists 1 in `compatible`. */
+const speaksVersionOne = (data: Partial<NotificationsConfig>) =>
+  data.version === 1 || (Array.isArray(data.compatible) && data.compatible.includes(1));
+
+/**
+ * The service's config, or undefined when no notifications service runs or its
+ * answer is not one this frontend can use (local mode then).
+ */
 export const getNotificationsConfig = async (): Promise<NotificationsConfig | undefined> => {
   try {
     const { data, status } = await GovernanceActionsAPI.get<NotificationsConfig>(
       "/notifications/config",
       { validateStatus: () => true },
     );
-    return status === 200 && data?.version === 1 ? data : undefined;
+    const isUsable =
+      status === 200 &&
+      typeof data === "object" &&
+      data !== null &&
+      speaksVersionOne(data) &&
+      typeof data.channels === "object" &&
+      data.channels !== null &&
+      Array.isArray(data.events);
+    return isUsable ? data : undefined;
   } catch {
     return undefined;
   }
+};
+
+/**
+ * Live actions closing soonest, for deadline reminders in local mode: the
+ * newest-first list can leave them out when many actions are open.
+ */
+export const getClosingProposals = async () => {
+  const { data } = await GovernanceActionsAPI.get<Infinite<ProposalData>>("/proposal/list", {
+    params: { page: 0, pageSize: 50, sort: "SoonestToExpire" },
+  });
+  return data;
 };
 
 const auth = (token: string) => ({ headers: { Authorization: `Bearer ${token}` } });

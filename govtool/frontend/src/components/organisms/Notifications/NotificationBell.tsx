@@ -10,12 +10,18 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 
 import { describeNotification } from "./notificationContent";
-import { ActionLink, IconTile, StatusChip, UnreadDot, notificationTime } from "./notificationParts";
+import {
+  ActionLink,
+  IconTile,
+  NotificationBoundary,
+  StatusChip,
+  UnreadDot,
+  notificationTime,
+} from "./notificationParts";
 
 const POPOVER_ITEMS = 4;
 
-/** The header bell: unread count, and the latest updates in a popover. */
-export const NotificationBell = () => {
+const NotificationBellContent = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
@@ -34,9 +40,10 @@ export const NotificationBell = () => {
   return (
     <>
       <IconButton
-        aria-controls={isOpen ? popoverId : undefined}
-        aria-expanded={isOpen}
-        aria-haspopup="dialog"
+        // On a phone the bell is a link to the centre, not a popup trigger.
+        aria-controls={!isMobile && isOpen ? popoverId : undefined}
+        aria-expanded={isMobile ? undefined : isOpen}
+        aria-haspopup={isMobile ? undefined : "dialog"}
         aria-label={unread ? t("notifications.bellUnread", { count: unread }) : t("notifications.bell")}
         data-testid="notifications-bell"
         onClick={(event) =>
@@ -204,3 +211,10 @@ export const NotificationBell = () => {
     </>
   );
 };
+
+/** The header bell: unread count, and the latest updates in a popover. */
+export const NotificationBell = () => (
+  <NotificationBoundary>
+    <NotificationBellContent />
+  </NotificationBoundary>
+);

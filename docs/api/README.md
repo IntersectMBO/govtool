@@ -13,6 +13,7 @@ the same thing stated precisely, and is the source of truth for shapes.
 | [`metadata-service-spec.md`](./metadata-service-spec.md) | What the metadata service does, its wire format, and which compliance items are done |
 | [`pdf-api.md`](./pdf-api.md) | The proposal discussion forum backend's endpoints (`govtool-pdf-backend`, D138): method, path, auth and purpose, pointing into its SPEC.md |
 | Governance action records | `govtool-backend` serves `/governance-actions` and `/misc` on the same `VITE_BASE_URL` as every other backend request; detail responses include complete per-role `vote_aggregates`, used independently by the voting panel (D158); response shapes in D143, naming amendment in D162 |
+| [`notifications.md`](./notifications.md) | Planned: the notifications service the frontend switches to when `GET /notifications/config` answers (feed, read state, preferences, wallet sign-in, email); until then the frontend derives notifications in the browser |
 | [`decisions.md`](./decisions.md) | Why: the append-only log of numbered decisions (D1 onward) and findings (F1 onward). Later entries beat earlier ones and name what they amend |
 
 Tracking: [#4221](https://github.com/IntersectMBO/govtool/issues/4221) for the

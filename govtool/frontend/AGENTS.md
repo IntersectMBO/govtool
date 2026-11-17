@@ -158,6 +158,18 @@ failure stays in the dialog. The forum query (utils/globalSearch.ts) must stay
 within the forum backend's PROPOSALS_ALLOWLIST. The button is hidden inside
 wallet flows.
 
+Notifications (organisms/Notifications, hooks/useNotifications.ts) have two
+modes behind one hook. GET /notifications/config answering version 1 means a
+notifications service runs (docs/api/notifications.md): the hook signs in with
+the wallet's signData and reads the service. Anything else (404 today) means
+local mode: utils/notifications.ts derives items from the routes GovTool
+already reads and keeps read state, first-seen times and preferences in
+localStorage per stake key. Both modes share the model in models/notifications.ts
+(kind plus data, copy in en.json), so a new kind needs the model, the
+contract table and notificationContent.ts. The bell renders only for connected
+wallets outside wallet flows; tests that render a connected TopNav stub it,
+since it needs a QueryClient.
+
 Each page has one main landmark, which TopNav's skip link focuses: public page
 shells pass component="main" to PageContainer (or a Box), while the Dashboard
 layout wraps its outlet in main, so a page rendered inside Dashboard must not

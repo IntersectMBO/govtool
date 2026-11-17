@@ -16,6 +16,7 @@ import { WalletMenu } from "@molecules";
 import { ds, SHADOWS } from "@/consts/designTokens";
 
 import { DrawerMobile } from "./DrawerMobile";
+import { GlobalSearchButton } from "./GlobalSearch/GlobalSearchButton";
 import { isNavEntryActive, NavEntry, NavEntryLink } from "./topNavItems";
 
 // Below this width the nav items and the wallet control no longer fit on one
@@ -141,6 +142,8 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
         ))}
       </Box>
       <Box sx={{ alignItems: "center", display: "flex", gap: 1 }}>
+        {/* Not inside a wallet flow, where leaving would drop the form. */}
+        {!onNavigateAway && <GlobalSearchButton />}
         {renderWalletControl()}
       </Box>
     </>
@@ -148,6 +151,7 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
 
   const renderMobileNav = () => (
     <Box sx={{ alignItems: "center", display: "flex", gap: 1 }}>
+      {!onNavigateAway && <GlobalSearchButton />}
       {renderWalletControl(true)}
       <IconButton
         aria-label={t("menu.open")}

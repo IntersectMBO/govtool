@@ -97,9 +97,13 @@ export const lookupStakeAddress = async (
     throw (account as PromiseRejectedResult).reason;
   }
   const current = settled(delegation)?.data;
+  // /account answers 404 for a stake address the chain has never registered.
+  const neverSeen =
+    account.status === "rejected" &&
+    (account.reason as { response?: { status?: number } })?.response?.status === 404;
   return {
     stakeAddress,
-    isRegistered: settled(account)?.data?.isRegistered,
+    isRegistered: neverSeen ? false : settled(account)?.data?.isRegistered,
     delegation: current
       ? {
         ...current,

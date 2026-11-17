@@ -801,6 +801,81 @@
       "proposedOn": "Proposed on:"
     }
   },
+  "globalSearch": {
+    "button": "Global Search",
+    "title": "Find anything in GovTool",
+    "description": "Search governance actions, DReps, proposals, outcomes, addresses or handles.",
+    "placeholder": "Search governance actions, DReps, addresses, handles…",
+    "inputLabel": "Search GovTool",
+    "clear": "Clear search",
+    "close": "Close search",
+    "recent": "Recent searches",
+    "clearAll": "Clear all",
+    "kinds": {
+      "keyword": "Keyword",
+      "handle": "Handle",
+      "address": "Address"
+    },
+    "browse": "Browse by type",
+    "browseHint": "Try a name, $handle, governance action ID, keyword or a pasted Cardano address.",
+    "addressHint": "Paste a full stake1… or addr1… address.",
+    "handleHint": "Type one word to look up a handle, like $intersect.",
+    "categoriesLabel": "Result types",
+    "categories": {
+      "actions": "Governance Actions",
+      "dreps": "DReps",
+      "proposals": "Proposals",
+      "outcomes": "Outcomes",
+      "addresses": "Addresses",
+      "handles": "Handles"
+    },
+    "loading": "Searching across {{count}} categories for “{{query}}”…",
+    "loadingRight": "Loading results",
+    "loadMore": "Load more",
+    "matches_one": "{{count}} match",
+    "matches_other": "{{count}} matches",
+    "matchesMore": "{{count}}+ matches",
+    "open": "Open",
+    "closeKey": "Close",
+    "noMatchesTitle": "No matches for “{{query}}”",
+    "noMatchesBody": "Check the spelling, try fewer words, or search by a governance action ID, $handle or complete Cardano address.",
+    "modify": "Modify search",
+    "errorTitle": "Search is temporarily unavailable",
+    "errorBody": "We couldn't complete this search. Your query is still here.",
+    "tryAgain": "Try again",
+    "categoryError": "These results could not be loaded.",
+    "notReady": "Search is not ready yet. Try again in a moment.",
+    "noStakePart": "This address has no stake part, so GovTool has nothing to show for it.",
+    "action": {
+      "badge": "Active",
+      "submitted": "Submitted {{date}}"
+    },
+    "votingPower": "₳ {{amount}} voting power",
+    "proposal": {
+      "submitted": "Submitted",
+      "discussion": "In discussion"
+    },
+    "outcome": {
+      "meta": "{{date}} · Epoch {{epoch}}"
+    },
+    "address": {
+      "title": "Stake address",
+      "registered": "Registered",
+      "notRegistered": "Not registered",
+      "delegatesTo": "Delegates to {{target}}",
+      "abstain": "Delegates to Abstain",
+      "noConfidence": "Delegates to No Confidence",
+      "notDelegated": "Not delegated",
+      "copyHint": "Enter copies the address"
+    },
+    "handle": {
+      "drep": "DRep",
+      "wallet": "Wallet",
+      "holder": "Holder: {{address}}",
+      "opensDRep": "Opens the DRep's profile",
+      "looksUp": "Looks up the holder's address"
+    }
+  },
   "governanceActionHistoryList": {
     "outcome": {
       "Enacted": "Enacted",

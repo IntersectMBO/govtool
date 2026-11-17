@@ -15,3 +15,4 @@ export * from "./useWalletErrorModal";
 
 export * from "./forms";
 export * from "./queries";
+export * from "./useNotifications";

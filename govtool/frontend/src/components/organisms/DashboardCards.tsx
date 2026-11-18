@@ -14,6 +14,7 @@ import { DRepDashboardCard } from "./DashboardCards/DRepDashboardCard";
 import { DirectVoterDashboardCard } from "./DashboardCards/DirectVoterDashboardCard";
 import { ListGovActionsDashboardCards } from "./DashboardCards/ListGovActionsDashboardCard";
 import { ProposeGovActionDashboardCard } from "./DashboardCards/ProposeGovActionDashboardCard";
+import { DRepDashboard } from "./DRepDashboard/DRepDashboard";
 
 export const DashboardCards = () => {
   const { dRepID, pendingTransaction, stakeKey } = useCardano();
@@ -63,6 +64,51 @@ export const DashboardCards = () => {
       ? "directVoter"
       : "notRegistered";
 
+  const walletCard = (
+    <DashboardWalletCard
+      currentDelegation={currentDelegation}
+      dRepID={dRepID}
+      isDelegationKnown={isDelegationStateAvailable}
+      stakeKey={stakeKey}
+      votingPower={votingPower}
+    />
+  );
+
+  // A registered DRep gets its own tabbed dashboard; the shared cards below
+  // become its Overview's action cards.
+  if (voter.isRegisteredAsDRep) {
+    return (
+      <DRepDashboard
+        actionCards={(
+          <>
+            {isDelegationStateAvailable && (
+              <DelegateDashboardCard
+                currentDelegation={currentDelegation}
+                delegateTx={pendingTransaction.delegate}
+                dRepID={dRepID}
+                voter={voter}
+                votingPower={votingPower}
+              />
+            )}
+            <DirectVoterDashboardCard
+              pendingTransaction={pendingTransaction}
+              voter={voter}
+              votingPower={voter.votingPower}
+            />
+            <ProposeGovActionDashboardCard
+              createGovActionTx={pendingTransaction.createGovAction}
+            />
+          </>
+        )}
+        dRepID={dRepID}
+        pendingTransaction={pendingTransaction}
+        stakeKey={stakeKey}
+        voter={voter}
+        walletCard={walletCard}
+      />
+    );
+  }
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
@@ -94,13 +140,7 @@ export const DashboardCards = () => {
           gridTemplateColumns: { xxs: "minmax(0, 1fr)", xl: "340px minmax(0, 1fr)" },
         }}
       >
-        <DashboardWalletCard
-          currentDelegation={currentDelegation}
-          dRepID={dRepID}
-          isDelegationKnown={isDelegationStateAvailable}
-          stakeKey={stakeKey}
-          votingPower={votingPower}
-        />
+        {walletCard}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
           {isDelegationStateAvailable && (
             <DelegateDashboardCard

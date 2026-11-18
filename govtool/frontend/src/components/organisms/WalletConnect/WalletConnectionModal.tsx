@@ -27,6 +27,7 @@ import { useCardano } from "@/context/wallet";
 import { useGetAdaHolderCurrentDelegationQuery } from "@/hooks/queries/useGetAdaHolderCurrentDelegationQuery";
 import { useGetVoterInfo } from "@/hooks/queries/useGetVoterInfoQuery";
 import { useStakeKeyVotingPowers } from "@/hooks/queries/useStakeKeyVotingPower";
+import { useTimedOut } from "@/hooks/useTimedOut";
 import { connectedWallet } from "@/utils/connectedWallet";
 import { stakeHexToBech32 } from "@/utils/drepDashboard";
 import { openInNewTab } from "@/utils/openInNewTab";
@@ -44,6 +45,8 @@ const ada = (lovelace?: number) =>
 const short = (value: string) => (value.length > 22 ? `${value.slice(0, 10)}…${value.slice(-8)}` : value);
 
 type StepState = "complete" | "inProgress" | "pending";
+
+const CHECK_BUDGET_MS = 15_000;
 
 const Step = ({ label, state }: { label: string; state: StepState }) => {
   const { t } = useTranslation();
@@ -68,15 +71,19 @@ const CheckingAndSuccess = () => {
   const navigate = useNavigate();
   const { closeModal } = useModal();
   const { network } = useAppContext();
-  const { isEnabled, stakeKey } = useCardano();
+  const { isEnabled, stakeKey, dRepID } = useCardano();
+  // Neither the voter nor the delegation read reports failure here, so the
+  // check stops waiting after a while and shows what it has.
+  const isOutOfTime = useTimedOut(CHECK_BUDGET_MS);
   const { voter } = useGetVoterInfo();
   const { currentDelegation } = useGetAdaHolderCurrentDelegationQuery(stakeKey);
   const { powers, isError } = useStakeKeyVotingPowers(stakeKey ? [stakeKey] : []);
   const wallet = connectedWallet();
   const address = stakeKey ? stakeHexToBech32(stakeKey) ?? stakeKey : "";
   const power = stakeKey ? powers[stakeKey] : undefined;
-  const powerDone = power !== undefined || isError;
-  const governanceDone = !!voter && currentDelegation !== undefined;
+  const powerDone = power !== undefined || isError || isOutOfTime;
+  const governanceDone =
+    (!!voter && currentDelegation !== undefined) || !dRepID || isOutOfTime;
   const label = networkLabel(network);
 
   const walletRow = (
@@ -111,12 +118,13 @@ const CheckingAndSuccess = () => {
   }
 
   let governance = t("walletConnect.status.notDelegated");
-  if (voter?.isRegisteredAsDRep) governance = t("walletConnect.status.drep");
-  else if (voter?.isRegisteredAsSoleVoter) governance = t("walletConnect.status.directVoter");
+  if (!voter || currentDelegation === undefined) governance = "–";
+  else if (voter.isRegisteredAsDRep) governance = t("walletConnect.status.drep");
+  else if (voter.isRegisteredAsSoleVoter) governance = t("walletConnect.status.directVoter");
   else if (currentDelegation?.dRepView) governance = t("walletConnect.status.delegated");
 
   const summary = [
-    { key: "votingPower", icon: Landmark, value: isError ? "–" : `₳ ${ada(power)}` },
+    { key: "votingPower", icon: Landmark, value: power === undefined ? "–" : `₳ ${ada(power)}` },
     { key: "network", icon: Globe, value: label },
     { key: "governance", icon: CircleDashed, value: governance, accent: true },
   ];
@@ -131,7 +139,7 @@ const CheckingAndSuccess = () => {
           {t("walletConnect.success.title")}
         </Box>
         <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0 }}>
-          {isError
+          {power === undefined
             ? t("walletConnect.success.bodyNoPower", { network: label })
             : t("walletConnect.success.body", { network: label, power: ada(power) })}
         </Box>
@@ -311,7 +319,7 @@ export const WalletConnectionModal = forwardRef<HTMLDivElement>((_, ref) => {
           <X aria-hidden size={16} />
         </ButtonBase>
       )}
-      <Box aria-labelledby="wallet-connection-title" role="group">
+      <Box aria-labelledby="wallet-connection-title" aria-modal="true" role="dialog">
         {state?.view === "error" ? <ConnectionError error={state.error} walletName={state.walletName} /> : <CheckingAndSuccess />}
       </Box>
     </ModalWrapper>

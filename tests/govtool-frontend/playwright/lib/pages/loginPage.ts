@@ -22,7 +22,15 @@ export default class LoginPage {
     await this.connectWalletBtn.click();
     await this.demosWalletBtn.click({ force: true });
 
-    await this.acceptSanchoNetInfoBtn.click({ force: true });
+    // One stake key: the connection modal opens (dismissed by its
+    // confirm-modal-button). Several: the stake key page opens instead.
+    await Promise.race([
+      this.acceptSanchoNetInfoBtn.waitFor({ state: "visible" }).catch(() => {}),
+      this.page.waitForURL(/stake_keys/).catch(() => {}),
+    ]);
+    if (await this.acceptSanchoNetInfoBtn.isVisible()) {
+      await this.acceptSanchoNetInfoBtn.click({ force: true });
+    }
 
     const { stakeKeys, rewardAddresses } = await this.page.evaluate(
       async () => {
@@ -49,6 +57,8 @@ export default class LoginPage {
         .first()
         .click({ force: true });
       await this.page.getByTestId("select-button").click();
+      // Choosing a key opens the connection modal over the dashboard.
+      await this.page.getByTestId("confirm-modal-button").click({ force: true });
     }
   }
 

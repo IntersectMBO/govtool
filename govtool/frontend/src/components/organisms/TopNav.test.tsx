@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router";
 
 import "@/i18n";
@@ -150,6 +150,13 @@ describe("TopNav (desktop)", () => {
       mocks.cardano.stakeKey = `e1${"ab".repeat(28)}`;
       renderAt("/dashboard");
       expect(screen.getByTestId("wallet-menu-button")).toHaveTextContent(/stake1u…/);
+    });
+
+    it("closes the wallet menu when View profile opens the profile", async () => {
+      renderAt("/dashboard");
+      fireEvent.click(screen.getByTestId("wallet-menu-button"));
+      fireEvent.click(screen.getByTestId("view-profile-button"));
+      await waitFor(() => expect(screen.queryByTestId("view-profile-button")).toBeNull());
     });
 
     it("truncates a long label rather than wrapping the nav", () => {

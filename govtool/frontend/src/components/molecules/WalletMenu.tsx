@@ -1,4 +1,5 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { useLocation } from "react-router";
 import { Box, ButtonBase, Popover } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 
@@ -21,6 +22,9 @@ export const WalletMenu = () => {
   const { voter } = useGetVoterInfo();
   const { isMobile } = useScreenDimension();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const { pathname } = useLocation();
+  // A link inside the menu (View profile) leaves it open over the new page.
+  useEffect(() => setAnchorEl(null), [pathname]);
   const isOpen = Boolean(anchorEl);
   const menuId = useId();
 

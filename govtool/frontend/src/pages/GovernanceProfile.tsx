@@ -13,6 +13,7 @@ import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
 import { useCardano } from "@/context/wallet";
 import { useGetVoterInfo } from "@/hooks/queries/useGetVoterInfoQuery";
 import { useStakeKeyVotingPowers } from "@/hooks/queries/useStakeKeyVotingPower";
+import { useTimedOut } from "@/hooks/useTimedOut";
 import { checkIsWalletConnected } from "@/utils/checkIsWalletConnected";
 import { connectedWallet } from "@/utils/connectedWallet";
 import { stakeHexToBech32 } from "@/utils/drepDashboard";
@@ -53,7 +54,9 @@ const STEPS = ["wallet", "stakeKey", "review"] as const;
 export const GovernanceProfilePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { stakeKey } = useCardano();
+  const { stakeKey, dRepID } = useCardano();
+  // The voter read reports no failure; stop waiting for it after a while.
+  const isOutOfTime = useTimedOut(15_000);
   const { voter } = useGetVoterInfo();
   const { powers, isError } = useStakeKeyVotingPowers(stakeKey ? [stakeKey] : []);
 
@@ -164,6 +167,9 @@ export const GovernanceProfilePage = () => {
             <Box component="p" sx={{ color: ds.gray["700"], fontSize: 14, m: 0 }}>{t("profile.votingPower.body")}</Box>
           </Card>
           <Card testId="profile-drep-status">
+            {!voter && (isOutOfTime || !dRepID) && (
+              <Box data-testid="profile-drep-unknown" sx={{ color: ds.gray["700"], fontSize: 14 }}>{t("profile.drep.unknown")}</Box>
+            )}
             {voter ? (
               <>
                 <Box sx={{ display: "flex", gap: 1.5 }}>
@@ -192,7 +198,7 @@ export const GovernanceProfilePage = () => {
                 </Box>
               </>
             ) : (
-              <Skeleton height={180} variant="rounded" />
+              !(isOutOfTime || !dRepID) && <Skeleton height={180} variant="rounded" />
             )}
           </Card>
         </Box>

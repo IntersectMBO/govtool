@@ -17,6 +17,9 @@ export const useStakeKeyVotingPowers = (stakeKeys: string[]) => {
     powers: Object.fromEntries(
       stakeKeys.map((key, i) => [key, results[i]?.data]),
     ) as Record<string, number | undefined>,
+    errors: Object.fromEntries(
+      stakeKeys.map((key, i) => [key, !!results[i]?.isError]),
+    ) as Record<string, boolean>,
     isLoading: results.some((result) => result.isLoading),
     isError: results.some((result) => result.isError),
   };

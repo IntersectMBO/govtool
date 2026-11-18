@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { Box, ButtonBase, Skeleton } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -36,7 +36,8 @@ export const ChooseStakeKeyPanel = () => {
   const { openModal } = useModal();
   const { addSuccessAlert } = useSnackbar();
   const [chosenKey, setChosenKey] = useState("");
-  const { powers } = useStakeKeyVotingPowers(stakeKeys);
+  const { powers, errors } = useStakeKeyVotingPowers(stakeKeys);
+  const radios = useRef<(HTMLDivElement | null)[]>([]);
   const wallet = connectedWallet();
 
   return (
@@ -76,58 +77,82 @@ export const ChooseStakeKeyPanel = () => {
             const selected = chosenKey === key;
             const address = stakeHexToBech32(key) ?? key;
             const power = powers[key];
+            const move = (step: number) => {
+              const next = (index + step + stakeKeys.length) % stakeKeys.length;
+              setChosenKey(stakeKeys[next]);
+              radios.current[next]?.focus();
+            };
             return (
               <Box
                 key={key}
-                aria-checked={selected}
                 data-testid={`${key}-radio`}
                 onClick={() => setChosenKey(key)}
-                onKeyDown={(event) => {
-                  if (event.key === " " || event.key === "Enter") {
-                    event.preventDefault();
-                    setChosenKey(key);
-                  }
-                }}
-                role="radio"
                 sx={{
                   backgroundColor: "#FFFFFF",
                   border: `${selected ? 2 : 1}px solid ${selected ? ds.primary["600"] : ds.gray["200"]}`,
                   borderRadius: `${RADIUS.lg}px`,
                   cursor: "pointer",
-                  display: "flex",
-                  gap: 1.75,
-                  p: selected ? "15px" : 2,
-                  "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
+                  position: "relative",
                 }}
-                tabIndex={selected || (!chosenKey && index === 0) ? 0 : -1}
               >
-                <Box aria-hidden sx={{ border: `2px solid ${selected ? ds.primary["600"] : ds.gray["400"]}`, borderRadius: "50%", flexShrink: 0, height: 20, mt: 0.25, position: "relative", width: 20, "&::after": selected ? { backgroundColor: ds.primary["600"], borderRadius: "50%", content: '""', inset: 3, position: "absolute" } : undefined }} />
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ alignItems: "flex-start", display: "flex", gap: 1, justifyContent: "space-between" }}>
-                    <Box sx={{ minWidth: 0 }}>
-                      <Box sx={{ color: ds.gray["900"], fontSize: 15, fontWeight: 600 }}>{t("walletConnect.stakeKeys.key", { n: index + 1 })}</Box>
-                      <Box sx={{ color: ds.gray["600"], fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={address}>{address}</Box>
-                    </Box>
-                    <ButtonBase
-                      aria-label={t("walletConnect.stakeKeys.copyLabel", { n: index + 1 })}
-                      onClick={async (event) => {
-                        event.stopPropagation();
-                        await navigator.clipboard?.writeText(address);
-                        addSuccessAlert(t("alerts.copiedToClipboard"));
-                      }}
-                      sx={{ border: `1px solid ${ds.gray["200"]}`, borderRadius: `${RADIUS.sm}px`, color: ds.primary["600"], flexShrink: 0, fontSize: 13, fontWeight: 600, gap: 0.5, px: 1, py: 0.25 }}
-                    >
-                      <Copy aria-hidden size={13} />
-                      {t("walletConnect.stakeKeys.copy")}
-                    </ButtonBase>
-                  </Box>
-                  <Box sx={{ alignItems: "center", display: "flex", justifyContent: "space-between", mt: 1.25 }}>
-                    <Box sx={{ color: ds.gray["600"], fontSize: 13 }}>{t("walletConnect.stakeKeys.votingPower")}</Box>
-                    <Box data-testid={`${key}-voting-power`} sx={{ color: ds.gray["900"], fontSize: 17, fontWeight: 600 }}>
-                      {power === undefined ? <Skeleton width={90} /> : `₳ ${(power / 1_000_000).toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
+                <Box
+                  ref={(node: HTMLDivElement | null) => { radios.current[index] = node; }}
+                  aria-checked={selected}
+                  aria-label={t("walletConnect.stakeKeys.key", { n: index + 1 })}
+                  onKeyDown={(event) => {
+                    const moves: Record<string, number> = {
+                      ArrowDown: 1,
+                      ArrowRight: 1,
+                      ArrowUp: -1,
+                      ArrowLeft: -1,
+                    };
+                    if (event.key in moves) {
+                      event.preventDefault();
+                      move(moves[event.key]);
+                    } else if (event.key === " " || event.key === "Enter") {
+                      event.preventDefault();
+                      setChosenKey(key);
+                    }
+                  }}
+                  role="radio"
+                  sx={{
+                    borderRadius: `${RADIUS.lg}px`,
+                    display: "flex",
+                    gap: 1.75,
+                    p: selected ? "15px" : 2,
+                    pr: 12,
+                    "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
+                  }}
+                  tabIndex={selected || (!chosenKey && index === 0) ? 0 : -1}
+                >
+                  <Box aria-hidden sx={{ border: `2px solid ${selected ? ds.primary["600"] : ds.gray["400"]}`, borderRadius: "50%", flexShrink: 0, height: 20, mt: 0.25, position: "relative", width: 20, "&::after": selected ? { backgroundColor: ds.primary["600"], borderRadius: "50%", content: '""', inset: 3, position: "absolute" } : undefined }} />
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box sx={{ color: ds.gray["900"], fontSize: 15, fontWeight: 600 }}>{t("walletConnect.stakeKeys.key", { n: index + 1 })}</Box>
+                    <Box sx={{ color: ds.gray["600"], fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={address}>{address}</Box>
+                    <Box sx={{ alignItems: "center", display: "flex", justifyContent: "space-between", mt: 1.25 }}>
+                      <Box sx={{ color: ds.gray["600"], fontSize: 13 }}>{t("walletConnect.stakeKeys.votingPower")}</Box>
+                      <Box data-testid={`${key}-voting-power`} sx={{ color: ds.gray["900"], fontSize: 17, fontWeight: 600, mr: -10 }}>
+                        {errors[key] ? "–" : power === undefined ? <Skeleton width={90} /> : `₳ ${(power / 1_000_000).toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
+                      </Box>
                     </Box>
                   </Box>
                 </Box>
+                <ButtonBase
+                  aria-label={t("walletConnect.stakeKeys.copyLabel", { n: index + 1 })}
+                  onClick={async (event) => {
+                    event.stopPropagation();
+                    try {
+                      await navigator.clipboard.writeText(address);
+                      addSuccessAlert(t("alerts.copiedToClipboard"));
+                    } catch {
+                      // Nothing was copied, so nothing is confirmed.
+                    }
+                  }}
+                  sx={{ border: `1px solid ${ds.gray["200"]}`, borderRadius: `${RADIUS.sm}px`, color: ds.primary["600"], fontSize: 13, fontWeight: 600, gap: 0.5, position: "absolute", px: 1, py: 0.25, right: 16, top: 16, "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}` } }}
+                >
+                  <Copy aria-hidden size={13} />
+                  {t("walletConnect.stakeKeys.copy")}
+                </ButtonBase>
               </Box>
             );
           })}

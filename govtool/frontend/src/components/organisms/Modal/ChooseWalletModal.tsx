@@ -168,7 +168,7 @@ export const ChooseWalletModal = forwardRef<HTMLDivElement>((_, ref) => {
 
   return (
     <ModalWrapper ref={ref} dataTestId="connect-your-wallet-modal" hideCloseButton onClose={closeModal} sx={{ maxWidth: 500, p: 3 }}>
-      <Box aria-labelledby="choose-wallet-title" role="group">{content}</Box>
+      <Box aria-labelledby="choose-wallet-title" aria-modal="true" role="dialog">{content}</Box>
     </ModalWrapper>
   );
 });

@@ -2158,7 +2158,8 @@
       "become": "Become a DRep",
       "explore": "Explore governance",
       "dashboard": "Open DRep dashboard",
-      "openDashboard": "Open dashboard"
+      "openDashboard": "Open dashboard",
+      "unknown": "GovTool couldn't read your DRep status right now. Reload the page to try again."
     },
     "noTxTitle": "No transaction is submitted now",
     "noTxBody": "Reviewing this profile or choosing an action does not submit a blockchain transaction. Transaction review and wallet approval happen later."

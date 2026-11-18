@@ -16,6 +16,10 @@ describe("classifyWalletError", () => {
       expect(classifyWalletError(text).kind).toBe("declined"));
   });
 
+  it("does not read maintenance as a declined request", () => {
+    expect(classifyWalletError("Action canceled due to maintenance mode.").kind).toBe("generic");
+  });
+
   it("knows a wallet without the needed extensions", () => {
     expect(classifyWalletError("Your wallet does not support CIP-30 extensions.").kind).toBe("unsupported");
     expect(classifyWalletError("Your wallet did not enable the needed CIP-95 functions during connection.").kind)

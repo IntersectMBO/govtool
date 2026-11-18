@@ -16,7 +16,8 @@ export const classifyWalletError = (error?: string | null): WalletErrorKind => {
   if (network) {
     return { kind: "network", walletNetwork: network[1], requiredNetwork: network[2] };
   }
-  if (/declin|reject|refus|cancel|denied/i.test(text)) return { kind: "declined" };
+  // "user canceled", not any "canceled": maintenance mode says "Action canceled".
+  if (/declin|reject|refus|denied|user\s+cancel/i.test(text)) return { kind: "declined" };
   if (/CIP-?(30|90|95)|does not support/i.test(text)) return { kind: "unsupported" };
   return { kind: "generic" };
 };

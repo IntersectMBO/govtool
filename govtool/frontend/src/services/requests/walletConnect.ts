@@ -5,6 +5,8 @@ export const getStakeKeyVotingPower = async (stakeKey: string) => {
   const { data } = await GovernanceActionsAPI.get<number>(
     `/ada-holder/get-voting-power/${encodeURIComponent(stakeKey)}`,
   );
-  const value = Number(data);
-  return Number.isFinite(value) ? value : 0;
+  const value = typeof data === "number" ? data : Number.NaN;
+  // Refuse rather than show a made-up ₳ 0.
+  if (!Number.isFinite(value)) throw new Error("Voting power is not a number");
+  return value;
 };

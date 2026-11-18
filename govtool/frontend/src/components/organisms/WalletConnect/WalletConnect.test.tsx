@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 
 import "@/i18n";
@@ -22,6 +22,7 @@ const mocks = vi.hoisted(() => ({
   voter: undefined as Record<string, unknown> | undefined,
   delegation: undefined as unknown,
   powers: {} as Record<string, number | undefined>,
+  errors: {} as Record<string, boolean>,
 }));
 
 vi.mock("react-router", async (importOriginal) => ({
@@ -43,17 +44,27 @@ vi.mock("@/hooks/queries/useGetAdaHolderCurrentDelegationQuery", () => ({
   useGetAdaHolderCurrentDelegationQuery: () => ({ currentDelegation: mocks.delegation }),
 }));
 vi.mock("@/hooks/queries/useStakeKeyVotingPower", () => ({
-  useStakeKeyVotingPowers: () => ({ powers: mocks.powers, isLoading: false, isError: false }),
+  useStakeKeyVotingPowers: () => ({
+    powers: mocks.powers,
+    errors: mocks.errors,
+    isLoading: false,
+    isError: Object.values(mocks.errors).some(Boolean),
+  }),
 }));
 
 const inRouter = (node: React.ReactNode) => render(<MemoryRouter>{node}</MemoryRouter>);
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 beforeEach(() => {
   mocks.modalState = null;
   mocks.openModal.mockReset();
   mocks.closeModal.mockReset();
   mocks.navigate.mockReset();
-  mocks.cardano = { isEnabled: true, stakeKey: STAKE, isEnableLoading: null };
+  mocks.cardano = { isEnabled: true, stakeKey: STAKE, dRepID: "ab".repeat(28), isEnableLoading: null };
+  mocks.errors = {};
   mocks.voter = { isRegisteredAsDRep: false, isRegisteredAsSoleVoter: false };
   mocks.delegation = null;
   mocks.powers = { [STAKE]: 125_430_000_000 };
@@ -79,6 +90,25 @@ describe("WalletConnectionModal", () => {
     expect(mocks.closeModal).toHaveBeenCalled();
     expect(mocks.navigate).toHaveBeenCalledWith("/profile");
     expect(screen.getByTestId("confirm-modal-button")).toBeInTheDocument();
+  });
+
+  it("does not wait on a voter record GovTool cannot read", () => {
+    mocks.modalState = { view: "checking" };
+    mocks.voter = undefined;
+    mocks.cardano = { ...mocks.cardano, dRepID: "" };
+    inRouter(<WalletConnectionModal />);
+    expect(screen.getByTestId("wallet-summary-governance")).toHaveTextContent("–");
+  });
+
+  it("stops checking after a while and shows what it has", () => {
+    vi.useFakeTimers();
+    mocks.modalState = { view: "checking" };
+    mocks.voter = undefined;
+    inRouter(<WalletConnectionModal />);
+    expect(screen.getByText("Checking your wallet")).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(15_000); });
+    expect(screen.getByTestId("wallet-summary-governance")).toHaveTextContent("–");
+    vi.useRealTimers();
   });
 
   it("asks to switch network, keeping the wallet's message", () => {
@@ -115,7 +145,7 @@ describe("DisconnectWalletModal", () => {
     const onConfirm = vi.fn();
     mocks.modalState = { onConfirm };
     inRouter(<DisconnectWalletModal />);
-    expect(screen.getByText("Disconnect Lace from GovTool?")).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Disconnect Lace from GovTool?" })).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("cancel-disconnect-button"));
     expect(onConfirm).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("confirm-disconnect-button"));
@@ -175,6 +205,34 @@ describe("WalletOptionButton", () => {
 });
 
 describe("ChooseStakeKeyPanel", () => {
+  it("moves between keys with the arrow keys, keeping Copy outside each radio", () => {
+    mocks.cardano = {
+      ...mocks.cardano,
+      stakeKeys: [STAKE, STAKE2],
+      setStakeKey: vi.fn(),
+      disconnectWallet: vi.fn(),
+    };
+    inRouter(<ChooseStakeKeyPanel />);
+    const radios = screen.getAllByRole("radio");
+    expect(within(radios[0]).queryByRole("button")).toBeNull();
+    fireEvent.keyDown(radios[0], { key: "ArrowDown" });
+    expect(radios[1]).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("select-button")).toBeEnabled();
+  });
+
+  it("shows a dash when a key's voting power cannot be read", () => {
+    mocks.cardano = {
+      ...mocks.cardano,
+      stakeKeys: [STAKE],
+      setStakeKey: vi.fn(),
+      disconnectWallet: vi.fn(),
+    };
+    mocks.powers = {};
+    mocks.errors = { [STAKE]: true };
+    inRouter(<ChooseStakeKeyPanel />);
+    expect(screen.getByTestId(`${STAKE}-voting-power`)).toHaveTextContent("–");
+  });
+
   it("shows each key's voting power and continues with the chosen one", () => {
     const setStakeKey = vi.fn();
     mocks.cardano = {

@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The DRep directory dates a DRep by its newest registration or update certificate (`latestRegistrationDate`, `latestTxHash`, and the registration transaction on the DRep dashboard card), as GovTool did before 3.0
 - Importing the proposal discussion forum from Strapi merges accounts that share a username into one, keeping each one's comments, likes and poll votes, instead of keeping the first account and skipping the others' content. The backup taken before the import leaves out the copied Strapi tables, which hold emails and password hashes
 - Markdown in governance actions, the proposal discussion forum and the budget archive shows a single `$` as text, so amounts such as `$500,000 ... $250,000` no longer render as a formula; math between `$$` still renders
+- A delegator viewing their DRep's details page sees "You have delegated ₳ X to this DRep" again, as the DRep Directory shows; a DRep's own page still leaves out what it delegated to itself
 
 ## [v3.0.0](https://github.com/IntersectMBO/govtool/compare/v2.1.0-beta.1...v3.0.0) 2026-10-17
 

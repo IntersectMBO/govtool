@@ -116,6 +116,8 @@ export const SHADOWS = {
   // The highlight inside the primary and orange buttons.
   innerPrimary: "inset 0px 4px 4px 0px #5C7FFF",
   innerAccent: "inset 0px 4px 4px 0px #FF995C",
+  // The red button's top highlight, error 400 (the Retire button).
+  innerError: "inset 0px 4px 4px 0px #F97066",
 };
 
 // @fontsource registers Geist as "Geist Sans"; "Geist" covers a locally

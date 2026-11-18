@@ -36,18 +36,18 @@ test.describe("Logged in DRep", () => {
     await sharedDRep("dRep01");
   });
 
-  test("4E. Should display DRep's voting power in governance actions page", async ({
+  test("4E. Should display DRep's voting power on the dashboard", async ({
     page,
   }) => {
-    const votingPowerPromise = page.waitForResponse("**/get-voting-power/**");
-    const governanceActionsPage = new GovernanceActionsPage(page);
-    await governanceActionsPage.goto();
+    const dRepInfoPromise = page.waitForResponse("**/drep/info/**");
+    await page.goto("/dashboard");
 
-    const res = await votingPowerPromise;
-    const votingPower = await res.json();
+    const res = await dRepInfoPromise;
+    const { votingPower } = await res.json();
+    const ada = Math.round(lovelaceToAda(votingPower ?? 0)).toLocaleString("en-US");
 
-    await expect(page.getByTestId("voting-power-chips-value")).toHaveText(
-      `₳ ${lovelaceToAda(votingPower)}`,
+    await expect(page.getByTestId("drep-representation-voting-power")).toHaveText(
+      `₳ ${ada}`,
       { timeout: 60_000 }
     );
   });

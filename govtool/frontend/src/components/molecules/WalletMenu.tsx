@@ -8,6 +8,7 @@ import { ds, RADIUS } from "@/consts/designTokens";
 
 import { DRepInfoCard } from "./DRepInfoCard";
 import { WalletInfoCard } from "./WalletInfoCard";
+import { stakeHexToBech32 } from "@/utils/drepDashboard";
 
 // stake1u9…xyz: the first 7 and last 3 characters of the stake key.
 const shortenStakeKey = (stakeKey?: string) =>
@@ -74,7 +75,7 @@ export const WalletMenu = () => {
             whiteSpace: "nowrap",
           }}
         >
-          {shortenStakeKey(stakeKey)}
+          {shortenStakeKey(stakeHexToBech32(stakeKey) ?? stakeKey)}
         </Box>
         <ChevronDown aria-hidden color={ds.gray["600"]} size={12} />
       </ButtonBase>

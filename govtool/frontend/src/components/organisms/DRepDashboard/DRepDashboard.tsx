@@ -9,7 +9,7 @@ import { Button } from "@/components/atoms/Button";
 import { PageTabs } from "@/components/molecules/PageTabs";
 import { PATHS } from "@/consts/paths";
 import { QUERY_KEYS } from "@/consts/queryKeys";
-import { ds, PILL_TONES, RADIUS } from "@/consts/designTokens";
+import { ds, PILL_TONES, RADIUS, SHADOWS } from "@/consts/designTokens";
 import { useAppContext } from "@/context/appContext";
 import type { PendingTransaction } from "@/context/pendingTransaction";
 import { useGetDRepDetailsQuery } from "@/hooks/queries/useGetDrepDetailsQuery";
@@ -202,7 +202,11 @@ export const DRepDashboard = ({
             disabled={isBusy}
             size="medium"
             startIcon={<UserRoundX aria-hidden size={16} />}
-            sx={{ backgroundColor: ds.error["600"], "&:hover": { backgroundColor: ds.error["700"] } }}
+            sx={{
+              backgroundColor: ds.error["600"],
+              boxShadow: SHADOWS.innerError,
+              "&:hover": { backgroundColor: ds.error["700"], boxShadow: SHADOWS.innerError },
+            }}
             to={PATHS.retireAsDrep}
           >
             {t("drepDashboard.retire")}

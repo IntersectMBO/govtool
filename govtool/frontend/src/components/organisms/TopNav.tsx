@@ -3,11 +3,10 @@ import { NavLink, useLocation, useNavigate } from "react-router";
 import { Box, IconButton } from "@mui/material";
 import { Menu, Wallet } from "lucide-react";
 
-import { Button, VotingPowerChips } from "@atoms";
+import { Button } from "@atoms";
 import { CONNECTED_NAV_ITEMS, IMAGES, NAV_ITEMS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
 import {
-  useGetDRepVotingPowerQuery,
   useGetVoterInfo,
   useScreenDimension,
   useTranslation,
@@ -18,6 +17,7 @@ import { ds, SHADOWS } from "@/consts/designTokens";
 import { DrawerMobile } from "./DrawerMobile";
 import { GlobalSearchButton } from "./GlobalSearch/GlobalSearchButton";
 import { NotificationBell } from "./Notifications/NotificationBell";
+import { ProfileAvatar } from "./ProfileAvatar";
 import { isNavEntryActive, NavEntry, NavEntryLink } from "./topNavItems";
 
 // Below this width the nav items and the wallet control no longer fit on one
@@ -40,15 +40,13 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
   const { openModal } = useModal();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { screenWidth } = useScreenDimension();
-  const { isEnabled, disconnectWallet, stakeKey, isEnableLoading } =
-    useCardano();
+  const { isEnabled, disconnectWallet, stakeKey } = useCardano();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { t } = useTranslation();
 
   const isConnected = Boolean(isEnabled && stakeKey);
   const { voter } = useGetVoterInfo({ enabled: isConnected });
-  const { dRepVotingPower } = useGetDRepVotingPowerQuery(voter);
   const navEntries = (
     isConnected ? CONNECTED_NAV_ITEMS : NAV_ITEMS
   ) as NavEntry[];
@@ -90,17 +88,9 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
     if (isConnected) {
       return (
         <>
-          <VotingPowerChips
-            isLoading={
-              dRepVotingPower === undefined || !!isEnableLoading || !voter
-            }
-            isShown={
-              voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter
-            }
-            votingPower={dRepVotingPower}
-          />
           <WalletMenu />
           {!onNavigateAway && <NotificationBell />}
+          {!onNavigateAway && <ProfileAvatar name={voter?.givenName} />}
         </>
       );
     }

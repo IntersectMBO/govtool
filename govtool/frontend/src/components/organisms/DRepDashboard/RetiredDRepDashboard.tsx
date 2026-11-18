@@ -20,11 +20,6 @@ import { tenureMonths } from "@/utils/drepDashboard";
 import { twoColumns } from "./OverviewTab";
 import { formatAda, formatLongDate, formatShortDate, Panel } from "./parts";
 
-const orangeButton = {
-  backgroundColor: ds.orange["700"],
-  "&:hover": { backgroundColor: ds.orange["750"] },
-};
-
 const Muted = ({ label, value }: { label: string; value?: string | null }) =>
   (value ? (
     <Box sx={{ minWidth: 0 }}>
@@ -87,7 +82,8 @@ export const RetiredDRepDashboard = ({ voter, dRepID, actionCards }: Props) => {
       component={RouterLink}
       dataTestId={testId}
       size="medium"
-      sx={{ ...orangeButton, ...(fullWidth && { width: "100%" }) }}
+      color="secondary"
+      sx={fullWidth ? { width: "100%" } : undefined}
       to={PATHS.registerAsdRep}
     >
       {t("drepDashboard.retired.reactivate")}

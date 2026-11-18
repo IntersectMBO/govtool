@@ -45,7 +45,7 @@ test.describe("Logged in DReps", () => {
   }) => {
     await page.goto("/");
 
-    await expect(page.getByTestId("voting-power-chips")).toBeVisible({
+    await expect(page.getByTestId("drep-dashboard")).toBeVisible({
       timeout: 60_000,
     });
 
@@ -199,7 +199,7 @@ test.describe("Temporary DReps", () => {
       await dRepPage.getByTestId("confirm-modal-button").click();
     });
 
-    await expect(dRepPage.getByTestId("voting-power-chips")).not.toBeVisible({
+    await expect(dRepPage.getByTestId("retired-drep-dashboard")).toBeVisible({
       timeout: 20_000,
     });
 

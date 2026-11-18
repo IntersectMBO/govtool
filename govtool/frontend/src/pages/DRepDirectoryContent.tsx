@@ -278,12 +278,9 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
                 ? navigate(PATHS.registerAsdRep)
                 : openModal({ type: "chooseWallet" }))
             }
+              color="secondary"
               size="large"
               startIcon={<UserRoundPlus aria-hidden size={18} />}
-              sx={{
-              backgroundColor: ds.orange["700"],
-              "&:hover": { backgroundColor: ds.orange["750"] },
-            }}
             >
               {t("dRepDirectory.becomeADRep")}
             </Button>

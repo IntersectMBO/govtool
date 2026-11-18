@@ -6,11 +6,9 @@ import { PATHS } from "@consts";
 import { useSnackbar } from "@context";
 import { useTranslation } from "@hooks";
 import type { CurrentDelegation } from "@models";
-import {
-  correctVoteAdaFormat,
-  getItemFromLocalStorage,
-  WALLET_LS_KEY,
-} from "@utils";
+import { correctVoteAdaFormat } from "@/utils/adaFormat";
+import { connectedWallet } from "@/utils/connectedWallet";
+import { stakeHexToBech32 } from "@/utils/drepDashboard";
 import { AutomatedVotingOptionCurrentDelegation } from "@/types/automatedVotingOptions";
 import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
 
@@ -23,7 +21,7 @@ type Props = {
   isDelegationKnown: boolean;
 };
 
-const short = (value: string) => `${value.slice(0, 10)}…${value.slice(-6)}`;
+const short = (value: string, tail = 6) => `${value.slice(0, 10)}…${value.slice(-tail)}`;
 
 /** The connected wallet: name, stake key, voting power and delegation. */
 export const DashboardWalletCard = ({
@@ -35,7 +33,9 @@ export const DashboardWalletCard = ({
 }: Props) => {
   const { t } = useTranslation();
   const { addSuccessAlert } = useSnackbar();
-  const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
+  const wallet = connectedWallet();
+  // The design shows the stake address as stake1…; the wallet hands over hex.
+  const stakeAddress = stakeKey ? stakeHexToBech32(stakeKey) ?? stakeKey : undefined;
   const view = currentDelegation?.dRepView;
 
   const delegation = (() => {
@@ -69,24 +69,28 @@ export const DashboardWalletCard = ({
         {t("dashboard.wallet.title")}
       </Box>
       <Box sx={{ alignItems: "center", display: "flex", gap: 1.5, minWidth: 0 }}>
-        <Box sx={{ alignItems: "center", border: `1px solid ${ds.gray["200"]}`, borderRadius: `${RADIUS.md}px`, color: ds.primary["600"], display: "flex", flexShrink: 0, height: 36, justifyContent: "center", width: 36 }}>
-          <Wallet aria-hidden size={18} />
+        <Box sx={{ alignItems: "center", border: `1px solid ${ds.gray["200"]}`, borderRadius: `${RADIUS.md}px`, color: ds.primary["600"], display: "flex", flexShrink: 0, height: 40, justifyContent: "center", width: 40 }}>
+          {wallet?.icon ? (
+            <Box alt="" component="img" data-testid="dashboard-wallet-icon" src={wallet.icon} sx={{ height: 24, objectFit: "contain", width: 24 }} />
+          ) : (
+            <Wallet aria-hidden size={18} />
+          )}
         </Box>
         <Box sx={{ minWidth: 0 }}>
-          <Box sx={{ color: ds.gray["900"], fontSize: 14, fontWeight: 500, textTransform: "capitalize" }}>
-            {t("dashboard.wallet.walletName", { name: walletName ?? "" })}
+          <Box sx={{ color: ds.gray["900"], fontSize: 14, fontWeight: 500 }}>
+            {t("dashboard.wallet.walletName", { name: wallet?.name ?? "" })}
           </Box>
-          {stakeKey && (
+          {stakeAddress && (
             <ButtonBase
-              aria-label={t("dashboard.wallet.copyStakeKey", { key: stakeKey })}
+              aria-label={t("dashboard.wallet.copyStakeKey", { key: stakeAddress })}
               data-testid="dashboard-wallet-stake-key"
               onClick={() => {
-                navigator.clipboard.writeText(stakeKey);
+                navigator.clipboard.writeText(stakeAddress);
                 addSuccessAlert(t("alerts.copiedToClipboard"));
               }}
               sx={{ borderRadius: `${RADIUS.xs}px`, color: ds.gray["600"], fontFamily: "inherit", fontSize: 13, gap: 0.5, "&.Mui-focusVisible": { outline: `2px solid ${ds.primary["600"]}` } }}
             >
-              {short(stakeKey)}
+              {short(stakeAddress, 8)}
               <Copy aria-hidden size={13} />
             </ButtonBase>
           )}

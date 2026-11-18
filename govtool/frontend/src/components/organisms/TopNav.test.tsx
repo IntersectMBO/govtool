@@ -138,6 +138,20 @@ describe("TopNav (desktop)", () => {
       expect(pill).toHaveTextContent("stake1u…xyz");
     });
 
+    it("shows a profile avatar and no voting power chip", () => {
+      mocks.voter = { isRegisteredAsDRep: true, givenName: "Jordan Dyer" } as typeof mocks.voter;
+      renderAt("/dashboard");
+      expect(screen.getByTestId("profile-avatar")).toHaveTextContent("JD");
+      expect(screen.getByTestId("profile-avatar")).toHaveAttribute("href", "/dashboard");
+      expect(screen.queryByTestId("voting-power-chips")).toBeNull();
+    });
+
+    it("shows a hex stake key as its stake1 address", () => {
+      mocks.cardano.stakeKey = `e1${"ab".repeat(28)}`;
+      renderAt("/dashboard");
+      expect(screen.getByTestId("wallet-menu-button")).toHaveTextContent(/stake1u…/);
+    });
+
     it("truncates a long label rather than wrapping the nav", () => {
       renderAt("/dashboard");
       expect(screen.getByText("stake1u…xyz")).toHaveStyle({
@@ -171,12 +185,6 @@ describe("TopNav (desktop)", () => {
       expect(logo).toHaveAttribute("href", "/dashboard");
       fireEvent.click(logo);
       expect(mocks.cardano.disconnectWallet).not.toHaveBeenCalled();
-    });
-
-    it("shows a DRep's voting power without opening anything", () => {
-      mocks.voter = { isRegisteredAsDRep: true };
-      renderAt("/dashboard");
-      expect(screen.getByTestId("voting-power-chips")).toBeInTheDocument();
     });
 
     it("hides voting power for a wallet that is not a voter", () => {

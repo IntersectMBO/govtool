@@ -33,7 +33,7 @@ describe("WhatRetirementMeans", () => {
   });
 
   it("asks for both acknowledgements before retiring", () => {
-    render(<WhatRetirementMeans onClickCancel={vi.fn()} />);
+    render(<WhatRetirementMeans onClickCancel={vi.fn()} onSubmitted={vi.fn()} />);
     const go = screen.getByTestId("continue-retirement-button");
     expect(go).toBeDisabled();
     fireEvent.click(screen.getByTestId("retirement-ack-voting"));
@@ -42,33 +42,14 @@ describe("WhatRetirementMeans", () => {
     expect(go).toBeEnabled();
   });
 
-  it("shows the retirement in progress, and goes to the dashboard once it confirms", async () => {
-    const back = vi.fn();
-    const { rerender } = render(<WhatRetirementMeans onClickCancel={back} />);
+  it("hands the submitted retirement to the page", async () => {
+    const onSubmitted = vi.fn();
+    render(<WhatRetirementMeans onClickCancel={vi.fn()} onSubmitted={onSubmitted} />);
     fireEvent.click(screen.getByTestId("retirement-ack-voting"));
     fireEvent.click(screen.getByTestId("retirement-ack-deposit"));
     fireEvent.click(screen.getByTestId("continue-retirement-button"));
-    const dialog = await screen.findByTestId("retirement-transaction-submitted-modal");
-    expect(dialog).toHaveTextContent("MrDRep");
-    expect(dialog).toHaveTextContent("₳500");
-    expect(back).not.toHaveBeenCalled();
-
-    mocks.pending = { retireAsDrep: { transactionHash: "txhash" } };
-    rerender(<WhatRetirementMeans onClickCancel={back} />);
-    expect(back).not.toHaveBeenCalled();
-    mocks.pending = {};
-    rerender(<WhatRetirementMeans onClickCancel={back} />);
-    expect(back).toHaveBeenCalled();
-  });
-
-  it("lets the user leave the in-progress dialog for the dashboard", async () => {
-    const back = vi.fn();
-    render(<WhatRetirementMeans onClickCancel={back} />);
-    fireEvent.click(screen.getByTestId("retirement-ack-voting"));
-    fireEvent.click(screen.getByTestId("retirement-ack-deposit"));
-    fireEvent.click(screen.getByTestId("continue-retirement-button"));
-    fireEvent.click(await screen.findByTestId("confirm-modal-button"));
-    expect(back).toHaveBeenCalled();
+    await vi.waitFor(() =>
+      expect(onSubmitted).toHaveBeenCalledWith({ txHash: "txhash", name: "MrDRep", deposit: "500" }));
   });
 });
 

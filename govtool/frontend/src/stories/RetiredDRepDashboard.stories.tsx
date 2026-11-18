@@ -105,7 +105,7 @@ const card = { background: "#FFFFFF", borderRadius: 16, margin: "40px auto", max
 export const RetireConfirmation: StoryObj = {
   render: () => (
     <div style={card}>
-      <WhatRetirementMeans onClickCancel={() => {}} />
+      <WhatRetirementMeans onClickCancel={() => {}} onSubmitted={() => {}} />
     </div>
   ),
   play: async ({ canvasElement }) => {

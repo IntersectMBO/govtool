@@ -43,7 +43,7 @@ export const ReRegisterIntro = ({
           <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0 }}>{t("drepDashboard.reRegister.next2")}</Box>
         </Box>
       </Box>
-      <Box component="section" sx={{ backgroundColor: ds.warning["50"], border: `1px solid ${ds.warning["200"]}`, borderRadius: `${RADIUS.lg}px`, display: "flex", gap: 1.5, p: 2.5 }}>
+      <Box component="section" sx={{ backgroundColor: ds.warning["50"], border: `1px solid ${ds.warning["100"]}`, borderRadius: `${RADIUS.lg}px`, display: "flex", gap: 1.5, p: 2.5 }}>
         <CircleAlert aria-hidden color={ds.warning["700"]} size={18} style={{ flexShrink: 0, marginTop: 2 }} />
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <Box component="h2" sx={{ color: ds.warning["700"], fontSize: 16, fontWeight: 600, m: 0 }}>{t("drepDashboard.reRegister.beforeTitle")}</Box>

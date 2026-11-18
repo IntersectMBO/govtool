@@ -1,17 +1,14 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useState } from "react";
 import * as Sentry from "@sentry/react";
-import { Box, ButtonBase, Checkbox, CircularProgress, Dialog } from "@mui/material";
+import { Box, ButtonBase, Checkbox, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { CircleX, Info, TriangleAlert, Undo2, X, type LucideIcon } from "lucide-react";
+import { CircleX, Info, TriangleAlert, Undo2, type LucideIcon } from "lucide-react";
 
-import { LINKS } from "@/consts/links";
 import { ds, RADIUS } from "@/consts/designTokens";
-import { useAppContext } from "@/context/appContext";
 import { useCardano } from "@/context/wallet";
 import { useGetVoterInfo } from "@/hooks/queries/useGetVoterInfoQuery";
 import { useWalletErrorModal } from "@/hooks/useWalletErrorModal";
 import { correctVoteAdaFormat } from "@/utils/adaFormat";
-import { openInNewTab } from "@/utils/openInNewTab";
 
 const POINTS: { key: "voting" | "delegation" | "id"; icon: LucideIcon }[] = [
   { key: "voting", icon: CircleX },
@@ -50,34 +47,33 @@ const Ack = ({
   </Box>
 );
 
+/** What the page needs to follow a retirement after this form unmounts. */
+export type RetirementSubmission = {
+  txHash: string;
+  name?: string | null;
+  /** ADA, formatted. */
+  deposit?: string;
+};
+
 export const WhatRetirementMeans = ({
   onClickCancel,
+  onSubmitted,
 }: {
   onClickCancel: () => void;
+  /** The page shows the progress: this form unmounts while the voter reloads. */
+  onSubmitted: (submission: RetirementSubmission) => void;
 }) => {
-  const { cExplorerBaseUrl } = useAppContext();
   const {
     isPendingTransaction,
     buildDRepRetirementCert,
     buildSignSubmitConwayCertTx,
-    pendingTransaction,
   } = useCardano();
   const { t } = useTranslation();
   const [isRetirementLoading, setIsRetirementLoading] =
     useState<boolean>(false);
   const [acks, setAcks] = useState({ voting: false, deposit: false });
-  const [submittedTx, setSubmittedTx] = useState<string | null>(null);
   const { voter } = useGetVoterInfo();
   const openWalletErrorModal = useWalletErrorModal();
-
-  // Once the retirement this page submitted confirms, go to the dashboard.
-  const isPending = !!pendingTransaction?.retireAsDrep;
-  const sawPending = useRef(false);
-  useEffect(() => {
-    if (!submittedTx) return;
-    if (isPending) sawPending.current = true;
-    else if (sawPending.current) onClickCancel();
-  }, [submittedTx, isPending]);
 
   const retireAsDrep = useCallback(async () => {
     try {
@@ -94,7 +90,13 @@ export const WhatRetirementMeans = ({
         type: "retireAsDrep",
         voter,
       });
-      if (result) setSubmittedTx(result);
+      if (result) {
+        onSubmitted({
+          txHash: result,
+          name: voter?.givenName,
+          deposit: correctVoteAdaFormat(voter.deposit),
+        });
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       Sentry.captureException(error);
@@ -111,7 +113,8 @@ export const WhatRetirementMeans = ({
     buildDRepRetirementCert,
     buildSignSubmitConwayCertTx,
     isPendingTransaction,
-    voter?.deposit,
+    onSubmitted,
+    voter,
   ]);
 
   const deposit = voter?.deposit ? correctVoteAdaFormat(voter.deposit) : undefined;
@@ -173,49 +176,6 @@ export const WhatRetirementMeans = ({
           {t("retirement.continue")}
         </ButtonBase>
       </Box>
-
-      <Dialog
-        aria-labelledby="retirement-progress-title"
-        open={!!submittedTx}
-        PaperProps={{ sx: { borderRadius: `${RADIUS.xl}px`, maxWidth: 500, width: "100%" } }}
-      >
-        <Box data-testid="retirement-transaction-submitted-modal" sx={{ alignItems: "center", display: "flex", flexDirection: "column", gap: 1.5, p: { xxs: 3, md: 4 }, position: "relative", textAlign: "center" }}>
-          <ButtonBase
-            aria-label={t("retirement.progress.close")}
-            data-testid="confirm-modal-button"
-            onClick={onClickCancel}
-            sx={{ backgroundColor: ds.gray["100"], borderRadius: "50%", color: ds.gray["700"], height: 32, position: "absolute", right: 16, top: 16, width: 32, "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}` } }}
-          >
-            <X aria-hidden size={16} />
-          </ButtonBase>
-          <CircularProgress aria-hidden size={36} sx={{ color: ds.orange["500"], mt: 1 }} />
-          <Box role="status" sx={{ color: ds.primary["600"], fontSize: 14, fontWeight: 500 }}>{t("retirement.progress.confirming")}</Box>
-          <Box component="h2" id="retirement-progress-title" sx={{ color: ds.gray["900"], fontSize: 20, fontWeight: 600, m: 0 }}>
-            {t("retirement.progress.title")}
-          </Box>
-          <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0 }}>
-            {voter?.givenName
-              ? t("retirement.progress.body", { name: voter.givenName, deposit: deposit ?? "" })
-              : t("retirement.progress.bodyNoName", { deposit: deposit ?? "" })}
-          </Box>
-          <Box aria-hidden sx={{ alignSelf: "stretch", borderTop: `1px dashed ${ds.gray["200"]}`, my: 1 }} />
-          <Box sx={{ alignSelf: "stretch", display: "flex", gap: 1.5 }}>
-            <ButtonBase
-              onClick={() => openInNewTab(LINKS.RETIRE_AS_A_DREP)}
-              sx={{ ...halfButton, backgroundColor: ds.gray["50"], border: `1px solid ${ds.gray["200"]}`, color: ds.gray["800"] }}
-            >
-              {t("retirement.progress.learnMore")}
-            </ButtonBase>
-            <ButtonBase
-              data-testid="retirement-show-transaction"
-              onClick={() => openInNewTab(`${cExplorerBaseUrl}/tx/${submittedTx ?? ""}`)}
-              sx={{ ...halfButton, backgroundColor: ds.primary["600"], color: "#FFFFFF", "&:hover": { backgroundColor: ds.primary["700"] } }}
-            >
-              {t("retirement.progress.showTx")}
-            </ButtonBase>
-          </Box>
-        </Box>
-      </Dialog>
     </Box>
   );
 };

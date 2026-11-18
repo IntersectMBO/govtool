@@ -67,13 +67,19 @@ export const RetiredDRepDashboard = ({ voter, dRepID, actionCards }: Props) => {
     ? history.data?.elements.find((event) => event.kind === "retired")?.at.time
     : undefined;
   const months = tenureMonths(dRep?.latestRegistrationDate, retiredAt);
-  const finalPower = dRep?.votingPower ?? voter.votingPower ?? 0;
+  const finalPower = dRep?.votingPower ?? voter.votingPower ?? undefined;
+  const powerText = (lovelace?: number | null) =>
+    (lovelace === undefined || lovelace === null ? "–" : `₳ ${formatAda(lovelace, 0)}`);
   const peak = growth.isServed && growth.data?.length
     ? Math.max(...growth.data.map((point) => Number(point.votingPower) || 0))
     : undefined;
-  const depositLovelace = voter.deposit || epochParams?.drep_deposit;
-  const deposit = depositLovelace ? formatAda(depositLovelace, 0) : undefined;
-  const source = { ...dRep, ...voter };
+  // Registering again costs today's deposit; the refund was the deposit paid.
+  const nextDeposit = epochParams?.drep_deposit
+    ? formatAda(epochParams.drep_deposit, 0)
+    : undefined;
+  const refunded = voter.deposit ? formatAda(voter.deposit, 0) : undefined;
+  const field = (key: "objectives" | "motivations" | "qualifications") =>
+    voter[key] ?? dRep?.[key] ?? null;
   const currentEpoch = typeof epochParams?.epoch_no === "number" ? epochParams.epoch_no : undefined;
 
   const reactivate = (testId: string, fullWidth = false) => (
@@ -125,7 +131,7 @@ export const RetiredDRepDashboard = ({ voter, dRepID, actionCards }: Props) => {
       <Box
         data-testid="retired-drep-banner"
         role="status"
-        sx={{ alignItems: "center", backgroundColor: ds.warning["50"], border: `1px solid ${ds.warning["200"]}`, borderLeft: `3px solid ${ds.warning["500"]}`, borderRadius: `${RADIUS.md}px`, color: ds.warning["700"], display: "flex", fontSize: 14, fontWeight: 500, gap: 1.25, px: 2, py: 1.5 }}
+        sx={{ alignItems: "center", backgroundColor: ds.warning["50"], border: `1px solid ${ds.warning["100"]}`, borderLeft: `3px solid ${ds.warning["500"]}`, borderRadius: `${RADIUS.md}px`, color: ds.warning["700"], display: "flex", fontSize: 14, fontWeight: 500, gap: 1.25, px: 2, py: 1.5 }}
       >
         <TriangleAlert aria-hidden size={18} style={{ flexShrink: 0 }} />
         {t("drepDashboard.retired.banner")}
@@ -133,16 +139,20 @@ export const RetiredDRepDashboard = ({ voter, dRepID, actionCards }: Props) => {
 
       <Box sx={twoColumns}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, minWidth: 0 }}>
-          <Box component="section" sx={{ backgroundColor: ds.orange["50"], border: `1px solid ${ds.orange["300"]}`, borderRadius: `${RADIUS.lg}px`, display: "flex", flexDirection: "column", gap: 2, p: 3 }}>
+          <Box component="section" data-testid="retired-return-card" sx={{ backgroundColor: ds.orange["50"], border: `1px solid ${ds.orange["300"]}`, borderRadius: `${RADIUS.lg}px`, display: "flex", flexDirection: "column", gap: 2, p: 3 }}>
             <Box component="h2" sx={{ color: ds.orange["750"], fontSize: 18, fontWeight: 600, m: 0 }}>{t("drepDashboard.retired.returnTitle")}</Box>
             <Box component="p" sx={{ color: ds.orange["750"], fontSize: 14, lineHeight: "20px", m: 0 }}>
-              {deposit ? t("drepDashboard.retired.returnBody", { deposit }) : t("drepDashboard.retired.returnBodyNoDeposit")}
+              {nextDeposit
+                ? t("drepDashboard.retired.returnBody", { deposit: nextDeposit })
+                : t("drepDashboard.retired.returnBodyNoDeposit")}
             </Box>
             {reactivate("register-button", true)}
           </Box>
           <Panel title={t("drepDashboard.retired.finalStats")} titleId="retired-final-title">
             <Box>
-              <Box sx={{ color: ds.gray["900"], fontSize: 30, fontWeight: 600, letterSpacing: "-0.6px" }}>₳ {formatAda(finalPower, 0)}</Box>
+              <Box data-testid="retired-final-power" sx={{ color: ds.gray["900"], fontSize: 30, fontWeight: 600, letterSpacing: "-0.6px" }}>
+                {powerText(finalPower)}
+              </Box>
               <Box sx={{ color: ds.gray["600"], fontSize: 13 }}>{t("drepDashboard.retired.finalPower")}</Box>
             </Box>
           </Panel>
@@ -164,11 +174,11 @@ export const RetiredDRepDashboard = ({ voter, dRepID, actionCards }: Props) => {
           </Box>
           <Box component="section" sx={{ backgroundColor: ds.gray["50"], border: `1px solid ${ds.gray["200"]}`, borderRadius: `${RADIUS.lg}px`, display: "flex", flexDirection: "column", gap: 2, p: 3 }}>
             <Box component="h3" sx={{ color: ds.gray["600"], fontSize: 18, fontWeight: 600, m: 0 }}>{t("drepDashboard.overview.details.title")}</Box>
-            {(["objectives", "motivations", "qualifications"] as const).map((field) => (
-              <Box key={field}>
-                <Box component="h4" sx={{ color: ds.gray["700"], fontSize: 16, fontWeight: 600, m: 0 }}>{t(`drepDashboard.overview.details.${field}`)}</Box>
+            {(["objectives", "motivations", "qualifications"] as const).map((key) => (
+              <Box key={key}>
+                <Box component="h4" sx={{ color: ds.gray["700"], fontSize: 16, fontWeight: 600, m: 0 }}>{t(`drepDashboard.overview.details.${key}`)}</Box>
                 <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0, mt: 0.75, overflowWrap: "anywhere", whiteSpace: "pre-line" }}>
-                  {source[field] || t("drepDashboard.overview.details.notProvided")}
+                  {field(key) || t("drepDashboard.overview.details.notProvided")}
                 </Box>
               </Box>
             ))}
@@ -184,12 +194,14 @@ export const RetiredDRepDashboard = ({ voter, dRepID, actionCards }: Props) => {
               <Tile
                 label={peak !== undefined ? t("drepDashboard.retired.peak") : t("drepDashboard.retired.final")}
                 testId="retired-peak"
-                value={`₳ ${formatAda(peak ?? finalPower, 0)}`}
+                value={powerText(peak ?? finalPower)}
               />
             </Box>
-            <Box sx={{ alignItems: "center", backgroundColor: ds.success["50"], borderRadius: `${RADIUS.md}px`, color: ds.success["700"], display: "flex", fontSize: 14, fontWeight: 500, gap: 1, px: 2, py: 1.5 }}>
+            <Box data-testid="retired-deposit-note" sx={{ alignItems: "center", backgroundColor: ds.success["50"], borderRadius: `${RADIUS.md}px`, color: ds.success["700"], display: "flex", fontSize: 14, fontWeight: 500, gap: 1, px: 2, py: 1.5 }}>
               <CircleCheck aria-hidden size={16} style={{ flexShrink: 0 }} />
-              {deposit ? t("drepDashboard.retired.deposit", { deposit }) : t("drepDashboard.retired.depositNoAmount")}
+              {refunded
+                ? t("drepDashboard.retired.deposit", { deposit: refunded })
+                : t("drepDashboard.retired.depositNoAmount")}
             </Box>
           </Panel>
           <Panel title={t("drepDashboard.retired.archive")} titleId="retired-archive-title">

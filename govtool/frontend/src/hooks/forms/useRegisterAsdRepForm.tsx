@@ -17,6 +17,7 @@ import {
 } from "@utils";
 
 import { useGetVoterInfo } from "@hooks";
+import { walletErrorReason } from "@/utils/walletErrorReason";
 import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
 
@@ -228,7 +229,7 @@ export const useRegisterAsdRepForm = (
         } else {
           // The wallet did not sign or submit: say so, keep its reason, and
           // let the user try again from where they were.
-          const reason = error?.message ? String(error.message) : "";
+          const reason = walletErrorReason(error);
           openModal({
             type: "statusModal",
             state: {

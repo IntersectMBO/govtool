@@ -11,6 +11,7 @@ import { ShareDRepDialog } from "./ShareDRepDialog";
 const mocks = vi.hoisted(() => ({
   history: {} as Record<string, unknown>,
   votes: [] as unknown[],
+  dRep: {} as Record<string, unknown>,
 }));
 
 vi.mock("@/context/appContext", () => ({
@@ -18,17 +19,7 @@ vi.mock("@/context/appContext", () => ({
 }));
 vi.mock("@/context/snackbar", () => ({ useSnackbar: () => ({ addSuccessAlert: vi.fn() }) }));
 vi.mock("@/hooks/queries/useGetDrepDetailsQuery", () => ({
-  useGetDRepDetailsQuery: () => ({
-    dRep: {
-      view: "drep1retired",
-      status: "Retired",
-      latestRegistrationDate: "2025-03-15T00:00:00Z",
-      votingPower: 3_200_000_000_000,
-      identityReferences: [],
-      linkReferences: [{ "@type": "Links", label: "Blog", uri: "https://blog.example" }],
-    },
-    isLoading: false,
-  }),
+  useGetDRepDetailsQuery: () => ({ dRep: mocks.dRep, isLoading: false }),
 }));
 vi.mock("@/hooks/queries/useDRepDashboard", () => ({
   useDRepDashboardVotes: () => ({ votes: mocks.votes, isLoading: false, isError: false }),
@@ -43,6 +34,7 @@ const voter = {
   votingPower: null,
   deposit: 0,
   objectives: "Transparency",
+  motivations: null,
 } as unknown as VoterInfo;
 
 const vote = (n: number, choice: string) => ({
@@ -59,6 +51,15 @@ const renderRetired = () =>
 
 describe("RetiredDRepDashboard", () => {
   beforeEach(() => {
+    mocks.dRep = {
+      view: "drep1retired",
+      status: "Retired",
+      latestRegistrationDate: "2025-03-15T00:00:00Z",
+      votingPower: 3_200_000_000_000,
+      motivations: "From the DRep record",
+      identityReferences: [],
+      linkReferences: [{ "@type": "Links", label: "Blog", uri: "https://blog.example" }],
+    };
     mocks.history = { isServed: false };
     mocks.votes = [vote(1, "yes"), vote(2, "no"), vote(3, "abstain"), vote(4, "yes")];
   });
@@ -71,6 +72,25 @@ describe("RetiredDRepDashboard", () => {
     expect(screen.getByTestId("retired-total-votes")).toHaveTextContent("4 proposals");
     expect(screen.getAllByTestId("retired-archived-vote")).toHaveLength(3);
     expect(screen.getByText("cards")).toBeInTheDocument();
+  });
+
+  it("asks for today's deposit to return, and dates no refund it cannot see", () => {
+    renderRetired();
+    expect(screen.getByTestId("retired-return-card")).toHaveTextContent("500 ADA deposit");
+    expect(screen.getByTestId("retired-deposit-note")).toHaveTextContent(
+      "Your DRep deposit was returned to your wallet when the retirement was confirmed.",
+    );
+  });
+
+  it("fills profile fields the voter record leaves empty from the DRep record", () => {
+    renderRetired();
+    expect(screen.getByText("From the DRep record")).toBeInTheDocument();
+  });
+
+  it("shows a dash for an unknown final voting power", () => {
+    mocks.dRep = { ...mocks.dRep, votingPower: undefined };
+    renderRetired();
+    expect(screen.getByTestId("retired-final-power")).toHaveTextContent("–");
   });
 
   it("shows the registration date until the retirement date is known", () => {

@@ -170,6 +170,15 @@ contract table and notificationContent.ts. The bell renders only for connected
 wallets outside wallet flows; tests that render a connected TopNav stub it,
 since it needs a QueryClient.
 
+A registered DRep's /dashboard is organisms/DRepDashboard, tabbed by the tab
+query parameter; DashboardCards still builds its wallet and action cards, and
+everyone else keeps the cards. Its figures come from utils/drepDashboard.ts
+over the DRep's votes and every /governance-actions row. Delegators, the full
+history, delegation history and delegation growth read routes the backend does
+not have yet (docs/api/drep-dashboard.md), behind useIsFeatureServed in
+hooks/queries/useDRepDashboard.ts, which fails closed, unlike useFeatureFlag.
+Its story seeds the query cache, since the dashboard needs a wallet.
+
 Each page has one main landmark, which TopNav's skip link focuses: public page
 shells pass component="main" to PageContainer (or a Box), while the Dashboard
 layout wraps its outlet in main, so a page rendered inside Dashboard must not

@@ -15,11 +15,23 @@ export async function createNewPageWithWallet(
   return newPage;
 }
 
+// A 404 here is the frontend's minute-by-minute maintenance check finding no
+// notice, which is the normal state, not a page error.
+const EXPECTED_404_PATHS = ["/maintenance.json"];
+
+function isExpected404(msg: ConsoleMessage) {
+  if (!msg.text().includes("status of 404")) return false;
+  const { url } = msg.location();
+  if (!url) return false;
+  const { pathname } = new URL(url);
+  return EXPECTED_404_PATHS.includes(pathname);
+}
+
 export function injectLogger(page: Page) {
   // @ts-ignore
   if (!page.isLoggerInjected) {
     page.on("console", (msg: ConsoleMessage) => {
-      if (msg.type() === "error") {
+      if (msg.type() === "error" && !isExpected404(msg)) {
         Logger.fail(msg.text());
       }
     });

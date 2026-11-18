@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Dependencies patched for open security advisories in qs, body-parser, multer, undici, fast-uri, serialize-javascript and vite
 - Live DRep tallies and the DRep stake total count a DRep whose activity had lapsed at the epoch's snapshot but who voted since, which renews it: on mainnet such a DRep's 1.3M ADA was missing from every live action's Yes or No
 - Live DRep tallies and the DRep stake total leave out a DRep that retired since the epoch's snapshot and has not registered again, as the ledger's next count does, instead of counting its stake as not voted until the epoch ends
 - A concluded action is tallied from the state the ledger decided it from, the start of its ratified or expired epoch, so a vote, committee resignation, hot-key authorisation, DRep retirement or vote delegation during that epoch no longer changes it. Treasury withdrawal 03f67179, ratified on mainnet, no longer shows the committee failing

@@ -7,3 +7,4 @@ export * from "./governanceActions";
 export * from "./maintenance";
 export * from "./globalSearch";
 export * from "./notifications";
+export * from "./drepDashboard";

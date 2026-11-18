@@ -36,6 +36,13 @@ export const QUERY_KEYS = {
   useGetProposalsPageKey: "useGetProposalsPageKey",
   useGetGovernanceActionProposalDiscussionKey: "useGetGovernanceActionProposalDiscussionKey",
   useGovernanceActionVerifySignatureKey: "useGovernanceActionVerifySignatureKey",
+  drepDashboardActionsKey: "drepDashboardActionsKey",
+  drepDashboardVotesKey: "drepDashboardVotesKey",
+  drepDashboardDelegatorsKey: "drepDashboardDelegatorsKey",
+  drepDashboardHistoryKey: "drepDashboardHistoryKey",
+  drepDashboardDelegationHistoryKey: "drepDashboardDelegationHistoryKey",
+  drepDashboardVotingPowerKey: "drepDashboardVotingPowerKey",
+  drepDashboardDiscussionsKey: "drepDashboardDiscussionsKey",
 };
 
 export const MUTATION_KEYS = {

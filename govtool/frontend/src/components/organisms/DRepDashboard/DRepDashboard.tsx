@@ -7,7 +7,6 @@ import { CircleCheck, UserRoundX } from "lucide-react";
 
 import { Button } from "@/components/atoms/Button";
 import { PageTabs } from "@/components/molecules/PageTabs";
-import { Share } from "@/components/molecules/Share";
 import { PATHS } from "@/consts/paths";
 import { QUERY_KEYS } from "@/consts/queryKeys";
 import { ds, PILL_TONES, RADIUS } from "@/consts/designTokens";
@@ -28,6 +27,7 @@ import { GovernanceTab } from "./GovernanceTab";
 import { DiscussionsTab } from "./DiscussionsTab";
 import { ActivityReportTab } from "./ActivityReportTab";
 import { HistoryLogTab } from "./HistoryLogTab";
+import { ShareDRepDialog } from "./ShareDRepDialog";
 import { useFeatureFlag } from "@/context/featureFlag";
 
 const TABS = ["overview", "governance", "discussions", "activity", "history"] as const;
@@ -207,7 +207,7 @@ export const DRepDashboard = ({
           >
             {t("drepDashboard.retire")}
           </Button>
-          {data.profileLink && <Share link={data.profileLink} />}
+          {data.profileLink && <ShareDRepDialog link={data.profileLink} />}
         </Box>
       </Box>
 

@@ -313,3 +313,36 @@ export const stakeHexToBech32 = (hex?: string) => {
   const prefix = hex[1] === "1" ? "stake" : "stake_test";
   return bech32.encode(prefix, bech32.toWords(bytes));
 };
+
+/**
+ * A wallet that was a DRep and is now neither a DRep nor a direct voter, with
+ * no registration on its way: it gets the retired DRep dashboard.
+ */
+export const isRetiredDRep = (
+  voter: {
+    isRegisteredAsDRep: boolean;
+    wasRegisteredAsDRep: boolean;
+    isRegisteredAsSoleVoter: boolean;
+  },
+  pending: { registerAsDrep?: unknown },
+) =>
+  voter.wasRegisteredAsDRep &&
+  !voter.isRegisteredAsDRep &&
+  !voter.isRegisteredAsSoleVoter &&
+  !pending.registerAsDrep;
+
+/** Whole calendar months from one date to another, in UTC. */
+export const tenureMonths = (from?: string | null, to?: string | null) => {
+  if (!from || !to) return undefined;
+  const start = new Date(from);
+  const end = new Date(to);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
+    return undefined;
+  }
+  return (
+    (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +
+    end.getUTCMonth() -
+    start.getUTCMonth() -
+    (end.getUTCDate() < start.getUTCDate() ? 1 : 0)
+  );
+};

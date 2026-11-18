@@ -170,6 +170,8 @@ test.describe("Temporary DReps", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
+    await dRepPage.getByTestId("retirement-ack-voting").check();
+    await dRepPage.getByTestId("retirement-ack-deposit").check();
     await dRepPage.getByTestId("continue-retirement-button").click();
 
     await expect(
@@ -187,6 +189,8 @@ test.describe("Temporary DReps", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
+    await dRepPage.getByTestId("retirement-ack-voting").check();
+    await dRepPage.getByTestId("retirement-ack-deposit").check();
     await waitForTxConfirmation(dRepPage, async () => {
       await dRepPage.getByTestId("continue-retirement-button").click();
       await expect(

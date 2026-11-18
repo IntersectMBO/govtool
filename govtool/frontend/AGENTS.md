@@ -178,6 +178,10 @@ history, delegation history and delegation growth read routes the backend does
 not have yet (docs/api/drep-dashboard.md), behind useIsFeatureServed in
 hooks/queries/useDRepDashboard.ts, which fails closed, unlike useFeatureFlag.
 Its story seeds the query cache, since the dashboard needs a wallet.
+A former DRep that is neither a DRep nor a direct voter gets RetiredDRepDashboard
+instead (utils/drepDashboard.ts isRetiredDRep). Retiring needs both
+acknowledgements ticked (retirement-ack-voting, retirement-ack-deposit) before
+continue-retirement-button enables; the Playwright retirement specs tick them.
 
 Each page has one main landmark, which TopNav's skip link focuses: public page
 shells pass component="main" to PageContainer (or a Box), while the Dashboard

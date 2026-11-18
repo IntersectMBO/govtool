@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Retiring as a DRep asks the DRep to acknowledge what retirement means before signing, then follows the transaction in a progress dialog until it confirms; a retired DRep's dashboard shows the retired status, the previous profile, a tenure summary and archived votes with a way to reactivate; registering again starts from a "Register as a DRep again" page, and a registration the wallet did not complete can be retried. The DRep dashboard's share button opens a share dialog with the public profile link and X, LinkedIn, Facebook and email links
 - The frontend and docs images use nginx 1.30 instead of 1.28; the devnet's prebuilt frontend image follows
 - The frontend's shell follows the new design: Geist type self-hosted instead of Poppins from Google Fonts, the new colour scale and shared components, a top navigation for every page (with a wallet menu once connected) in place of the connected sidebar, Proposed, Live Voting and Outcomes tabs on the governance action lists, and a new footer
 - The governance action pages follow the new design: Live Voting as rows with DRep, SPO and CC tallies, a type filter sidebar and numbered pages; a new action details layout with vote group cards and an action information panel; Outcomes rows with type and status filters; and a "Have an idea" banner under the forum list

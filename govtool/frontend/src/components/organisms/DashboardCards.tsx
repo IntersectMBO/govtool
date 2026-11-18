@@ -15,6 +15,8 @@ import { DirectVoterDashboardCard } from "./DashboardCards/DirectVoterDashboardC
 import { ListGovActionsDashboardCards } from "./DashboardCards/ListGovActionsDashboardCard";
 import { ProposeGovActionDashboardCard } from "./DashboardCards/ProposeGovActionDashboardCard";
 import { DRepDashboard } from "./DRepDashboard/DRepDashboard";
+import { RetiredDRepDashboard } from "./DRepDashboard/RetiredDRepDashboard";
+import { isRetiredDRep } from "@/utils/drepDashboard";
 
 export const DashboardCards = () => {
   const { dRepID, pendingTransaction, stakeKey } = useCardano();
@@ -74,32 +76,38 @@ export const DashboardCards = () => {
     />
   );
 
-  // A registered DRep gets its own tabbed dashboard; the shared cards below
-  // become its Overview's action cards.
+  const actionCards = (
+    <>
+      {isDelegationStateAvailable && (
+      <DelegateDashboardCard
+        currentDelegation={currentDelegation}
+        delegateTx={pendingTransaction.delegate}
+        dRepID={dRepID}
+        voter={voter}
+        votingPower={votingPower}
+      />
+            )}
+      <DirectVoterDashboardCard
+        pendingTransaction={pendingTransaction}
+        voter={voter}
+        votingPower={voter.votingPower}
+      />
+      <ProposeGovActionDashboardCard
+        createGovActionTx={pendingTransaction.createGovAction}
+      />
+    </>
+  );
+
+  // A registered DRep gets its own tabbed dashboard, and a retired one its
+  // retired view; the shared cards become their action cards.
+  if (isRetiredDRep(voter, pendingTransaction)) {
+    return <RetiredDRepDashboard actionCards={actionCards} dRepID={dRepID} voter={voter} />;
+  }
+
   if (voter.isRegisteredAsDRep) {
     return (
       <DRepDashboard
-        actionCards={(
-          <>
-            {isDelegationStateAvailable && (
-              <DelegateDashboardCard
-                currentDelegation={currentDelegation}
-                delegateTx={pendingTransaction.delegate}
-                dRepID={dRepID}
-                voter={voter}
-                votingPower={votingPower}
-              />
-            )}
-            <DirectVoterDashboardCard
-              pendingTransaction={pendingTransaction}
-              voter={voter}
-              votingPower={voter.votingPower}
-            />
-            <ProposeGovActionDashboardCard
-              createGovActionTx={pendingTransaction.createGovAction}
-            />
-          </>
-        )}
+        actionCards={actionCards}
         dRepID={dRepID}
         pendingTransaction={pendingTransaction}
         stakeKey={stakeKey}

@@ -8,9 +8,11 @@ import {
   averageResponseDays,
   categoryPattern,
   epochActivity,
+  isRetiredDRep,
   participation,
   registrationEpoch,
   stakeHexToBech32,
+  tenureMonths,
   toCsv,
   voteCalendar,
   voteSummary,
@@ -258,5 +260,36 @@ describe("stakeHexToBech32", () => {
     expect(stakeHexToBech32(`01${hash}`)).toBeUndefined();
     expect(stakeHexToBech32("e1abc")).toBeUndefined();
     expect(stakeHexToBech32(undefined)).toBeUndefined();
+  });
+});
+
+describe("isRetiredDRep", () => {
+  const voter = {
+    isRegisteredAsDRep: false,
+    wasRegisteredAsDRep: true,
+    isRegisteredAsSoleVoter: false,
+  };
+
+  it("is a former DRep that is neither a DRep nor a direct voter now", () => {
+    expect(isRetiredDRep(voter, {})).toBe(true);
+  });
+
+  it("is not while registering again, nor for a direct voter or a current DRep", () => {
+    expect(isRetiredDRep(voter, { registerAsDrep: { transactionHash: "t" } })).toBe(false);
+    expect(isRetiredDRep({ ...voter, isRegisteredAsSoleVoter: true }, {})).toBe(false);
+    expect(isRetiredDRep({ ...voter, isRegisteredAsDRep: true }, {})).toBe(false);
+    expect(isRetiredDRep({ ...voter, wasRegisteredAsDRep: false }, {})).toBe(false);
+  });
+});
+
+describe("tenureMonths", () => {
+  it("counts whole months between two dates", () => {
+    expect(tenureMonths("2025-03-15T00:00:00Z", "2026-08-20T00:00:00Z")).toBe(17);
+    expect(tenureMonths("2026-03-15T00:00:00Z", "2026-03-20T00:00:00Z")).toBe(0);
+  });
+
+  it("is undefined for a missing or reversed range", () => {
+    expect(tenureMonths(undefined, "2026-08-20T00:00:00Z")).toBeUndefined();
+    expect(tenureMonths("2026-08-20T00:00:00Z", "2025-08-20T00:00:00Z")).toBeUndefined();
   });
 });

@@ -16,6 +16,7 @@ import {
   DRepStorageInformation,
   DRepStoreDataInfo,
   RegisterAsDRepForm,
+  ReRegisterIntro,
   RolesAndResponsibilities,
   WrongRouteInfo,
 } from "@organisms";
@@ -60,7 +61,8 @@ export const RegisterAsdRep = () => {
   }, []);
 
   useEffect(() => {
-    if (voter?.wasRegisteredAsDRep) setStep(2);
+    // A returning DRep starts at "Register as a DRep again", then the form.
+    if (voter?.wasRegisteredAsDRep) setStep(0);
   }, [voter?.wasRegisteredAsDRep]);
 
   const pageTitle = t("registration.becomeADRep");
@@ -95,7 +97,7 @@ export const RegisterAsdRep = () => {
     <CenteredBoxPageWrapper
       pageTitle={pageTitle}
       onClickBackToDashboard={onClickBackToDashboard}
-      stepper={{
+      stepper={step === 0 ? undefined : {
         // A returning DRep starts at the form; the steps count from there.
         steps: (voter?.wasRegisteredAsDRep
           ? []
@@ -108,6 +110,9 @@ export const RegisterAsdRep = () => {
         current: voter?.wasRegisteredAsDRep ? step - 1 : step,
       }}
     >
+      {step === 0 && (
+        <ReRegisterIntro onCancel={onClickBackToDashboard} onContinue={() => setStep(2)} />
+      )}
       {step === 1 && !voter?.wasRegisteredAsDRep && (
         <RolesAndResponsibilities setStep={setStep} />
       )}

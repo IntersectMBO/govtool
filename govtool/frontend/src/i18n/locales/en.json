@@ -22,7 +22,7 @@
     "retireAsDrep": {
       "failed": "Retirement transaction failed",
       "warning": "You have successfully retired from being a DRep! Please refresh the page.",
-      "success": "You have successfully retired from being a DRep!"
+      "success": "You have successfully retired as a DRep"
     },
     "retireAsDirectVoter": {
       "failed": "Retirement transaction failed",
@@ -1770,6 +1770,34 @@
       "description": "Looks like you cannot retire, because currently you are not a DRep."
     },
     "continue": "Continue to Retirement",
+      "title": "Retire your DRep?",
+      "intro": "You are about to retire from your role as a Delegated Representative (DRep). This action will be submitted as a governance transaction on-chain.",
+      "points": {
+        "voting": {
+          "title": "Voting rights removed",
+          "body": "Retiring your DRep removes your ability to vote on Governance Actions. Voting Power delegated to your DRep ID remains associated with it."
+        },
+        "delegation": {
+          "title": "Delegation remains",
+          "body": "ADA Holders who delegated to you can see that your DRep is retired and may re-delegate their Voting Power to another DRep."
+        },
+        "id": {
+          "title": "DRep ID remains",
+          "body": "You can come out of retirement and resume your role as a DRep using the same DRep ID. Your Voting Power will include your own ADA balance and any Voting Power still delegated to your DRep ID."
+        }
+      },
+      "ackVoting": "I understand that retiring will remove my voting rights as a DRep. Voting Power delegated to my DRep ID will remain associated with it until redelegated.",
+      "ackDeposit": "I understand that my ₳{{deposit}} DRep deposit will be refunded to my wallet upon retirement.",
+      "ackDepositNoAmount": "I understand that my DRep deposit will be refunded to my wallet upon retirement.",
+      "progress": {
+        "confirming": "Confirming transaction…",
+        "title": "DRep retirement in progress",
+        "body": "Your DRep, {{name}}, is being retired. Once the transaction is confirmed, your ₳{{deposit}} deposit will be refunded to your wallet.",
+        "bodyNoName": "Your DRep is being retired. Once the transaction is confirmed, your ₳{{deposit}} deposit will be refunded to your wallet.",
+        "learnMore": "Learn More",
+        "showTx": "Show transaction",
+        "close": "Go to dashboard"
+      },
     "retireAsDrep": "Retire as a Drep",
     "whatRetirementMeansTitle": "What Retirement Means",
     "whatRetirementMeansDescription": "By retiring you are giving up your voting rights. Voting Power that is delegated to you will remain in place.\n\nADA Holders that have delegated to be able to see that you are retired in the DRep directory. They will be able to re-delegate their Voting Power to another DRep.\n\nYou can still participate in Governance by proposing Governance Actions, by delegating your personal Voting Power to another DRep, or by coming out of retirement, and assuming your previous role as a DRep.\n\nIf you come out of retirement, your DRep ID will be the same as it was before retirement, and your Voting Power will consist of your own Ada balance and what delegated power that remains associated\nto your DRep ID."
@@ -1959,6 +1987,68 @@
   "votingPower": "Voting power",
   "yourself": "Yourself",
   "drepDashboard": {
+    "share": {
+      "open": "Share DRep profile",
+      "title": "Share DRep",
+      "body": "This profile is public. Anyone can view it, no wallet connection required.",
+      "urlLabel": "DRep profile URL",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "hint": "Copies the full URL, including the DRep identifier.",
+      "via": "Or share via",
+      "x": "X",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "email": "Email",
+      "text": "My DRep profile on GovTool",
+      "close": "Close"
+    },
+    "retired": {
+      "role": "Retired",
+      "reactivate": "Reactivate as DRep",
+      "banner": "Your DRep status is retired. You can no longer vote on governance actions or receive delegation. Your history remains visible.",
+      "returnTitle": "Ready to return to governance?",
+      "returnBody": "Reactivate your status as a DRep to start participating in upcoming proposals. You will need to re-submit your registration with the standard {{deposit}} ADA deposit.",
+      "returnBodyNoDeposit": "Reactivate your status as a DRep to start participating in upcoming proposals. You will need to re-submit your registration with the standard DRep deposit.",
+      "finalStats": "Final Representation Stats",
+      "finalPower": "Final Delegated ADA",
+      "links": "Previously Registered Links",
+      "profileTitle": "Previous DRep Profile (Inactive)",
+      "record": "Retired historical record",
+      "summary": "Tenure & Retirement Summary",
+      "tenure": "Tenure Duration",
+      "tenureMonths_one": "{{count}} month",
+      "tenureMonths_other": "{{count}} months",
+      "registeredOn": "Registered",
+      "totalVotes": "Total Votes Cast",
+      "totalVotesValue_one": "{{count}} proposal",
+      "totalVotesValue_other": "{{count}} proposals",
+      "peak": "Peak Delegation",
+      "final": "Final Voting Power",
+      "deposit": "Your {{deposit}} ADA DRep deposit was returned to your wallet when the retirement was confirmed.",
+      "depositNoAmount": "Your DRep deposit was returned to your wallet when the retirement was confirmed.",
+      "archive": "Voting History (Archived Tenure)",
+      "archived": "Vote archived • {{date}}",
+      "noVotes": "No votes were cast during this tenure."
+    },
+    "reRegister": {
+      "title": "Register as a DRep again",
+      "body": "Your previous DRep registration was retired. You can register again to become an active DRep and continue participating in governance.",
+      "nextTitle": "What happens next",
+      "next1": "By continuing, you'll submit a new DRep registration transaction through your connected wallet. Once the transaction is confirmed on-chain, your DRep status will become Active.",
+      "next2": "Your existing DRep identity and profile will remain associated with your registration unless you update your metadata.",
+      "beforeTitle": "Before you continue",
+      "before": "Make sure your wallet is connected and has enough funds to cover the registration deposit and transaction fee. Your wallet will ask you to review and approve the transaction.",
+      "cancel": "Cancel",
+      "continue": "Continue to Register again"
+    },
+    "registrationError": {
+      "title": "Registration wasn't completed",
+      "body": "Your wallet didn't confirm the registration transaction. Check your wallet, then try again.",
+      "reason": "Wallet message: {{reason}}",
+      "close": "Close",
+      "retry": "Try Again"
+    },
     "welcome": "Welcome, {{name}}",
     "welcomeAnonymous": "Welcome",
     "role": {

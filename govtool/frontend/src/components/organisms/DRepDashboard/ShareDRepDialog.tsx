@@ -63,8 +63,22 @@ const ShareLink = ({
   </Box>
 );
 
-/** The round share button on the DRep dashboard, and its dialog. */
-export const ShareDRepDialog = ({ link }: { link: string }) => {
+const middle = (value: string) =>
+  (value.length > 32 ? `${value.slice(0, 18)}…${value.slice(-12)}` : value);
+
+/** A round share button and its dialog, for a DRep's public profile. */
+export const ShareDRepDialog = ({
+  link,
+  dRepId,
+  buttonTestId = "share-drep-button",
+  copyTestId = "share-drep-copy",
+}: {
+  link: string;
+  /** Shown in the field, shortened; Copy link still copies the whole URL. */
+  dRepId?: string;
+  buttonTestId?: string;
+  copyTestId?: string;
+}) => {
   const { t } = useTranslation();
   const { addSuccessAlert } = useSnackbar();
   const [open, setOpen] = useState(false);
@@ -86,7 +100,7 @@ export const ShareDRepDialog = ({ link }: { link: string }) => {
     <>
       <ButtonBase
         aria-label={t("drepDashboard.share.open")}
-        data-testid="share-drep-button"
+        data-testid={buttonTestId}
         onClick={() => { setCopied(false); setOpen(true); }}
         sx={{
           border: `1px solid ${ds.gray["200"]}`,
@@ -149,10 +163,10 @@ export const ShareDRepDialog = ({ link }: { link: string }) => {
                   px: 1.5,
                   textOverflow: "ellipsis",
                 }}
-                value={link}
+                value={dRepId ? middle(dRepId) : link}
               />
               <ButtonBase
-                data-testid="share-drep-copy"
+                data-testid={copyTestId}
                 onClick={copy}
                 sx={{
                   backgroundColor: ds.primary["600"],

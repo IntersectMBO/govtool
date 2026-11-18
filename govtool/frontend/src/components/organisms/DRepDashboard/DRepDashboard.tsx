@@ -211,7 +211,7 @@ export const DRepDashboard = ({
           >
             {t("drepDashboard.retire")}
           </Button>
-          {data.profileLink && <ShareDRepDialog link={data.profileLink} />}
+          {data.profileLink && <ShareDRepDialog dRepId={dRep?.view} link={data.profileLink} />}
         </Box>
       </Box>
 

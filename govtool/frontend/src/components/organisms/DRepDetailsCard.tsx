@@ -20,7 +20,6 @@ import {
   DataMissingInfoBox,
   DRepVotingTrend,
   MetadataFailureDetails,
-  Share,
   StatCard,
 } from "@molecules";
 import {
@@ -44,6 +43,7 @@ import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
 import { avatarTone, dRepInitials } from "./DRepCard";
 import { DRepActivityTable } from "./DRepActivityTable";
 import { DelegationReviewDialog } from "./DelegationReviewDialog";
+import { ShareDRepDialog } from "./DRepDashboard/ShareDRepDialog";
 
 type DRepDetailsProps = {
   dRepData: DRepData;
@@ -249,7 +249,12 @@ export const DRepDetailsCard = ({
               {t("connectToDelegate")}
             </Button>
           )}
-          <Share link={window.location.href} />
+          <ShareDRepDialog
+            buttonTestId="share-button"
+            copyTestId="copy-link-from-share-button"
+            dRepId={view}
+            link={`${window.location.origin}${window.location.pathname.replace(/^\/connected\//, "/")}`}
+          />
         </Box>
       </Box>
 

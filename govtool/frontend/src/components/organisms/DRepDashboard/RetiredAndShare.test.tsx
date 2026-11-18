@@ -111,6 +111,24 @@ describe("RetiredDRepDashboard", () => {
 });
 
 describe("ShareDRepDialog", () => {
+  it("shows a shortened DRep id but copies the whole URL, under the test ids it is given", () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    Object.assign(navigator, { clipboard: { writeText } });
+    const id = "drep1example7m4k2v9n6p3qwertyuiopasdfghjklp2q9r6s3t8v5";
+    render(
+      <ShareDRepDialog
+        buttonTestId="share-button"
+        copyTestId="copy-link-from-share-button"
+        dRepId={id}
+        link={`https://gov.tools/drep_directory/${id}`}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("share-button"));
+    expect(screen.getByTestId("share-drep-url")).toHaveValue("drep1example7m4k2v…p2q9r6s3t8v5");
+    fireEvent.click(screen.getByTestId("copy-link-from-share-button"));
+    expect(writeText).toHaveBeenCalledWith(`https://gov.tools/drep_directory/${id}`);
+  });
+
   const link = "https://gov.tools/drep_directory/drep1abc";
 
   it("copies the profile URL and offers encoded share links", async () => {

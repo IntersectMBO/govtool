@@ -28,7 +28,9 @@ export const formatAdaCompact = (lovelace: number | string | null | undefined) =
 };
 
 export const shortId = (value: string, head = 10, tail = 6) =>
-  (value.length > head + tail + 1 ? `${value.slice(0, head)}…${value.slice(-tail)}` : value);
+  (value.length > head + tail + 1
+    ? `${value.slice(0, head)}…${tail ? value.slice(-tail) : ""}`
+    : value);
 
 /** "March 15, 2025" in UTC. */
 export const formatLongDate = (time?: string | null) => {
@@ -76,6 +78,13 @@ export const VOTE_COLORS = {
   yes: ds.success["600"],
   no: ds.error["600"],
   abstain: ds.orange["500"],
+};
+
+/** Vote labels on a tinted pill, each pair at least 4.5:1. */
+export const VOTE_PILL_TONES = {
+  yes: PILL_TONES.success,
+  no: PILL_TONES.error,
+  abstain: PILL_TONES.warning,
 };
 
 export const VOTE_TEXT = {
@@ -240,12 +249,12 @@ export const EmptyState = ({
   </Box>
 );
 
-const AVATAR_TONES = [
+export const AVATAR_TONES = [
   { bg: ds.primary["600"], fg: "#FFFFFF" },
-  { bg: "#7A5AF8", fg: "#FFFFFF" },
-  { bg: "#0BA5EC", fg: "#FFFFFF" },
-  { bg: ds.orange["600"], fg: "#FFFFFF" },
-  { bg: ds.success["600"], fg: "#FFFFFF" },
+  { bg: "#6941C6", fg: "#FFFFFF" },
+  { bg: "#026AA2", fg: "#FFFFFF" },
+  { bg: ds.orange["750"], fg: "#FFFFFF" },
+  { bg: ds.success["700"], fg: "#FFFFFF" },
 ];
 
 export const initialsOf = (name: string) =>
@@ -327,12 +336,14 @@ export const ArrowLink = ({
   to,
   children,
   testId,
+  state,
 }: {
   to: string;
   children: ReactNode;
   testId?: string;
+  state?: unknown;
 }) => (
-  <Box component={RouterLink} data-testid={testId} sx={linkSx} to={to}>
+  <Box component={RouterLink} data-testid={testId} state={state} sx={linkSx} to={to}>
     {children}
     <ArrowRight aria-hidden size={14} />
   </Box>
@@ -423,7 +434,8 @@ export const downloadCsv = (fileName: string, csv: string) => {
   anchor.href = url;
   anchor.download = fileName;
   anchor.click();
-  URL.revokeObjectURL(url);
+  // Revoking at once can cancel the download in some browsers.
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
 export const ExportButton = ({

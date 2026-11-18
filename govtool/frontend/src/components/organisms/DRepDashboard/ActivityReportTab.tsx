@@ -29,7 +29,7 @@ import {
   TableFrame,
   td,
   th,
-  VOTE_TEXT,
+  VOTE_PILL_TONES,
 } from "./parts";
 import type { DashboardData } from "./types";
 
@@ -299,7 +299,18 @@ const RecentlyVoted = ({ data }: { data: DashboardData }) => {
               <Box sx={{ alignItems: "flex-start", display: "flex", gap: 1, justifyContent: "space-between" }}>
                 <Box sx={{ color: ds.gray["900"], fontSize: 14, fontWeight: 600 }}>{proposal.title || proposal.type}</Box>
                 {vote && (
-                  <Box component="span" sx={{ backgroundColor: vote.vote === "yes" ? PILL_TONES.success.bg : vote.vote === "no" ? PILL_TONES.error.bg : PILL_TONES.neutral.bg, borderRadius: `${RADIUS.pill}px`, color: VOTE_TEXT[vote.vote], flexShrink: 0, fontSize: 12, fontWeight: 600, px: 1 }}>
+                  <Box
+                    component="span"
+                    sx={{
+                      backgroundColor: VOTE_PILL_TONES[vote.vote].bg,
+                      borderRadius: `${RADIUS.pill}px`,
+                      color: VOTE_PILL_TONES[vote.vote].text,
+                      flexShrink: 0,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      px: 1,
+                    }}
+                  >
                     {t(`drepDashboard.vote.${vote.vote}`)}
                   </Box>
                 )}
@@ -370,7 +381,8 @@ const EpochTable = ({ data }: { data: DashboardData }) => {
 
 export const ActivityReportTab = ({ data }: { data: DashboardData }) => {
   const { t } = useTranslation();
-  if (data.votesLoading || data.actionsLoading) {
+  // Participation needs the registration date, from the DRep record.
+  if (data.votesLoading || data.actionsLoading || data.dRepLoading) {
     return (
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
         <Skeleton height={110} variant="rounded" />

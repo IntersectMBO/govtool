@@ -37,6 +37,8 @@ export const useDRepDashboardActions = () => {
     queryKey: [QUERY_KEYS.drepDashboardActionsKey],
     queryFn: getAllGovernanceActions,
     staleTime: FIVE_MINUTES,
+    // main.tsx turns this off app-wide; outcomes move while the user is away.
+    refetchOnMount: true,
   });
   return { actions: data, isLoading, isError, refetch, dataUpdatedAt };
 };
@@ -50,8 +52,14 @@ export const useDRepDashboardVotes = (dRepID?: string) => {
       pendingTransaction.vote?.transactionHash,
       dRepID,
     ],
-    queryFn: () => getDRepVotesById(dRepID ?? ""),
+    queryFn: async () => {
+      const votes = await getDRepVotesById(dRepID ?? "");
+      return Array.isArray(votes) ? votes : [];
+    },
     enabled: !!dRepID,
+    // A vote cast elsewhere confirms while the dashboard is unmounted, and
+    // main.tsx turns this off app-wide.
+    refetchOnMount: true,
   });
   return { votes: data, isLoading, isError, refetch, dataUpdatedAt };
 };

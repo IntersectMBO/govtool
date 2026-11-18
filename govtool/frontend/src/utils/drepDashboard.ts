@@ -112,10 +112,21 @@ export const registrationEpoch = (
   if (!registeredAt) return undefined;
   const at = new Date(registeredAt).getTime();
   if (Number.isNaN(at)) return undefined;
-  const started = anchors.filter(({ time }) => new Date(time).getTime() <= at);
-  return started.length
-    ? Math.max(...started.map(({ epoch }) => epoch))
-    : undefined;
+  const dated = anchors
+    .filter(({ time }) => !!time)
+    .map(({ time, epoch }) => ({ at: new Date(time).getTime(), epoch }))
+    .filter((anchor) => !Number.isNaN(anchor.at));
+  const before = dated
+    .filter((anchor) => anchor.at <= at)
+    .sort((a, b) => b.at - a.at || b.epoch - a.epoch)[0];
+  if (!before) return undefined;
+  const after = dated
+    .filter((anchor) => anchor.at > at)
+    .sort((a, b) => a.at - b.at || a.epoch - b.epoch)[0];
+  if (!after || after.epoch <= before.epoch) return before.epoch;
+  // Epochs are evenly spaced in time, so place the date between the two.
+  const elapsed = (at - before.at) / (after.at - before.at);
+  return before.epoch + Math.floor(elapsed * (after.epoch - before.epoch));
 };
 
 /** Of the actions open since registration, how many the DRep voted on. */

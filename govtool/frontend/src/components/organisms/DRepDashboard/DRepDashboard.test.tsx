@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "@/i18n";
 import type { GovernanceActionRecord, VotedProposal, VoterInfo } from "@/models";
@@ -50,7 +51,7 @@ vi.mock("@/context/featureFlag", () => ({
 vi.mock("@/context/snackbar", () => ({ useSnackbar: () => ({ addSuccessAlert: vi.fn() }) }));
 vi.mock("@/components/molecules/Share", () => ({ Share: () => null }));
 vi.mock("@/hooks/queries/useGetDrepDetailsQuery", () => ({
-  useGetDRepDetailsQuery: () => ({ dRep: mocks.dRep, isLoading: false }),
+  useGetDRepDetailsQuery: () => ({ dRep: mocks.dRep, isLoading: mocks.dRep === undefined }),
 }));
 vi.mock("@/hooks/queries/useGetAdaHolderCurrentDelegationQuery", () => ({
   useGetAdaHolderCurrentDelegationQuery: () => ({ currentDelegation: null }),
@@ -117,19 +118,34 @@ const voted = (id: string, vote: "yes" | "no" | "abstain", epoch = 10, url = "ht
     proposal: { txHash: id, index: 0, type: "InfoAction", title: `Action ${id}`, createdDate: "2026-11-08T00:00:00Z" },
   }) as unknown as VotedProposal;
 
-const renderAt = (path = "/dashboard") =>
-  render(
+const ProfileStub = () => {
+  const { state } = useLocation();
+  return <div data-testid="profile-stub">{JSON.stringify(state)}</div>;
+};
+
+const dashboard = (pending: Record<string, unknown> = {}) => (
+  <DRepDashboard
+    actionCards={<div>action cards</div>}
+    dRepID={"cd".repeat(28)}
+    pendingTransaction={pending as never}
+    stakeKey={STAKE_HEX}
+    voter={voter}
+    walletCard={<div>wallet card</div>}
+  />
+);
+
+const tree = (path: string, client: QueryClient, pending: Record<string, unknown> = {}) => (
+  <QueryClientProvider client={client}>
     <MemoryRouter initialEntries={[path]}>
-      <DRepDashboard
-        actionCards={<div>action cards</div>}
-        dRepID={"cd".repeat(28)}
-        pendingTransaction={{} as never}
-        stakeKey={STAKE_HEX}
-        voter={voter}
-        walletCard={<div>wallet card</div>}
-      />
-    </MemoryRouter>,
-  );
+      <Routes>
+        <Route element={dashboard(pending)} path="/dashboard" />
+        <Route element={<ProfileStub />} path="/connected/drep_directory/:dRepId" />
+      </Routes>
+    </MemoryRouter>
+  </QueryClientProvider>
+);
+
+const renderAt = (path = "/dashboard", client = new QueryClient()) => render(tree(path, client));
 
 beforeEach(() => {
   window.localStorage.clear();
@@ -163,6 +179,7 @@ beforeEach(() => {
 describe("DRepDashboard", () => {
   it("welcomes a DRep with no votes, and remembers a dismissal", () => {
     mocks.votes = [];
+    mocks.dRep = { ...mocks.dRep, latestRegistrationDate: new Date().toISOString() };
     const { unmount } = renderAt();
     expect(screen.getByTestId("dashboard-role-pill")).toHaveTextContent("New DRep");
     fireEvent.click(screen.getByTestId("drep-dashboard-welcome-dismiss"));
@@ -171,6 +188,36 @@ describe("DRepDashboard", () => {
     renderAt();
     expect(screen.queryByTestId("drep-dashboard-welcome")).not.toBeInTheDocument();
     expect(screen.getByTestId("drep-recent-votes-empty")).toBeInTheDocument();
+  });
+
+  it("does not call a long-registered DRep new for not having voted", () => {
+    mocks.votes = [];
+    renderAt();
+    expect(screen.getByTestId("dashboard-role-pill")).toHaveTextContent("DRep");
+    expect(screen.getByTestId("dashboard-role-pill")).not.toHaveTextContent("New");
+    expect(screen.queryByTestId("drep-dashboard-welcome")).not.toBeInTheDocument();
+  });
+
+  it("opens the public profile with its back button", () => {
+    renderAt();
+    fireEvent.click(screen.getByTestId("view-drep-details-button"));
+    expect(screen.getByTestId("profile-stub")).toHaveTextContent("enteredFromWithinApp");
+  });
+
+  it("refreshes the profile once a metadata update confirms", () => {
+    const client = new QueryClient();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const { rerender } = render(tree("/dashboard", client, { updateMetaData: { transactionHash: "u1" } }));
+    expect(invalidate).not.toHaveBeenCalled();
+    rerender(tree("/dashboard", client, {}));
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["useGetDRepInfoKey"] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["useGetDRepListInfiniteKey"] });
+  });
+
+  it("holds the activity figures until the DRep record has loaded", () => {
+    mocks.dRep = undefined;
+    renderAt("/dashboard?tab=activity");
+    expect(screen.queryByTestId("drep-activity-participation")).not.toBeInTheDocument();
   });
 
   it("shows recent votes with their outcome, and links to the full history", () => {

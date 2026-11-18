@@ -1,4 +1,5 @@
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Box, ButtonBase } from "@mui/material";
 import { Link as RouterLink, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
@@ -8,6 +9,7 @@ import { Button } from "@/components/atoms/Button";
 import { PageTabs } from "@/components/molecules/PageTabs";
 import { Share } from "@/components/molecules/Share";
 import { PATHS } from "@/consts/paths";
+import { QUERY_KEYS } from "@/consts/queryKeys";
 import { ds, PILL_TONES, RADIUS } from "@/consts/designTokens";
 import { useAppContext } from "@/context/appContext";
 import type { PendingTransaction } from "@/context/pendingTransaction";
@@ -30,6 +32,8 @@ import { useFeatureFlag } from "@/context/featureFlag";
 
 const TABS = ["overview", "governance", "discussions", "activity", "history"] as const;
 export type DashboardTab = (typeof TABS)[number];
+
+const NEW_DREP_DAYS = 30;
 
 const welcomeKey = (dRepID: string) => `govtool_drep_welcome_dismissed_${dRepID}`;
 
@@ -67,7 +71,20 @@ export const DRepDashboard = ({
   const [params] = useSearchParams();
   const [isWelcomeDismissed, setWelcomeDismissed] = useState(() => readDismissed(dRepID));
 
-  const { dRep } = useGetDRepDetailsQuery(dRepID);
+  const queryClient = useQueryClient();
+  const { dRep, isLoading: dRepLoading } = useGetDRepDetailsQuery(dRepID);
+
+  // Nothing refetches the profile when a metadata update confirms, so do it
+  // here once the pending update clears.
+  const pendingUpdate = pendingTransaction.updateMetaData?.transactionHash;
+  const lastUpdate = useRef(pendingUpdate);
+  useEffect(() => {
+    if (lastUpdate.current && !pendingUpdate) {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.useGetDRepInfoKey] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.useGetDRepListInfiniteKey] });
+    }
+    lastUpdate.current = pendingUpdate;
+  }, [pendingUpdate, queryClient]);
   const votesQuery = useDRepDashboardVotes(dRepID);
   const actionsQuery = useDRepDashboardActions();
   const currentEpoch =
@@ -78,7 +95,11 @@ export const DRepDashboard = ({
     const actionsByKey = new Map(
       (actions ?? []).map((record) => [actionKey(record.tx_hash, record.index), record]),
     );
+    // Dated epochs, to place the registration date: submissions, votes, now.
     const anchors = [
+      ...(currentEpoch !== undefined
+        ? [{ time: new Date().toISOString(), epoch: currentEpoch }]
+        : []),
       ...(actions ?? []).map((record) => ({ time: record.time, epoch: record.epoch_no })),
       ...(votesQuery.votes ?? []).flatMap(({ vote }) =>
         (vote ? [{ time: vote.date, epoch: vote.epochNo }] : [])),
@@ -86,6 +107,7 @@ export const DRepDashboard = ({
     return {
       voter,
       dRep,
+      dRepLoading,
       dRepID,
       stakeKey,
       currentEpoch,
@@ -107,6 +129,7 @@ export const DRepDashboard = ({
   }, [
     voter,
     dRep,
+    dRepLoading,
     dRepID,
     stakeKey,
     currentEpoch,
@@ -124,7 +147,12 @@ export const DRepDashboard = ({
   const requested = params.get("tab") as DashboardTab | null;
   const tab: DashboardTab = requested && tabs.includes(requested) ? requested : "overview";
 
-  const isNew = votesQuery.votes !== undefined && votesQuery.votes.length === 0;
+  // New: registered in the last 30 days and not voted yet.
+  const registeredAt = new Date(dRep?.latestRegistrationDate ?? "").getTime();
+  const isNew =
+    votesQuery.votes !== undefined &&
+    votesQuery.votes.length === 0 &&
+    Date.now() - registeredAt < NEW_DREP_DAYS * 24 * 60 * 60 * 1000;
   const name = voter.givenName || dRep?.givenName;
   const pending = pendingTransaction.retireAsDrep ?? pendingTransaction.updateMetaData;
   const isBusy = !!(pendingTransaction.retireAsDrep || pendingTransaction.updateMetaData);

@@ -103,7 +103,11 @@ export const RepresentationCard = ({ data }: { data: DashboardData }) => {
         </Box>
       )}
       {dRep?.view && (
-        <ArrowLink testId="view-drep-details-button" to={PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", encodeURIComponent(dRep.view))}>
+        <ArrowLink
+          state={{ enteredFromWithinApp: true }}
+          testId="view-drep-details-button"
+          to={PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", encodeURIComponent(dRep.view))}
+        >
           {t("drepDashboard.overview.representation.viewProfile")}
         </ArrowLink>
       )}

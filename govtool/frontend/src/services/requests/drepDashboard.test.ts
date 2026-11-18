@@ -105,6 +105,22 @@ describe("getDRepDiscussions", () => {
     });
   });
 
+  it("asks only for the active revision of each thread replied to", async () => {
+    axiosGet.mockImplementation((url: string) =>
+      Promise.resolve({
+        data: {
+          data: url.includes("/api/comments?")
+            ? [{ id: 1, attributes: { proposal_id: 7, user_id: "x", createdAt: "2026-11-02T00:00:00Z" } }]
+            : [],
+        },
+      }));
+    await getDRepDiscussions("ab".repeat(28));
+    const replied = axiosGet.mock.calls
+      .map(([url]) => String(url))
+      .find((url) => url.includes("filters[prop_id][$in]"));
+    expect(replied).toContain("filters[prop_rev_active][$eq]=true");
+  });
+
   it("is empty without a comment, and never sends a malformed id", async () => {
     axiosGet.mockResolvedValue({ data: { data: [] } });
     expect(await getDRepDiscussions("ab".repeat(28))).toEqual([]);

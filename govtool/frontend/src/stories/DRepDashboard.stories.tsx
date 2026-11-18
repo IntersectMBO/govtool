@@ -102,7 +102,16 @@ const clientWith = (withVotes: boolean) => {
   client.setQueryData([QUERY_KEYS.drepDashboardActionsKey], actions);
   client.setQueryData(
     [QUERY_KEYS.useGetDRepListInfiniteKey, "noPendingTransaction", "", D_REP_ID, "", ""],
-    { pages: [{ elements: [dRep], page: 0, pageSize: 10, total: 1 }], pageParams: [0] },
+    {
+      // A DRep counts as new for 30 days after registering.
+      pages: [{
+        elements: [withVotes ? dRep : { ...dRep, latestRegistrationDate: ago(3) }],
+        page: 0,
+        pageSize: 10,
+        total: 1,
+      }],
+      pageParams: [0],
+    },
   );
   return client;
 };

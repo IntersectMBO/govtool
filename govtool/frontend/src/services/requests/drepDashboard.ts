@@ -158,6 +158,8 @@ export const getDRepDiscussions = async (dRepHash: string): Promise<DRepDiscussi
     repliedIds.length
       ? forumGet<ForumThread>(
         `proposals?${repliedIds.map((id, i) => `filters[prop_id][$in][${i}]=${id}`).join("&")}` +
+            // A prop_id filter turns off the forum's own active-revision rule.
+            "&filters[prop_rev_active][$eq]=true&sort[createdAt]=desc" +
             `&pagination[page]=1&pagination[pageSize]=${repliedIds.length}`,
       )
       : Promise.resolve([]),

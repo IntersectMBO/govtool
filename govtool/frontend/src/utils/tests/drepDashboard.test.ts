@@ -107,6 +107,22 @@ describe("registrationEpoch", () => {
     expect(registrationEpoch("2026-01-21T00:00:00Z", anchors)).toBe(504);
   });
 
+  it("interpolates between the anchors either side of the registration", () => {
+    const sparse = [
+      { time: "2026-01-01T00:00:00Z", epoch: 500 },
+      { time: "2026-02-20T00:00:00Z", epoch: 510 },
+    ];
+    expect(registrationEpoch("2026-01-26T00:00:00Z", sparse)).toBe(505);
+  });
+
+  it("ignores anchors without a time", () => {
+    const withNull = [
+      { time: null as unknown as string, epoch: 600 },
+      { time: "2026-01-01T00:00:00Z", epoch: 500 },
+    ];
+    expect(registrationEpoch("2026-01-02T00:00:00Z", withNull)).toBe(500);
+  });
+
   it("is undefined before every anchor or without a date", () => {
     expect(registrationEpoch("2025-12-01T00:00:00Z", anchors)).toBeUndefined();
     expect(registrationEpoch(undefined, anchors)).toBeUndefined();

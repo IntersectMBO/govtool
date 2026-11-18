@@ -9,6 +9,7 @@ import type {
 export type DashboardData = {
   voter: VoterInfo;
   dRep?: DRepData;
+  dRepLoading: boolean;
   /** The DRep credential hash, as the backend's DRep routes take it. */
   dRepID: string;
   stakeKey?: string;

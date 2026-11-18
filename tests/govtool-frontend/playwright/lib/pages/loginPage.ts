@@ -66,6 +66,8 @@ export default class LoginPage {
   async logout() {
     await this.openWalletMenu();
     await this.disconnectWalletBtn.click();
+    // Disconnecting asks for confirmation first.
+    await this.page.getByTestId("confirm-disconnect-button").click();
   }
 
   async isLoggedIn() {

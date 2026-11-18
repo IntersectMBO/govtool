@@ -28,3 +28,4 @@ export * from "./useGetProposalsPageQuery";
 export * from "./useGetDRepVotesByIdQuery";
 export * from "./useGlobalSearch";
 export * from "./useDRepDashboard";
+export * from "./useStakeKeyVotingPower";

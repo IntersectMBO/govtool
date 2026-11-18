@@ -8,12 +8,13 @@ import {
   GOV_ACTION_HISTORY_PATHS,
   BUDGET_DISCUSSION_PATHS,
 } from "@consts";
-import { useCardano } from "@context";
+import { useCardano, useModal } from "@context";
 import { useTranslation } from "@hooks";
 import { Card } from "./Card";
 
 export const WalletInfoCard = () => {
   const { address, disconnectWallet } = useCardano();
+  const { openModal } = useModal();
   const navigate = useNavigate();
   const { pathname, hash } = useLocation();
   const { t } = useTranslation();
@@ -69,11 +70,24 @@ export const WalletInfoCard = () => {
           <Button
             data-testid="disconnect-button"
             variant="text"
-            onClick={onClickDisconnect}
+            onClick={() =>
+              openModal({
+                type: "disconnectWallet",
+                state: { onConfirm: onClickDisconnect },
+              })}
           >
             {t("wallet.disconnect")}
           </Button>
         </Box>
+        <Button
+          data-testid="view-profile-button"
+          fullWidth
+          onClick={() => navigate(PATHS.profile)}
+          sx={{ mt: 1 }}
+          variant="outlined"
+        >
+          {t("walletConnect.viewProfile")}
+        </Button>
       </Card>
     )
   );

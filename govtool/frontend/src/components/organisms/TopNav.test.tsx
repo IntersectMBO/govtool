@@ -142,7 +142,7 @@ describe("TopNav (desktop)", () => {
       mocks.voter = { isRegisteredAsDRep: true, givenName: "Jordan Dyer" } as typeof mocks.voter;
       renderAt("/dashboard");
       expect(screen.getByTestId("profile-avatar")).toHaveTextContent("JD");
-      expect(screen.getByTestId("profile-avatar")).toHaveAttribute("href", "/dashboard");
+      expect(screen.getByTestId("profile-avatar")).toHaveAttribute("href", "/profile");
       expect(screen.queryByTestId("voting-power-chips")).toBeNull();
     });
 

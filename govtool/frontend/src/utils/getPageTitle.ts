@@ -68,6 +68,7 @@ const PAGE_TITLES = [
     title: "Retire as a Direct Voter",
   },
   { path: PATHS.stakeKeys, title: "Select Stake Key" },
+  { path: PATHS.profile, title: "Your Governance Profile" },
   { path: PATHS.editDrepMetadata, title: "Edit DRep Info" },
 
   {

@@ -43,6 +43,7 @@ export const QUERY_KEYS = {
   drepDashboardDelegationHistoryKey: "drepDashboardDelegationHistoryKey",
   drepDashboardVotingPowerKey: "drepDashboardVotingPowerKey",
   drepDashboardDiscussionsKey: "drepDashboardDiscussionsKey",
+  stakeKeyVotingPowerKey: "stakeKeyVotingPowerKey",
 };
 
 export const MUTATION_KEYS = {

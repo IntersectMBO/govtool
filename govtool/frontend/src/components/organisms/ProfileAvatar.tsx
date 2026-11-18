@@ -38,7 +38,7 @@ export const ProfileAvatar = ({ name }: { name?: string | null }) => {
         width: 40,
         "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
       }}
-      to={PATHS.dashboard}
+      to={PATHS.profile}
     >
       {letters || <UserRound aria-hidden size={18} />}
     </Box>

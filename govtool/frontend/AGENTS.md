@@ -183,6 +183,14 @@ instead (utils/drepDashboard.ts isRetiredDRep). Retiring needs both
 acknowledgements ticked (retirement-ack-voting, retirement-ack-deposit) before
 continue-retirement-button enables; the Playwright retirement specs tick them.
 
+Connecting goes through organisms/Modal/ChooseWalletModal and
+molecules/WalletOption: wallet.tsx's enable wrapper still opens its own modals,
+and WalletOption replaces them once enable settles with the walletConnection
+modal (organisms/WalletConnect: checking then a summary, or the failure read
+from the error text by utils/walletConnect.ts). Its close button keeps
+confirm-modal-button, which the E2E login clicks; Disconnect opens the
+disconnectWallet modal (confirm-disconnect-button). The avatar opens /profile.
+
 Each page has one main landmark, which TopNav's skip link focuses: public page
 shells pass component="main" to PageContainer (or a Box), while the Dashboard
 layout wraps its outlet in main, so a page rendered inside Dashboard must not

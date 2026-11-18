@@ -1986,7 +1986,182 @@
   "votingPower": "Voting power",
   "yourself": "Yourself",
   "topNav": {
-    "profile": "Your dashboard"
+    "profile": "Your governance profile"
+  },
+  "walletConnect": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "notConnected": "Not connected",
+    "supported": "Supported",
+    "supportedWallets": "Supported Wallets",
+    "browserWallet": "Browser wallet",
+    "chooser": {
+      "title": "Connect your Wallet",
+      "body": "Connect a compatible wallet to view your governance profile and participate in GovTool.",
+      "connectionOnlyTitle": "Connection only",
+      "connectionOnlyBody": "Connecting shares your public wallet identity. It does not submit a transaction or charge fees.",
+      "more": "For more information please check the supported wallets list or visit our official documentation.",
+      "learnMore": "Learn more"
+    },
+    "none": {
+      "status": "No wallet found",
+      "title": "No Cardano wallet detected",
+      "body": "GovTool could not find a supported browser wallet on this device.",
+      "notDetected": "Not detected",
+      "mobileTitle": "Using a mobile device?",
+      "mobileBody": "Open GovTool from your wallet's in-app browser, or install a supported desktop extension.",
+      "retry": "Try Again",
+      "install": "Install Wallet"
+    },
+    "approve": {
+      "status": "Action needed",
+      "title": "Approve in {{wallet}}",
+      "body": "A {{wallet}} window is waiting for you. Review the requesting site and approve account access.",
+      "waitingTitle": "Waiting for your approval",
+      "waitingBody": "Complete the prompt in the {{wallet}} window.",
+      "onlyTitle": "Approve connection only",
+      "onlyBody": "Do not approve a transaction. GovTool only needs permission to read your public wallet identity.",
+      "waiting": "Waiting for approval…"
+    },
+    "network": {
+      "status": "Wrong network",
+      "title": "Switch to {{network}}",
+      "currentTitle": "Current network: {{network}}",
+      "currentBody": "Switch networks inside your wallet, then connect again. This does not submit a transaction.",
+      "retry": "Try Again"
+    },
+    "declined": {
+      "status": "Not connected",
+      "title": "Connection request declined",
+      "body": "The request was rejected in your wallet, so GovTool did not connect to it.",
+      "nothingTitle": "Nothing changed",
+      "nothingBody": "No wallet access was granted and no transaction was submitted."
+    },
+    "unsupported": {
+      "status": "Unsupported",
+      "title": "Wallet is not supported",
+      "body": "This wallet cannot connect to this version of GovTool.",
+      "chooseTitle": "Choose a supported wallet",
+      "chooseBody": "GovTool needs a wallet with the CIP-30 and CIP-95 extensions.",
+      "viewSupported": "View supported wallets"
+    },
+    "generic": {
+      "status": "Connection failed",
+      "title": "Couldn't connect your wallet",
+      "body": "The wallet returned an unexpected connection error. Your account remains unchanged.",
+      "detailTitle": "Wallet message",
+      "detailFallback": "Check that the wallet is open and up to date, then try the connection again."
+    },
+    "chooseAnother": "Choose Another Wallet",
+    "tryAgain": "Try Again",
+    "checking": {
+      "title": "Checking your wallet",
+      "body": "We're verifying your stake key and loading your governance information. This may take a moment.",
+      "progress": "Verification progress",
+      "walletConnected": "Wallet connected",
+      "stakeKey": "Stake key verified",
+      "votingPower": "Voting power loaded",
+      "governance": "Governance status checked",
+      "complete": "Complete",
+      "inProgress": "In progress",
+      "pending": "Pending"
+    },
+    "success": {
+      "title": "Wallet connected",
+      "body": "Your wallet is connected and ready for governance on {{network}} with ₳{{power}} voting power.",
+      "bodyNoPower": "Your wallet is connected and ready for governance on {{network}}.",
+      "stakeKey": "Stake key",
+      "summary": "Connection summary",
+      "verified": "Verified",
+      "votingPower": "Voting power",
+      "network": "Network",
+      "governance": "Governance status",
+      "viewProfile": "View your profile"
+    },
+    "status": {
+      "drep": "Registered DRep",
+      "directVoter": "Direct voter",
+      "delegated": "Delegated",
+      "notDelegated": "Not delegated"
+    },
+    "disconnect": {
+      "status": "Confirm disconnect",
+      "title": "Disconnect {{wallet}} from GovTool?",
+      "body": "GovTool will stop reading this wallet and end access to the current connected session.",
+      "accessEnds": "GovTool's current wallet access ends",
+      "chainUnchanged": "On-chain governance and funds stay unchanged",
+      "warningTitle": "On-chain data stays unchanged",
+      "warningBody": "Your funds, votes, DRep registration, and delegation remain on-chain. You can reconnect this wallet later.",
+      "confirm": "Disconnect",
+      "cancel": "Cancel"
+    },
+    "stakeKeys": {
+      "title": "Select stake key",
+      "body": "This wallet has multiple stake keys. Select the one you want to use for governance.",
+      "connected": "{{wallet}} · Connected",
+      "connectedPill": "Connected",
+      "choose": "Choose a stake key",
+      "available_one": "{{count}} available",
+      "available_other": "{{count}} available",
+      "key": "Stake key {{n}}",
+      "copy": "Copy",
+      "copyLabel": "Copy stake key {{n}}",
+      "votingPower": "Voting power",
+      "cancel": "Cancel",
+      "continue": "Continue"
+    },
+    "viewProfile": "View profile"
+  },
+  "profile": {
+    "badge": "Governance identity review",
+    "title": "Your governance profile",
+    "body": "Your {{wallet}} wallet is connected. Review your stake key and governance information before continuing.",
+    "bodyNoWallet": "Your wallet is connected. Review your stake key and governance information before continuing.",
+    "secureTitle": "Secure, read-only review",
+    "secureBody": "Confirm the identity GovTool will use before you choose a governance action.",
+    "steps": {
+      "label": "Profile progress",
+      "wallet": "Wallet connected",
+      "stakeKey": "Stake key selected",
+      "review": "Review governance status"
+    },
+    "details": "Profile details",
+    "detailsHint": "Compare identity and status at a glance",
+    "wallet": {
+      "title": "Connected wallet",
+      "body": "Verified for this GovTool session",
+      "pill": "Connected"
+    },
+    "votingPower": {
+      "title": "Voting power",
+      "body": "This is the current voting power associated with the selected stake key."
+    },
+    "stakeKey": {
+      "title": "Selected stake key",
+      "pill": "Selected",
+      "label": "Stake key",
+      "body": "Governance actions and voting power below apply to this stake key, not the wallet address."
+    },
+    "drep": {
+      "notRegisteredTitle": "DRep status — Not registered",
+      "notRegisteredPill": "Not registered",
+      "notRegisteredBody": "You can register this stake key as a DRep and participate in Cardano governance.",
+      "registeredTitle": "DRep status — Registered",
+      "registeredPill": "Registered",
+      "registeredBody": "This stake key is a registered DRep. Manage your profile, votes and delegators from your DRep dashboard.",
+      "retiredTitle": "DRep status — Retired",
+      "retiredPill": "Retired",
+      "retiredBody": "Your DRep registration is retired. You can register again from your dashboard.",
+      "directTitle": "DRep status — Direct voter",
+      "directPill": "Direct voter",
+      "directBody": "This stake key votes directly as a direct voter.",
+      "become": "Become a DRep",
+      "explore": "Explore governance",
+      "dashboard": "Open DRep dashboard",
+      "openDashboard": "Open dashboard"
+    },
+    "noTxTitle": "No transaction is submitted now",
+    "noTxBody": "Reviewing this profile or choosing an action does not submit a blockchain transaction. Transaction review and wallet approval happen later."
   },
   "drepDashboard": {
     "share": {

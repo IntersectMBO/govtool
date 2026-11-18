@@ -8,6 +8,8 @@ import {
   VoteContextModal,
   SubmittedVotesModal,
   LoadingModal,
+  WalletConnectionModal,
+  DisconnectWalletModal,
 } from "@organisms";
 import { basicReducer, callAll, BasicReducer } from "@utils";
 
@@ -29,7 +31,9 @@ export type ModalType =
   | "statusModal"
   | "externalLink"
   | "submittedVotes"
-  | "voteContext";
+  | "voteContext"
+  | "walletConnection"
+  | "disconnectWallet";
 
 const modals: Record<ModalType, ContextModal> = {
   none: {
@@ -40,6 +44,12 @@ const modals: Record<ModalType, ContextModal> = {
   },
   chooseWallet: {
     component: <ChooseWalletModal />,
+  },
+  walletConnection: {
+    component: <WalletConnectionModal />,
+  },
+  disconnectWallet: {
+    component: <DisconnectWalletModal />,
   },
   statusModal: {
     component: <StatusModal />,

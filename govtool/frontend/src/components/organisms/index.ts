@@ -42,3 +42,5 @@ export * from "./GovernanceActionsListLayout";
 export * from "./ProposeActionBanner";
 export * from "./DelegationReviewDialog";
 export * from "./DashboardWalletCard";
+export * from "./WalletConnect/WalletConnectionModal";
+export * from "./WalletConnect/DisconnectWalletModal";

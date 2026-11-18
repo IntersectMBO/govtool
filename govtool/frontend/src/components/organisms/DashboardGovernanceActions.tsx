@@ -76,6 +76,9 @@ export const DashboardGovernanceActions = () => {
   const [content, setContent] = useState<number>(
     state?.isVotedListOnLoad ? 1 : 0,
   );
+  const canVote = voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
+  // Without the tabs, such as for a retired DRep, only the first list shows.
+  const tab = canVote ? content : 0;
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setContent(newValue);
@@ -121,7 +124,7 @@ export const DashboardGovernanceActions = () => {
           </Box>
         ) : (
           <>
-            {(voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter) && (
+            {canVote && (
               <Box display="flex" flexDirection="row" alignItems="center">
                 <Tabs
                   sx={{
@@ -130,7 +133,7 @@ export const DashboardGovernanceActions = () => {
                     fontSize: 16,
                     fontWeight: 500,
                   }}
-                  value={content}
+                  value={tab}
                   indicatorColor="secondary"
                   onChange={handleChange}
                   aria-label="Governance Actions tabs"
@@ -169,10 +172,10 @@ export const DashboardGovernanceActions = () => {
             )}
 
             <Box height={isMobile ? 24 : 60} />
-            <CustomTabPanel value={content} index={0}>
+            <CustomTabPanel value={tab} index={0}>
               <GovernanceActionsToVote onDashboard />
             </CustomTabPanel>
-            <CustomTabPanel value={content} index={1}>
+            <CustomTabPanel value={tab} index={1}>
               <DashboardGovernanceActionsVotedOn
                 searchPhrase={debouncedSearchText}
               />

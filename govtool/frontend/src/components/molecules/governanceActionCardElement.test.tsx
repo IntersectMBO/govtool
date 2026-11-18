@@ -20,4 +20,19 @@ describe("GovernanceActionCardElement", () => {
     const strongElement = screen.getByText("Bold").closest("strong");
     expect(strongElement).toBeInTheDocument();
   });
+
+  it("leaves single dollar signs as text", () => {
+    const { container } = render(
+      <GovernanceActionCardElement
+        label="Example Label"
+        text="Budget of $500,000 now and $250,000 later"
+        isMarkdown
+      />,
+    );
+
+    expect(container.querySelector("math")).toBeNull();
+    expect(
+      screen.getByText("Budget of $500,000 now and $250,000 later"),
+    ).toBeInTheDocument();
+  });
 });

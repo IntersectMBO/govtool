@@ -169,7 +169,10 @@ export const GovernanceActionCardElement = ({
       <Markdown
         className="markdown"
         components={markdownComponents}
-        remarkPlugins={[remarkMath, remarkGfm]}
+        remarkPlugins={[
+          [remarkMath, { singleDollarTextMath: false }],
+          remarkGfm,
+        ]}
         rehypePlugins={[rehypeKatex]}
       >
         {formattedText}

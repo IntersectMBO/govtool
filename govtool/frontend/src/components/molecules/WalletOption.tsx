@@ -2,12 +2,7 @@ import { FC, useCallback } from "react";
 import { To, useNavigate, useLocation } from "react-router";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
-import {
-  BUDGET_DISCUSSION_PATHS,
-  GOV_ACTION_HISTORY_PATHS,
-  PATHS,
-  PDF_PATHS,
-} from "@consts";
+import { PATHS } from "@consts";
 import { useCardano } from "@context";
 import { theme } from "@/theme";
 
@@ -37,27 +32,10 @@ export const WalletOptionButton: FC<WalletOption> = ({
 
   const enableByWalletName = useCallback(async () => {
     if (isEnableLoading) return;
-    const isBudgetDiscussion = window.location.pathname.includes(
-      BUDGET_DISCUSSION_PATHS.budgetDiscussion.replace("/", ""),
-    );
-
-    const isProposalDiscussionForum = window.location.pathname.includes(
-      PDF_PATHS.proposalDiscussion.replace("/", ""),
-    );
-
-    const isGovernanceGovernanceActionHistoryPillar = window.location.pathname.includes(
-      GOV_ACTION_HISTORY_PATHS.governanceActionHistory.replace("/", ""),
-    );
 
     const result = await enable(name);
 
     if (result?.stakeKey) {
-      if (
-        isBudgetDiscussion ||
-        isProposalDiscussionForum ||
-        isGovernanceGovernanceActionHistoryPillar
-      )
-        return;
       // Any other page stays where it is: the same URL turns into the
       // dashboard's view of it.
       if (pathToNavigate) {

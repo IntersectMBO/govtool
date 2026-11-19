@@ -13,7 +13,10 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ICONS } from '@/consts/icons';
-import { getGovActionPath } from '@/utils/getGovActionId';
+import {
+    getGovActionCIP129Id,
+    getGovActionPath,
+} from '@/utils/getGovActionId';
 import {
     Badge,
     Box,
@@ -260,7 +263,7 @@ const SingleGovernanceAction = ({ id }) => {
     const voteEnd = submittedAction ? getGovernanceActionVoteEnd(submittedAction) : null;
     const seeGovernanceAction = () =>
         navigate(
-            `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${submissionTxHash}#0`
+            `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${getGovActionCIP129Id(submissionTxHash, 0)}`
         );
 
     const targetRef = useRef();

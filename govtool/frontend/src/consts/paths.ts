@@ -49,21 +49,25 @@ export const GOV_ACTION_HISTORY_PATHS = {
   governanceActionHistoryDetail: "/actions/history/:id",
 };
 
-// Path segments GovTool used before its URLs named resources. Old links and
-// bookmarks are redirected by replacing each segment that matches; a value
-// may stand for several segments.
+// First path segments GovTool used before its URLs named resources, and what
+// replaces them; a value may stand for several segments. Old links and
+// bookmarks are redirected by utils/getCurrentUrl.ts.
 export const LEGACY_PATH_SEGMENTS: Record<string, string> = {
   budget_discussion: "budget",
   create_governance_action: "actions/new",
   drep_directory: "dreps",
   edit_drep: "my/drep/edit",
   governance_actions: "actions",
-  proposal_comment_review: "comment-review",
   proposal_discussion: "proposals",
   register_direct_voter: "my/direct-voter/register",
   register_drep: "my/drep/register",
   retire_direct_voter: "my/direct-voter/retire",
   retire_drep: "my/drep/retire",
   stake_keys: "my/stake-key",
-  votes_and_favorites: "votes",
+};
+
+// Old second segments, by the (current) first segment they followed.
+export const LEGACY_CHILD_SEGMENTS: Record<string, Record<string, string>> = {
+  my: { votes_and_favorites: "votes" },
+  proposals: { proposal_comment_review: "comment-review", propose: "new" },
 };

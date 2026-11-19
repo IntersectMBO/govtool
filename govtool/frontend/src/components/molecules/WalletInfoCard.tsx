@@ -4,7 +4,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { PATHS, gray } from "@consts";
 import { useCardano } from "@context";
 import { useTranslation } from "@hooks";
-import { isWalletOptionalPath } from "@utils";
+import { isWalletOnlyPath } from "@utils";
 import { Card } from "./Card";
 
 export const WalletInfoCard = () => {
@@ -17,7 +17,7 @@ export const WalletInfoCard = () => {
     await disconnectWallet();
 
     // A page that works without a wallet stays; the rest need one.
-    if (!isWalletOptionalPath(pathname)) {
+    if (isWalletOnlyPath(pathname)) {
       navigate(PATHS.home);
     }
 

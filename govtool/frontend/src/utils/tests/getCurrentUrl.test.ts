@@ -85,6 +85,20 @@ describe("getCurrentUrl", () => {
     );
   });
 
+  it("renames only route names, not ids or slugs that match one", () => {
+    expect(getCurrentUrl(url("/dreps/stake_keys"))).toBeNull();
+    expect(getCurrentUrl(url("/proposals/12/edit_drep"))).toBeNull();
+    expect(getCurrentUrl(url("/drep_directory/governance_actions"))).toEqual(
+      url("/dreps/governance_actions"),
+    );
+  });
+
+  it("keeps a malformed type as it is instead of throwing", () => {
+    expect(getCurrentUrl(url("/governance_actions/category/%E0"))).toEqual(
+      url("/actions", "?type=%25E0"),
+    );
+  });
+
   it("leaves current and unknown URLs alone", () => {
     expect(getCurrentUrl(url("/"))).toBeNull();
     expect(getCurrentUrl(url("/dreps", "?search=x", "#top"))).toBeNull();

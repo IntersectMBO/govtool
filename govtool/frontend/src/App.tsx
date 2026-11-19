@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 import {
   Navigate,
   Route,
@@ -16,7 +16,7 @@ import {
   BUDGET_DISCUSSION_PATHS,
 } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
-import { useWalletConnectionListener } from "@hooks";
+import { useIsWalletConnected, useWalletConnectionListener } from "@hooks";
 import { DashboardGovernanceActionDetails } from "@organisms";
 import {
   ChooseStakeKey,
@@ -45,7 +45,7 @@ import {
   removeItemFromLocalStorage,
   getCurrentUrl,
   getPageTitle,
-  isWalletOptionalPath,
+  isWalletOnlyPath,
 } from "@utils";
 import { TopBanners } from "./components/organisms/TopBanners";
 import { DashboardHome } from "./pages/DashboardHome";
@@ -53,7 +53,12 @@ import { GovernanceActionHistoryPage } from "./pages/GovernanceActionHistory";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
-  const { enable, isEnabled } = useCardano();
+  const { enable } = useCardano();
+  // A saved wallet counts while it reconnects, so a reload does not flash
+  // the public layout before the dashboard.
+  const isWalletConnected = useIsWalletConnected();
+  // Re-renders once a saved wallet is dropped, as that changes no state.
+  const [, rerender] = useReducer((count: number) => count + 1, 0);
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
   const { pathname, search, hash, state } = useLocation();
@@ -77,6 +82,7 @@ export default () => {
     const cleanUpWalletData = () => {
       removeItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
       removeItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`);
+      rerender();
     };
 
     const waitForWalletExtension = async () => {
@@ -95,13 +101,11 @@ export default () => {
         });
       }
 
-      if (!isOnAllowedPage) {
+      if (isWalletOnlyPath(window.location.pathname)) {
         navigate(PATHS.home);
       }
       cleanUpWalletData();
     };
-
-    const isOnAllowedPage = isWalletOptionalPath(window.location.pathname);
 
     const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
 
@@ -118,6 +122,54 @@ export default () => {
     checkTheWalletIsActive();
   }, [checkTheWalletIsActive]);
 
+  // Pages with both layouts; the rest need a wallet or have no dashboard.
+  const walletOptionalRoutes = (
+    <>
+      {isProposalDiscussionForumEnabled && (
+        <Route
+          path={`${PDF_PATHS.proposalDiscussion}/*`}
+          element={<ProposalDiscussionPillar />}
+        />
+      )}
+      <Route
+        path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+        element={<BudgetProposalsArchive />}
+      />
+      <Route
+        path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
+        element={<GovernanceActionHistoryPage />}
+      />
+      <Route
+        path={USER_PATHS.governanceActionsVotedByMe}
+        element={<GovernanceActionHistoryPage />}
+      />
+      <Route
+        path={PATHS.governanceActions}
+        element={<GovernanceActionsIndex isConnected={isWalletConnected} />}
+      />
+      <Route
+        path={PATHS.governanceActionsAction}
+        element={
+          isWalletConnected ? (
+            <DashboardGovernanceActionDetails />
+          ) : (
+            <GovernanceActionDetails />
+          )
+        }
+      />
+      <Route element={<DRepDirectory isConnected={isWalletConnected} />}>
+        <Route
+          path={PATHS.dRepDirectory}
+          element={<DRepDirectoryContent isConnected={isWalletConnected} />}
+        />
+        <Route
+          path={PATHS.dRepDirectoryDRep}
+          element={<DRepDetails isConnected={isWalletConnected} />}
+        />
+      </Route>
+    </>
+  );
+
   return (
     <TopBanners>
       <ScrollToTop />
@@ -127,90 +179,12 @@ export default () => {
         <Routes>
           <Route path={PATHS.home} element={<Home />} />
           {/* One URL per page: the wallet picks the dashboard or the public
-          layout. */}
+          layout of the same routes. */}
           <Route element={<Dashboard />}>
             <Route path={PATHS.dashboard} element={<DashboardHome />} />
-            {isEnabled && (
-              <>
-                {isProposalDiscussionForumEnabled && (
-                  <Route
-                    path={`${PDF_PATHS.proposalDiscussion}/*`}
-                    element={<ProposalDiscussionPillar />}
-                  />
-                )}
-                <Route
-                  path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
-                  element={<BudgetProposalsArchive />}
-                />
-                <Route
-                  path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
-                  element={<GovernanceActionHistoryPage />}
-                />
-                <Route
-                  path={USER_PATHS.governanceActionsVotedByMe}
-                  element={<GovernanceActionHistoryPage />}
-                />
-                <Route
-                  path={PATHS.governanceActions}
-                  element={<GovernanceActionsIndex isConnected />}
-                />
-                <Route
-                  path={PATHS.governanceActionsAction}
-                  element={<DashboardGovernanceActionDetails />}
-                />
-                <Route element={<DRepDirectory isConnected />}>
-                  <Route
-                    path={PATHS.dRepDirectory}
-                    element={<DRepDirectoryContent isConnected />}
-                  />
-                  <Route
-                    path={PATHS.dRepDirectoryDRep}
-                    element={<DRepDetails isConnected />}
-                  />
-                </Route>
-              </>
-            )}
+            {isWalletConnected && walletOptionalRoutes}
           </Route>
-          {!isEnabled && (
-            <>
-              {isProposalDiscussionForumEnabled && (
-                <Route
-                  path={`${PDF_PATHS.proposalDiscussion}/*`}
-                  element={<ProposalDiscussionPillar />}
-                />
-              )}
-              <Route
-                path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
-                element={<BudgetProposalsArchive />}
-              />
-              <Route
-                path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
-                element={<GovernanceActionHistoryPage />}
-              />
-              <Route
-                path={USER_PATHS.governanceActionsVotedByMe}
-                element={<GovernanceActionHistoryPage />}
-              />
-              <Route
-                path={PATHS.governanceActions}
-                element={<GovernanceActionsIndex />}
-              />
-              <Route
-                path={PATHS.governanceActionsAction}
-                element={<GovernanceActionDetails />}
-              />
-              <Route element={<DRepDirectory />}>
-                <Route
-                  path={PATHS.dRepDirectory}
-                  element={<DRepDirectoryContent />}
-                />
-                <Route
-                  path={PATHS.dRepDirectoryDRep}
-                  element={<DRepDetails />}
-                />
-              </Route>
-            </>
-          )}
+          {!isWalletConnected && walletOptionalRoutes}
           <Route
             path={PATHS.createGovernanceAction}
             element={<CreateGovernanceAction />}

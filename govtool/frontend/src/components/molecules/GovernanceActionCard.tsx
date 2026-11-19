@@ -11,7 +11,7 @@ import {
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
-  encodeCIP129Identifier,
+  getGovActionCIP129Id,
   getFullGovActionId,
   getGovActionPath,
   getProposalTypeLabel,
@@ -52,11 +52,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
   const { t } = useTranslation();
 
   const govActionId = getFullGovActionId(txHash, index);
-  const cip129GovernanceActionId = encodeCIP129Identifier({
-    txID: txHash,
-    index: index.toString(16).padStart(2, "0"),
-    bech32Prefix: "gov_action",
-  });
+  const cip129GovernanceActionId = getGovActionCIP129Id(txHash, index);
 
   const [searchParams] = useSearchParams();
   const isCategoryView = searchParams.has(GOVERNANCE_ACTION_TYPE_PARAM);

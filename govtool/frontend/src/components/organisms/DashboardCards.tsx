@@ -7,7 +7,12 @@ import {
   useGetVoterInfo,
   useTranslation,
 } from "@hooks";
-import { ds, RADIUS } from "@/consts/designTokens";
+import { Link as RouterLink } from "react-router";
+import { UserRoundX } from "lucide-react";
+import { Button } from "@/components/atoms/Button";
+import { PATHS } from "@/consts/paths";
+import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
+import { RetiredBanner } from "./RetiredBanner";
 import { DashboardWalletCard } from "./DashboardWalletCard";
 import { DelegateDashboardCard } from "./DashboardCards/DelegateDashboardCard";
 import { DRepDashboardCard } from "./DashboardCards/DRepDashboardCard";
@@ -119,27 +124,47 @@ export const DashboardCards = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
-        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 1.25 }}>
-          <Box component="h1" sx={{ color: ds.gray["900"], fontSize: { xxs: 26, md: 32 }, fontWeight: 600, letterSpacing: "-0.6px", lineHeight: { xxs: "32px", md: "40px" }, m: 0, overflowWrap: "anywhere" }}>
-            {voter.givenName
+      <Box sx={{ alignItems: { md: "flex-start" }, display: "flex", flexDirection: { xxs: "column", md: "row" }, gap: 2, justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+          <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 1.25 }}>
+            <Box component="h1" sx={{ color: ds.gray["900"], fontSize: { xxs: 26, md: 32 }, fontWeight: 600, letterSpacing: "-0.6px", lineHeight: { xxs: "32px", md: "40px" }, m: 0, overflowWrap: "anywhere" }}>
+              {voter.givenName
               ? t("dashboard.welcomeName", { name: voter.givenName })
               : t("dashboard.welcome")}
+            </Box>
+            <Box
+              component="span"
+              data-testid="dashboard-role-pill"
+              sx={{ backgroundColor: role === "notRegistered" ? ds.gray["100"] : ds.primary["50"], borderRadius: `${RADIUS.xs}px`, color: role === "notRegistered" ? ds.gray["700"] : ds.primary["700"], fontSize: 11, fontWeight: 600, letterSpacing: "0.3px", lineHeight: "18px", px: 0.75, textTransform: "uppercase" }}
+            >
+              {t(`dashboard.role.${role}`)}
+            </Box>
           </Box>
-          <Box
-            component="span"
-            data-testid="dashboard-role-pill"
-            sx={{ backgroundColor: role === "notRegistered" ? ds.gray["100"] : ds.primary["50"], borderRadius: `${RADIUS.xs}px`, color: role === "notRegistered" ? ds.gray["700"] : ds.primary["700"], fontSize: 11, fontWeight: 600, letterSpacing: "0.3px", lineHeight: "18px", px: 0.75, textTransform: "uppercase" }}
-          >
-            {t(`dashboard.role.${role}`)}
-          </Box>
-        </Box>
-        {typeof epochParams?.epoch_no === "number" && (
+          {typeof epochParams?.epoch_no === "number" && (
           <Box sx={{ color: ds.gray["500"], fontSize: 13 }}>
             {t("dashboard.currentEpoch", { epoch: epochParams.epoch_no })}
           </Box>
         )}
+        </Box>
+        {role === "directVoter" && !pendingTransaction.retireAsDirectVoter && (
+        <Button
+          component={RouterLink}
+          dataTestId="retire-direct-voter-header-button"
+          size="medium"
+          startIcon={<UserRoundX aria-hidden size={16} />}
+          sx={{
+            alignSelf: { xxs: "flex-start", md: "auto" },
+            backgroundColor: ds.error["600"],
+            boxShadow: SHADOWS.innerError,
+            "&:hover": { backgroundColor: ds.error["700"], boxShadow: SHADOWS.innerError },
+          }}
+          to={PATHS.retireAsDirectVoter}
+        >
+          {t("directVoter.headerRetire")}
+        </Button>
+      )}
       </Box>
+      <RetiredBanner />
       <Box
         sx={{
           alignItems: "start",

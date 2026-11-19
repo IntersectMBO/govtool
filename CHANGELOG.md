@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Retiring as a Direct Voter follows the new design: what retirement means and the deposit refund, a progress dialog that stays until the retirement confirms, and a confirmation banner on the dashboard; a direct voter's dashboard header offers Retire as Direct Voter
 - The connected top navigation shows a profile avatar instead of the voting power chip, the wallet pill and dashboard wallet card show the stake address as stake1… and the card shows the connected wallet's own icon; the Become a DRep, Reactivate and Retire as DRep buttons lose a stray blue edge
 - Retiring as a DRep asks the DRep to acknowledge what retirement means before signing, then follows the transaction in a progress dialog until it confirms; a retired DRep's dashboard shows the retired status, the previous profile, a tenure summary and archived votes with a way to reactivate; registering again starts from a "Register as a DRep again" page, and a registration the wallet did not complete can be retried. The DRep dashboard's share button opens a share dialog with the public profile link and X, LinkedIn, Facebook and email links
 - The frontend and docs images use nginx 1.30 instead of 1.28; the devnet's prebuilt frontend image follows

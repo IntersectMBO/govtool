@@ -22,8 +22,15 @@ export const RetirementProgressDialog = ({
   name,
   deposit,
   onClose,
+  title,
+  bodyText,
+  showActions = true,
 }: {
   txHash: string;
+  /** Overrides the DRep wording, e.g. for a direct voter. */
+  title?: string;
+  bodyText?: string;
+  showActions?: boolean;
   name?: string | null;
   /** ADA, formatted. */
   deposit?: string;
@@ -31,8 +38,8 @@ export const RetirementProgressDialog = ({
 }) => {
   const { t } = useTranslation();
   const { cExplorerBaseUrl } = useAppContext();
-  let body = t("retirement.progress.bodyUnknown");
-  if (deposit) {
+  let body = bodyText ?? t("retirement.progress.bodyUnknown");
+  if (deposit && !bodyText) {
     body = name
       ? t("retirement.progress.body", { name, deposit })
       : t("retirement.progress.bodyNoName", { deposit });
@@ -55,10 +62,11 @@ export const RetirementProgressDialog = ({
         <CircularProgress aria-hidden size={36} sx={{ color: ds.orange["500"], mt: 1 }} />
         <Box role="status" sx={{ color: ds.primary["600"], fontSize: 14, fontWeight: 500 }}>{t("retirement.progress.confirming")}</Box>
         <Box component="h2" id="retirement-progress-title" sx={{ color: ds.gray["900"], fontSize: 20, fontWeight: 600, m: 0 }}>
-          {t("retirement.progress.title")}
+          {title ?? t("retirement.progress.title")}
         </Box>
         <Box component="p" sx={{ color: ds.gray["600"], fontSize: 14, lineHeight: "20px", m: 0 }}>{body}</Box>
-        <Box aria-hidden sx={{ alignSelf: "stretch", borderTop: `1px dashed ${ds.gray["200"]}`, my: 1 }} />
+        {showActions && <Box aria-hidden sx={{ alignSelf: "stretch", borderTop: `1px dashed ${ds.gray["200"]}`, my: 1 }} />}
+        {showActions && (
         <Box sx={{ alignSelf: "stretch", display: "flex", gap: 1.5 }}>
           <ButtonBase
             onClick={() => openInNewTab(LINKS.RETIRE_AS_A_DREP)}
@@ -74,6 +82,7 @@ export const RetirementProgressDialog = ({
             {t("retirement.progress.showTx")}
           </ButtonBase>
         </Box>
+        )}
       </Box>
     </Dialog>
   );

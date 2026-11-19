@@ -1806,6 +1806,21 @@
     "viewAll": "View all"
   },
   "directVoter": {
+    "retireTitle": "Retire as Direct Voter?",
+    "retireIntro": "Retiring as a Direct Voter will remove your Direct Voter status. You will no longer be able to participate in governance votes as a Direct Voter.",
+    "retirePoints": {
+      "abstain": "You will give up your Voting Power, which will be delegated to Abstain on all votes. You will no longer be able to vote on Governance Actions.",
+      "again": "You can re-register as a Direct Voter at any time, delegate your Voting Power to someone else, or become a DRep.",
+      "deposit": "Your {{deposit}} ADA deposit will be refunded to your wallet once you retire as a Direct Voter.",
+      "depositNoAmount": "Your deposit will be refunded to your wallet once you retire as a Direct Voter."
+    },
+    "retireContinue": "Continue to Retirement",
+    "progressTitle": "Direct Voter retirement in progress",
+    "progressBody": "Once the transaction is confirmed, your ₳{{deposit}} deposit will be refunded to your wallet.",
+    "progressBodyNoAmount": "Once the transaction is confirmed, your deposit will be refunded to your wallet.",
+    "retiredBanner": "You have successfully retired as a Direct Voter",
+    "dismiss": "Dismiss",
+    "headerRetire": "Retire as Direct Voter",
     "alreadyRegistered": {
       "title": "You already are a Direct Voter",
       "description": "Looks like you have already successfully completed your registration and you currently are a Direct Voter."

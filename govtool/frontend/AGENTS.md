@@ -277,8 +277,10 @@ path that src/theme.ts does not define.
 
 The forum backend pins the query strings the forum sends, in its SPEC.md
 appendix, its *.allowlists.ts files and test/helpers/pdf-ui-corpus.ts. They are
-built in lib/api.js and in components such as ProposalsList and CommentCard;
-changing a proposal, comment or poll query means changing all of them.
+built in lib/api.js, lib/proposalList.js (the proposals list: one request across
+the chosen types) and components such as ProposalsList (now only the unfinished
+drafts) and CommentCard; changing a proposal, comment or poll query means
+changing all of them.
 
 The budget archive never calls the forum backend: its E2E spec fails on any
 budget-discussion API request, and the shared CommentCard stays off the forum API only while the

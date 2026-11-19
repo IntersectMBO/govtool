@@ -8,7 +8,6 @@ import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
 import { isBootStrapingPhase } from "@helpers/cardano";
 import { getProposalType } from "@helpers/index";
-import { injectLogger } from "@helpers/page";
 import { extractProposalIdFromUrl } from "@helpers/string";
 import { functionWaitedAssert } from "@helpers/waitedLoop";
 import ProposalDiscussionDetailsPage from "@pages/proposalDiscussionDetailsPage";
@@ -45,22 +44,27 @@ test.describe("Filter and sort proposals", () => {
     await proposalDiscussionPage.goto();
   });
 
-  test("8B_1. Should filter the list of proposed governance actions.", async () => {
+  test("8B_1. Should filter the list of proposed governance actions.", async ({
+    page,
+  }) => {
     test.slow();
 
-    await proposalDiscussionPage.filterBtn.click();
-
-    // unselect active proposal
+    // unselect active proposal, in the status menu
+    await proposalDiscussionPage.statusFilterBtn.click();
     await proposalDiscussionPage.activeProposalWrapper.click();
+    await page.keyboard.press("Escape");
     const isBootStraping = await isBootStrapingPhase();
 
     // proposal type filter
+    await proposalDiscussionPage.filterBtn.click();
     await proposalDiscussionPage.applyAndValidateFilters(
       isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : getProposalType(),
       proposalDiscussionPage._validateTypeFiltersInProposalCard
     );
+    await page.keyboard.press("Escape");
 
     // proposal status filter
+    await proposalDiscussionPage.statusFilterBtn.click();
     await proposalDiscussionPage.applyAndValidateFilters(
       PROPOSAL_STATUS_FILTER,
       proposalDiscussionPage._validateStatusFiltersInProposalCard
@@ -166,44 +170,41 @@ test("8C. Should search the list of proposed governance actions.", async ({
   );
 });
 
-test("8D. Should show the view-all categorized proposed governance actions.", async ({
-  browser,
+test("8D. Should list one type of proposed governance action through the type filter.", async ({
+  page,
 }) => {
-  await Promise.all(
-    getProposalType().map(async (proposalType: string) => {
-      const context = await browser.newContext();
-      const page = await context.newPage();
-      injectLogger(page);
+  const proposalDiscussionPage = new ProposalDiscussionPage(page);
+  await proposalDiscussionPage.goto();
 
-      const proposalDiscussionPage = new ProposalDiscussionPage(page);
-      await proposalDiscussionPage.goto();
-      const isShowAllButtonVisible = await page
-        .waitForSelector(
-          `[data-testid="${proposalType.toLowerCase().replace(/ /g, "-")}-show-all-button"]`,
-          { timeout: 60_000 }
-        )
-        .then(() => true)
-        .catch(() => false);
+  for (const proposalType of getProposalType()) {
+    await proposalDiscussionPage.filterBtn.click();
+    const filtered = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/proposals?") &&
+        decodeURIComponent(response.url()).includes("[gov_action_type_id][$in]")
+    );
+    await page.getByTestId(`${proposalType.toLowerCase()}-radio`).click();
+    await filtered;
+    await page.keyboard.press("Escape");
+    // The previous rows stay, dimmed, until the new page renders.
+    await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
 
-      if (isShowAllButtonVisible) {
-        await page
-          .getByTestId(
-            proposalType.toLowerCase().replace(/ /g, "-") + "-show-all-button"
-          )
-          .click();
-
-        const proposalCards = await proposalDiscussionPage.getAllProposals();
-
-        for (const proposalCard of proposalCards) {
-          await expect(
-            proposalCard.getByTestId("governance-action-type")
-          ).toHaveText(proposalType, { timeout: 60_000 });
-        }
-      } else {
-        expect(true, `No ${proposalType} found`).toBeTruthy();
+    const isEmpty = await page
+      .getByTestId("proposals-empty-state")
+      .isVisible();
+    if (!isEmpty) {
+      const proposalCards = await proposalDiscussionPage.getAllProposals();
+      for (const proposalCard of proposalCards) {
+        await expect(
+          proposalCard.getByTestId("governance-action-type")
+        ).toHaveText(proposalType, { timeout: 60_000 });
       }
-    })
-  );
+    }
+
+    await proposalDiscussionPage.filterBtn.click();
+    await page.getByTestId(`${proposalType.toLowerCase()}-radio`).click();
+    await page.keyboard.press("Escape");
+  }
 });
 
 test("8H. Should disable proposal interaction on a disconnected state.", async ({

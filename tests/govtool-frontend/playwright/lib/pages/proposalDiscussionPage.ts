@@ -16,10 +16,11 @@ export default class ProposalDiscussionPage {
     "propose-a-governance-action-button"
   );
   readonly continueBtn = this.page.getByTestId("continue-button");
+  // The type menu keeps filter-button; status has its own menu.
   readonly filterBtn = this.page.getByTestId("filter-button");
+  readonly statusFilterBtn = this.page.getByTestId("status-filter-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly searchInput = this.page.getByTestId("search-input");
-  readonly showAllBtn = this.page.getByTestId("show-all-button").first(); //this.page.getByTestId("show-all-button");
   readonly verifyIdentityBtn = this.page
     .getByTestId("verify-user-link")
     .first();
@@ -178,7 +179,7 @@ export default class ProposalDiscussionPage {
     );
 
     await this.sortBtn.click();
-    await this.page.getByTestId(`${type}-sort-option`).click();
+    await this.page.getByTestId(`${type}-radio`).click();
     const response = await responsePromise;
 
     let proposals: ProposedGovAction[] = (await response.json()).data;

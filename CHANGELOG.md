@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The proposal discussion list follows the new design: search, sort, proposal type and status in one bar above a single list of proposal rows (type and status, date, share, title, abstract, proposer, comments and support) with numbered pages, instead of one carousel per type with Show all
 - Creating a governance action follows the new design step by step: an acknowledgement with the deposit, a searchable action type picker, the details in Identity, About, Address or action details, Linked survey and Links cards, a review, and a confirm step with the metadata file, the deposit, the network and the connected wallet; a declined or failed signature now offers Try again, and an error thrown as an Error object no longer leaves the loading dialog open
 - Retiring as a Direct Voter follows the new design: what retirement means and the deposit refund, a progress dialog that stays until the retirement confirms, and a confirmation banner on the dashboard; a direct voter's dashboard header offers Retire as Direct Voter
 - The connected top navigation shows a profile avatar instead of the voting power chip, the wallet pill and dashboard wallet card show the stake address as stake1… and the card shows the connected wallet's own icon; the Become a DRep, Reactivate and Retire as DRep buttons lose a stray blue edge

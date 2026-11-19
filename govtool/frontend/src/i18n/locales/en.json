@@ -2173,6 +2173,118 @@
     "noTxTitle": "No transaction is submitted now",
     "noTxBody": "Reviewing this profile or choosing an action does not submit a blockchain transaction. Transaction review and wallet approval happen later."
   },
+  "createGA": {
+    "steps": {
+      "understand": "Understand",
+      "type": "Action Type",
+      "details": "Action details",
+      "review": "Review",
+      "prepareFile": "Prepare file",
+      "confirm": "Confirm"
+    },
+    "intro": {
+      "title": "Create a Governance Action",
+      "body": "Propose changes to Cardano governance. Governance Actions allow you to put forward proposals for the community to review and vote on.",
+      "ackTitle": "Acknowledgement",
+      "ackBody": "Before you begin, there are a few things you need to know.",
+      "points": {
+        "provide": "Provide the information required to create your Governance Action.",
+        "store": "Store the metadata of your Governance Action at your own expense.",
+        "deposit": "Pay a refundable deposit of ₳{{deposit}}.",
+        "depositNoAmount": "Pay a refundable deposit.",
+        "returned": "Your deposit will be returned to your wallet when the Governance Action is enacted or expires."
+      },
+      "info": "The deposit will not affect your Voting Power. Once submitted, your Governance Action will be available for voting for {{epochs}} epochs, starting from the epoch after submission.",
+      "infoNoEpochs": "The deposit will not affect your Voting Power. Once submitted, your Governance Action will be available for voting from the epoch after submission.",
+      "accept": "Accept & Continue"
+    },
+    "type": {
+      "title": "Select Action Type",
+      "body": "Select one governance action type below. Each option is explained so you can choose the right path for your proposal.",
+      "search": "Search for Governance Action type",
+      "selected": "Selected",
+      "available": "Available",
+      "noMatch": "No action type matches this search.",
+      "names": {
+        "TreasuryWithdrawals": "Treasury Withdrawal",
+        "ParameterChange": "Protocol Parameter Change",
+        "HardForkInitiation": "Hard Fork",
+        "NewConstitution": "Constitution / Guardrails",
+        "NewCommittee": "Committee Change",
+        "NoConfidence": "Motion of No Confidence",
+        "InfoAction": "Info Action"
+      },
+      "descriptions": {
+        "TreasuryWithdrawals": "Request funds from the treasury for a project, initiative, or reimbursement. This action is used when the proposal needs treasury resources.",
+        "ParameterChange": "Update a protocol parameter, such as a fee, reward, or network setting. This action changes how the protocol operates.",
+        "HardForkInitiation": "Propose a hard fork, which changes the protocol rules and may require a network upgrade. Use this for major architectural changes.",
+        "NewConstitution": "Update the constitution or governance guardrails, which define the rules and limits of the governance process.",
+        "NewCommittee": "Add or remove Constitutional Committee members, or change the committee's quorum.",
+        "NoConfidence": "Declare no confidence in the current Constitutional Committee.",
+        "InfoAction": "Share information or gauge community sentiment without changing anything on chain."
+      }
+    },
+    "details": {
+      "title": "Governance Action details",
+      "body": "Complete the information below to explain your governance action to the community.",
+      "identity": "Identity",
+      "about": "About Action",
+      "parameters": "Action Details",
+      "address": "Address",
+      "addressBody": "Where the requested funds are paid, and how much.",
+      "survey": "Linked survey",
+      "links": "Links & References",
+      "required": "Required",
+      "optional": "Optional",
+      "typeHint": "To change the Governance Action Type go back to the previous page.",
+      "addLink": "Add Link",
+      "removeLink": "Remove link {{index}}",
+      "continue": "Continue & Preview"
+    },
+    "review": {
+      "title": "Review Governance Action",
+      "body": "Check the information below before preparing your metadata file.",
+      "type": "Governance Action Type",
+      "edit": "Back to Edit",
+      "continue": "Continue"
+    },
+    "storeData": {
+      "title": "Store your metadata",
+      "body": "Your Governance Action's metadata must be hosted at a public URL before it can be submitted."
+    },
+    "confirm": {
+      "title": "Submit Governance Action",
+      "body": "Add the URL of your stored metadata, check the details below, then approve the request in your connected wallet.",
+      "typeLabel": "Governance Action Type:",
+      "transaction": "Transaction Details",
+      "deposit": "Governance action deposit",
+      "network": "Network",
+      "wallet": "Connected Wallet",
+      "connected": "Connected",
+      "signatureTitle": "Your wallet will request a signature",
+      "signatureBody": "Your wallet will open after you continue. Review and sign the transaction there to submit this governance action for community review.",
+      "storageTitle": "Prepare your metadata file",
+      "edit": "Back to edit",
+      "submit": "Continue to wallet"
+    },
+    "modals": {
+      "successTitle": "Action submitted successfully",
+      "successBody": "Your Governance Action has been submitted to the Cardano blockchain. It will appear in Live Voting once it has been processed.",
+      "successLink": "View transaction on explorer",
+      "backToDashboard": "Back to Dashboard",
+      "cancelledTitle": "Submission cancelled",
+      "cancelledBody": "The signature request was declined in your wallet, so nothing was submitted. Your details are still on this page, so you can try again when you're ready.",
+      "failedTitle": "Submission failed",
+      "failedBody": "Your Governance Action could not be submitted. Your details are still on this page, so you can try again.",
+      "reason": "Details: {{reason}}",
+      "close": "Close",
+      "tryAgain": "Try again",
+      "cancelTitle": "Do you want to cancel your Governance Action submission?",
+      "cancelBody": "It will cancel your proposed Governance Action and it will not be submitted.",
+      "cancelConfirm": "Yes, cancel submission",
+      "cancelBack": "Back"
+    }
+  },
   "drepDashboard": {
     "share": {
       "open": "Share DRep profile",

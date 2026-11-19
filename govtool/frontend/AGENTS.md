@@ -183,6 +183,12 @@ instead (utils/drepDashboard.ts isRetiredDRep). Retiring needs both
 acknowledgements ticked (retirement-ack-voting, retirement-ack-deposit) before
 continue-retirement-button enables; the Playwright retirement specs tick them.
 
+Creating a governance action (pages/CreateGovernanceAction.tsx) is six steps in
+CenteredBoxPageWrapper's frameless mode, built from
+organisms/CreateGovernanceActionSteps/parts.tsx. The CIP-179 suite drives it by
+continue-button, the ${type}-radio cards, the fields' name attributes,
+storing-information-checkbox and metadata-download-button, so keep those.
+
 Connecting goes through organisms/Modal/ChooseWalletModal and
 molecules/WalletOption: wallet.tsx's enable wrapper still opens its own modals,
 and WalletOption replaces them once enable settles with the walletConnection

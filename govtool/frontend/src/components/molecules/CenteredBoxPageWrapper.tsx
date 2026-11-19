@@ -19,6 +19,8 @@ interface Props {
   showVotingPower?: boolean;
   /** Centre the content without the card, for loaders. */
   hideBox?: boolean;
+  /** Steps that lay out their own section cards (create governance action). */
+  frameless?: boolean;
   /** The flow's progress above the card, titled with `pageTitle`. */
   stepper?: Omit<FlowStepperProps, "title">;
 }
@@ -31,6 +33,7 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
   pageTitle,
   onClickBackToDashboard,
   hideBox,
+  frameless,
   stepper,
   children,
 }) => {
@@ -94,7 +97,12 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
               </Box>
             )
           )}
-          {hideBox ? (
+          {frameless && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 3, width: "100%" }}>
+              {children}
+            </Box>
+          )}
+          {!frameless && hideBox && (
             <Box
               sx={{
                 alignItems: "center",
@@ -106,7 +114,8 @@ export const CenteredBoxPageWrapper: FC<PropsWithChildren<Props>> = ({
             >
               {children}
             </Box>
-          ) : (
+          )}
+          {!frameless && !hideBox && (
             <Box
               sx={{
                 backgroundColor: "#FFFFFF",

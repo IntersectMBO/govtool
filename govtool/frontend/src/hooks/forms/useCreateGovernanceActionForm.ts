@@ -3,6 +3,7 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { useNavigate } from "react-router";
@@ -32,6 +33,7 @@ import {
   getRenderabilityProblem,
   type SurveyDefinitionEnvelope,
 } from "@/cip179/core";
+import { readSubmissionError } from "@/utils/submissionError";
 import {
   GovernanceActionFieldSchemas,
   GovernanceActionType,
@@ -331,14 +333,12 @@ export const useCreateGovernanceActionForm = (
       type: "statusModal",
       state: {
         link: `${cExplorerBaseUrl}/tx/${link}`,
+        linkText: t("createGA.modals.successLink"),
         status: "success",
-        title: t(
-          "createGovernanceAction.modals.submitTransactionSuccess.title",
-        ),
-        message: t(
-          "createGovernanceAction.modals.submitTransactionSuccess.message",
-        ),
-        buttonText: t("modals.common.goToDashboard"),
+        title: t("createGA.modals.successTitle"),
+        // The explorer link follows the message on its own line.
+        message: `${t("createGA.modals.successBody")}\n`,
+        buttonText: t("createGA.modals.backToDashboard"),
         dataTestId: "governance-action-submitted-modal",
         onSubmit: backToDashboard,
       },
@@ -382,23 +382,14 @@ export const useCreateGovernanceActionForm = (
         });
 
         if (result) showSuccessModal(result);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        const isInsufficientBalance = error
-          ?.toLowerCase()
-          ?.includes("insufficient");
+      } catch (error: unknown) {
+        const failure = readSubmissionError(error);
 
-        if (
-          Object.values(MetadataValidationStatus).includes(
-            error as MetadataValidationStatus,
-          )
-        ) {
+        if (failure.kind === "metadata") {
           openModal({
             type: "statusModal",
             state: {
-              ...storageInformationErrorModals[
-                error as MetadataValidationStatus
-              ],
+              ...storageInformationErrorModals[failure.status],
               metadataAnchor: { url: data.storingURL, hash: hash ?? "" },
               metadataReportId: validation?.reportId,
               metadataError: validation?.error,
@@ -406,19 +397,39 @@ export const useCreateGovernanceActionForm = (
               onCancel: backToDashboard,
             },
           });
-        } else {
+        } else if (failure.kind === "insufficient") {
           openWalletErrorModal({
-            error: isInsufficientBalance
-              ? t("errors.insufficientBalanceDescription", {
-                  ada: correctVoteAdaFormat(
-                    epochParams?.gov_action_deposit ?? undefined,
-                  ),
-                })
-              : error,
-            title: isInsufficientBalance
-              ? t("errors.insufficientBalanceTitle")
-              : undefined,
+            error: t("errors.insufficientBalanceDescription", {
+              ada: correctVoteAdaFormat(
+                epochParams?.gov_action_deposit ?? undefined,
+              ),
+            }),
+            title: t("errors.insufficientBalanceTitle"),
             dataTestId: "create-governance-action-error-modal",
+          });
+        } else {
+          const isCancelled = failure.kind === "cancelled";
+          const body = isCancelled
+            ? t("createGA.modals.cancelledBody")
+            : t("createGA.modals.failedBody");
+          openModal({
+            type: "statusModal",
+            state: {
+              status: "warning",
+              title: isCancelled
+                ? t("createGA.modals.cancelledTitle")
+                : t("createGA.modals.failedTitle"),
+              message: failure.text
+                ? `${body}\n\n${t("createGA.modals.reason", { reason: failure.text })}`
+                : body,
+              buttonText: t("createGA.modals.tryAgain"),
+              cancelText: t("createGA.modals.close"),
+              dataTestId: "create-governance-action-error-modal",
+              onSubmit: () => {
+                closeModal();
+                retry.current?.(data);
+              },
+            },
           });
         }
       } finally {
@@ -433,6 +444,10 @@ export const useCreateGovernanceActionForm = (
       epochParams?.gov_action_deposit,
     ],
   );
+
+  // Try again in the failure modal resubmits with the latest handler.
+  const retry = useRef(onSubmit);
+  retry.current = onSubmit;
 
   return {
     control,

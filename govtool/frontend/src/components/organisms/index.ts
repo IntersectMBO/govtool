@@ -38,6 +38,8 @@ export * from "./Notifications";
 export * from "./GovernanceActivity";
 export * from "./Home";
 export * from "./GovernanceActionsHeader";
+export * from "./GovernanceActionsStats";
+export * from "./ProposeHeaderControls";
 export * from "./GovernanceActionsListLayout";
 export * from "./ProposeActionBanner";
 export * from "./DelegationReviewDialog";

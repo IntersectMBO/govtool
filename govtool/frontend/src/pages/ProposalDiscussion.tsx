@@ -1,12 +1,11 @@
-import React, { ComponentProps, Suspense } from "react";
+import React, { ComponentProps, Suspense, useState } from "react";
 import { Box, CircularProgress } from "@mui/material";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation } from "react-router";
 import {
   useAppContext,
   useCardano,
   useGovernanceActions,
   useProposalDiscussion,
-  useModal,
   useSnackbar,
 } from "@/context";
 import { useValidateMutation } from "@/hooks/mutations";
@@ -17,6 +16,10 @@ import {
   ProposeActionBanner,
   TopNav,
 } from "@/components/organisms";
+import {
+  type ForumProposeState,
+  useProposeHeaderControls,
+} from "@/components/organisms/ProposeHeaderControls";
 import { PDF_PATHS } from "@/consts/paths";
 import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
 import {
@@ -43,8 +46,10 @@ export const ProposalDiscussionPillar = () => {
   const { username, setUsername } = useProposalDiscussion();
   const snackbarContext = useSnackbar();
   const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const { openModal } = useModal();
+  const [forumPropose, setForumPropose] = useState<ForumProposeState | null>(
+    null,
+  );
+  const proposeControls = useProposeHeaderControls(forumPropose);
   // Computed on every render: it also reads the saved wallet name.
   const walletStatus = getPdfWalletStatus(context);
   // The propose path is the list with pdf-ui's propose dialog over it.
@@ -52,15 +57,10 @@ export const ProposalDiscussionPillar = () => {
     pathname === PDF_PATHS.proposalDiscussion ||
     pathname === PDF_PATHS.proposalDiscussionPropose;
 
-  // Disconnected: connect first. Connected: open the forum's propose flow,
-  // which needs a forum sign-in; its sign-in prompt sits by the forum's own
-  // Propose button at the top of the list.
+  // The banner at the foot takes the same next step as the header button:
+  // connect, sign in to the forum, create a display name, or propose.
   const onPropose = () => {
-    if (!context.isEnabled) {
-      openModal({ type: "chooseWallet" });
-      return;
-    }
-    navigate(PDF_PATHS.proposalDiscussionPropose);
+    proposeControls.onPropose();
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -78,7 +78,12 @@ export const ProposalDiscussionPillar = () => {
         component={context.isEnabled ? "div" : "main"}
         sx={{ display: "flex", flex: 1, flexDirection: "column" }}
       >
-        {isListPage && <GovernanceActionsHeader />}
+        {isListPage && (
+          <GovernanceActionsHeader
+            action={proposeControls.action}
+            notice={proposeControls.notice}
+          />
+        )}
         <Suspense
           fallback={
             <Box
@@ -117,6 +122,7 @@ export const ProposalDiscussionPillar = () => {
             getAdaHolderVotingPower={getAdaHolderVotingPower}
             getAccount={getAccount}
             getEnactedProposalDetails={getEnactedProposalDetails}
+            onProposeStateChange={setForumPropose}
             {...snackbarContext}
           />
         </Suspense>

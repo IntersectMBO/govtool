@@ -2,7 +2,6 @@ import { expect, Locator, Page } from "@playwright/test";
 import {
   ProposalCreateRequest,
   ProposalDiscussionFilterTypes,
-  ProposalType,
   ProposedGovAction,
 } from "@types";
 import environments from "lib/constants/environments";
@@ -16,22 +15,14 @@ export default class ProposalDiscussionPage {
     "propose-a-governance-action-button"
   );
   readonly continueBtn = this.page.getByTestId("continue-button");
-  // The type menu keeps filter-button; status has its own menu.
-  readonly filterBtn = this.page.getByTestId("filter-button");
-  readonly statusFilterBtn = this.page.getByTestId("status-filter-button");
+  // The action type sidebar sits behind this button on phones.
+  readonly filtersBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
   readonly searchInput = this.page.getByTestId("search-input");
   readonly verifyIdentityBtn = this.page
     .getByTestId("verify-user-link")
     .first();
   readonly addLinkBtn = this.page.getByTestId("add-link-button");
-  readonly infoRadio = this.page.getByTestId("info action-radio-wrapper");
-  readonly treasuryRadio = this.page.getByTestId(
-    "treasury requests-radio-wrapper"
-  );
-  readonly activeProposalWrapper = this.page.getByTestId(
-    "active-proposal-radio-wrapper"
-  );
 
   constructor(private readonly page: Page) {}
 
@@ -115,12 +106,22 @@ export default class ProposalDiscussionPage {
     }
   }
 
+  /** Opens the action type sidebar where it hides behind Filters (phones). */
+  async showTypeFilter() {
+    if (await this.filtersBtn.isVisible()) {
+      if ((await this.filtersBtn.getAttribute("aria-expanded")) !== "true") {
+        await this.filtersBtn.click();
+      }
+    }
+  }
+
+  /** Toggles sidebar rows, whose ids are the type name without spaces. */
   async clickRadioButtonsByNames(names: string[]) {
+    await this.showTypeFilter();
     for (const name of names) {
-      const testId = Object.values(ProposalType).includes(name as ProposalType)
-        ? name.toLowerCase()
-        : name.toLowerCase().replace(/ /g, "-");
-      await this.page.getByTestId(`${testId}-radio`).click();
+      await this.page
+        .getByTestId(`${name.replace(/ /g, "")}-checkbox`)
+        .click();
     }
   }
 
@@ -160,6 +161,7 @@ export default class ProposalDiscussionPage {
     validationFn: (p1: ProposedGovAction, p2: ProposedGovAction) => boolean
   ) {
     const sortMappings = {
+      Latest: "&sort[createdAt]=DESC",
       "Name A-Z": "&sort[prop_name]=ASC",
       "Name Z-A": "&sort[prop_name]=DESC",
       "Most comments": "&sort[proposal][prop_comments_number]=DESC",

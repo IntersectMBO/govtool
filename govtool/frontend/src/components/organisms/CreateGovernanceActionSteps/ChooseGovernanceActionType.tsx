@@ -27,12 +27,12 @@ type ChooseGovernanceActionTypeProps = {
 /** The order and icons the design gives the action types. */
 const TYPES: { type: GovernanceActionType; icon: LucideIcon }[] = [
   { type: GovernanceActionType.TreasuryWithdrawals, icon: Wallet },
-  { type: GovernanceActionType.ParameterChange, icon: Settings },
+  { type: GovernanceActionType.InfoAction, icon: Info },
   { type: GovernanceActionType.HardForkInitiation, icon: GitBranch },
   { type: GovernanceActionType.NewConstitution, icon: Shield },
-  { type: GovernanceActionType.NewCommittee, icon: Users },
   { type: GovernanceActionType.NoConfidence, icon: Ban },
-  { type: GovernanceActionType.InfoAction, icon: Info },
+  { type: GovernanceActionType.ParameterChange, icon: Settings },
+  { type: GovernanceActionType.NewCommittee, icon: Users },
 ];
 
 export const ChooseGovernanceActionType = ({

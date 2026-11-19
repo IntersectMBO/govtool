@@ -50,6 +50,19 @@ describe("ChooseGovernanceActionType", () => {
   it("selects the next type with the arrow keys", () => {
     renderPicker(GovernanceActionType.TreasuryWithdrawals);
     fireEvent.keyDown(screen.getByTestId("TreasuryWithdrawals-radio"), { key: "ArrowDown" });
-    expect(screen.getByTestId("ParameterChange-radio")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("InfoAction-radio")).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("lists the types in the design's order", () => {
+    renderPicker();
+    expect(screen.getAllByRole("radio").map((radio) => radio.dataset.testid)).toEqual([
+      "TreasuryWithdrawals-radio",
+      "InfoAction-radio",
+      "HardForkInitiation-radio",
+      "NewConstitution-radio",
+      "NoConfidence-radio",
+      "ParameterChange-radio",
+      "NewCommittee-radio",
+    ]);
   });
 });

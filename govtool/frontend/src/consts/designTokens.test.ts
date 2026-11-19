@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ds, PILL_TONES } from "./designTokens";
+import { ds, NOTICE_TONES, PILL_TONES } from "./designTokens";
 
 // WCAG 2.1 relative luminance and contrast ratio.
 const luminance = (hex: string) => {
@@ -18,6 +18,13 @@ const contrast = (a: string, b: string) => {
 const NAV_TINT = "#FFF3EC";
 
 describe("text colours meet WCAG AA (4.5:1)", () => {
+  it("the header notices' text and links on their tints", () => {
+    Object.values(NOTICE_TONES).forEach((tone) => {
+      expect(contrast(tone.link, tone.linkBg)).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(ds.gray["900"], tone.bg)).toBeGreaterThanOrEqual(4.5);
+    });
+  });
+
   it("the active nav item on its orange tint", () => {
     expect(contrast(ds.orange["750"], NAV_TINT)).toBeGreaterThanOrEqual(4.5);
   });

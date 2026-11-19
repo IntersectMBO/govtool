@@ -177,6 +177,9 @@ export function AppContextProvider({ children, govtoolProps = {} }) {
                 identificationType,
                 setIdentificationType,
                 epochParams,
+                // GovTool draws the propose button and its sign-in notice
+                // in its own page header, from the state the list reports.
+                onProposeStateChange: govtoolProps.onProposeStateChange,
             }}
         >
             {children}

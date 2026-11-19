@@ -46,3 +46,37 @@ export const supportPercent = (likes, dislikes) => {
     if (up + down === 0) return null;
     return Math.round((up * 100) / (up + down));
 };
+
+const totalOf = (result) =>
+    Array.isArray(result?.proposals) || typeof result?.total === 'number'
+        ? result?.total
+        : undefined;
+
+/**
+ * How many proposals match the search, in all and per type: one single-row
+ * request each, read for its total. Undefined when any of them fails.
+ */
+export const countProposalsByType = async (
+    fetchProposals,
+    { search, typeIds, statuses = [] }
+) => {
+    const [all, ...perType] = await Promise.all([
+        fetchProposals(buildProposalListQuery({ search, statuses, pageSize: 1 })),
+        ...typeIds.map((id) =>
+            fetchProposals(
+                buildProposalListQuery({
+                    search,
+                    statuses,
+                    typeIds: [id],
+                    pageSize: 1,
+                })
+            )
+        ),
+    ]);
+    const totals = [all, ...perType].map(totalOf);
+    if (totals.some((total) => typeof total !== 'number')) return undefined;
+    return {
+        all: totals[0],
+        byType: Object.fromEntries(typeIds.map((id, i) => [id, totals[i + 1]])),
+    };
+};

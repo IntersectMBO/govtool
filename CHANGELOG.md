@@ -18,7 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The proposal discussion list follows the new design: search, sort, proposal type and status in one bar above a single list of proposal rows (type and status, date, share, title, abstract, proposer, comments and support) with numbered pages, instead of one carousel per type with Show all
+- The proposal discussion list follows the new design: search and a date range above, an action type sidebar with counts beside a single list of proposal rows (type and status, date, share, title, abstract, proposer, comments and support) with numbered pages, instead of one carousel per type with Show all
+- The governance action pages show Total Actions, Voting Now, Expiring Soon and Enacted under the title, and the Proposed tab's header holds Propose a Governance Action with a notice saying what proposing still needs (connect a wallet, sign in to the forum or create a display name), replacing the forum's own propose button
+- Creating a governance action names the types as the forum does (Treasury requests, Updates to the Constitution, Motion of No Confidence) in the design's order
 - Creating a governance action follows the new design step by step: an acknowledgement with the deposit, a searchable action type picker, the details in Identity, About, Address or action details, Linked survey and Links cards, a review, and a confirm step with the metadata file, the deposit, the network and the connected wallet; a declined or failed signature now offers Try again, and an error thrown as an Error object no longer leaves the loading dialog open
 - Retiring as a Direct Voter follows the new design: what retirement means and the deposit refund, a progress dialog that stays until the retirement confirms, and a confirmation banner on the dashboard; a direct voter's dashboard header offers Retire as Direct Voter
 - The connected top navigation shows a profile avatar instead of the voting power chip, the wallet pill and dashboard wallet card show the stake address as stake1… and the card shows the connected wallet's own icon; the Become a DRep, Reactivate and Retire as DRep buttons lose a stray blue edge
@@ -30,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The wallet flows (DRep registration, edit and retirement, direct voter registration and retirement, create governance action) share a new frame with the top navigation, a step indicator and one card, and leaving a flow from the navigation asks first; the connected dashboard has a welcome header, a wallet card and row-style action cards; modals follow the new design
 
 - The redesigned pages meet WCAG AA text contrast (the active nav item, orange buttons and links, and some green labels are a shade darker), every page has a main landmark and a "Skip to main content" link, navigation regions are labelled, the dashboard's To vote and Voted on tabs work with the arrow keys, and pagination buttons are named without their arrows; leftover colours from the old palette now use the new scale
+
+### Removed
+
+- The proposal discussion list's likes, dislikes, comments and name sorts and its status filter; it sorts by date and lists the proposals still under discussion
 
 ### Fixed
 

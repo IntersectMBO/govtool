@@ -1,83 +1,64 @@
 'use client';
 
-import { Box } from '@mui/material';
-import { Button } from '@atoms';
-import { useEffect, useMemo, useState } from 'react';
+import { Box, ButtonBase } from '@mui/material';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
+import { ListFilter } from 'lucide-react';
+import { GovernanceActionTypeIcon } from '@/components/atoms/GovernanceActionTypeIcon';
+import { FilterSidebar } from '@/components/molecules/FilterSidebar';
 import { SearchField } from '@/components/molecules/SearchField';
 import { SortSelect } from '@/components/molecules/SortSelect';
+import { ds, RADIUS } from '@/consts/designTokens';
+import { useScreenDimension } from '@/hooks/useScreenDimension';
 import { CreateGovernanceActionDialog } from '../../components';
-import ProposalFilterMenu from '../../components/ProposalFilterMenu';
 import ProposalRows from '../../components/ProposalRows';
-import { getGovernanceActionTypes } from '../../lib/api';
+import { getGovernanceActionTypes, getProposals } from '../../lib/api';
 import { useAppContext } from '../../context/context';
 import { useDebounce } from '../../lib/hooks';
-import {
-    checkIfDrepIsSignedIn,
-    checkShowValidation,
-    loginUserToApp,
-} from '../../lib/helpers';
-import UserValidation from '../../components/UserValidation/UserValidation';
+import { countProposalsByType } from '../../lib/proposalList';
+import { useReportProposeState } from '../../lib/proposeState';
 
-// The titles double as the option keys, so each option's id is
-// `${title}-radio`, which the forum sort spec clicks.
-const sortOptions = [
-    { fieldId: 'createdAt', type: 'DESC', title: 'Newest' },
-    { fieldId: 'createdAt', type: 'ASC', title: 'Oldest' },
-    { fieldId: 'proposal][prop_likes', type: 'DESC', title: 'Most likes' },
-    { fieldId: 'proposal][prop_likes', type: 'ASC', title: 'Least likes' },
-    { fieldId: 'proposal][prop_dislikes', type: 'DESC', title: 'Most dislikes' },
-    { fieldId: 'proposal][prop_dislikes', type: 'ASC', title: 'Least dislikes' },
-    {
-        fieldId: 'proposal][prop_comments_number',
-        type: 'DESC',
-        title: 'Most comments',
-    },
-    {
-        fieldId: 'proposal][prop_comments_number',
-        type: 'ASC',
-        title: 'Least comments',
-    },
-    { fieldId: 'prop_name', type: 'ASC', title: 'Name A-Z' },
-    { fieldId: 'prop_name', type: 'DESC', title: 'Name Z-A' },
+// "Date Range: Latest": the option keys are the labels, so each option's id
+// is `${label}-radio`, which the forum sort spec clicks.
+const dateOptions = [
+    { key: 'Latest', label: 'Latest', sort: { fieldId: 'createdAt', type: 'DESC' } },
+    { key: 'Oldest', label: 'Oldest', sort: { fieldId: 'createdAt', type: 'ASC' } },
 ];
 
-const statusOptions = [
-    { key: 'active', label: 'Active', testId: 'active-proposal' },
-    { key: 'submitted', label: 'Submitted for vote', testId: 'submitted-for-vote' },
-];
+// Submitted proposals are on chain, and Live Voting lists them; Proposed
+// keeps to the ones still under discussion.
+const STATUSES = ['active'];
 
-const toggle = (list, key) =>
-    list.includes(key) ? list.filter((item) => item !== key) : [...list, key];
+// The forum's type names (its seeded lookup) against GovTool's type icons.
+const TYPE_ICONS = {
+    'Info Action': 'InfoAction',
+    'Treasury requests': 'TreasuryWithdrawals',
+    'Updates to the Constitution': 'NewConstitution',
+    'Motion of No Confidence': 'NoConfidence',
+    'Hard fork': 'HardForkInitiation',
+};
 
 const ProposedGovernanceActions = () => {
     const location = useLocation();
-    const {
-        user,
-        walletAPI,
-        setOpenUsernameModal,
-        setUser,
-        clearStates,
-        addSuccessAlert,
-        addErrorAlert,
-        addChangesSavedAlert,
-    } = useAppContext();
+    const { user, setOpenUsernameModal } = useAppContext();
+    const { isMobile } = useScreenDimension();
     const [searchText, setSearchText] = useState('');
     const search = useDebounce(searchText.trim(), 500);
-    const [sortTitle, setSortTitle] = useState(sortOptions[0].title);
-    const [governanceActionTypeList, setGovernanceActionTypeList] = useState(
-        []
-    );
+    const [dateKey, setDateKey] = useState(dateOptions[0].key);
+    const [types, setTypes] = useState([]);
     const [selectedTypes, setSelectedTypes] = useState([]);
-    // Submitted proposals have moved on chain, so the list opens on the
-    // active ones, as it always has.
-    const [selectedStatuses, setSelectedStatuses] = useState(['active']);
+    const [counts, setCounts] = useState(undefined);
+    const [areFiltersOpen, setAreFiltersOpen] = useState(false);
     const [showCreateGADialog, setShowCreateGADialog] = useState(false);
+    const countsRequest = useRef(0);
+
+    // GovTool's header shows the propose button and the sign-in notice.
+    useReportProposeState(() => setShowCreateGADialog(true));
 
     useEffect(() => {
         getGovernanceActionTypes()
             .then((response) => {
-                if (response?.data) setGovernanceActionTypeList(response.data);
+                if (response?.data) setTypes(response.data);
             })
             .catch((error) => console.error(error));
     }, []);
@@ -92,70 +73,62 @@ const ProposedGovernanceActions = () => {
         }
     }, [location.pathname]);
 
-    const typeOptions = useMemo(
-        () =>
-            governanceActionTypeList.map((type, index) => {
+    const typeIds = useMemo(() => types.map((type) => type?.id), [types]);
+
+    // The sidebar counts follow the search; a later search wins.
+    useEffect(() => {
+        if (!typeIds.length) return;
+        const current = countsRequest.current + 1;
+        countsRequest.current = current;
+        countProposalsByType(getProposals, {
+            search,
+            typeIds,
+            statuses: STATUSES,
+        })
+            .then((next) => {
+                if (countsRequest.current === current) setCounts(next);
+            })
+            .catch(() => {
+                if (countsRequest.current === current) setCounts(undefined);
+            });
+    }, [search, typeIds]);
+
+    const sort = (
+        dateOptions.find((option) => option.key === dateKey) ?? dateOptions[0]
+    ).sort;
+
+    const sidebar = (
+        <FilterSidebar
+            allCount={counts?.all}
+            allIcon={
+                <ListFilter aria-hidden color={ds.primary['600']} size={16} />
+            }
+            allLabel='All Governance Actions'
+            dataTestId='proposal-type-filter'
+            onChange={setSelectedTypes}
+            options={types.map((type) => {
                 const name = type?.attributes?.gov_action_type_name ?? '';
                 return {
                     key: String(type?.id),
                     label: name,
-                    testId: name ? name.toLowerCase() : String(index),
+                    icon: TYPE_ICONS[name] ? (
+                        <GovernanceActionTypeIcon type={TYPE_ICONS[name]} />
+                    ) : undefined,
+                    count: counts?.byType?.[type?.id],
                 };
-            }),
-        [governanceActionTypeList]
+            })}
+            selected={selectedTypes}
+            title='Action type'
+        />
     );
-    const sort =
-        sortOptions.find((option) => option.title === sortTitle) ??
-        sortOptions[0];
-    const typeIds = selectedTypes.map(Number);
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* GovTool's page header above the forum carries the title
-                and the Proposed / Live Voting / Outcomes tabs. The forum's
-                own propose button stays: its sign-in prompt sits beside it. */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             <Box
                 sx={{
                     alignItems: 'center',
                     display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 1,
-                    justifyContent: 'flex-end',
-                }}
-            >
-                {checkShowValidation(false, walletAPI, user) && (
-                    <UserValidation
-                        type='proposal'
-                        drepCheck={checkIfDrepIsSignedIn(walletAPI)}
-                        drepRequired={false}
-                    />
-                )}
-                <Button
-                    variant='outlined'
-                    disabled={checkShowValidation(false, walletAPI, user)}
-                    onClick={async () =>
-                        await loginUserToApp({
-                            wallet: walletAPI,
-                            setUser: setUser,
-                            setOpenUsernameModal: setOpenUsernameModal,
-                            callBackFn: () => setShowCreateGADialog(true),
-                            clearStates: clearStates,
-                            addErrorAlert: addErrorAlert,
-                            addSuccessAlert: addSuccessAlert,
-                            addChangesSavedAlert: addChangesSavedAlert,
-                        })
-                    }
-                    data-testid='propose-a-governance-action-button'
-                >
-                    Propose a Governance Action
-                </Button>
-            </Box>
-
-            <Box
-                sx={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    flexWrap: 'wrap',
+                    flexWrap: { xxs: 'wrap', md: 'nowrap' },
                     gap: 1.5,
                 }}
             >
@@ -165,41 +138,79 @@ const ProposedGovernanceActions = () => {
                     placeholder='Search proposals by name…'
                     value={searchText}
                 />
+                <ButtonBase
+                    aria-expanded={areFiltersOpen}
+                    data-testid='filters-button'
+                    onClick={() => setAreFiltersOpen((open) => !open)}
+                    sx={{
+                        alignItems: 'center',
+                        backgroundColor: '#FFFFFF',
+                        border: `1px solid ${
+                            selectedTypes.length
+                                ? ds.primary['600']
+                                : ds.gray['200']
+                        }`,
+                        borderRadius: `${RADIUS.md}px`,
+                        color: ds.gray['700'],
+                        display: { xxs: 'inline-flex', md: 'none' },
+                        flex: { xxs: 1, md: 'none' },
+                        fontFamily: 'inherit',
+                        fontSize: 14,
+                        gap: 0.75,
+                        height: 40,
+                        px: 1.5,
+                        '&.Mui-focusVisible': {
+                            outline: `2px solid ${ds.primary['600']}`,
+                        },
+                    }}
+                >
+                    <ListFilter aria-hidden size={16} />
+                    Filters
+                    {selectedTypes.length > 0 && ` (${selectedTypes.length})`}
+                </ButtonBase>
                 <SortSelect
-                    onChange={setSortTitle}
-                    options={sortOptions.map((option) => ({
-                        key: option.title,
-                        label: option.title,
-                    }))}
-                    value={sortTitle}
-                />
-                <ProposalFilterMenu
-                    dataTestId='filter-button'
-                    label='Proposal type:'
-                    onClear={() => setSelectedTypes([])}
-                    onToggle={(key) =>
-                        setSelectedTypes((list) => toggle(list, key))
-                    }
-                    options={typeOptions}
-                    selected={selectedTypes}
-                />
-                <ProposalFilterMenu
-                    dataTestId='status-filter-button'
-                    label='Status:'
-                    onToggle={(key) =>
-                        setSelectedStatuses((list) => toggle(list, key))
-                    }
-                    options={statusOptions}
-                    selected={selectedStatuses}
+                    label='Date Range:'
+                    onChange={setDateKey}
+                    options={dateOptions.map(({ key, label }) => ({ key, label }))}
+                    value={dateKey}
                 />
             </Box>
 
-            <ProposalRows
-                search={search}
-                sort={sort}
-                statuses={selectedStatuses}
-                typeIds={typeIds}
-            />
+            {/* One sidebar in the DOM at a time, so its row ids stay unique. */}
+            {isMobile && areFiltersOpen && sidebar}
+
+            <Box
+                sx={{
+                    alignItems: 'start',
+                    display: 'grid',
+                    gap: 2.5,
+                    gridTemplateColumns: {
+                        xxs: '1fr',
+                        md: '230px minmax(0, 1fr)',
+                    },
+                }}
+            >
+                {!isMobile && (
+                    <Box
+                        sx={{
+                            maxHeight: 'calc(100vh - 104px)',
+                            overflowY: 'auto',
+                            position: 'sticky',
+                            top: 88,
+                        }}
+                    >
+                        {sidebar}
+                    </Box>
+                )}
+                <Box sx={{ minWidth: 0 }}>
+                    <ProposalRows
+                        search={search}
+                        sort={sort}
+                        statuses={STATUSES}
+                        typeIds={selectedTypes.map(Number)}
+                    />
+                </Box>
+            </Box>
 
             {showCreateGADialog && (
                 <CreateGovernanceActionDialog

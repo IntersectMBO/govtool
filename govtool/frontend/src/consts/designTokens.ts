@@ -137,4 +137,26 @@ export const PILL_TONES = {
   warning: { bg: warning["50"], border: warning["100"], text: warning["700"] },
 };
 
+/**
+ * The header notices (what proposing still needs): tint, border, icon, and
+ * the action link on its own lighter tint. Orange text on an orange tint
+ * uses 750, as on the nav's tint.
+ */
+export const NOTICE_TONES = {
+  info: {
+    bg: primary["25"],
+    border: primary["200"],
+    icon: primary["600"],
+    link: primary["700"],
+    linkBg: primary["50"],
+  },
+  warning: {
+    bg: orange["25"],
+    border: orange["200"],
+    icon: orange["600"],
+    link: orange["750"],
+    linkBg: orange["50"],
+  },
+};
+
 export type PillTone = keyof typeof PILL_TONES;

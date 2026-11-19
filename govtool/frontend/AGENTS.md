@@ -221,7 +221,12 @@ an exact version. Rebuilt pages sit in the PageContainer atom (1180px). The
 governance action lists share GovernanceActionsHeader (title, Create Governance
 Action, tabs) and a search, sort and filter-sidebar frame:
 GovernanceActionsListLayout for Live Voting, GovernanceActionHistorySearchFiltersSortBar
-for Outcomes, whose state lives in the URL. Import
+for Outcomes, whose state lives in the URL; the forum's Proposed list copies
+that frame inside pdf-ui. The header's four figures (GovernanceActionsStats)
+come from every /governance-actions row and the live list. On the Proposed tab
+the header's button and notice come from useProposeHeaderControls: GovTool
+knows the wallet, and pdf-ui reports the forum sign-in through the App prop
+onProposeStateChange (pdf-ui lib/proposeState.js). Import
 tokens from @/consts/designTokens rather than @consts in components that tests
 render with a mocked @consts barrel.
 

@@ -130,7 +130,7 @@ export const Review: Story = {
     await expect(canvas.getByTestId("governance-action-title-content")).toHaveTextContent(
       "Strike Finance Liquidity Deployment",
     );
-    await expect(canvas.getByTestId("create-ga-review")).toHaveTextContent("Treasury Withdrawal");
+    await expect(canvas.getByTestId("create-ga-review")).toHaveTextContent("Treasury requests");
     await expect(canvas.getByTestId("governance-action-link-1-content")).toBeVisible();
     await expect(canvas.getByTestId("back-button")).toHaveTextContent("Back to Edit");
   },

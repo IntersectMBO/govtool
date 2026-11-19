@@ -7,6 +7,14 @@ import type {
 } from "@/models";
 import type { GovernanceActionType } from "@/types/governanceAction";
 
+/** What proposing still needs, with the actions that move it on. */
+export type ForumProposeState = {
+  status: "disconnected" | "unverified" | "noUsername" | "ready";
+  verify: () => void;
+  createUsername: () => void;
+  propose: () => void;
+};
+
 export type ProposalDiscussionProps = {
   pdfApiUrl: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,6 +59,11 @@ export type ProposalDiscussionProps = {
   getEnactedProposalDetails: (
     type: GovernanceActionType,
   ) => Promise<EnactedProposalDetails | null>;
+  /**
+   * Called by the proposals list with its propose state, and with null when
+   * the list unmounts; GovTool's header draws the button and notice.
+   */
+  onProposeStateChange?: (state: ForumProposeState | null) => void;
 };
 
 export default function ProposalDiscussion(

@@ -395,6 +395,7 @@ export type BudgetProposalFilterTypes =
   | "Proposer Z-A";
 
 export type ProposalDiscussionFilterTypes =
+  | "Latest"
   | "Newest"
   | "Oldest"
   | "Most likes"

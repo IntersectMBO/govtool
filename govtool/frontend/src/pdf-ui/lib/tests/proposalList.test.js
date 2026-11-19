@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildProposalListQuery, supportPercent } from '../proposalList';
+import {
+    buildProposalListQuery,
+    countProposalsByType,
+    supportPercent,
+} from '../proposalList';
 
 const TAIL =
     '&populate[0]=proposal_links&populate[1]=proposal_withdrawals&populate[2]=proposal_constitution_content&populate[3]=proposal';
@@ -56,5 +60,44 @@ describe('supportPercent', () => {
     it('is null with no likes or dislikes', () => {
         expect(supportPercent(0, 0)).toBeNull();
         expect(supportPercent(undefined, null)).toBeNull();
+    });
+});
+
+describe('countProposalsByType', () => {
+    it('asks for one row per type and for all, and keeps each total', async () => {
+        const queries = [];
+        const fetch = async (query) => {
+            queries.push(query);
+            const type = query.match(/\[\$in\]\[0\]=(\d+)/)?.[1];
+            return { proposals: [], total: type ? Number(type) * 10 : 99 };
+        };
+        await expect(
+            countProposalsByType(fetch, { search: 'x', typeIds: [1, 2] })
+        ).resolves.toEqual({ all: 99, byType: { 1: 10, 2: 20 } });
+        expect(queries).toHaveLength(3);
+        expect(queries.every((q) => q.includes('pagination[pageSize]=1'))).toBe(true);
+        expect(queries.every((q) => q.includes('[$containsi]=x&'))).toBe(true);
+    });
+
+    it('counts only the chosen statuses', async () => {
+        const queries = [];
+        const fetch = async (query) => {
+            queries.push(query);
+            return { proposals: [], total: 1 };
+        };
+        await countProposalsByType(fetch, {
+            search: '',
+            typeIds: [1],
+            statuses: ['active'],
+        });
+        expect(queries.every((q) => q.includes('[prop_submitted]=false'))).toBe(true);
+    });
+
+    it('gives up on the counts when any request fails', async () => {
+        const fetch = async (query) =>
+            query.includes('[$in]') ? new Error('Network Error') : { total: 3 };
+        await expect(
+            countProposalsByType(fetch, { search: '', typeIds: [1] })
+        ).resolves.toBeUndefined();
     });
 });

@@ -1,8 +1,5 @@
 import environments from "@constants/environments";
-import {
-  BOOTSTRAP_PROPOSAL_TYPE_FILTERS,
-  PROPOSAL_STATUS_FILTER,
-} from "@constants/index";
+import { BOOTSTRAP_PROPOSAL_TYPE_FILTERS } from "@constants/index";
 import { faker } from "@faker-js/faker";
 import { test } from "@fixtures/proposal";
 import { setAllureEpic } from "@helpers/allure";
@@ -44,68 +41,28 @@ test.describe("Filter and sort proposals", () => {
     await proposalDiscussionPage.goto();
   });
 
-  test("8B_1. Should filter the list of proposed governance actions.", async ({
-    page,
-  }) => {
+  test("8B_1. Should filter the list of proposed governance actions.", async () => {
     test.slow();
 
-    // unselect active proposal, in the status menu
-    await proposalDiscussionPage.statusFilterBtn.click();
-    await proposalDiscussionPage.activeProposalWrapper.click();
-    await page.keyboard.press("Escape");
     const isBootStraping = await isBootStrapingPhase();
 
-    // proposal type filter
-    await proposalDiscussionPage.filterBtn.click();
+    // proposal type filter, in the action type sidebar
     await proposalDiscussionPage.applyAndValidateFilters(
       isBootStraping ? BOOTSTRAP_PROPOSAL_TYPE_FILTERS : getProposalType(),
       proposalDiscussionPage._validateTypeFiltersInProposalCard
-    );
-    await page.keyboard.press("Escape");
-
-    // proposal status filter
-    await proposalDiscussionPage.statusFilterBtn.click();
-    await proposalDiscussionPage.applyAndValidateFilters(
-      PROPOSAL_STATUS_FILTER,
-      proposalDiscussionPage._validateStatusFiltersInProposalCard
     );
   });
 
   test("8B_2. Should sort the list of proposed governance actions.", async () => {
     test.slow();
+    // The Date Range menu: Latest and Oldest.
     const sortOptions = {
       Oldest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
         p1.attributes.content.attributes.createdAt <=
         p2.attributes.content.attributes.createdAt,
-      Newest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
+      Latest: (p1: ProposedGovAction, p2: ProposedGovAction) =>
         p1.attributes.content.attributes.createdAt >=
         p2.attributes.content.attributes.createdAt,
-      "Most likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.prop_likes >= p2.attributes.prop_likes,
-      "Least likes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.prop_likes <= p2.attributes.prop_likes,
-      "Most dislikes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.prop_dislikes >= p2.attributes.prop_dislikes,
-      "Least dislikes": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.prop_dislikes <= p2.attributes.prop_dislikes,
-      "Most comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.prop_comments_number >=
-        p2.attributes.prop_comments_number,
-      "Least comments": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.prop_comments_number <=
-        p2.attributes.prop_comments_number,
-      "Name A-Z": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.content.attributes.prop_name
-          .replace(/ /g, "")
-          .localeCompare(
-            p2.attributes.content.attributes.prop_name.replace(/ /g, "")
-          ) <= 0,
-      "Name Z-A": (p1: ProposedGovAction, p2: ProposedGovAction) =>
-        p1.attributes.content.attributes.prop_name
-          .replace(/ /g, "")
-          .localeCompare(
-            p2.attributes.content.attributes.prop_name.replace(/ /g, "")
-          ) >= 0,
     };
 
     for (const [sortOption, sortFunction] of Object.entries(sortOptions)) {
@@ -177,15 +134,14 @@ test("8D. Should list one type of proposed governance action through the type fi
   await proposalDiscussionPage.goto();
 
   for (const proposalType of getProposalType()) {
-    await proposalDiscussionPage.filterBtn.click();
     const filtered = page.waitForResponse(
       (response) =>
         response.url().includes("/api/proposals?") &&
+        response.url().includes("pageSize]=10") &&
         decodeURIComponent(response.url()).includes("[gov_action_type_id][$in]")
     );
-    await page.getByTestId(`${proposalType.toLowerCase()}-radio`).click();
+    await proposalDiscussionPage.filterProposalByNames([proposalType]);
     await filtered;
-    await page.keyboard.press("Escape");
     // The previous rows stay, dimmed, until the new page renders.
     await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
 
@@ -201,9 +157,7 @@ test("8D. Should list one type of proposed governance action through the type fi
       }
     }
 
-    await proposalDiscussionPage.filterBtn.click();
-    await page.getByTestId(`${proposalType.toLowerCase()}-radio`).click();
-    await page.keyboard.press("Escape");
+    await proposalDiscussionPage.unFilterProposalByNames([proposalType]);
   }
 });
 
@@ -225,13 +179,16 @@ test("8H. Should disable proposal interaction on a disconnected state.", async (
   await expect(proposalDiscussionDetailsPage.commentBtn).toBeDisabled();
 });
 
-test("8S. Should restrict proposal creation on disconnected state", async ({
+test("8S. Should ask a disconnected visitor to connect before proposing", async ({
   page,
 }) => {
   const proposalDiscussionPage = new ProposalDiscussionPage(page);
   await proposalDiscussionPage.goto();
 
-  await expect(proposalDiscussionPage.proposalCreateBtn).toBeDisabled();
+  // The header's notice says what proposing needs; the button connects.
+  await expect(page.getByTestId("connect-wallet-link")).toBeVisible();
+  await proposalDiscussionPage.proposalCreateBtn.click();
+  await expect(page.getByTestId("connect-your-wallet-modal")).toBeVisible();
 });
 
 test("8E. Should share proposed governance action", async ({

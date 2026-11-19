@@ -1284,6 +1284,23 @@
     "pageTitle": "Governance actions",
     "pageDescription": "Explore proposals shaping Cardano. Review the details, follow voting progress and take part in decisions that move the ecosystem forward.",
     "createAction": "Create Governance Action",
+    "propose": {
+      "button": "Propose a Governance Action",
+      "connectNotice": "To submit a proposal, you need to connect a Cardano Wallet.",
+      "connectAction": "Connect a Cardano wallet",
+      "verifyNotice": "To submit a proposal, you need to verify yourself by signing a transaction.",
+      "verifyAction": "Sign a transaction",
+      "usernameNotice": "To submit a proposal, you need to create a GovTool display name.",
+      "usernameAction": "Create a display name"
+    },
+    "stats": {
+      "label": "Governance action figures",
+      "total": "Total Actions",
+      "votingNow": "Voting Now",
+      "expiringSoon": "Expiring Soon",
+      "enacted": "Enacted",
+      "unknown": "Not available yet"
+    },
     "card": {
       "active": "Active",
       "submitted": "Submitted",
@@ -2206,10 +2223,10 @@
       "available": "Available",
       "noMatch": "No action type matches this search.",
       "names": {
-        "TreasuryWithdrawals": "Treasury Withdrawal",
+        "TreasuryWithdrawals": "Treasury requests",
         "ParameterChange": "Protocol Parameter Change",
         "HardForkInitiation": "Hard Fork",
-        "NewConstitution": "Constitution / Guardrails",
+        "NewConstitution": "Updates to the Constitution",
         "NewCommittee": "Committee Change",
         "NoConfidence": "Motion of No Confidence",
         "InfoAction": "Info Action"
@@ -2221,7 +2238,7 @@
         "NewConstitution": "Update the constitution or governance guardrails, which define the rules and limits of the governance process.",
         "NewCommittee": "Add or remove Constitutional Committee members, or change the committee's quorum.",
         "NoConfidence": "Declare no confidence in the current Constitutional Committee.",
-        "InfoAction": "Share information or gauge community sentiment without changing anything on chain."
+        "InfoAction": "Share information, announce a decision, or provide context without requesting funds or changing protocol rules."
       }
     },
     "details": {

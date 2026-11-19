@@ -16,7 +16,7 @@ const halfButton = {
   "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
 };
 
-/** A submitted DRep retirement, waiting for Cardano to confirm it. */
+/** A submitted retirement (DRep by default), waiting for Cardano to confirm it. */
 export const RetirementProgressDialog = ({
   txHash,
   name,

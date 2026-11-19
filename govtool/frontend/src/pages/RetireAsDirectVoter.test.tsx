@@ -61,7 +61,22 @@ describe("RetireAsDirectVoter", () => {
     mocks.voter = { ...directVoter, isRegisteredAsSoleVoter: false };
     rerender(<RetireAsDirectVoter />);
     expect(screen.queryByTestId("wrong-route")).toBeNull();
-    expect(mocks.navigate).toHaveBeenCalledWith("/dashboard", { state: { retired: "directVoter" } });
+    expect(mocks.navigate).toHaveBeenCalledWith("/dashboard", {
+      replace: true,
+      state: { retired: "directVoter" },
+    });
+  });
+
+  it("goes to the dashboard without the success banner when the retirement expires", async () => {
+    const { rerender } = render(<RetireAsDirectVoter />);
+    fireEvent.click(screen.getByTestId("continue-retirement-button"));
+    await screen.findByTestId("retirement-transaction-submitted-modal");
+    mocks.pending = { retireAsDirectVoter: { transactionHash: "tx1" } };
+    rerender(<RetireAsDirectVoter />);
+    mocks.pending = {};
+    rerender(<RetireAsDirectVoter />);
+    expect(mocks.navigate).toHaveBeenCalledWith("/dashboard", { replace: true });
+    expect(mocks.navigate).not.toHaveBeenCalledWith("/dashboard", expect.objectContaining({ state: expect.anything() }));
   });
 
   it("says a wallet that is not a direct voter cannot retire as one", () => {

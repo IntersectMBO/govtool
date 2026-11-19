@@ -79,10 +79,15 @@ export const RetireAsDirectVoter = () => {
   const sawPending = useRef(false);
   useEffect(() => {
     if (pendingHash) sawPending.current = true;
-    const isRetired = !!submission && !!voter && !voter.isRegisteredAsSoleVoter;
+    // Only a voter seen retired earns the success banner; a pending state that
+    // clears otherwise (expired, failed) goes to the dashboard without it.
+    const isRetired =
+      !!voter && !voter.isRegisteredAsSoleVoter && (!!submission || !!pendingHash);
     const isSettled = sawPending.current && !pendingHash;
-    if (isRetired || isSettled) {
-      navigate(PATHS.dashboard, { state: { retired: "directVoter" } });
+    if (isRetired) {
+      navigate(PATHS.dashboard, { replace: true, state: { retired: "directVoter" } });
+    } else if (isSettled) {
+      navigate(PATHS.dashboard, { replace: true });
     }
   }, [pendingHash, submission, voter]);
 

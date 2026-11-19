@@ -48,6 +48,16 @@ describe("DashboardCards", () => {
     expect(screen.getByTestId("retire-direct-voter-header-button")).toHaveAttribute("href", "/retire_direct_voter");
   });
 
+  it("hides it once the retire page reports the retirement", () => {
+    mocks.voter = { ...base, isRegisteredAsSoleVoter: true };
+    render(
+      <MemoryRouter initialEntries={[{ pathname: "/dashboard", state: { retired: "directVoter" } }]}>
+        <DashboardCards />
+      </MemoryRouter>,
+    );
+    expect(screen.queryByTestId("retire-direct-voter-header-button")).toBeNull();
+  });
+
   it("hides it while a retirement is pending, and for anyone else", () => {
     mocks.voter = { ...base, isRegisteredAsSoleVoter: true };
     mocks.pending = { retireAsDirectVoter: { transactionHash: "t" } };

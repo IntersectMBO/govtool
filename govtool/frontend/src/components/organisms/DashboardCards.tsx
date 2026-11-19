@@ -7,7 +7,7 @@ import {
   useGetVoterInfo,
   useTranslation,
 } from "@hooks";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useLocation } from "react-router";
 import { UserRoundX } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
 import { PATHS } from "@/consts/paths";
@@ -26,6 +26,10 @@ import { isRetiredDRep } from "@/utils/drepDashboard";
 export const DashboardCards = () => {
   const { dRepID, pendingTransaction, stakeKey } = useCardano();
   const { t } = useTranslation();
+  // The retire page reports a confirmed retirement in the route state; until
+  // the voter record catches up, do not offer to retire again.
+  const justRetired =
+    (useLocation().state as { retired?: string } | null)?.retired === "directVoter";
   const { epochParams } = useAppContext();
   const { isFeatureAvailable } = useFeatureFlag();
 
@@ -146,7 +150,7 @@ export const DashboardCards = () => {
           </Box>
         )}
         </Box>
-        {role === "directVoter" && !pendingTransaction.retireAsDirectVoter && (
+        {role === "directVoter" && !pendingTransaction.retireAsDirectVoter && !justRetired && (
         <Button
           component={RouterLink}
           dataTestId="retire-direct-voter-header-button"

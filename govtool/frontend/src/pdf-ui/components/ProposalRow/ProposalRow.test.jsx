@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
+
+import '@/i18n';
 import { describe, expect, it, vi } from 'vitest';
 
 import ProposalRow from './index';
@@ -11,6 +13,10 @@ vi.mock('../../context/context', () => ({
 }));
 
 vi.mock('../EditProposalDialog', () => ({ default: () => null }));
+
+vi.mock('@/context/snackbar', () => ({
+    useSnackbar: () => ({ addSuccessAlert: () => {} }),
+}));
 
 const proposal = {
     id: 7,
@@ -57,11 +63,10 @@ describe('ProposalRow', () => {
     it("names each row's actions after its proposal", () => {
         ctx.user = { user: { id: 42 } };
         renderRow();
-        expect(
-            screen.getByRole('button', {
-                name: 'Copy link to Kenya Retirement Edition',
-            })
-        ).toBeInTheDocument();
+        // The shared share dialog, worded for a proposal.
+        expect(screen.getByTestId('proposal-7-share-button')).toHaveAccessibleName(
+            'Share proposal'
+        );
         expect(
             screen.getByRole('button', { name: 'Edit Kenya Retirement Edition' })
         ).toBeInTheDocument();

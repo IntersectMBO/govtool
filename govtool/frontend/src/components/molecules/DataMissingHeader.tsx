@@ -7,7 +7,7 @@ import {
   getMetadataDataMissingStatusTranslation,
 } from "@/utils";
 import { ICONS } from "@/consts";
-import { Share } from "./Share";
+import { ShareDialog } from "@/components/organisms/DRepDashboard/ShareDRepDialog";
 import { useScreenDimension } from "@/hooks";
 
 type DataMissingHeaderProps = {
@@ -97,7 +97,12 @@ export const DataMissingHeader = ({
         )}
       </Box>
       {screenWidth >= 1020 && (
-        <Share link={shareLink ?? window.location.href} />
+        <ShareDialog
+          buttonTestId="share-button"
+          copyTestId="copy-link-from-share-button"
+          kind={isDRep ? "drep" : "action"}
+          link={shareLink ?? window.location.href}
+        />
       )}
     </Box>
   );

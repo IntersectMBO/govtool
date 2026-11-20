@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { Box, ButtonBase } from "@mui/material";
 
+import { Check } from "lucide-react";
+
 import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
 
 export type FilterSidebarOption = {
@@ -8,6 +10,10 @@ export type FilterSidebarOption = {
   label: string;
   icon?: ReactNode;
   count?: number;
+  /** The label's colour, such as a status colour. */
+  color?: string;
+  /** Names the row's test id when the shown label is a short form. */
+  testLabel?: string;
 };
 
 type Props = {
@@ -20,29 +26,59 @@ type Props = {
   selected: string[];
   onChange: (next: string[]) => void;
   dataTestId?: string;
+  /** Rows are checkboxes with a box at the end, as the status filter draws them. */
+  checkboxes?: boolean;
 };
 
 const testIdFor = (label: string) => `${label.replace(/ /g, "")}-checkbox`;
+
+const Box16 = ({ isChecked }: { isChecked: boolean }) => (
+  <Box
+    aria-hidden
+    component="span"
+    sx={{
+      alignItems: "center",
+      backgroundColor: isChecked ? ds.primary["600"] : "#FFFFFF",
+      border: `1px solid ${isChecked ? ds.primary["600"] : ds.gray["300"]}`,
+      borderRadius: "4px",
+      color: "#FFFFFF",
+      display: "inline-flex",
+      flexShrink: 0,
+      height: 16,
+      justifyContent: "center",
+      width: 16,
+    }}
+  >
+    {isChecked && <Check size={12} strokeWidth={3} />}
+  </Box>
+);
 
 const Row = ({
   icon,
   label,
   count,
+  color,
   isSelected,
   onClick,
   dataTestId,
+  checkbox,
 }: {
   icon?: ReactNode;
   label: string;
   count?: number;
+  color?: string;
   isSelected: boolean;
   onClick: () => void;
   dataTestId: string;
+  /** Draw a checkbox and report checked; otherwise a pressed toggle. */
+  checkbox?: { isChecked: boolean };
 }) => (
   <ButtonBase
-    aria-pressed={isSelected}
+    aria-checked={checkbox ? checkbox.isChecked : undefined}
+    aria-pressed={checkbox ? undefined : isSelected}
     data-testid={dataTestId}
     onClick={onClick}
+    role={checkbox ? "checkbox" : undefined}
     sx={{
       alignItems: "center",
       backgroundColor: isSelected ? ds.gray["100"] : "transparent",
@@ -69,7 +105,7 @@ const Row = ({
         {icon}
       </Box>
     )}
-    <Box component="span" sx={{ flex: 1, minWidth: 0 }}>
+    <Box component="span" sx={{ color, flex: 1, minWidth: 0 }}>
       {label}
     </Box>
     {count !== undefined && (
@@ -91,6 +127,7 @@ const Row = ({
         {count}
       </Box>
     )}
+    {checkbox && <Box16 isChecked={checkbox.isChecked} />}
   </ButtonBase>
 );
 
@@ -107,6 +144,7 @@ export const FilterSidebar = ({
   selected,
   onChange,
   dataTestId,
+  checkboxes = false,
 }: Props) => (
   <Box
     component="section"
@@ -141,6 +179,8 @@ export const FilterSidebar = ({
       </Box>
     )}
     <Row
+      // The all row clears the choice; its box stays empty, as in the design.
+      checkbox={checkboxes ? { isChecked: false } : undefined}
       count={allCount}
       dataTestId={testIdFor(allLabel)}
       icon={allIcon}
@@ -151,8 +191,10 @@ export const FilterSidebar = ({
     {options.map((option) => (
       <Row
         key={option.key}
+        checkbox={checkboxes ? { isChecked: selected.includes(option.key) } : undefined}
+        color={option.color}
         count={option.count}
-        dataTestId={testIdFor(option.label)}
+        dataTestId={testIdFor(option.testLabel ?? option.label)}
         icon={option.icon}
         isSelected={selected.includes(option.key)}
         label={option.label}

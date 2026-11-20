@@ -66,20 +66,46 @@ const ShareLink = ({
 const middle = (value: string) =>
   (value.length > 32 ? `${value.slice(0, 18)}…${value.slice(-12)}` : value);
 
-/** A round share button and its dialog, for a DRep's public profile. */
-export const ShareDRepDialog = ({
-  link,
-  dRepId,
-  buttonTestId = "share-drep-button",
-  copyTestId = "share-drep-copy",
-}: {
+/** What is shared: a DRep's profile, a governance action, or a forum proposal. */
+export type ShareKind = "drep" | "action" | "proposal";
+
+// Each kind's own wording; the buttons' words are shared.
+const KIND_KEYS: Record<ShareKind, string> = {
+  drep: "drepDashboard.share",
+  action: "shareDialog.action",
+  proposal: "shareDialog.proposal",
+};
+
+type ShareDialogProps = {
   link: string;
+  kind?: ShareKind;
   /** Shown in the field, shortened; Copy link still copies the whole URL. */
-  dRepId?: string;
+  displayId?: string;
   buttonTestId?: string;
   copyTestId?: string;
-}) => {
-  const { t } = useTranslation();
+};
+
+/** A round share button and its dialog: copy the link, or share it on. */
+export const ShareDialog = ({
+  link,
+  kind = "drep",
+  displayId,
+  buttonTestId = "share-drep-button",
+  copyTestId = "share-drep-copy",
+}: ShareDialogProps) => {
+  const { t: translate } = useTranslation();
+  const own = new Set(["open", "title", "body", "urlLabel", "hint", "text"]);
+  // The kind's wording for its own keys; the DRep dialog's for the buttons.
+  const t = (key: string, values?: Record<string, unknown>) => {
+    const [, , leaf] = key.split(".");
+    return translate(
+      key.startsWith("drepDashboard.share.") && own.has(leaf)
+        ? `${KIND_KEYS[kind]}.${leaf}`
+        : key,
+      values,
+    );
+  };
+  const dRepId = displayId;
   const { addSuccessAlert } = useSnackbar();
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -226,3 +252,11 @@ export const ShareDRepDialog = ({
     </>
   );
 };
+
+/** The DRep profile's share button and dialog. */
+export const ShareDRepDialog = ({
+  dRepId,
+  ...props
+}: Omit<ShareDialogProps, "kind" | "displayId"> & { dRepId?: string }) => (
+  <ShareDialog {...props} displayId={dRepId} kind="drep" />
+);

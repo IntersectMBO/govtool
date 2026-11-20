@@ -225,9 +225,14 @@ for (const sample of samples) {
             : aggregate.representation === "stake"
               ? `₳ ${((BigInt(aggregate.yes) + 999999n) / 1000000n).toLocaleString("en-US")}`
               : BigInt(aggregate.yes).toLocaleString("en-US");
-        await expect(section.getByTestId(`${title}-yes-votes`)).toHaveText(
+        // See all data is a modal dialog, outside the section; close it
+        // before the next role.
+        const dialog = page.getByRole("dialog");
+        await expect(dialog.getByTestId(`${title}-yes-votes`)).toHaveText(
           value
         );
+        await dialog.getByTestId("outcome-all-data-close").click();
+        await expect(page.getByTestId(`${title}-yes-votes`)).toHaveCount(0);
       } else {
         await expect(section.getByRole("status")).toBeVisible();
         await expect(section.getByRole("progressbar")).toHaveCount(0);
@@ -236,23 +241,26 @@ for (const sample of samples) {
             "inconsistent voting breakdown"
           );
         }
+        // No verdict without a usable tally: neither Pass nor Fail.
         await expect(
           page.getByTestId(`${prefix}-voting-results-indicator`)
-        ).toContainText("-");
+        ).not.toContainText(/Pass|Fail/);
       }
       if (type === "InfoAction") {
+        // Info actions have no threshold, so no pass or fail.
         await expect(
           page.getByTestId(`${prefix}-voting-results-indicator`)
-        ).toContainText("-");
+        ).not.toContainText(/Pass|Fail/);
       }
       if (aggregate?.passing === false && type !== "InfoAction") {
         const indicator = page.getByTestId(
           `${prefix}-voting-results-indicator`
         );
-        await expect(indicator).not.toContainText("-");
+        await expect(indicator).toContainText("Fail");
+        // The design system's error 600.
         await expect(indicator.getByTestId("vote-result-icon")).toHaveCSS(
           "background-color",
-          "rgb(211, 47, 47)"
+          "rgb(217, 45, 32)"
         );
       }
     }

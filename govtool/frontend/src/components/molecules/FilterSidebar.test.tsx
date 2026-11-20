@@ -48,4 +48,25 @@ describe("FilterSidebar", () => {
     expect(screen.getByTestId("HardFork-checkbox")).toHaveTextContent("0");
     expect(screen.getByTestId("InfoAction-checkbox")).toHaveTextContent("2");
   });
+
+  it("draws checkboxes that say which rows are chosen", () => {
+    render(
+      <FilterSidebar
+        allLabel="All Status"
+        checkboxes
+        onChange={vi.fn()}
+        options={[
+          { key: "expired", label: "Expired", color: "#B42318" },
+          { key: "enacted", label: "Enacted" },
+        ]}
+        selected={["expired"]}
+      />,
+    );
+    const expired = screen.getByTestId("Expired-checkbox");
+    expect(expired).toHaveAttribute("role", "checkbox");
+    expect(expired).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("Enacted-checkbox")).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByTestId("AllStatus-checkbox")).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByText("Expired")).toHaveStyle({ color: "#B42318" });
+  });
 });

@@ -10,6 +10,7 @@ import "./tableMarkdown.css";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 import { removeMarkdown } from "@/utils";
+import { markdownLineBreaks } from "@/utils/markdownLineBreaks";
 import { ICONS } from "@/consts";
 import { useModal } from "@/context";
 import { ds, FONT_FAMILY } from "@/consts/designTokens";
@@ -152,19 +153,7 @@ export const GovernanceActionCardElement = ({
   };
 
   const renderMarkdown = (markdownText: string | number) => {
-    const formattedText = markdownText
-      .toString()
-      .replace(/\r\n|\r/g, "\n")
-      .replace(
-        /\n\n+/g,
-        (match) =>
-          `\n\n${Array(match.length - 1)
-            .fill("&nbsp;  \n")
-            .join("")}\n`,
-      )
-      .split("\n")
-      .map((line) => `${line}  `)
-      .join("\n");
+    const formattedText = markdownLineBreaks(markdownText);
 
     return (
       <Markdown

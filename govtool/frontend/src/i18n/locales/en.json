@@ -39,6 +39,7 @@
     },
     "changesSaved": "Your changes have been saved",
     "copiedToClipboard": "Copied to clipboard",
+    "copyFailed": "Could not copy. Your browser blocked the clipboard.",
     "transactionInProgress": "Transaction in progress. Please wait.",
     "walletConnected": "Wallet connected"
   },
@@ -914,6 +915,15 @@
         "enacted": "Enacted",
         "ratified": "Ratified",
         "expired": "Expired"
+      },
+      "shortTypes": {
+        "InfoAction": "Info",
+        "TreasuryWithdrawals": "Treasury Withdrawal",
+        "ParameterChange": "Parameter Change",
+        "HardForkInitiation": "Hard Fork",
+        "NewConstitution": "New Constitution",
+        "NewCommittee": "New Committee",
+        "NoConfidence": "No Confidence"
       }
     },
     "sort": {
@@ -2724,6 +2734,157 @@
       "errorTitle": "We couldn't load DRep activity",
       "errorBody": "Something interrupted the request. Your DRep information is safe—please try loading the history again.",
       "partial": "GovTool shows only your latest registration until your full DRep history is available."
+    }
+  },
+  "shareDialog": {
+    "action": {
+      "open": "Share governance action",
+      "title": "Share Governance Action",
+      "body": "This governance action is public. Anyone can view it, no wallet connection required.",
+      "urlLabel": "Governance action URL",
+      "hint": "Copies the full URL, including the governance action ID.",
+      "text": "A governance action on GovTool"
+    },
+    "proposal": {
+      "open": "Share proposal",
+      "title": "Share Proposal",
+      "body": "This proposal is public. Anyone can read it and its discussion, no wallet connection required.",
+      "urlLabel": "Proposal URL",
+      "hint": "Copies the full URL of the proposal's discussion.",
+      "text": "A governance action proposal on GovTool"
+    }
+  },
+  "outcome": {
+    "breadcrumbRoot": "Governance Actions",
+    "breadcrumbOutcome": "Outcome",
+    "more": "More actions",
+    "copyId": "Copy governance action ID",
+    "copyId129": "Copy CIP-129 governance action ID",
+    "copyAddress": "Copy receiving address",
+    "copyAddressNumbered": "Copy receiving address {{n}}",
+    "openMetadata": "Open the metadata document",
+    "submitted": "Submitted",
+    "votingEnds": "Voting ends",
+    "expiredOn": "Expired on",
+    "enactedOn": "Enacted on",
+    "ratifiedOn": "Ratified on",
+    "droppedOn": "Dropped on",
+    "dateEpoch": "{{date}}, (Epoch {{epoch}})",
+    "tabs": {
+      "label": "Governance action sections",
+      "overview": "Overview",
+      "discussions": "Discussions",
+      "votes": "Votes",
+      "activity": "Activity"
+    },
+    "sections": {
+      "label": "Overview sections",
+      "reasoning": "Reasoning",
+      "parameters": "Parameters",
+      "links": "Supporting links"
+    },
+    "abstract": "Abstract",
+    "motivation": "Motivation",
+    "rationale": "Rationale",
+    "readMore": "Read more...",
+    "readLess": "Show less",
+    "noReasoning": "This action has no abstract, motivation or rationale.",
+    "supportingLinks": "Supporting links",
+    "noLinks": "This action lists no supporting links.",
+    "pass": "Pass",
+    "fail": "Fail",
+    "noVote": "No vote",
+    "noThreshold": "No threshold",
+    "notEligible": "Not Eligible",
+    "pending": "Not counted",
+    "statuses": {
+      "enacted": "Enacted",
+      "ratified": "Ratified",
+      "expired": "Expired",
+      "dropped": "Not Ratified",
+      "live": "In Progress"
+    },
+    "votes": {
+      "title": "Votes submitted for this Governance Action",
+      "yes": "Yes",
+      "no": "No",
+      "threshold": "Threshold",
+      "totalActive": "Total Active Stake",
+      "totalAbstain": "Total Abstain",
+      "thresholdStake": "Ratification Threshold Stake",
+      "totalActiveMembers": "Total Active Members",
+      "thresholdMembers": "Ratification Threshold Members",
+      "notVoted": "Not Voted",
+      "seeAll": "See all data",
+      "metric": "Metric",
+      "value": "Value",
+      "close": "Close",
+      "unavailable": "The tally for this group is not available.",
+      "spoNotVoting": "SPOs do not vote on this type of action",
+      "ccNotVoting": "CC do not vote on this type of action",
+      "constitutional": "Constitutional",
+      "unconstitutional": "Unconstitutional",
+      "membersThreshold": "Threshold: {{percent}}% required",
+      "overall": "Overall Outcome",
+      "overallBody": "Final conclusion across all voting groups",
+      "outcome": "Outcome: {{status}}"
+    },
+    "info": {
+      "title": "Action Information",
+      "id105": "Governance Action ID",
+      "id129": "(CIP-129) Governance Action ID",
+      "anchorLink": "Metadata anchor link",
+      "anchorHash": "Metadata anchor hash",
+      "receivingAddress": "Receiving Address",
+      "amount": "Amount",
+      "epoch": "Epoch",
+      "submitted": "Submitted",
+      "votingEndsOn": "Voting Ends on"
+    },
+    "discussions": {
+      "forumTitle": "Discussion forum",
+      "empty": "No discussion for this action in GovTool.",
+      "linked": "This action was discussed in the GovTool forum before it was submitted.",
+      "comments_one": "{{count}} comment",
+      "comments_other": "{{count}} comments",
+      "open": "Open the discussion",
+      "ctaTitle": "Take part in this Conversation and Make your voice heard",
+      "ctaBody": "Connect your wallet and sign in with a verified on-chain role to participate in the discussion.",
+      "ctaConnect": "Connect wallet to Join",
+      "ctaForum": "Go to the forum"
+    },
+    "breakdown": {
+      "title": "Breakdown by Voter Groups",
+      "dreps": "Delegated Representatives (DReps)",
+      "spos": "Stake Pool Operators (SPOs)",
+      "cc": "Constitutional Committee (CC)",
+      "yesPower": "Yes Power:",
+      "noPower": "No Power:",
+      "complete": "Voting Complete",
+      "active": "Active Voting",
+      "notRequired": "Not Required"
+    },
+    "voters": {
+      "title": "Votes by voter",
+      "dreps": "DReps",
+      "spos": "SPOs",
+      "cc": "CC",
+      "unavailable": "Individual votes are not available yet. GovTool shows each voter here once the backend serves an action's votes."
+    },
+    "additional": {
+      "title": "Additional Information",
+      "discussions": "Discussions",
+      "lastActivity": "Last activity",
+      "none": "None yet"
+    },
+    "activity": {
+      "title": "Activity",
+      "submitted": "Submitted on chain",
+      "ratified": "Ratified",
+      "enacted": "Enacted",
+      "expired": "Expired",
+      "dropped": "Dropped",
+      "epoch": "Epoch {{epoch}}"
     }
   }
 }

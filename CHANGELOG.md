@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The Outcomes pages follow the new design: the status filter comes first with checkboxes, the type filter shows a count per type, and an action's page has a header with each group's verdict and the action's status, Overview, Discussions, Votes and Activity tabs, a votes card with each group's threshold, a See all data table and the overall outcome, and an Action Information card. The list of individual votes waits for a backend route that serves an action's votes
+- Share buttons on outcomes, live governance actions and forum proposals open the DRep share dialog, worded for what is shared, and an outcome's More menu copies the governance action ID, the CIP-129 ID and each receiving address
 - The dashboard's Useful Links line up with the cards in its main column, and a DRep's representation card shows its voting power as a small bar chart (the last six epochs once the backend serves the history)
 - The proposal discussion list follows the new design: search and a date range above, an action type sidebar with counts beside a single list of proposal rows (type and status, date, share, title, abstract, proposer, comments and support) with numbered pages, instead of one carousel per type with Show all
 - The governance action pages show Total Actions, Voting Now, Expiring Soon and Enacted under the title, and the Proposed tab's header holds Propose a Governance Action with a notice saying what proposing still needs (connect a wallet, sign in to the forum or create a display name), replacing the forum's own propose button

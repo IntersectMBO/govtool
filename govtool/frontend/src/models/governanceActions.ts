@@ -132,8 +132,10 @@ export type GovernanceActionProposalDiscussion = {
   id: number | string;
   attributes?: {
     createdAt?: string;
+    prop_comments_number?: number;
     content?: {
       attributes?: {
+        prop_name?: string;
         gov_action_type?: {
           attributes?: { gov_action_type_name?: string };
         };

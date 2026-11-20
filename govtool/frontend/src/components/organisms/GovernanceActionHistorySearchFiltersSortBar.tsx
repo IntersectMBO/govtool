@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Box, ButtonBase } from "@mui/material";
 import { useSearchParams } from "react-router";
-import { AlarmClock, Check, CircleCheck, CircleDot, ListFilter } from "lucide-react";
+import { AlarmClock, Check, CircleCheck, ListFilter, Square } from "lucide-react";
 
 import { GovernanceActionTypeIcon } from "@atoms";
 import {
@@ -14,14 +14,27 @@ import {
 import { FilterSidebar, SearchField, SortSelect } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { getCurrentSearchParams } from "@utils";
+import { useDRepDashboardActions } from "@/hooks/queries/useDRepDashboard";
 import { ds, RADIUS } from "@/consts/designTokens";
 
-const STATUS_ICONS: Record<string, ReactNode> = {
-  live: <CircleDot aria-hidden color={ds.primary["600"]} size={16} />,
-  enacted: <Check aria-hidden color={ds.success["600"]} size={16} />,
-  ratified: <CircleCheck aria-hidden color={ds.success["600"]} size={16} />,
-  expired: <AlarmClock aria-hidden color={ds.error["600"]} size={16} />,
-};
+// The Outcomes frame's status card: concluded statuses only, in its order and
+// colours. "Live" stays a valid URL filter but is not offered here.
+const STATUS_ROWS: { value: string; icon: ReactNode; color: string }[] = [
+  { value: "expired", icon: <AlarmClock aria-hidden color={ds.error["600"]} size={16} />, color: ds.error["700"] },
+  { value: "enacted", icon: <Check aria-hidden color={ds.success["600"]} size={16} />, color: ds.success["700"] },
+  { value: "ratified", icon: <CircleCheck aria-hidden color={ds.success["600"]} size={16} />, color: ds.success["700"] },
+];
+
+// The frame's type card names and order.
+const TYPE_ROWS = [
+  "InfoAction",
+  "TreasuryWithdrawals",
+  "ParameterChange",
+  "HardForkInitiation",
+  "NewConstitution",
+  "NewCommittee",
+  "NoConfidence",
+];
 
 type FilterParam = "type" | "status";
 
@@ -69,6 +82,13 @@ export const GovernanceActionHistorySearchFiltersSortBar = ({
   const currentSort = searchParams.get("sort") ?? "";
   const typeFilters = typeParam.split(",").filter(Boolean);
   const statusFilters = statusParam.split(",").filter(Boolean);
+  // Every concluded action, cached with the governance action figures.
+  const { actions } = useDRepDashboardActions();
+  const typeCounts = actions?.reduce<Record<string, number>>((counts, action) => {
+    counts[action.type] = (counts[action.type] ?? 0) + 1;
+    return counts;
+  }, {});
+  const actionsCount = actions?.length ?? 0;
 
   useEffect(() => {
     const paramsToSet = new URLSearchParams(searchParams);
@@ -150,30 +170,37 @@ export const GovernanceActionHistorySearchFiltersSortBar = ({
   const sidebar = (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <FilterSidebar
+        allIcon={<Square aria-hidden color={ds.gray["700"]} fill={ds.gray["700"]} size={10} />}
+        allLabel={t("listControls.allStatuses")}
+        checkboxes
+        dataTestId="history-status-filter"
+        onChange={(values) => setFilter("status", values)}
+        options={STATUS_ROWS.map((row) => ({
+          key: row.value,
+          label:
+            GOV_ACTION_HISTORY_STATUS_FILTERS.find((filter) => filter.value === row.value)
+              ?.label ?? row.value,
+          icon: row.icon,
+          color: row.color,
+        }))}
+        selected={statusFilters}
+      />
+      <FilterSidebar
+        allCount={typeCounts ? actionsCount : undefined}
         allIcon={<ListFilter aria-hidden color={ds.primary["600"]} size={16} />}
         allLabel={t("listControls.allTypes")}
         dataTestId="history-type-filter"
         onChange={(values) => setFilter("type", values)}
-        options={GOV_ACTION_HISTORY_TYPE_FILTERS.map((filter) => ({
-          key: filter.value,
-          label: filter.label,
-          icon: <GovernanceActionTypeIcon type={filter.value} />,
+        options={TYPE_ROWS.filter((type) =>
+          GOV_ACTION_HISTORY_TYPE_FILTERS.some((filter) => filter.value === type)).map((type) => ({
+          key: type,
+          label: t(`governanceActionHistoryList.filters.shortTypes.${type}`),
+          // The ids keep the long names the E2E filter specs click.
+          testLabel: t(`governanceActionHistoryList.filters.types.${type}`),
+          icon: <GovernanceActionTypeIcon type={type} />,
+          count: typeCounts ? typeCounts[type] ?? 0 : undefined,
         }))}
         selected={typeFilters}
-        title={t("listControls.actionType")}
-      />
-      <FilterSidebar
-        allIcon={<ListFilter aria-hidden color={ds.gray["600"]} size={16} />}
-        allLabel={t("listControls.allStatuses")}
-        dataTestId="history-status-filter"
-        onChange={(values) => setFilter("status", values)}
-        options={GOV_ACTION_HISTORY_STATUS_FILTERS.map((filter) => ({
-          key: filter.value,
-          label: filter.label,
-          icon: STATUS_ICONS[filter.value],
-        }))}
-        selected={statusFilters}
-        title={t("listControls.status")}
       />
     </Box>
   );

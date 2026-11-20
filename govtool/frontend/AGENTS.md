@@ -227,8 +227,19 @@ an exact version. Rebuilt pages sit in the PageContainer atom (1180px). The
 governance action lists share GovernanceActionsHeader (title, Create Governance
 Action, tabs) and a search, sort and filter-sidebar frame:
 GovernanceActionsListLayout for Live Voting, GovernanceActionHistorySearchFiltersSortBar
-for Outcomes, whose state lives in the URL; the forum's Proposed list copies
-that frame inside pdf-ui. The header's four figures (GovernanceActionsStats)
+for Outcomes, whose state lives in the URL (its status filter draws
+FilterSidebar's checkbox rows). An outcome's page is organisms/OutcomeDetails:
+tabs in ?tab=, which must keep the URL hash that holds the action index; each
+role section keeps the ${prefix}-voting-results-data and ${title}-expand-button
+ids and the Overall Outcome rows the ${prefix}-voting-results-indicator ids,
+which test:governance-action-aggregates reads. See all data is a modal dialog in
+a portal (in place, MUI would hide it from screen readers), so read its
+${title}-*-votes ids from the page, not the section. The page shows nothing from
+an anchored document that failed its check (utils/outcomeDetails.ts
+outcomeContent): the backend returns the body with an INVALID_HASH status. The
+Outcomes type rows show short names but keep the long names in their row ids
+(FilterSidebar testLabel), which the E2E filter specs click. The forum's
+Proposed list copies that frame inside pdf-ui. The header's four figures (GovernanceActionsStats)
 come from every /governance-actions row and the live list. On the Proposed tab
 the header's button and notice come from useProposeHeaderControls: GovTool
 knows the wallet, and pdf-ui reports the forum sign-in through the App prop

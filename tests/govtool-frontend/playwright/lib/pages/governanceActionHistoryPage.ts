@@ -10,7 +10,8 @@ import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { createNewPageWithWallet, injectLogger } from "@helpers/page";
 import { testWallet } from "lib/wallet/testWallets";
 
-const status = ["Expired", "Ratified", "Enacted", "Live"];
+// Outcomes offers no Live row; live actions are on Live Voting.
+const status = ["Expired", "Ratified", "Enacted"];
 
 enum SortOption {
   SoonToExpire = "Soon to expire",

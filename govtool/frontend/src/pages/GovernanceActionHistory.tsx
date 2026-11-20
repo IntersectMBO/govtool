@@ -50,6 +50,8 @@ export const GovernanceActionHistoryPage = () => {
           flexDirection: "column",
           flex: 1,
           minHeight: !isEnabled ? "100vh" : "auto",
+          // An outcome's header tint spans the window; clip keeps sticky intact.
+          overflowX: "clip",
         }}
       >
         {!isEnabled && <TopNav />}

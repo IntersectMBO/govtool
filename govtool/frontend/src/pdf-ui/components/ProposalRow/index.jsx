@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { Box, ButtonBase } from '@mui/material';
-import { Info, MessageCircle, Pencil, Share2, TrendingUp } from 'lucide-react';
+import { Info, MessageCircle, Pencil, TrendingUp } from 'lucide-react';
 
+import { ShareDialog } from '@/components/organisms/DRepDashboard/ShareDRepDialog';
 import { ds, PILL_TONES, RADIUS, SHADOWS } from '@/consts/designTokens';
 import { removeMarkdown } from '@/utils/removeMarkdown';
 import { useAppContext } from '../../context/context';
@@ -78,7 +79,7 @@ const Stat = ({ label, children, testId }) => (
 // abstract, proposer, discussion and support. The test ids are the old
 // card's, which the forum E2E specs read.
 const ProposalRow = ({ proposal, setShouldRefresh = () => {} }) => {
-    const { user, addSuccessAlert } = useAppContext();
+    const { user } = useAppContext();
     const [openEditDialog, setOpenEditDialog] = useState(false);
 
     const id = proposal?.id;
@@ -97,12 +98,6 @@ const ProposalRow = ({ proposal, setShouldRefresh = () => {} }) => {
     const username = attributes?.user_govtool_username;
     const detailsPath = `${DETAILS_PATH}/${id}`;
 
-    const copyLink = () => {
-        navigator.clipboard?.writeText(
-            `${window.location.origin}${detailsPath}`
-        );
-        addSuccessAlert?.('Link copied');
-    };
 
     return (
         <Box
@@ -177,14 +172,12 @@ const ProposalRow = ({ proposal, setShouldRefresh = () => {} }) => {
                             <Pencil aria-hidden size={16} />
                         </ButtonBase>
                     )}
-                    <ButtonBase
-                        aria-label={`Copy link to ${content?.prop_name ?? 'proposal'}`}
-                        data-testid={`proposal-${id}-share-button`}
-                        onClick={copyLink}
-                        sx={iconButtonSx}
-                    >
-                        <Share2 aria-hidden size={16} />
-                    </ButtonBase>
+                    <ShareDialog
+                        buttonTestId={`proposal-${id}-share-button`}
+                        copyTestId={`proposal-${id}-share-copy`}
+                        kind='proposal'
+                        link={`${window.location.origin}${detailsPath}`}
+                    />
                 </Box>
             </Box>
             <Box component='h3' sx={{ m: 0 }}>

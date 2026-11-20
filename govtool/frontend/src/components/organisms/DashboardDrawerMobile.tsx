@@ -128,6 +128,18 @@ export const DashboardDrawerMobile = ({
                               `child-${i}-${ci}`
                             }
                             {...childItem}
+                            // Live Voting (/actions) is a prefix of Historical
+                            // (/actions/history); only the longest match is
+                            // active.
+                            isActive={
+                              childItem.navTo ===
+                              findActiveNavTo(
+                                pathname,
+                                navItem.childNavItems!.map(
+                                  (item) => item.navTo,
+                                ),
+                              )
+                            }
                             size="big"
                             onClick={() => {
                               if (childItem.newTabLink)

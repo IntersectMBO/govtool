@@ -27,7 +27,7 @@ import {
   filterOutNullParams,
   getFullGovActionId,
   mapArrayToObjectByKeys,
-  encodeCIP129Identifier,
+  getGovActionCIP129Id,
   validateSignature,
 } from "@utils";
 import { MetadataIssue, MetadataValidationStatus, ProposalData } from "@models";
@@ -158,11 +158,7 @@ export const GovernanceActionDetailsCardData = ({
 
   const label = getProposalTypeLabel(type);
   const govActionId = getFullGovActionId(txHash, index);
-  const cip129GovernanceActionId = encodeCIP129Identifier({
-    txID: txHash,
-    index: index.toString(16).padStart(2, "0"),
-    bech32Prefix: "gov_action",
-  });
+  const cip129GovernanceActionId = getGovActionCIP129Id(txHash, index);
   const prevGovActionId =
     prevGovActionIndex && prevGovActionTxHash
       ? getFullGovActionId(prevGovActionTxHash, prevGovActionIndex)

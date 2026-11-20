@@ -44,7 +44,7 @@ export default class GovernanceActionHistoryPage {
     params: { filter?: string; sort?: string; status?: string } = {}
   ): Promise<void> {
     const { filter, sort = "newestFirst", status } = params;
-    const url = new URL(`${environments.frontendUrl}/governance_actions/history`);
+    const url = new URL(`${environments.frontendUrl}/actions/history`);
     url.searchParams.append("sort", sort);
     if (filter) {
       url.searchParams.append("type", filter);
@@ -275,7 +275,7 @@ export default class GovernanceActionHistoryPage {
       await this.page.getByTestId("governance-actions").click();
     }
 
-    await expect(this.page).toHaveURL(/\/governance_actions\/history(\?|$)/);
+    await expect(this.page).toHaveURL(/\/actions\/history(\?|$)/);
     // Text, not role: the governance actions menu reopened above leaves the
     // page aria-hidden. Connected, the page has no heading of its own; the
     // dashboard bar repeats the nav item's label.

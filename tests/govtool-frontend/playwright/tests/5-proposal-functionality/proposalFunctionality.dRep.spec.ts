@@ -6,7 +6,7 @@ import {
   isBootStrapingPhase,
   skipIfMainnet,
 } from "@helpers/cardano";
-import { encodeCIP129Identifier } from "@helpers/encodeDecode";
+import { parseGovActionCIP129Id } from "@helpers/encodeDecode";
 import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import GovernanceActionDetailsPage from "@pages/governanceActionDetailsPage";
@@ -51,17 +51,12 @@ test.describe("Proposal checks", () => {
   });
 
   test("5A. Should show relevant details about governance action as DRep", async () => {
-    const governanceActionIdWithIndex = currentPage.url().split("/").pop();
-    const governanceActionId = governanceActionIdWithIndex.substring(0, 64);
-
-    const cip129GovActionId = encodeCIP129Identifier({
-      txID: governanceActionId,
-      index: governanceActionIdWithIndex
-        .replace(`${governanceActionId}#`, "")
-        .toString()
-        .padStart(2, "0"),
-      bech32Prefix: "gov_action",
-    });
+    // The page is /actions/gov_action1…, the action's CIP-129 id.
+    const cip129GovActionId = new URL(currentPage.url()).pathname
+      .split("/")
+      .pop();
+    const { txHash, index } = parseGovActionCIP129Id(cip129GovActionId);
+    const governanceActionIdWithIndex = `${txHash}#${index}`;
 
     await expect(govActionDetailsPage.governanceActionType).toBeVisible();
     await expect(govActionDetailsPage.submittedDate).toBeVisible();

@@ -56,7 +56,7 @@ test("11A_2. Should open the archive from Useful links", async ({ page }) => {
   await page.goto("/");
   await page.getByTestId("useful-link-budgetProposalsArchive").click();
 
-  await expect(page).toHaveURL(/\/budget_discussion$/);
+  await expect(page).toHaveURL(/\/budget$/);
   await expect(new BudgetDiscussionPage(page).archiveBanner).toBeVisible();
 });
 
@@ -173,7 +173,7 @@ test("11C. Should show every proposal of a category on its category page", async
       ).length;
 
       await budgetDiscussionPage.showAll(category);
-      await expect(page).toHaveURL(/\/budget_discussion\/category\//);
+      await expect(page).toHaveURL(/\/budget\/category\//);
       await expect(budgetDiscussionPage.backToListBtn).toBeVisible();
 
       const proposalCards = await budgetDiscussionPage.getAllProposals();
@@ -207,7 +207,7 @@ test("11D. Should share an archived budget proposal", async ({
 
   const copiedText = await page.evaluate(() => navigator.clipboard.readText());
   expect(copiedText).toEqual(
-    `${environments.frontendUrl}/budget_discussion/${proposalId}`
+    `${environments.frontendUrl}/budget/${proposalId}`
   );
 });
 
@@ -332,15 +332,15 @@ test.describe("Old budget discussion links", () => {
   test("11I_2. Should redirect the propose page to the archive", async ({
     page,
   }) => {
-    await page.goto(`${environments.frontendUrl}/budget_discussion/propose`);
-    await expect(page).toHaveURL(/\/budget_discussion$/);
+    await page.goto(`${environments.frontendUrl}/budget/propose`);
+    await expect(page).toHaveURL(/\/budget$/);
   });
 
   test("11I_3. Should redirect an unknown proposal to the archive", async ({
     page,
   }) => {
-    await page.goto(`${environments.frontendUrl}/budget_discussion/99999999`);
+    await page.goto(`${environments.frontendUrl}/budget/99999999`);
     // The archive redirects only once its proposal index has loaded.
-    await expect(page).toHaveURL(/\/budget_discussion$/, { timeout: 30_000 });
+    await expect(page).toHaveURL(/\/budget$/, { timeout: 30_000 });
   });
 });

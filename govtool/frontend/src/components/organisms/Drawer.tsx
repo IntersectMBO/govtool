@@ -89,6 +89,15 @@ export const Drawer = () => {
                     <DrawerLink
                       key={childItem.label}
                       {...childItem}
+                      // Live Voting (/actions) is a prefix of Historical
+                      // (/actions/history); only the longest match is active.
+                      isActive={
+                        childItem.navTo ===
+                        findActiveNavTo(
+                          pathname,
+                          navItem.childNavItems!.map((item) => item.navTo),
+                        )
+                      }
                       onClick={
                         childItem.newTabLink
                           ? () => openInNewTab(childItem.newTabLink!)

@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  useNavigate,
-  useLocation,
-  useParams,
-  generatePath,
-} from "react-router";
+import { useNavigate, useLocation, useParams } from "react-router";
 import { Box, CircularProgress, Link, Typography } from "@mui/material";
 import { AxiosError } from "axios";
 
@@ -16,7 +11,12 @@ import {
   useScreenDimension,
   useTranslation,
 } from "@hooks";
-import { getFullGovActionId, getShortenedGovActionId } from "@utils";
+import {
+  getFullGovActionId,
+  getGovActionsTypePath,
+  getShortenedGovActionId,
+  parseGovActionCIP129Id,
+} from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
 import {
@@ -39,22 +39,25 @@ type DashboardGovernanceActionDetailsState = {
 export const DashboardGovernanceActionDetails = () => {
   const { voter } = useGetVoterInfo();
   const { pendingTransaction, isEnableLoading } = useCardano();
-  const { state: untypedState, hash } = useLocation();
+  const { state: untypedState } = useLocation();
   const state = untypedState as DashboardGovernanceActionDetailsState | null;
-  const index = hash.slice(1);
   const navigate = useNavigate();
   const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
-  const { proposalId: txHash } = useParams();
+  // The CIP-129 gov_action1… id.
+  const { proposalId = "" } = useParams();
+  const parsedId = parseGovActionCIP129Id(proposalId);
   const [isValidating, setIsValidating] = useState(true);
   const [metadataStatus, setMetadataStatus] = useState<
     MetadataValidationStatus | undefined
   >();
   const [isMetadataValid, setIsMetadataValid] = useState<boolean | undefined>();
   const [metadataIssues, setMetadataIssues] = useState<MetadataIssue[]>();
-  const fullProposalId = txHash && getFullGovActionId(txHash, +index);
-  const shortenedGovActionId =
-    txHash && getShortenedGovActionId(txHash, +index);
+  const fullProposalId =
+    parsedId && getFullGovActionId(parsedId.txHash, parsedId.index);
+  const shortenedGovActionId = parsedId
+    ? getShortenedGovActionId(proposalId, "")
+    : proposalId;
 
   const needsProposal = !state?.proposal || !state?.vote;
   // A row opened from a list carries its document, and so its authors, only
@@ -63,7 +66,7 @@ export const DashboardGovernanceActionDetails = () => {
   const needsDocument = !needsProposal && state?.proposal?.json == null;
   const { data, isLoading, error } = useGetProposalQuery(
     fullProposalId ?? "",
-    needsProposal || needsDocument,
+    !!fullProposalId && (needsProposal || needsDocument),
   );
   // TODO: Refactor this mess with proposals and metadata validation
   // once authors are existing in all CIP-108 metadata
@@ -135,7 +138,10 @@ export const DashboardGovernanceActionDetails = () => {
       error.response?.data.message.match(/Proposal with id: .* not found/);
     if (isProposalNotFound && fullProposalId) {
       navigate(
-        GOV_ACTION_HISTORY_PATHS.governanceActionHistoryDetail.replace(":id", fullProposalId),
+        GOV_ACTION_HISTORY_PATHS.governanceActionHistoryDetail.replace(
+          ":id",
+          proposalId,
+        ),
       );
     }
   }, [error]);
@@ -151,7 +157,7 @@ export const DashboardGovernanceActionDetails = () => {
     >
       <Breadcrumbs
         elementOne={t("govActions.title")}
-        elementOnePath={PATHS.dashboardGovernanceActions}
+        elementOnePath={PATHS.governanceActions}
         elementTwo={extendedProposal?.title ?? ""}
         isDataMissing={metadataStatus ?? null}
       />
@@ -164,11 +170,9 @@ export const DashboardGovernanceActionDetails = () => {
         }}
         onClick={() =>
           navigate(
-            state?.openedFromCategoryPage
-              ? generatePath(PATHS.dashboardGovernanceActionsCategory, {
-                  category: state?.proposal?.type,
-                })
-              : PATHS.dashboardGovernanceActions,
+            state?.openedFromCategoryPage && state.proposal?.type
+              ? getGovActionsTypePath(state.proposal.type)
+              : PATHS.governanceActions,
             {
               state: {
                 isVotedListOnLoad: !!vote,

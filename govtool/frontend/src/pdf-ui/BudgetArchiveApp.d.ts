@@ -4,7 +4,7 @@ export type BudgetArchiveProps = {
   view: "list" | "detail";
   /** The master id, for the detail view. */
   id?: string;
-  /** A category slug, for /budget_discussion/category/:category. */
+  /** A category slug, for /budget/category/:category. */
   category?: string;
   /** False where the host already titles the page (the dashboard). */
   showTitle?: boolean;

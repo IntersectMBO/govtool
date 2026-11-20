@@ -12,7 +12,11 @@ import { useValidateMutation } from "@/hooks/mutations";
 import { useScreenDimension } from "@/hooks/useScreenDimension";
 import { Background } from "@/components/atoms";
 import { Footer, TopNav } from "@/components/organisms";
-import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
+import {
+  useGetDRepVotingPowerList,
+  useGetVoterInfo,
+  useIsWalletConnected,
+} from "@/hooks";
 import {
   getAdaHolderVotingPower,
   getAccount,
@@ -38,6 +42,8 @@ export const ProposalDiscussionPillar = () => {
   const { username, setUsername } = useProposalDiscussion();
   const snackbarContext = useSnackbar();
   const { pathname } = useLocation();
+  // The layout follows a saved wallet while it reconnects, as App.tsx does.
+  const isConnected = useIsWalletConnected();
   // Computed on every render: it also reads the saved wallet name.
   const walletStatus = getPdfWalletStatus(context);
 
@@ -47,15 +53,15 @@ export const ProposalDiscussionPillar = () => {
         display: "flex",
         flexDirection: "column",
         flex: 1,
-        minHeight: !context.isEnabled ? "100vh" : "auto",
+        minHeight: !isConnected ? "100vh" : "auto",
       }}
     >
-      {!context.isEnabled && <TopNav />}
+      {!isConnected && <TopNav />}
       <Box
         sx={{
           // Connected: the dashboard's PagePaddingBox values. Public: the
           // pagePadding every public GovTool page uses.
-          px: context.isEnabled ? { xxs: 2, md: 5 } : pagePadding,
+          px: isConnected ? { xxs: 2, md: 5 } : pagePadding,
           py: 3,
           display: "flex",
           flex: 1,
@@ -103,11 +109,11 @@ export const ProposalDiscussionPillar = () => {
           />
         </Suspense>
       </Box>
-      {!context.isEnabled && <Footer />}
+      {!isConnected && <Footer />}
     </Box>
   );
 
   // Public GovTool pages sit on the orange and blue background; the
   // dashboard layout draws its own.
-  return context.isEnabled ? content : <Background>{content}</Background>;
+  return isConnected ? content : <Background>{content}</Background>;
 };

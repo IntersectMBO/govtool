@@ -35,7 +35,7 @@ export default class ProposalDiscussionPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto(`${environments.frontendUrl}/proposal_discussion`);
+    await this.page.goto(`${environments.frontendUrl}/proposals`);
     // wait for the proposal cards to load
     await this.page.waitForTimeout(2_000);
   }

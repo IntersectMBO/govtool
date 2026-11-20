@@ -16,7 +16,7 @@ export default class GovernanceActionsPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto(`${environments.frontendUrl}/governance_actions`);
+    await this.page.goto(`${environments.frontendUrl}/actions`);
     await this.page.waitForTimeout(2_000); // Waits to ensure the alert-success popup does not interfere
   }
 
@@ -38,10 +38,10 @@ export default class GovernanceActionsPage {
       .locator('[data-testid^="govaction-"][data-testid$="-view-detail"]')
       .first()
       .click();
-    // Details live at /governance_actions/<txHash>#<index> (prefixed with
-    // /connected when a wallet is connected); wait for it so callers do not
-    // assert against the list page while navigation is still in flight.
-    await this.page.waitForURL(/\/governance_actions\/(?!category\/)[^/?#]+/);
+    // Details live at /actions/gov_action1…, with or without a wallet; wait
+    // for it so callers do not assert against the list page while
+    // navigation is still in flight.
+    await this.page.waitForURL(/\/actions\/gov_action1[0-9a-z]+/);
     // The router updates the URL before it renders the new route, so also
     // wait for the list cards to go.
     await expect(

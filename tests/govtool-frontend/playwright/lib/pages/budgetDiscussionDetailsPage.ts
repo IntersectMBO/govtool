@@ -39,7 +39,7 @@ export default class BudgetDiscussionDetailsPage {
 
   async goto(masterId: number | string) {
     await this.page.goto(
-      `${environments.frontendUrl}/budget_discussion/${masterId}`
+      `${environments.frontendUrl}/budget/${masterId}`
     );
     await this.titleContent.waitFor();
   }

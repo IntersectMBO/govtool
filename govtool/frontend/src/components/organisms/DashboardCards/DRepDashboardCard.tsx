@@ -43,7 +43,7 @@ export const DRepDashboardCard = ({
 
   const navigateToDrepDirectory = () => {
     if (dRep) {
-      navigate(PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", dRep.view), {
+      navigate(PATHS.dRepDirectoryDRep.replace(":dRepId", dRep.view), {
         state: { enteredFromWithinApp: true },
       });
     }

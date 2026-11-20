@@ -229,7 +229,7 @@ export const DRepDetailsCard = ({
               openModal({
                 type: "chooseWallet",
                 state: {
-                  pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+                  pathToNavigate: PATHS.dRepDirectoryDRep.replace(
                     ":dRepId",
                     view,
                   ),

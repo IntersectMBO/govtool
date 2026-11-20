@@ -21,7 +21,7 @@ const CancelRegistrationModal = ({ open, onClose }) => {
             primaryButton={{
                 label: 'Back to Dashboard',
                 sx: { borderRadius: '20px' },
-                onClick: () => navigate(`/proposal_discussion`),
+                onClick: () => navigate(`/proposals`),
                 dataTestId: 'cancel-registration-modal-back-button',
             }}
         />

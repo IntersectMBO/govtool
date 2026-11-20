@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Box, Skeleton } from "@mui/material";
-import { Link, useLocation } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { Button } from "@atoms";
 import {
@@ -11,12 +11,14 @@ import {
 } from "@molecules";
 import { useScreenDimension, useTranslation } from "@hooks";
 import {
-  encodeCIP129Identifier,
+  getGovActionCIP129Id,
   getFullGovActionId,
+  getGovActionPath,
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
 } from "@utils";
 import { MetadataIssue, MetadataValidationStatus, ProposalData } from "@models";
+import { GOVERNANCE_ACTION_TYPE_PARAM } from "@consts";
 
 type ActionTypeProps = Omit<
   ProposalData,
@@ -50,14 +52,10 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
   const { t } = useTranslation();
 
   const govActionId = getFullGovActionId(txHash, index);
-  const cip129GovernanceActionId = encodeCIP129Identifier({
-    txID: txHash,
-    index: index.toString(16).padStart(2, "0"),
-    bech32Prefix: "gov_action",
-  });
+  const cip129GovernanceActionId = getGovActionCIP129Id(txHash, index);
 
-  const pathname = useLocation().pathname.replace(/governance_actions.*/g, "governance_actions");
-  const isCategoryView = useLocation().pathname.includes("category");
+  const [searchParams] = useSearchParams();
+  const isCategoryView = searchParams.has(GOVERNANCE_ACTION_TYPE_PARAM);
 
   return (
     <Box
@@ -154,7 +152,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
           <Button
             onClick={onClick}
             component={Link}
-            to={`${pathname}/${govActionId}`}
+            to={getGovActionPath(txHash, index)}
             state={{
               proposal: {
                 abstract,

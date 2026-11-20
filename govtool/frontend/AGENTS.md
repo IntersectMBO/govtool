@@ -124,21 +124,33 @@ diagnostic; Sentry is.
 fixtures (tests/govtool-frontend/playwright/tests/cip179/fixtures.ts) seed the
 same keys, so renaming one breaks the E2E suite and the CIP-179 check.
 
-Pages take one of two shapes. Governance actions and the DRep directory have a
-separate "/connected" path, and PublicRoute, GovernanceActionDetails and
-Dashboard rewrite between the two by string. Newer pages keep one path: App.tsx
-mounts the public route only while no wallet is enabled and the Dashboard route
-always, and the page switches its layout on isEnabled, as
-BudgetProposalsArchive.tsx does.
+Every page has one URL, with or without a wallet; there is no "/connected"
+path. App.tsx lists the pages that have both layouts once, in
+walletOptionalRoutes, and mounts them inside the Dashboard route or on their
+own as useIsWalletConnected says: a wallet is enabled, or a saved one is still
+reconnecting. Pages that pick their own chrome (the forum, budget archive and
+history) use the same hook. Every other page needs a wallet; the rule is
+utils/walletOnlyPath.ts (/dashboard, …/new and /my/… except /my/votes).
+
+URLs name resources: an action is /actions/gov_action1… (its CIP-129 id;
+build it with getGovActionCIP129Id or getGovActionPath, read it with
+parseGovActionCIP129Id), a type's list is /actions?type=…, and intents are
+/actions/new, /proposals/new or under /my.
+
+Old URLs (underscores, /connected, /actions/category/…, txHash#index, in any
+letter case) are rewritten by utils/getCurrentUrl.ts before any route renders.
+Only route names are renamed: a renamed first segment goes in
+LEGACY_PATH_SEGMENTS and a renamed second one in LEGACY_CHILD_SEGMENTS, both in
+src/consts/paths.ts.
 
 Wallet-only pages are top-level routes that redirect from a useEffect when no
 wallet is connected; copy CreateGovernanceAction.tsx.
 
-A new page touches src/consts/paths.ts, src/pages/index.ts, App.tsx (both
-branches when it has both), utils/getPageTitle.ts and en.json. It also needs the
-title function in pages/Dashboard.tsx when it renders in the Dashboard without a
-CONNECTED_NAV_ITEMS entry, and NAV_ITEMS and CONNECTED_NAV_ITEMS in
-src/consts/navItems.tsx when it is in the nav.
+A new page touches src/consts/paths.ts, src/pages/index.ts, App.tsx
+(walletOptionalRoutes when it has both layouts), utils/getPageTitle.ts and
+en.json. It also needs the title function in pages/Dashboard.tsx when it
+renders in the Dashboard without a CONNECTED_NAV_ITEMS entry, and NAV_ITEMS and
+CONNECTED_NAV_ITEMS in src/consts/navItems.tsx when it is in the nav.
 
 ## Transactions
 
@@ -168,11 +180,11 @@ script path nor any governance action builder. Check those on tests/devnet.
 ## pdf-ui
 
 src/pdf-ui is vendored plain JavaScript with two entry points. App.jsx is the
-proposal discussion forum, lazy-loaded at /proposal_discussion only when the
+proposal discussion forum, lazy-loaded at /proposals only when the
 forum flag is on; it talks to govtool/govtool-pdf-backend through
 VITE_PDF_API_URL. BudgetArchiveApp.jsx is the read-only 2025 budget proposals
-archive, lazy-loaded by pages/BudgetProposalsArchive.tsx at /budget_discussion
-with no flag.
+archive, lazy-loaded by pages/BudgetProposalsArchive.tsx at /budget with no
+flag.
 
 Lint skips its .js and .jsx (--ext ts,tsx), and tsc compiles them without
 type-checking (allowJs, no checkJs). App.d.ts and BudgetArchiveApp.d.ts type

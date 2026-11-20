@@ -5,12 +5,16 @@ import { Background, PagePaddingBox, ContentBox } from "@atoms";
 import { useTranslation } from "@hooks";
 import { PageTitle } from "@molecules";
 import { Footer, TopNav } from "@organisms";
-import { checkIsWalletConnected } from "@utils";
 
-export const DRepDirectory = () => {
+type DRepDirectoryProps = {
+  isConnected?: boolean;
+};
+
+// The dashboard supplies its own chrome; the public page adds it here.
+export const DRepDirectory = ({ isConnected = false }: DRepDirectoryProps) => {
   const { t } = useTranslation();
 
-  if (checkIsWalletConnected()) {
+  if (isConnected) {
     return (
       <PagePaddingBox
         sx={{ display: "flex", flex: 1, flexDirection: "column", py: 2 }}

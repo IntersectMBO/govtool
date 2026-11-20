@@ -41,7 +41,7 @@ const ShareMenu = ({ masterId }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [copied, setCopied] = useState(false);
     const open = Boolean(anchorEl);
-    const link = `${window.location.origin}/budget_discussion/${masterId}`;
+    const link = `${window.location.origin}/budget/${masterId}`;
 
     return (
         <>
@@ -293,7 +293,7 @@ const BudgetDiscussionCard = ({ budgetDiscussion }) => {
                 </Box>
                 <Box sx={cardFooterSx}>
                     <Link
-                        to={`/budget_discussion/${masterId}`}
+                        to={`/budget/${masterId}`}
                         data-testid={`budget-discussion-${slug}-view-details-link-wrapper`}
                         style={{ display: 'block', textDecoration: 'none' }}
                     >

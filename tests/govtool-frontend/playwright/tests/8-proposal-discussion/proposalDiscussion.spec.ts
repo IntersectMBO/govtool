@@ -253,7 +253,7 @@ test("8E. Should share proposed governance action", async ({
   const copiedTextDRepDirectory = await page.evaluate(() =>
     navigator.clipboard.readText()
   );
-  const expectedCopyUrl = `${environments.frontendUrl}/proposal_discussion/${proposalId}`;
+  const expectedCopyUrl = `${environments.frontendUrl}/proposals/${proposalId}`;
 
   expect(copiedTextDRepDirectory).toEqual(expectedCopyUrl);
 });

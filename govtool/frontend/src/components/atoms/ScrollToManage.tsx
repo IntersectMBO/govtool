@@ -19,35 +19,31 @@ export function debounce(
 export const pathMap = new Map<string, number>();
 
 export const ScrollToManage = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  // The list and one type's list (?type=…) share a path but not a position.
+  const page = `${pathname}${search}`;
 
   useEffect(() => {
-    if (pathMap.has(pathname)) {
-      window.scrollTo(0, pathMap.get(pathname)!);
+    if (pathMap.has(page)) {
+      window.scrollTo(0, pathMap.get(page)!);
     } else {
-      if (
-        pathname === PATHS.dashboardGovernanceActions ||
-        pathname === PATHS.governanceActions
-      ) {
-        pathMap.set(pathname, 0);
+      if (page === PATHS.governanceActions) {
+        pathMap.set(page, 0);
       }
       window.scrollTo(0, 0);
     }
-  }, [pathname]);
+  }, [page]);
 
   useEffect(() => {
     const fn = debounce(() => {
-      if (
-        pathname === PATHS.dashboardGovernanceActions ||
-        pathname === PATHS.governanceActions
-      ) {
-        pathMap.set(pathname, window.scrollY);
+      if (page === PATHS.governanceActions) {
+        pathMap.set(page, window.scrollY);
       }
     }, 200);
 
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
-  }, [pathname]);
+  }, [page]);
 
   return <></>;
 };

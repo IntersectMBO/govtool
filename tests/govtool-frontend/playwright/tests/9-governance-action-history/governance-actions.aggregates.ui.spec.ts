@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import type { GovernanceActionVoteAggregate } from "../../../../../govtool/frontend/src/models/governanceActions";
+import { getGovActionCIP129Id } from "../../lib/helpers/encodeDecode";
 
 const drep: GovernanceActionVoteAggregate = {
   role: "drep",
@@ -188,7 +189,7 @@ for (const sample of samples) {
       });
     }
     await page.goto(
-      `/governance_actions/history/${sample.txHash}#${sample.index}`
+      `/actions/history/${getGovActionCIP129Id(sample.txHash, sample.index)}`
     );
     const panel = page.getByTestId("single-action-voting-numbers");
     await expect(panel).toBeVisible();
@@ -269,7 +270,7 @@ for (const sample of samples) {
           JSON.stringify("unavailable-wallet")
         )
       );
-      await page.goto("/governance_actions/history");
+      await page.goto("/actions/history");
       await expect
         .poll(() =>
           page.evaluate(() => localStorage.getItem("wallet_data_name"))
@@ -283,7 +284,7 @@ for (const sample of samples) {
       );
       await expect(details).toHaveAttribute(
         "href",
-        `/governance_actions/history/${sample.txHash}#${sample.index}`
+        `/actions/history/${getGovActionCIP129Id(sample.txHash, sample.index)}`
       );
       await details.click();
       await expect(

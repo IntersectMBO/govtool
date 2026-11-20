@@ -6,18 +6,16 @@ import { Menu, Wallet } from "lucide-react";
 import { Button } from "@atoms";
 import { CONNECTED_NAV_ITEMS, IMAGES, NAV_ITEMS, PATHS } from "@consts";
 import { useCardano, useModal } from "@context";
-import {
-  useGetVoterInfo,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
+import { useScreenDimension, useTranslation } from "@hooks";
 import { WalletMenu } from "@molecules";
 import { ds, SHADOWS } from "@/consts/designTokens";
 
 import { DrawerMobile } from "./DrawerMobile";
 import { GlobalSearchButton } from "./GlobalSearch/GlobalSearchButton";
 import { NotificationBell } from "./Notifications/NotificationBell";
-import { ProfileAvatar } from "./ProfileAvatar";
+import { useOpenChooserAfterSwitch } from "@/hooks/useConnectedWallet";
+
+import { ProfileMenu } from "./ProfileMenu";
 import { isNavEntryActive, NavEntry, NavEntryLink } from "./topNavItems";
 
 // Below this width the nav items and the wallet control no longer fit on one
@@ -46,7 +44,7 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
   const { t } = useTranslation();
 
   const isConnected = Boolean(isEnabled && stakeKey);
-  const { voter } = useGetVoterInfo({ enabled: isConnected });
+  useOpenChooserAfterSwitch();
   const navEntries = (
     isConnected ? CONNECTED_NAV_ITEMS : NAV_ITEMS
   ) as NavEntry[];
@@ -90,7 +88,7 @@ export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) 
         <>
           <WalletMenu />
           {!onNavigateAway && <NotificationBell />}
-          {!onNavigateAway && <ProfileAvatar name={voter?.givenName} />}
+          {!onNavigateAway && <ProfileMenu />}
         </>
       );
     }

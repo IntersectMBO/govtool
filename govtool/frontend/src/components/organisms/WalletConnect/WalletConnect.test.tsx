@@ -73,7 +73,7 @@ beforeEach(() => {
 });
 
 describe("WalletConnectionModal", () => {
-  it("checks the wallet, then sums it up and opens the profile", () => {
+  it("checks the wallet, then sums it up and opens the profile menu or dashboard", () => {
     mocks.modalState = { view: "checking" };
     mocks.voter = undefined;
     const { rerender } = inRouter(<WalletConnectionModal />);
@@ -88,7 +88,8 @@ describe("WalletConnectionModal", () => {
     expect(screen.getByTestId("wallet-summary-governance")).toHaveTextContent("Registered DRep");
     fireEvent.click(screen.getByTestId("view-your-profile-button"));
     expect(mocks.closeModal).toHaveBeenCalled();
-    expect(mocks.navigate).toHaveBeenCalledWith("/profile");
+    // No profile menu is on screen here, so it goes to the dashboard.
+    expect(mocks.navigate).toHaveBeenCalledWith("/dashboard");
     expect(screen.getByTestId("confirm-modal-button")).toBeInTheDocument();
   });
 

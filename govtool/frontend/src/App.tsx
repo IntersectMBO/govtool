@@ -51,7 +51,6 @@ import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
 import { DashboardHome } from "./pages/DashboardHome";
 import { GovernanceActionHistoryPage } from "./pages/GovernanceActionHistory";
-import { GovernanceProfilePage } from "./pages/GovernanceProfile";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
@@ -169,7 +168,6 @@ export default () => {
         <Route element={<Dashboard />}>
           <Route path={PATHS.dashboard} element={<DashboardHome />} />
           <Route path={PATHS.notifications} element={<NotificationsPage />} />
-          <Route path={PATHS.profile} element={<GovernanceProfilePage />} />
           <Route
             path={PATHS.notificationPreferences}
             element={<NotificationPreferencesPage />}

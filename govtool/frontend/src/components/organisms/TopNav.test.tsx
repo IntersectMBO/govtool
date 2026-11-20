@@ -32,6 +32,24 @@ vi.mock("@hooks", async (importOriginal) => ({
   useGetDRepVotingPowerQuery: () => ({ dRepVotingPower: 1_234_000_000 }),
 }));
 
+// The profile menu and the wallet card read through React Query; they have
+// their own tests (ProfileMenu.test.tsx, ConnectedWalletCard.test.tsx).
+vi.mock("./ProfileMenu", () => ({
+  ProfileMenu: () => <button aria-label="Profile" data-testid="profile-avatar" type="button" />,
+}));
+vi.mock("@/context/wallet", () => ({ useCardano: () => mocks.cardano }));
+vi.mock("@/hooks/useConnectedWallet", () => ({
+  useOpenChooserAfterSwitch: () => {},
+  useWalletBalance: () => ({ balance: undefined }),
+  useDisconnectWallet: () => ({ confirmDisconnect: vi.fn(), switchWallet: vi.fn() }),
+}));
+vi.mock("@/hooks/queries/useGetAdaHolderVotingPowerQuery", () => ({
+  useGetAdaHolderVotingPowerQuery: () => ({ votingPower: undefined }),
+}));
+vi.mock("@/context/snackbar", () => ({
+  useSnackbar: () => ({ addSuccessAlert: vi.fn() }),
+}));
+
 // The bell reads notifications through React Query; it has its own tests.
 vi.mock("./Notifications/NotificationBell", () => ({
   NotificationBell: () => (
@@ -138,11 +156,9 @@ describe("TopNav (desktop)", () => {
       expect(pill).toHaveTextContent("stake1u…xyz");
     });
 
-    it("shows a profile avatar and no voting power chip", () => {
-      mocks.voter = { isRegisteredAsDRep: true, givenName: "Jordan Dyer" } as typeof mocks.voter;
+    it("shows the profile menu's avatar and no voting power chip", () => {
       renderAt("/dashboard");
-      expect(screen.getByTestId("profile-avatar")).toHaveTextContent("JD");
-      expect(screen.getByTestId("profile-avatar")).toHaveAttribute("href", "/profile");
+      expect(screen.getByTestId("profile-avatar")).toBeInTheDocument();
       expect(screen.queryByTestId("voting-power-chips")).toBeNull();
     });
 

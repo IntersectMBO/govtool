@@ -1,14 +1,17 @@
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { Box, IconButton, SwipeableDrawer } from "@mui/material";
 import { LifeBuoy, X } from "lucide-react";
 
 import { Button } from "@atoms";
 import { IMAGES } from "@consts";
-import { useGetVoterInfo, useTranslation } from "@hooks";
-import { DRepInfoCard, WalletInfoCard } from "@molecules";
+import { useTranslation } from "@hooks";
 import { openInNewTab } from "@utils";
 import { ds } from "@/consts/designTokens";
 import { LINKS } from "@/consts/links";
+import { PATHS } from "@/consts/paths";
+import { requestProfileMenu } from "@/utils/profileMenu";
+
+import { ConnectedWalletCard } from "./ConnectedWalletCard";
 
 import { DrawerMobileProps } from "./types";
 import { isNavEntryActive, NavEntryLink } from "./topNavItems";
@@ -24,7 +27,7 @@ export const DrawerMobile = ({
 }: DrawerMobileProps) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const { voter } = useGetVoterInfo({ enabled: isConnected });
+  const navigate = useNavigate();
   const close = () => setIsDrawerOpen(false);
 
   return (
@@ -102,9 +105,14 @@ export const DrawerMobile = ({
             ))}
           </Box>
           {isConnected && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-              {voter?.isRegisteredAsDRep && <DRepInfoCard />}
-              <WalletInfoCard />
+            <Box sx={{ border: `1px solid ${ds.gray["200"]}`, borderRadius: "12px", mt: 1, p: 2 }}>
+              <ConnectedWalletCard
+                onViewProfile={() => {
+                  close();
+                  // Phones show no avatar, so no profile menu to open.
+                  if (!requestProfileMenu()) navigate(PATHS.dashboard);
+                }}
+              />
             </Box>
           )}
         </Box>

@@ -27,7 +27,6 @@ export const PATHS = {
   retireAsDrep: "/retire_drep",
   retireAsDirectVoter: "/retire_direct_voter",
   stakeKeys: "/stake_keys",
-  profile: "/profile",
 };
 
 export const PDF_PATHS = {

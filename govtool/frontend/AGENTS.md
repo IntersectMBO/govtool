@@ -196,7 +196,13 @@ modal (organisms/WalletConnect: checking then a summary, or the failure read
 from the error text by utils/walletConnect.ts). Its close button keeps
 confirm-modal-button, which the E2E login clicks (with several stake keys it
 waits for /stake_keys instead, then dismisses the modal Continue opens); Disconnect opens the
-disconnectWallet modal (confirm-disconnect-button). The avatar opens /profile.
+disconnectWallet modal (confirm-disconnect-button). The avatar opens the profile
+popup (organisms/ProfileMenu) and the wallet pill the wallet popup
+(organisms/ConnectedWalletCard, also in the phone drawer); there is no /profile
+page. View Profile and the connection summary open the profile popup through
+utils/profileMenu.ts, or go to the dashboard where no avatar is shown (phones).
+Switch wallet disconnects without the reload and opens the wallet chooser,
+because enable does nothing while a wallet is enabled.
 
 Each page has one main landmark, which TopNav's skip link focuses: public page
 shells pass component="main" to PageContainer (or a Box), while the Dashboard

@@ -2138,57 +2138,36 @@
     },
     "viewProfile": "View profile"
   },
-  "profile": {
-    "badge": "Governance identity review",
-    "title": "Your governance profile",
-    "body": "Your {{wallet}} wallet is connected. Review your stake key and governance information before continuing.",
-    "bodyNoWallet": "Your wallet is connected. Review your stake key and governance information before continuing.",
-    "secureTitle": "Secure, read-only review",
-    "secureBody": "Confirm the identity GovTool will use before you choose a governance action.",
-    "steps": {
-      "label": "Profile progress",
-      "wallet": "Wallet connected",
-      "stakeKey": "Stake key selected",
-      "review": "Review governance status"
+  "accountMenu": {
+    "walletLabel": "Your connected wallet",
+    "walletName": "{{name}} Wallet",
+    "walletFallback": "Connected wallet",
+    "switchWallet": "Switch wallet",
+    "stakeAddress": "stake address",
+    "balance": "Wallet balance",
+    "votingPower": "Voting power",
+    "unknown": "Not available",
+    "connected": "Connected",
+    "viewProfile": "View Profile",
+    "disconnect": "Disconnect",
+    "profileLabel": "Your governance profile",
+    "account": "My account",
+    "roles": "Governance roles",
+    "directVoter": "Direct voter",
+    "drep": "DRep",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "retired": "Retired"
     },
-    "details": "Profile details",
-    "detailsHint": "Compare identity and status at a glance",
-    "wallet": {
-      "title": "Connected wallet",
-      "body": "Verified for this GovTool session",
-      "pill": "Connected"
-    },
-    "votingPower": {
-      "title": "Voting power",
-      "body": "This is the current voting power associated with the selected stake key."
-    },
-    "stakeKey": {
-      "title": "Selected stake key",
-      "pill": "Selected",
-      "label": "Stake key",
-      "body": "Governance actions and voting power below apply to this stake key, not the wallet address."
-    },
-    "drep": {
-      "notRegisteredTitle": "DRep status — Not registered",
-      "notRegisteredPill": "Not registered",
-      "notRegisteredBody": "You can register this stake key as a DRep and participate in Cardano governance.",
-      "registeredTitle": "DRep status — Registered",
-      "registeredPill": "Registered",
-      "registeredBody": "This stake key is a registered DRep. Manage your profile, votes and delegators from your DRep dashboard.",
-      "retiredTitle": "DRep status — Retired",
-      "retiredPill": "Retired",
-      "retiredBody": "Your DRep registration is retired. You can register again from your dashboard.",
-      "directTitle": "DRep status — Direct voter",
-      "directPill": "Direct voter",
-      "directBody": "This stake key votes directly as a direct voter.",
-      "become": "Become a DRep",
-      "explore": "Explore governance",
-      "dashboard": "Open DRep dashboard",
-      "openDashboard": "Open dashboard",
-      "unknown": "GovTool couldn't read your DRep status right now. Reload the page to try again."
-    },
-    "noTxTitle": "No transaction is submitted now",
-    "noTxBody": "Reviewing this profile or choosing an action does not submit a blockchain transaction. Transaction review and wallet approval happen later."
+    "overview": "Overview",
+    "overviewBody": "Your governance dashboard",
+    "votingActivity": "Voting activity",
+    "toVote_one": "{{count}} action to vote on",
+    "toVote_other": "{{count}} actions to vote on",
+    "myProposals": "My proposals",
+    "historyLog": "History Log",
+    "logout": "Logout"
   },
   "createGA": {
     "steps": {

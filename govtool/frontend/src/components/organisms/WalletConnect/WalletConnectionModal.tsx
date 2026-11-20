@@ -31,6 +31,7 @@ import { useTimedOut } from "@/hooks/useTimedOut";
 import { connectedWallet } from "@/utils/connectedWallet";
 import { stakeHexToBech32 } from "@/utils/drepDashboard";
 import { openInNewTab } from "@/utils/openInNewTab";
+import { requestProfileMenu } from "@/utils/profileMenu";
 import { classifyWalletError, networkLabel } from "@/utils/walletConnect";
 
 import { Callout, PrimaryAction, SecondaryAction, WalletRow, WalletStateFrame } from "./walletParts";
@@ -174,7 +175,7 @@ const CheckingAndSuccess = () => {
         <PrimaryAction
           onClick={() => {
             closeModal();
-            navigate(PATHS.profile);
+            if (!requestProfileMenu()) navigate(PATHS.dashboard);
           }}
           testId="view-your-profile-button"
         >

@@ -1,15 +1,16 @@
 import { useEffect, useId, useState } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { Box, ButtonBase, Popover } from "@mui/material";
 import { ChevronDown } from "lucide-react";
 
 import { useCardano } from "@context";
-import { useGetVoterInfo, useScreenDimension } from "@hooks";
-import { ds, RADIUS } from "@/consts/designTokens";
-
-import { DRepInfoCard } from "./DRepInfoCard";
-import { WalletInfoCard } from "./WalletInfoCard";
+import { useScreenDimension } from "@hooks";
+import { useTranslation } from "react-i18next";
+import { ConnectedWalletCard } from "@/components/organisms/ConnectedWalletCard";
+import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
+import { PATHS } from "@/consts/paths";
 import { stakeHexToBech32 } from "@/utils/drepDashboard";
+import { requestProfileMenu } from "@/utils/profileMenu";
 
 // stake1u9…xyz: the first 7 and last 3 characters of the stake key.
 const shortenStakeKey = (stakeKey?: string) =>
@@ -19,8 +20,9 @@ const shortenStakeKey = (stakeKey?: string) =>
 
 export const WalletMenu = () => {
   const { stakeKey } = useCardano();
-  const { voter } = useGetVoterInfo();
   const { isMobile } = useScreenDimension();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const { pathname } = useLocation();
   // A link inside the menu (View profile) leaves it open over the new page.
@@ -90,21 +92,28 @@ export const WalletMenu = () => {
         open={isOpen}
         slotProps={{
           paper: {
+            "aria-label": t("accountMenu.walletLabel"),
             id: menuId,
+            role: "dialog",
             sx: {
-              border: `1px solid ${ds.gray["200"]}`,
+              border: `1px solid ${ds.primary["200"]}`,
               borderRadius: `${RADIUS.lg}px`,
+              borderTop: `3px solid ${ds.primary["200"]}`,
+              boxShadow: SHADOWS.drop,
               mt: 1,
-              width: 320,
+              p: 2,
+              width: 360,
             },
           },
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2 }}>
-          {voter?.isRegisteredAsDRep && <DRepInfoCard />}
-          <WalletInfoCard />
-        </Box>
+        <ConnectedWalletCard
+          onViewProfile={() => {
+            setAnchorEl(null);
+            if (!requestProfileMenu()) navigate(PATHS.dashboard);
+          }}
+        />
       </Popover>
     </>
   );

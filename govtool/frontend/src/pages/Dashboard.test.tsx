@@ -34,6 +34,14 @@ vi.mock("react-router", async (importOriginal) => ({
   useNavigate: () => mocks.navigate,
 }));
 
+// The account popups read through React Query; they have their own tests.
+vi.mock("@/components/organisms/ProfileMenu", () => ({
+  ProfileMenu: () => <button aria-label="Profile" data-testid="profile-avatar" type="button" />,
+}));
+vi.mock("@/components/organisms/ConnectedWalletCard", () => ({
+  ConnectedWalletCard: () => null,
+}));
+
 vi.mock("@/components/organisms/Notifications/NotificationBell", () => ({
   NotificationBell: () => (
     <button aria-label="Notifications" data-testid="notifications-bell" type="button" />

@@ -171,6 +171,20 @@ export const participationRate = (
   return participation(votes, actions, fromEpoch, currentEpoch).rate;
 };
 
+/**
+ * A directory card's delegator count: the /drep/list row's when the backend
+ * sends one (db-sync and Koios do), else the delegators route's total once it
+ * is served, else none to show.
+ */
+export const pickDelegatorCount = (
+  rowCount: number | null | undefined,
+  route: { isServed: boolean; total?: number; isLoading: boolean },
+) => {
+  if (typeof rowCount === "number") return { show: true, count: rowCount, isLoading: false };
+  if (route.isServed) return { show: true, count: route.total, isLoading: route.isLoading };
+  return { show: false, count: undefined, isLoading: false };
+};
+
 /** Mean days from an action's submission to the DRep's vote, one decimal. */
 export const averageResponseDays = (votes: DashboardVote[]) => {
   const gaps = votes

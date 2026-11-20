@@ -135,6 +135,7 @@ export const DRepCard = ({
     motivations,
     qualifications,
     latestRegistrationDate,
+    delegatorCount,
   },
   isConnected,
   isDelegationLoading,
@@ -147,7 +148,7 @@ export const DRepCard = ({
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const { addErrorAlert, addSuccessAlert } = useSnackbar();
-  const stats = useDRepCardStats({ drepId, view, latestRegistrationDate });
+  const stats = useDRepCardStats({ drepId, view, latestRegistrationDate, delegatorCount });
   const { openModal } = useModal();
 
   const openChooseWalletModal = () =>

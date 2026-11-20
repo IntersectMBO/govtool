@@ -14,7 +14,7 @@ import {
   getDRepVotesById,
   getDRepVotingPowerHistory,
 } from "@/services/requests";
-import { participationRate } from "@/utils/drepDashboard";
+import { participationRate, pickDelegatorCount } from "@/utils/drepDashboard";
 
 import { useGetDRepVotesByIdQuery } from "./useGetDRepVotesByIdQuery";
 
@@ -150,15 +150,24 @@ export const useDRepCardStats = ({
   drepId,
   view,
   latestRegistrationDate,
+  delegatorCount,
 }: {
   drepId: string;
   view: string;
   latestRegistrationDate?: string;
+  /** The /drep/list row's count, where the backend sends one. */
+  delegatorCount?: number | null;
 }) => {
   const { epochParams } = useAppContext();
   const votes = useGetDRepVotesByIdQuery(view);
   const actions = useDRepDashboardActions();
-  const delegators = useDRepDelegators(drepId, 1, 1);
+  // The route is asked only when the row carries no count.
+  const route = useDRepDelegators(typeof delegatorCount === "number" ? undefined : drepId, 1, 1);
+  const delegators = pickDelegatorCount(delegatorCount, {
+    isServed: route.isServed,
+    total: route.data?.total,
+    isLoading: route.isLoading,
+  });
   const currentEpoch = typeof epochParams?.epoch_no === "number" ? epochParams.epoch_no : undefined;
   const participation =
     votes.dRepVotes && actions.actions && currentEpoch !== undefined
@@ -173,9 +182,9 @@ export const useDRepCardStats = ({
     /** A whole percentage, or null when it cannot be worked out. */
     participation,
     isParticipationLoading: votes.areDRepVotesLoading || actions.isLoading,
-    /** Undefined until the backend serves the delegators route. */
-    delegators: delegators.isServed ? delegators.data?.total : undefined,
-    areDelegatorsServed: delegators.isServed,
-    areDelegatorsLoading: delegators.isServed && delegators.isLoading,
+    /** Undefined while there is none to show (see pickDelegatorCount). */
+    delegators: delegators.count,
+    areDelegatorsServed: delegators.show,
+    areDelegatorsLoading: delegators.isLoading,
   };
 };

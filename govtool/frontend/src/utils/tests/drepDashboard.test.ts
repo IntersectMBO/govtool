@@ -11,6 +11,7 @@ import {
   isRetiredDRep,
   participation,
   participationRate,
+  pickDelegatorCount,
   registrationEpoch,
   stakeHexToBech32,
   tenureMonths,
@@ -171,6 +172,24 @@ describe("participationRate", () => {
 
   it("counts every action when the registration date is unknown", () => {
     expect(participationRate(votes, actions, "", 507)).toBe(50);
+  });
+});
+
+describe("pickDelegatorCount", () => {
+  const route = { isServed: true, total: 12, isLoading: false };
+
+  it("prefers the directory row's count, zero included", () => {
+    expect(pickDelegatorCount(920, route)).toEqual({ show: true, count: 920, isLoading: false });
+    expect(pickDelegatorCount(0, route)).toEqual({ show: true, count: 0, isLoading: false });
+  });
+
+  it("falls back to the delegators route, then to nothing", () => {
+    expect(pickDelegatorCount(null, route)).toEqual({ show: true, count: 12, isLoading: false });
+    expect(pickDelegatorCount(undefined, { ...route, isServed: false })).toEqual({
+      show: false,
+      count: undefined,
+      isLoading: false,
+    });
   });
 });
 

@@ -447,7 +447,7 @@ describe('CIP-108 title and abstract validation', () => {
 });
 
 describe('CIP-119 validation', () => {
-  it('names a missing givenName', async () => {
+  const validate = (body: Record<string, unknown>) => {
     const service = new MetadataService(
       {
         get: () => ({
@@ -458,18 +458,45 @@ describe('CIP-119 validation', () => {
       } as ConfigService,
       null,
     );
-    const raw = JSON.stringify({ body: { objectives: 'x' } });
+    const raw = JSON.stringify({ body });
     jest.mocked(fetchMetadataText).mockResolvedValue(raw);
     const hash = blake.blake2bHex(raw, undefined, 32);
-    const result = await service.validateMetadata({
+    return service.validateMetadata({
       url: 'https://example.net/drep',
       hash,
       standard: MetadataStandard.CIP119,
     });
+  };
+
+  it('names a missing givenName', async () => {
+    const result = await validate({ objectives: 'x' });
     expect(result).toMatchObject({
       valid: false,
       status: MetadataValidationStatus.INCORRECT_FORMAT,
       issues: [{ field: 'givenName', rule: 'required', severity: 'error' }],
     });
+  });
+
+  it('accepts a givenName at the length limit', async () => {
+    const result = await validate({ givenName: { '@value': 'a'.repeat(80) } });
+    expect(result).toMatchObject({ valid: true, status: undefined });
+  });
+
+  it('rejects a givenName over the length limit', async () => {
+    const result = await validate({ givenName: { '@value': 'a'.repeat(81) } });
+    expect(result).toMatchObject({
+      valid: false,
+      status: MetadataValidationStatus.INCORRECT_FORMAT,
+      issues: [
+        {
+          field: 'givenName',
+          rule: 'maxLength',
+          severity: 'error',
+          limit: 80,
+          actual: 81,
+        },
+      ],
+    });
+    expect(result.metadata).toBeUndefined();
   });
 });

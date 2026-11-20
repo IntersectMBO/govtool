@@ -146,6 +146,31 @@ export const participation = (
   };
 };
 
+/** Dated epochs, to place a registration date: now, submissions and votes. */
+export const epochAnchors = (
+  actions: DashboardAction[],
+  votes: DashboardVote[],
+  currentEpoch: number | undefined,
+) => [
+  ...(currentEpoch !== undefined ? [{ time: new Date().toISOString(), epoch: currentEpoch }] : []),
+  ...actions.map((record) => ({ time: record.time, epoch: record.epoch_no })),
+  ...votes.flatMap(({ vote }) => (vote ? [{ time: vote.date, epoch: vote.epochNo }] : [])),
+];
+
+/**
+ * A directory card's participation: the dashboard's rate, counted from the
+ * epoch the DRep registered in, or over every action when that is unknown.
+ */
+export const participationRate = (
+  votes: DashboardVote[],
+  actions: DashboardAction[],
+  registeredAt: string | undefined,
+  currentEpoch: number,
+) => {
+  const fromEpoch = registrationEpoch(registeredAt, epochAnchors(actions, votes, currentEpoch));
+  return participation(votes, actions, fromEpoch, currentEpoch).rate;
+};
+
 /** Mean days from an action's submission to the DRep's vote, one decimal. */
 export const averageResponseDays = (votes: DashboardVote[]) => {
   const gaps = votes

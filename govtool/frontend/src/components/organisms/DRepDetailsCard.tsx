@@ -1,5 +1,5 @@
 import { PropsWithChildren, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { Avatar, Box, ButtonBase, Link, Skeleton } from "@mui/material";
 import {
   CircleCheck,
@@ -40,7 +40,7 @@ import {
 } from "@/models";
 import { useValidateMutation } from "@/hooks/mutations";
 import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
-import { avatarTone, dRepInitials } from "./DRepCard";
+import { avatarTone, dRepInitials, VOTING_HISTORY_ID } from "./DRepCard";
 import { DRepActivityTable } from "./DRepActivityTable";
 import { DelegationReviewDialog } from "./DelegationReviewDialog";
 import { ShareDRepDialog } from "./DRepDashboard/ShareDRepDialog";
@@ -68,6 +68,14 @@ export const DRepDetailsCard = ({
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const { dRepVotes, areDRepVotesLoading, isDRepVotesError } =
     useGetDRepVotesByIdQuery(dRepData.view);
+  const { hash } = useLocation();
+
+  // The directory card's View Voting History lands here; the router does not
+  // scroll to a hash, and the table's height settles once the votes load.
+  useEffect(() => {
+    if (hash !== `#${VOTING_HISTORY_ID}` || areDRepVotesLoading) return;
+    document.getElementById(VOTING_HISTORY_ID)?.scrollIntoView({ block: "start" });
+  }, [hash, areDRepVotesLoading]);
 
   const {
     motivations,
@@ -445,11 +453,13 @@ export const DRepDetailsCard = ({
             isLoading={areDRepVotesLoading}
             votes={dRepVotes}
           />
-          <DRepActivityTable
-            isError={isDRepVotesError}
-            isLoading={areDRepVotesLoading}
-            votes={dRepVotes}
-          />
+          <Box id={VOTING_HISTORY_ID} sx={{ scrollMarginTop: 96 }}>
+            <DRepActivityTable
+              isError={isDRepVotesError}
+              isLoading={areDRepVotesLoading}
+              votes={dRepVotes}
+            />
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -18,7 +18,7 @@ import {
   useDRepDashboardVotes,
 } from "@/hooks/queries/useDRepDashboard";
 import type { VoterInfo } from "@/models";
-import { actionKey, registrationEpoch } from "@/utils/drepDashboard";
+import { actionKey, epochAnchors, registrationEpoch } from "@/utils/drepDashboard";
 
 import { formatLongDate } from "./parts";
 import type { DashboardData } from "./types";
@@ -95,15 +95,7 @@ export const DRepDashboard = ({
     const actionsByKey = new Map(
       (actions ?? []).map((record) => [actionKey(record.tx_hash, record.index), record]),
     );
-    // Dated epochs, to place the registration date: submissions, votes, now.
-    const anchors = [
-      ...(currentEpoch !== undefined
-        ? [{ time: new Date().toISOString(), epoch: currentEpoch }]
-        : []),
-      ...(actions ?? []).map((record) => ({ time: record.time, epoch: record.epoch_no })),
-      ...(votesQuery.votes ?? []).flatMap(({ vote }) =>
-        (vote ? [{ time: vote.date, epoch: vote.epochNo }] : [])),
-    ];
+    const anchors = epochAnchors(actions ?? [], votesQuery.votes ?? [], currentEpoch);
     return {
       voter,
       dRep,

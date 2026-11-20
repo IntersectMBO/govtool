@@ -10,6 +10,7 @@ import {
   epochActivity,
   isRetiredDRep,
   participation,
+  participationRate,
   registrationEpoch,
   stakeHexToBech32,
   tenureMonths,
@@ -150,6 +151,26 @@ describe("participation", () => {
 
   it("treats an action as closed from its ratification epoch", () => {
     expect(participation([], actions, 503, 507).votable).toBe(2);
+  });
+});
+
+describe("participationRate", () => {
+  const actions = [
+    action("old", 400, {
+      time: "2025-01-01T00:00:00Z",
+      status: { ...NO_STATUS, expired_epoch: 410 },
+    }),
+    action("new", 500, { time: "2026-01-01T00:00:00Z" }),
+  ];
+  const votes = [vote("new", 501)];
+
+  it("counts from the epoch the DRep registered in, placed by dated anchors", () => {
+    // Registered mid-2025, after the old action closed: one votable, voted.
+    expect(participationRate(votes, actions, "2025-06-01T00:00:00Z", 507)).toBe(100);
+  });
+
+  it("counts every action when the registration date is unknown", () => {
+    expect(participationRate(votes, actions, "", 507)).toBe(50);
   });
 });
 

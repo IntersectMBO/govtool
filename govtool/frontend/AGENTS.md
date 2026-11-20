@@ -170,6 +170,13 @@ contract table and notificationContent.ts. The bell renders only for connected
 wallets outside wallet flows; tests that render a connected TopNav stub it,
 since it needs a QueryClient.
 
+A DRep directory card (organisms/DRepCard) shows participation from that DRep's
+votes, one /drep/getVotes request per card through the profile's query, and
+every /governance-actions row (useDRepCardStats). Delegators appear once the
+backend serves drep.delegatorList; until then the registration date stands in.
+Its menu's View Voting History opens the profile at #voting-history, which
+DRepDetailsCard scrolls to.
+
 A registered DRep's /dashboard is organisms/DRepDashboard, tabbed by the tab
 query parameter; DashboardCards still builds its wallet and action cards, and
 everyone else keeps the cards. Its figures come from utils/drepDashboard.ts

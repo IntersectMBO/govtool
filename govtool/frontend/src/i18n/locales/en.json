@@ -502,10 +502,16 @@
     "becomeADRep": "Become a DRep",
     "card": {
       "copyId": "Copy DRep ID",
+      "copyLegacyId": "Copy Legacy DRep ID (CIP-105)",
+      "delegateVotingPower": "Delegate Voting Power",
+      "delegators": "Delegators",
       "moreActions": "More actions",
       "moreActionsFor": "More actions for {{name}}",
       "noSummary": "This DRep has not published a profile summary.",
+      "participation": "Participation",
       "registered": "Registered",
+      "viewProfile": "View Profile",
+      "viewVotingHistory": "View Voting History",
       "yourDRep": "Your DRep"
     },
     "clearAll": "Clear all",

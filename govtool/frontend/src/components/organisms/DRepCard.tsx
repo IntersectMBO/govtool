@@ -1,7 +1,13 @@
-import { useState, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Avatar, Box, IconButton, Menu, MenuItem, Skeleton } from "@mui/material";
-import { EllipsisVertical } from "lucide-react";
+import {
+  CircleCheck,
+  CircleUserRound,
+  Copy,
+  EllipsisVertical,
+  History,
+} from "lucide-react";
 
 import { Button, StatusPill } from "@atoms";
 import { PATHS } from "@consts";
@@ -14,6 +20,7 @@ import {
   MetadataValidationStatus,
 } from "@models";
 import {
+  copyToClipboard,
   correctDRepDirectoryFormat,
   encodeCIP129Identifier,
   formatDisplayDate,
@@ -21,6 +28,7 @@ import {
   getMetadataDataMissingStatusTranslation,
 } from "@utils";
 import { useValidateMutation } from "@/hooks/mutations";
+import { useDRepCardStats } from "@/hooks/queries/useDRepDashboard";
 import { ds, FONT_FAMILY, RADIUS, SHADOWS } from "@/consts/designTokens";
 
 /** Up to two initials from a name, or "DR" when there is none. */
@@ -57,6 +65,47 @@ const statValueSx = {
   lineHeight: "20px",
   whiteSpace: "nowrap" as const,
 };
+
+const menuItemSx = {
+  color: ds.gray["900"],
+  fontSize: 14,
+  gap: 1.25,
+  py: 1,
+  "& svg": { color: ds.primary["600"], flexShrink: 0 },
+};
+
+/** One figure under the card's divider; every one after the first is ruled off. */
+const Stat = ({
+  label,
+  children,
+  testId,
+  isFirst = false,
+}: {
+  label: string;
+  children: ReactNode;
+  testId: string;
+  isFirst?: boolean;
+}) => (
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 0.25,
+      minWidth: 0,
+      ...(!isFirst && { borderLeft: `1px solid ${ds.gray["200"]}`, pl: 2 }),
+    }}
+  >
+    <Box component="span" data-testid={`${testId}-label`} sx={statLabelSx}>
+      {label}
+    </Box>
+    <Box component="span" data-testid={testId} sx={statValueSx}>
+      {children}
+    </Box>
+  </Box>
+);
+
+/** The DRep profile's voting history table, which the card's menu links to. */
+export const VOTING_HISTORY_ID = "voting-history";
 
 type DRepCardProps = {
   dRep: DRepData;
@@ -97,7 +146,8 @@ export const DRepCard = ({
 }: DRepCardProps) => {
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const { addSuccessAlert } = useSnackbar();
+  const { addErrorAlert, addSuccessAlert } = useSnackbar();
+  const stats = useDRepCardStats({ drepId, view, latestRegistrationDate });
   const { openModal } = useModal();
 
   const openChooseWalletModal = () =>
@@ -157,11 +207,21 @@ export const DRepCard = ({
     : undefined;
   const canDelegate = ["Active", "Inactive"].includes(status);
 
-  const copyId = () => {
-    navigator.clipboard.writeText(cip129Identifier);
-    addSuccessAlert(t("alerts.copiedToClipboard"));
+  const copy = async (value: string) => {
     setMenuAnchor(null);
+    if (await copyToClipboard(value)) addSuccessAlert(t("alerts.copiedToClipboard"));
+    else addErrorAlert(t("alerts.copyFailed"));
   };
+  // The menu offers delegation wherever the card's own button would.
+  const canDelegateHere = canDelegate && !isMyDrep && !isInProgress
+    && (isConnected ? !!onDelegate : true);
+  const delegateFromMenu = () => {
+    setMenuAnchor(null);
+    if (isConnected) onDelegate?.();
+    else openChooseWalletModal();
+  };
+  let participation = "—";
+  if (stats.participation !== null) participation = `${stats.participation}%`;
 
   return (
     <Box
@@ -273,18 +333,58 @@ export const DRepCard = ({
           open={Boolean(menuAnchor)}
           transformOrigin={{ horizontal: "right", vertical: "top" }}
         >
+          {canDelegateHere && (
+            <MenuItem
+              data-testid={`${view}-menu-delegate`}
+              disabled={isConnected && isDelegateDisabled}
+              onClick={delegateFromMenu}
+              sx={menuItemSx}
+            >
+              <CircleCheck aria-hidden size={18} />
+              {t("dRepDirectory.card.delegateVotingPower")}
+            </MenuItem>
+          )}
           {type === "DRep" && (
             <MenuItem
               component={Link}
+              data-testid={`${view}-menu-view-profile`}
               onClick={() => setMenuAnchor(null)}
               state={{ enteredFromWithinApp: true }}
+              sx={menuItemSx}
               to={detailsPath}
             >
-              {t("viewDetails")}
+              <CircleUserRound aria-hidden size={18} />
+              {t("dRepDirectory.card.viewProfile")}
             </MenuItem>
           )}
-          <MenuItem data-testid={`${cip129Identifier}-copy-id-button`} onClick={copyId}>
+          {type === "DRep" && (
+            <MenuItem
+              component={Link}
+              data-testid={`${view}-menu-voting-history`}
+              onClick={() => setMenuAnchor(null)}
+              state={{ enteredFromWithinApp: true }}
+              sx={menuItemSx}
+              to={`${detailsPath}#${VOTING_HISTORY_ID}`}
+            >
+              <History aria-hidden size={18} />
+              {t("dRepDirectory.card.viewVotingHistory")}
+            </MenuItem>
+          )}
+          <MenuItem
+            data-testid={`${cip129Identifier}-copy-id-button`}
+            onClick={() => copy(cip129Identifier)}
+            sx={menuItemSx}
+          >
+            <Copy aria-hidden size={18} />
             {t("dRepDirectory.card.copyId")}
+          </MenuItem>
+          <MenuItem
+            data-testid={`${view}-copy-legacy-id-button`}
+            onClick={() => copy(view)}
+            sx={menuItemSx}
+          >
+            <Copy aria-hidden size={18} />
+            {t("dRepDirectory.card.copyLegacyId")}
           </MenuItem>
         </Menu>
       </Box>
@@ -308,24 +408,36 @@ export const DRepCard = ({
       <Box sx={{ borderTop: `1px dashed ${ds.gray["200"]}`, mt: "auto" }} />
 
       <Box sx={{ alignItems: "flex-end", display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2.5 }}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
-            <Box component="span" data-testid={`${view}-voting-power-label`} sx={statLabelSx}>
-              {t("votingPower")}
-            </Box>
-            <Box component="span" data-testid={`${view}-voting-power`} sx={{ ...statValueSx, fontFamily: FONT_FAMILY.sans }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, rowGap: 1.5 }}>
+          <Stat isFirst label={t("votingPower")} testId={`${view}-voting-power`}>
+            <Box component="span" sx={{ fontFamily: FONT_FAMILY.sans }}>
               {`₳\u00a0${correctDRepDirectoryFormat(votingPower)}`}
             </Box>
-          </Box>
-          {latestRegistrationDate && (
-            <Box sx={{ borderLeft: `1px solid ${ds.gray["200"]}`, display: "flex", flexDirection: "column", gap: 0.25, pl: 2.5 }}>
-              <Box component="span" sx={statLabelSx}>
-                {t("dRepDirectory.card.registered")}
+          </Stat>
+          <Stat label={t("dRepDirectory.card.participation")} testId={`${view}-participation`}>
+            {stats.isParticipationLoading ? (
+              <Skeleton variant="text" width={40} />
+            ) : (
+              <Box component="span" sx={{ color: stats.participation === null ? ds.gray["500"] : ds.primary["600"] }}>
+                {participation}
               </Box>
-              <Box component="span" sx={statValueSx}>
+            )}
+          </Stat>
+          {stats.areDelegatorsServed ? (
+            <Stat label={t("dRepDirectory.card.delegators")} testId={`${view}-delegators`}>
+              {stats.areDelegatorsLoading ? (
+                <Skeleton variant="text" width={32} />
+              ) : (
+                stats.delegators?.toLocaleString("en-US") ?? "—"
+              )}
+            </Stat>
+          ) : (
+            // Until the backend serves delegators, the registration date stands in.
+            latestRegistrationDate && (
+              <Stat label={t("dRepDirectory.card.registered")} testId={`${view}-registered`}>
                 {formatDisplayDate(latestRegistrationDate, "MMM d, yyyy")}
-              </Box>
-            </Box>
+              </Stat>
+            )
           )}
         </Box>
         {canDelegate && isConnected && onDelegate && !isMyDrep && !isInProgress && (

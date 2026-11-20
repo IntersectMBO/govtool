@@ -14,6 +14,9 @@ import {
   getDRepVotesById,
   getDRepVotingPowerHistory,
 } from "@/services/requests";
+import { participationRate } from "@/utils/drepDashboard";
+
+import { useGetDRepVotesByIdQuery } from "./useGetDRepVotesByIdQuery";
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
@@ -135,4 +138,44 @@ export const useDRepDiscussions = (dRepHash?: string) => {
     staleTime: FIVE_MINUTES,
   });
   return { isForumEnabled: isProposalDiscussionForumEnabled, ...query };
+};
+
+/**
+ * A directory card's participation and delegator count. Participation comes
+ * from the DRep's votes (the profile's query, so opening the profile reuses
+ * it) and every action; the count from the delegators route, read only once
+ * the backend serves it.
+ */
+export const useDRepCardStats = ({
+  drepId,
+  view,
+  latestRegistrationDate,
+}: {
+  drepId: string;
+  view: string;
+  latestRegistrationDate?: string;
+}) => {
+  const { epochParams } = useAppContext();
+  const votes = useGetDRepVotesByIdQuery(view);
+  const actions = useDRepDashboardActions();
+  const delegators = useDRepDelegators(drepId, 1, 1);
+  const currentEpoch = typeof epochParams?.epoch_no === "number" ? epochParams.epoch_no : undefined;
+  const participation =
+    votes.dRepVotes && actions.actions && currentEpoch !== undefined
+      ? participationRate(
+          Array.isArray(votes.dRepVotes) ? votes.dRepVotes : [],
+          actions.actions,
+          latestRegistrationDate,
+          currentEpoch,
+        )
+      : null;
+  return {
+    /** A whole percentage, or null when it cannot be worked out. */
+    participation,
+    isParticipationLoading: votes.areDRepVotesLoading || actions.isLoading,
+    /** Undefined until the backend serves the delegators route. */
+    delegators: delegators.isServed ? delegators.data?.total : undefined,
+    areDelegatorsServed: delegators.isServed,
+    areDelegatorsLoading: delegators.isServed && delegators.isLoading,
+  };
 };

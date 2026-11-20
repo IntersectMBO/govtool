@@ -729,6 +729,8 @@ export class DRepService {
       // last change.
       latestTxHash: newestCertificate(drep).txRef.txHash,
       latestRegistrationDate: newestCertificate(drep).at.time ?? '',
+      // Optional on the provider: absent means it cannot count, not zero.
+      delegatorCount: drep.delegatorCount ?? null,
       // Whether an anchor resolved is the metadata service's answer, and this
       // backend has none wired; the same goes for every field below.
       metadataError: null,

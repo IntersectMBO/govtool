@@ -2392,6 +2392,7 @@
     "overview": {
       "representation": {
         "title": "Your representation",
+          "trend": "Voting power over the last {{count}} epochs",
         "votingPower": "Delegated Voting Power",
         "delegators": "Delegators:",
         "note": "As you participate in governance, ADA holders can delegate their voting power to you.",

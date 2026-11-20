@@ -7,7 +7,7 @@ import { ArrowRight, Archive, PenLine } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
 import { GOV_ACTION_HISTORY_PATHS, PATHS } from "@/consts/paths";
 import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
-import { useDRepDelegators } from "@/hooks/queries/useDRepDashboard";
+import { useDRepDelegators, useDRepVotingPowerHistory } from "@/hooks/queries/useDRepDashboard";
 import { getFullGovActionId } from "@/utils/getGovActionId";
 import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { actionKey, actionOutcome } from "@/utils/drepDashboard";
@@ -39,6 +39,55 @@ const Label = ({ children }: { children: ReactNode }) => (
 );
 
 const Divider = () => <Box aria-hidden sx={{ borderTop: `1px solid ${ds.gray["200"]}` }} />;
+
+// The frame's rising bars, shown until the backend serves the history.
+const DEFAULT_BARS = [0.3, 0.4, 0.4, 0.55, 0.75, 1];
+const BAR_COLORS = [
+  ds.primary["100"],
+  ds.primary["100"],
+  ds.primary["200"],
+  ds.primary["200"],
+  ds.primary["300"],
+  ds.primary["600"],
+];
+
+/**
+ * A small bar chart of the DRep's voting power over its last six epochs,
+ * scaled to the largest; the frame's rising shape while no history is served.
+ */
+const VotingPowerBars = ({ dRepID }: { dRepID: string }) => {
+  const { t } = useTranslation();
+  const { isServed, data } = useDRepVotingPowerHistory(dRepID);
+  const recent = isServed && data && data.length > 1
+    ? data.slice(-DEFAULT_BARS.length).map((point) => Number(point.votingPower) || 0)
+    : undefined;
+  const max = recent ? Math.max(...recent) : 0;
+  const bars = recent && max > 0 ? recent.map((value) => value / max) : DEFAULT_BARS;
+  const colors = BAR_COLORS.slice(-bars.length);
+  return (
+    <Box
+      aria-hidden={recent ? undefined : true}
+      aria-label={recent ? t("drepDashboard.overview.representation.trend", { count: recent.length }) : undefined}
+      data-testid="drep-voting-power-bars"
+      role={recent ? "img" : undefined}
+      sx={{ alignItems: "flex-end", display: "flex", flexShrink: 0, gap: "5px", height: 32 }}
+    >
+      {bars.map((ratio, index) => (
+        <Box
+          // The bars are positional: one per epoch, oldest first.
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          sx={{
+            backgroundColor: colors[index],
+            borderRadius: "2px",
+            height: `${Math.max(12, Math.round(ratio * 100))}%`,
+            width: 5,
+          }}
+        />
+      ))}
+    </Box>
+  );
+};
 
 /** The DRep's name, status, voting power and delegators. */
 export const RepresentationCard = ({ data }: { data: DashboardData }) => {
@@ -86,8 +135,11 @@ export const RepresentationCard = ({ data }: { data: DashboardData }) => {
         <Box sx={{ color: ds.gray["600"], fontSize: 12, fontWeight: 600, letterSpacing: "0.4px", textTransform: "uppercase" }}>
           {t("drepDashboard.overview.representation.title")}
         </Box>
-        <Box data-testid="drep-representation-voting-power" sx={{ color: ds.gray["900"], fontSize: 30, fontWeight: 600, letterSpacing: "-0.6px", mt: 1.5 }}>
-          ₳ {formatAda(power, 0)}
+        <Box sx={{ alignItems: "flex-end", display: "flex", gap: 2, justifyContent: "space-between", mt: 1.5 }}>
+          <Box data-testid="drep-representation-voting-power" sx={{ color: ds.gray["900"], fontSize: 30, fontWeight: 600, letterSpacing: "-0.6px" }}>
+            ₳ {formatAda(power, 0)}
+          </Box>
+          <VotingPowerBars dRepID={dRepID} />
         </Box>
         <Label>{t("drepDashboard.overview.representation.votingPower")}</Label>
       </Box>

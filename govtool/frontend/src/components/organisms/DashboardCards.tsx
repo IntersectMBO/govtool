@@ -13,6 +13,7 @@ import { Button } from "@/components/atoms/Button";
 import { PATHS } from "@/consts/paths";
 import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
 import { RetiredBanner } from "./RetiredBanner";
+import { UsefulLinks } from "./UsefulLinks";
 import { DashboardWalletCard } from "./DashboardWalletCard";
 import { DelegateDashboardCard } from "./DashboardCards/DelegateDashboardCard";
 import { DRepDashboardCard } from "./DashboardCards/DRepDashboardCard";
@@ -110,19 +111,27 @@ export const DashboardCards = () => {
   // A registered DRep gets its own tabbed dashboard, and a retired one its
   // retired view; the shared cards become their action cards.
   if (isRetiredDRep(voter, pendingTransaction)) {
-    return <RetiredDRepDashboard actionCards={actionCards} dRepID={dRepID} voter={voter} />;
+    return (
+      <>
+        <RetiredDRepDashboard actionCards={actionCards} dRepID={dRepID} voter={voter} />
+        <UsefulLinks />
+      </>
+    );
   }
 
   if (voter.isRegisteredAsDRep) {
     return (
-      <DRepDashboard
-        actionCards={actionCards}
-        dRepID={dRepID}
-        pendingTransaction={pendingTransaction}
-        stakeKey={stakeKey}
-        voter={voter}
-        walletCard={walletCard}
-      />
+      <>
+        <DRepDashboard
+          actionCards={actionCards}
+          dRepID={dRepID}
+          pendingTransaction={pendingTransaction}
+          stakeKey={stakeKey}
+          voter={voter}
+          walletCard={walletCard}
+        />
+        <UsefulLinks />
+      </>
     );
   }
 
@@ -202,6 +211,10 @@ export const DashboardCards = () => {
           <ProposeGovActionDashboardCard
             createGovActionTx={pendingTransaction.createGovAction}
           />
+          {/* In the card column, so it lines up with the cards above. */}
+          <Box sx={{ mt: 2 }}>
+            <UsefulLinks />
+          </Box>
         </Box>
       </Box>
     </Box>

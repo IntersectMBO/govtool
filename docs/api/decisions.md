@@ -5921,3 +5921,19 @@ the directory, though the registration form refuses one. On mainnet on 2026-11-0
   no existing mainnet document starts failing.
 - `objectives`, `motivations` and `qualifications` (1000 each) stay unenforced; OPEN-69 still
   stands for them.
+
+## D177 — Directory rows carry `delegatorCount`
+
+**Date:** 2026-11-20
+**Amends:** D170 (what a `/drep/list` row carries).
+**Evidence:** the redesigned DRep directory card shows a DRep's delegators. On mainnet on
+2026-11-20, through Koios, the five DReps with the most voting power had 2,133, 14,851, 183,
+3,786 and 762.
+
+- `/drep/list` rows carry `delegatorCount`: the stake addresses whose current vote delegation is
+  the DRep. db-sync counts them for every DRep it lists, and Koios reports `live_delegator_count`.
+  Both providers already filled the contract's optional `DRep.delegatorCount`; the legacy row
+  dropped it.
+- Blockfrost and the fixture supply none, and the row says `null`, never 0: the field is optional
+  on the contract, and absent means the provider cannot count.
+- The Haskell backend sent no count, so the field is an addition, not a restored one.

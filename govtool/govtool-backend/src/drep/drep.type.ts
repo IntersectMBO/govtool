@@ -64,6 +64,11 @@ export type DRepListItem = {
   type: DRepType;
   latestTxHash: string | null;
   latestRegistrationDate: string;
+  /**
+   * Stake addresses delegated to the DRep, from the provider (db-sync and
+   * Koios count them); null where it supplies none. Not in the Haskell body.
+   */
+  delegatorCount: number | null;
   metadataError: string | null;
   /**
    * CIP-119 `doNotList` from the DRep's document; the directory hides such a

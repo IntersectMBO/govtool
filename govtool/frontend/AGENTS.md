@@ -330,6 +330,13 @@ through it. The path is hard-coded in lib/budgetArchive.js, nginx.conf (404 for
 a missing file, 30-day cache), the split script and
 tests/govtool-frontend/playwright/lib/pages/budgetDiscussionPage.ts.
 
+A forum proposal's page (pages/ProposedGovernanceActions/SingleGovernanceAction)
+follows OutcomeDetails: it imports Card, CardTitle, MonoTag and HEADER_TINTS from
+organisms/OutcomeDetails/parts and shares through ShareDialog (kind proposal).
+detailsState.js decides which side card shows; the forum E2E specs read the
+page's ids, and copy-link-text appears beside the share button for two seconds
+after a copy, as spec 8E expects.
+
 Keep its four-space, single-quote style. lib/markdownRenderer.jsx renders raw
 HTML from user content; do not copy that into GovTool code.
 

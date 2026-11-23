@@ -139,6 +139,14 @@ branches when it has both), utils/getPageTitle.ts and en.json. It also needs
 NAV_ITEMS and CONNECTED_NAV_ITEMS in src/consts/navItems.tsx when it is in the
 nav.
 
+Home's news section (organisms/Home/HomeNews, between Outcomes and the FAQ)
+lists the newsletter's posts from its Ghost Content API and holds the newsletter
+sign-up, which left the footer. Both talk to newsletter.gov.tools directly
+(services/requests/newsletter.ts, consts/links.ts NEWSLETTER): the Content API
+key is Ghost's public read-only one, and signing up asks Ghost to email a
+confirmation link, as its own portal does. Tests that render Home mock
+useNewsletterPosts, so no test reaches that site.
+
 Public pages and the connected Dashboard layout share one frame: TopNav (logo,
 nav, Connect Wallet or the wallet menu that holds disconnect-button), the page,
 Footer. Below 1024px the nav moves into the mobile drawer. Governance Actions is

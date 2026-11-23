@@ -11,6 +11,7 @@ import {
   HomeDRepLeaderboard,
   HomeFaq,
   HomeHero,
+  HomeNews,
   HomeOutcomes,
   HomePulse,
   TopNav,
@@ -36,6 +37,7 @@ export const Home = () => {
         <HomePulse />
         <HomeDRepLeaderboard />
         <HomeOutcomes />
+        <HomeNews />
         <HomeFaq />
         <Box sx={{ pb: { xxs: 6, md: 10 } }}>
           <DRepBanner />

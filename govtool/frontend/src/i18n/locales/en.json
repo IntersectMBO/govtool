@@ -621,7 +621,6 @@
     "copyright": "© {{year}} GovTool",
     "privacyPolicy": "Privacy policy",
     "termOfService": "Terms of Use",
-    "subscribe": "Subscribe to updates",
     "tagline": "A clearer connection to Cardano governance.",
     "intersect": "Intersect ↗"
   },
@@ -1479,6 +1478,28 @@
       "enacted": "Enacted",
       "expired": "Expired",
       "notRatified": "Not Ratified"
+    },
+    "news": {
+      "eyebrow": "What is happening in Cardano",
+      "title": "Governance is already\nshaping Cardano.",
+      "subscribeCta": "Subscribe for Newsletter",
+      "readPost": "Read {{title}}",
+      "loadMore": "Load More",
+      "error": "The newsletter's posts could not be loaded.",
+      "openNewsletter": "Open the newsletter"
+    },
+    "newsletter": {
+      "eyebrow": "Stay in the loop",
+      "title": "The best ideas, delivered\nthoughtfully.",
+      "emailLabel": "Email address",
+      "placeholder": "you@example.com",
+      "subscribe": "Subscribe",
+      "sending": "Subscribing…",
+      "invalid": "Enter a valid email address.",
+      "sent": "Check your inbox and follow the link to confirm your subscription.",
+      "failed": "We could not subscribe you. Please try again.",
+      "legal": "No spam. Unsubscribe anytime. By subscribing, you agree to our",
+      "privacyPolicy": "Privacy Policy"
     },
     "faq": {
       "eyebrow": "A little clarity",

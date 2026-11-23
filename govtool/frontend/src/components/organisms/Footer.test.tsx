@@ -21,9 +21,13 @@ describe("Footer", () => {
       "privacy-policy-footer-link",
       "terms-of-use-footer-link",
       "help-footer-button",
-      "newsletter-footer-button",
       "feedback-footer-button",
     ].forEach((id) => expect(screen.getByTestId(id)).toBeInTheDocument());
+  });
+
+  it("leaves the newsletter sign-up to Home", () => {
+    render(<Footer />);
+    expect(screen.queryByTestId("newsletter-footer-button")).toBeNull();
   });
 
   it("opens the FAQ in a new tab", () => {

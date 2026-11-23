@@ -40,6 +40,18 @@ vi.mock("@hooks", async (importOriginal) => ({
   useGetGovernanceActionMetadata: () => ({ metadata: undefined }),
 }));
 
+// The newsletter's posts come from another site; keep the test offline.
+vi.mock("@/hooks/queries/useNewsletterPosts", () => ({
+  useNewsletterPosts: () => ({
+    items: [],
+    isLoading: false,
+    isError: false,
+    hasMore: false,
+    isLoadingMore: false,
+    loadMore: vi.fn(),
+  }),
+}));
+
 vi.mock("@services", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@services")>()),
   getGovernanceActionRecord: vi.fn(async () => ({

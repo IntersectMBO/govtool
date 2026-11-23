@@ -126,11 +126,6 @@ export const Footer = () => {
               href={LINKS.SUPPORT}
               label={t("menu.help")}
             />
-            <FooterLink
-              dataTestId="newsletter-footer-button"
-              href={LINKS.NEWSLETTER_SIGNUP}
-              label={t("footer.subscribe")}
-            />
             <ButtonBase
               data-testid="feedback-footer-button"
               disableRipple

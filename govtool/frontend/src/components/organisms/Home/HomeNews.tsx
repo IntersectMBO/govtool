@@ -1,4 +1,4 @@
-import { Box, ButtonBase, Skeleton } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import { ArrowUpRight } from "lucide-react";
 
 import { useTranslation } from "@hooks";
@@ -94,8 +94,8 @@ const NewsRow = ({ item, index }: { item: NewsItem; index: number }) => {
 };
 
 /**
- * What the newsletter has published, newest first, four at a time, and its
- * sign-up. The sign-up lived in the footer before.
+ * The newsletter's four latest posts, a link to the rest on the newsletter
+ * site, and its sign-up. The sign-up lived in the footer before.
  */
 export const HomeNews = () => {
   const { t } = useTranslation();
@@ -116,10 +116,7 @@ export const HomeNews = () => {
   } else if (news.isError && !news.items.length) {
     list = (
       <Box component="li" data-testid="home-news-error" sx={{ color: ds.gray["600"], fontSize: 14, py: 3 }}>
-        {`${t("landing.news.error")} `}
-        <Box component="a" href={NEWSLETTER.SITE} rel="noopener noreferrer" sx={{ color: ds.primary["600"] }} target="_blank">
-          {t("landing.news.openNewsletter")}
-        </Box>
+        {t("landing.news.error")}
       </Box>
     );
   } else {
@@ -168,28 +165,34 @@ export const HomeNews = () => {
         <Box component="ol" sx={{ listStyle: "none", m: 0, mt: 3, p: 0 }}>
           {list}
         </Box>
-        {news.hasMore && !news.isError && (
+        {!news.isLoading && (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-            <ButtonBase
-              data-testid="home-news-load-more"
-              disabled={news.isLoadingMore}
-              onClick={news.loadMore}
+            <Box
+              component="a"
+              data-testid="home-news-view-all"
+              href={NEWSLETTER.SITE}
+              rel="noopener noreferrer"
               sx={{
+                alignItems: "center",
                 backgroundColor: "#FFFFFF",
                 border: `1px solid ${ds.gray["200"]}`,
                 borderRadius: `${RADIUS.pill}px`,
                 color: ds.gray["900"],
-                fontFamily: "inherit",
+                display: "inline-flex",
                 fontSize: 14,
                 fontWeight: 600,
+                gap: 0.5,
                 height: 40,
                 px: 2,
+                textDecoration: "none",
                 "&:hover": { backgroundColor: ds.gray["50"] },
-                "&.Mui-focusVisible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
+                "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
               }}
+              target="_blank"
             >
-              {t("landing.news.loadMore")}
-            </ButtonBase>
+              {t("landing.news.viewAll")}
+              <ArrowUpRight aria-hidden size={14} />
+            </Box>
           </Box>
         )}
         <Box sx={{ mt: { xxs: 5, md: 6 } }}>

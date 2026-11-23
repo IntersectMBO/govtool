@@ -1484,9 +1484,8 @@
       "title": "Governance is already\nshaping Cardano.",
       "subscribeCta": "Subscribe for Newsletter",
       "readPost": "Read {{title}}",
-      "loadMore": "Load More",
-      "error": "The newsletter's posts could not be loaded.",
-      "openNewsletter": "Open the newsletter"
+      "viewAll": "View all posts",
+      "error": "The newsletter's posts could not be loaded."
     },
     "newsletter": {
       "eyebrow": "Stay in the loop",

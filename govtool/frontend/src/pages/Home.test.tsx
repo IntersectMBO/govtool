@@ -46,9 +46,6 @@ vi.mock("@/hooks/queries/useNewsletterPosts", () => ({
     items: [],
     isLoading: false,
     isError: false,
-    hasMore: false,
-    isLoadingMore: false,
-    loadMore: vi.fn(),
   }),
 }));
 

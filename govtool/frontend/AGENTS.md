@@ -140,8 +140,9 @@ NAV_ITEMS and CONNECTED_NAV_ITEMS in src/consts/navItems.tsx when it is in the
 nav.
 
 Home's news section (organisms/Home/HomeNews, between Outcomes and the FAQ)
-lists the newsletter's posts from its Ghost Content API and holds the newsletter
-sign-up, which left the footer. Both talk to newsletter.gov.tools directly
+lists the newsletter's four latest posts from its Ghost Content API, links to
+the newsletter site for the rest, and holds the newsletter sign-up, which left
+the footer. Both talk to newsletter.gov.tools directly
 (services/requests/newsletter.ts, consts/links.ts NEWSLETTER): the Content API
 key is Ghost's public read-only one, and signing up asks Ghost to email a
 confirmation link, as its own portal does. Tests that render Home mock

@@ -11,9 +11,6 @@ const news = vi.hoisted(() => ({
     items: [] as unknown[],
     isLoading: false,
     isError: false,
-    hasMore: false,
-    isLoadingMore: false,
-    loadMore: vi.fn(),
   },
 }));
 const subscribe = vi.hoisted(() => vi.fn());
@@ -37,7 +34,7 @@ const ITEM = {
 
 describe("HomeNews", () => {
   beforeEach(() => {
-    news.value = { ...news.value, items: [ITEM], hasMore: true, isError: false };
+    news.value = { ...news.value, items: [ITEM], isError: false };
     subscribe.mockReset();
   });
 
@@ -53,17 +50,19 @@ describe("HomeNews", () => {
     );
   });
 
-  it("loads more posts while the newsletter has more", () => {
+  it("sends the reader to the newsletter for every other post", () => {
     render(<HomeNews />);
-    fireEvent.click(screen.getByTestId("home-news-load-more"));
-    expect(news.value.loadMore).toHaveBeenCalled();
+    expect(screen.queryByTestId("home-news-load-more")).toBeNull();
+    const all = screen.getByTestId("home-news-view-all");
+    expect(all).toHaveAttribute("href", "https://newsletter.gov.tools");
+    expect(all).toHaveAttribute("target", "_blank");
   });
 
-  it("says so when the posts cannot be read", () => {
-    news.value = { ...news.value, items: [], isError: true, hasMore: false };
+  it("still offers the newsletter when the posts cannot be read", () => {
+    news.value = { ...news.value, items: [], isError: true };
     render(<HomeNews />);
     expect(screen.getByTestId("home-news-error")).toBeInTheDocument();
-    expect(screen.queryByTestId("home-news-load-more")).toBeNull();
+    expect(screen.getByTestId("home-news-view-all")).toBeInTheDocument();
   });
 
   it("refuses an address that is not one, without a request", () => {

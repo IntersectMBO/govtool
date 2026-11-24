@@ -6,6 +6,7 @@ export * from "./useDelegateToDrep";
 export * from "./useFetchNextPageDetector";
 export * from "./useIsWalletConnected";
 export * from "./useOutsideClick";
+export * from "./usePageMeta";
 export * from "./usePrevious";
 export * from "./useSaveScrollPosition";
 export * from "./useScreenDimension";

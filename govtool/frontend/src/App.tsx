@@ -16,7 +16,11 @@ import {
   BUDGET_DISCUSSION_PATHS,
 } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
-import { useIsWalletConnected, useWalletConnectionListener } from "@hooks";
+import {
+  useIsWalletConnected,
+  usePageMeta,
+  useWalletConnectionListener,
+} from "@hooks";
 import { DashboardGovernanceActionDetails } from "@organisms";
 import {
   ChooseStakeKey,
@@ -44,7 +48,6 @@ import {
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
   getCurrentUrl,
-  getPageTitle,
   isWalletOnlyPath,
 } from "@utils";
 import { TopBanners } from "./components/organisms/TopBanners";
@@ -71,9 +74,7 @@ export default () => {
     SetupInterceptors(navigate);
   }, []);
 
-  useEffect(() => {
-    document.title = getPageTitle(pathname, search);
-  }, [pathname, search]);
+  usePageMeta();
 
   const checkTheWalletIsActive = useCallback(() => {
     const isWalletAvailable = () =>

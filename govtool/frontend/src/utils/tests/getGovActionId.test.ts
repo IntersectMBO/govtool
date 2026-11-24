@@ -5,6 +5,7 @@ import {
   getGovActionPath,
   getGovActionsTypePath,
   parseGovActionCIP129Id,
+  getGovActionShareLink,
 } from "..";
 
 describe("getShortenedGovActionId", () => {
@@ -82,5 +83,13 @@ describe("governance action URLs", () => {
     expect(getGovActionsTypePath("InfoAction")).toBe(
       "/actions?type=InfoAction",
     );
+  });
+});
+
+describe("getGovActionShareLink", () => {
+  it("links the action's public page by CIP-129 id", () => {
+    expect(
+      getGovActionShareLink("https://gov.tools", "gov_action1abc"),
+    ).toBe("https://gov.tools/actions/gov_action1abc");
   });
 });

@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
 import { Box, Tabs, Tab, styled, Skeleton, Link } from "@mui/material";
-import { useLocation } from "react-router";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -26,6 +25,7 @@ import {
   filterUpdatableProtocolParams,
   filterOutNullParams,
   getFullGovActionId,
+  getGovActionShareLink,
   mapArrayToObjectByKeys,
   getGovActionCIP129Id,
   validateSignature,
@@ -115,7 +115,6 @@ export const GovernanceActionDetailsCardData = ({
   const { t } = useTranslation();
   const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
-  const { pathname, hash } = useLocation();
 
   const mappedArraysToObjectsProtocolParams = useMemo(
     () =>
@@ -164,11 +163,10 @@ export const GovernanceActionDetailsCardData = ({
       ? getFullGovActionId(prevGovActionTxHash, prevGovActionIndex)
       : null;
 
-  const govActionLinkToShare = `${window.location.protocol}//${
-    window.location.hostname
-  }${window.location.port ? `:${window.location.port}` : ""}${pathname}${
-    hash ?? ""
-  }`;
+  const govActionLinkToShare = getGovActionShareLink(
+    window.location.origin,
+    cip129GovernanceActionId,
+  );
 
   const isItMLabsWithdrawal =
     type === GovernanceActionType.TreasuryWithdrawals &&

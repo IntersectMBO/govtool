@@ -57,3 +57,12 @@ export const getGovActionsTypePath = (type: string) =>
   `${PATHS.governanceActions}?${new URLSearchParams({
     [GOVERNANCE_ACTION_TYPE_PARAM]: type,
   })}`;
+
+/**
+ * The link the share button copies: the action's public page by CIP-129 id,
+ * whatever path the viewer reached it by.
+ */
+export const getGovActionShareLink = (origin: string, cip129Id: string) =>
+  `${origin}${generatePath(PATHS.governanceActionsAction, {
+    proposalId: cip129Id,
+  })}`;

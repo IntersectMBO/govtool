@@ -59,6 +59,8 @@ All of it is in `.env`:
 | `GATEWAY_NETWORK` | the gateway's swarm network |
 | `POSTGRES_NODE_CONSTRAINT` | the node the stack's Postgres stays on, when more than one node is labelled `govtool` |
 | `IPFS_*`, `SENTRY_*`, `CHATWOOT_*`, `UMAMI_*` | optional integrations |
+| `SEO_NOINDEX` | `true` keeps the site out of search results; set it everywhere except production |
+| `SEO_URL_SCHEME` | `clean` (default) or `develop`: the frontend URL scheme the SEO canonical links use |
 
 `DBSYNC_NETWORK` must match the db-sync database, or every route answers 500.
 

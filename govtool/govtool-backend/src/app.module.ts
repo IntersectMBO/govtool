@@ -38,6 +38,10 @@ import {
   GovernanceMiscController,
 } from './governance-actions/governance-actions.controller';
 import { GovernanceActionsService } from './governance-actions/governance-actions.service';
+import { CardService } from './seo/card/card.service';
+import { ForumClient } from './seo/forum.client';
+import { SeoController } from './seo/seo.controller';
+import { SeoService } from './seo/seo.service';
 
 /**
  * There is no `DbService` or `SqlService` here any more: every read goes
@@ -62,6 +66,7 @@ import { GovernanceActionsService } from './governance-actions/governance-action
     SurveyController,
     GovernanceActionsController,
     GovernanceMiscController,
+    SeoController,
   ],
   providers: [
     // Writes bigint response fields as unquoted JSON numbers, so a lovelace
@@ -85,6 +90,9 @@ import { GovernanceActionsService } from './governance-actions/governance-action
     SurveyService,
     SystemService,
     GovernanceActionsService,
+    SeoService,
+    ForumClient,
+    CardService,
   ],
 })
 export class AppModule {}

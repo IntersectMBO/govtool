@@ -106,6 +106,8 @@ export class ConfigService {
           .trim()
           .toLowerCase() === 'true',
       pdfApiUrl: this.httpUrl('GOVTOOL_PDF_API_URL'),
+      siteUrl: this.originUrl('GOVTOOL_SITE_URL'),
+      seoUrlScheme: this.seoUrlScheme(),
       port: this.envNumber('GOVTOOL_PORT', rawConfig.port),
       host: this.envString('GOVTOOL_HOST', rawConfig.host),
       cacheDurationSeconds: this.envNumber(
@@ -135,6 +137,42 @@ export class ConfigService {
       throw new Error(`${name} must be an http(s) url`);
     }
     return raw.replace(/\/+$/, '');
+  }
+
+  /** An optional http(s) origin, nothing after the host; null when unset. */
+  private originUrl(name: string): string | null {
+    const raw = this.envString(name, '').trim();
+    if (raw === '') return null;
+    let url: URL | undefined;
+    try {
+      url = new URL(raw);
+    } catch {
+      url = undefined;
+    }
+    if (
+      url === undefined ||
+      (url.protocol !== 'http:' && url.protocol !== 'https:') ||
+      url.pathname !== '/' ||
+      url.search !== '' ||
+      url.hash !== '' ||
+      url.username !== '' ||
+      url.password !== ''
+    ) {
+      throw new Error(
+        `${name} must be an http(s) origin such as https://gov.tools`,
+      );
+    }
+    return url.origin;
+  }
+
+  private seoUrlScheme(): 'develop' | 'clean' {
+    const raw = this.envString('GOVTOOL_SEO_URL_SCHEME', 'clean').trim();
+    if (raw !== 'develop' && raw !== 'clean') {
+      throw new Error(
+        `GOVTOOL_SEO_URL_SCHEME must be develop or clean; got '${raw}'`,
+      );
+    }
+    return raw;
   }
 
   private positiveInteger(name: string, fallback: number): number {

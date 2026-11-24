@@ -119,6 +119,18 @@ export type BackendConfig = {
    * its discussion answers 503 without it.
    */
   pdfApiUrl: string | null;
+  /**
+   * The public origin of the frontend, such as https://gov.tools, for the SEO
+   * tags' canonical, og:url and og:image and the sitemap. Unset, those are
+   * left out and /seo/sitemap.xml answers 404.
+   */
+  siteUrl: string | null;
+  /**
+   * Which frontend URL scheme the SEO canonical paths use: clean (/actions,
+   * /dreps), the frontend's since PR 4310, or develop (/governance_actions,
+   * /drep_directory) for a frontend from before it.
+   */
+  seoUrlScheme: 'develop' | 'clean';
   port: number;
   host: string;
   cacheDurationSeconds: number;

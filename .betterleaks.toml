@@ -1,0 +1,22 @@
+title = "GovTool betterleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "GovTool public identifiers and generated files"
+regexTarget = "match"
+regexes = [
+  '''\b(addr|addr_test|stake|stake_test|drep|drep_script|cc_hot|cc_cold|pool|gov_action)1[02-9ac-hj-np-z]{20,}\b''',
+  '''\b(Qm[1-9A-HJ-NP-Za-km-z]{44}|bafy[a-z2-7]{50,})\b''',
+]
+paths = [
+  '''(^|/)\.betterleaks\.toml$''',
+  '''(^|/)package-lock\.json$''',
+  '''(^|/)yarn\.lock$''',
+  '''(^|/)pnpm-lock\.yaml$''',
+  '''(^|/)cabal\.project\.freeze$''',
+  '''(^|/)flake\.lock$''',
+  '''\.(png|jpe?g|gif|svg|ico|webp|woff2?|ttf|pdf)$''',
+]
+stopwords = ["example", "placeholder", "changeme"]

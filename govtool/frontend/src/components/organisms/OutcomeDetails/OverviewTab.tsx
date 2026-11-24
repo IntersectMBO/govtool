@@ -47,7 +47,11 @@ const Section = ({ title, text, testId }: { title: string; text?: string; testId
       >
         {/* Markdown without raw HTML: react-markdown escapes it. Line breaks and
             maths as the rest of GovTool renders them. */}
-        <Markdown rehypePlugins={[rehypeKatex]} remarkPlugins={[remarkMath, remarkGfm]}>
+        <Markdown
+          rehypePlugins={[rehypeKatex]}
+          // A single $ is an amount, not maths; maths sits between $$.
+          remarkPlugins={[[remarkMath, { singleDollarTextMath: false }], remarkGfm]}
+        >
           {markdownLineBreaks(text)}
         </Markdown>
       </Box>

@@ -68,8 +68,8 @@ const action = {
 } as unknown as GovernanceActionRecord;
 
 const Where = () => {
-  const { search, hash } = useLocation();
-  return <output data-testid="where">{`${search}${hash}`}</output>;
+  const { pathname, search } = useLocation();
+  return <output data-testid="where">{`${pathname}${search}`}</output>;
 };
 
 const renderAt = (path: string) =>
@@ -87,17 +87,21 @@ const renderAt = (path: string) =>
   );
 
 describe("OutcomeDetails", () => {
-  it("keeps the action's #index in the URL when the tab changes", () => {
-    renderAt(`/governance_actions/history/${"ab".repeat(32)}#1`);
+  it("keeps the action's path and names the tab in the query", () => {
+    renderAt("/actions/history/gov_action1x");
     fireEvent.click(screen.getByTestId("outcome-tab-votes"));
-    expect(screen.getByTestId("where")).toHaveTextContent("?tab=votes#1");
+    expect(screen.getByTestId("where")).toHaveTextContent(
+      "/actions/history/gov_action1x?tab=votes",
+    );
     fireEvent.click(screen.getByTestId("outcome-tab-overview"));
-    expect(screen.getByTestId("where")).toHaveTextContent(/^#1$/);
+    expect(screen.getByTestId("where")).toHaveTextContent(
+      /^\/actions\/history\/gov_action1x$/,
+    );
   });
 
   it("shows each treasury withdrawal's amount beside its address", () => {
     render(
-      <MemoryRouter initialEntries={["/governance_actions/history/x#1"]}>
+      <MemoryRouter initialEntries={["/actions/history/x"]}>
         <OutcomeDetails
           action={{ ...action, description: [{ receivingAddress: "stake1a", amount: 120000000000000 }] } as unknown as GovernanceActionRecord}
           isMetadataLoading={false}
@@ -115,7 +119,7 @@ describe("OutcomeDetails", () => {
     const address = "stake1uyl49lk2c6vfcvjq9zy0r640rf73k0q";
     const description = [{ receivingAddress: address, amount: 5 }];
     render(
-      <MemoryRouter initialEntries={["/governance_actions/history/x#1"]}>
+      <MemoryRouter initialEntries={["/actions/history/x"]}>
         <OutcomeDetails
           action={{ ...action, description } as unknown as GovernanceActionRecord}
           isMetadataLoading={false}
@@ -142,7 +146,7 @@ describe("OutcomeDetails", () => {
 
   it("links a visitor without a wallet to the action's forum proposal", () => {
     render(
-      <MemoryRouter initialEntries={["/governance_actions/history/x?tab=discussions#1"]}>
+      <MemoryRouter initialEntries={["/actions/history/x?tab=discussions"]}>
         <OutcomeDetails
           action={action}
           isMetadataLoading={false}
@@ -154,15 +158,15 @@ describe("OutcomeDetails", () => {
     );
     expect(screen.getByTestId("proposal-7-view-details")).toHaveAttribute(
       "href",
-      "/proposal_discussion/7",
+      "/proposals/7",
     );
   });
 
   it("keeps the abstract's single line breaks and renders its maths", () => {
     render(
-      <MemoryRouter initialEntries={["/governance_actions/history/x#1"]}>
+      <MemoryRouter initialEntries={["/actions/history/x"]}>
         <OutcomeDetails
-          abstract={"First line\nSecond line with $a^2$"}
+          abstract={"First line\nSecond line with $$a^2$$, costing $500 to $250"}
           action={action}
           isMetadataLoading={false}
           isProposalLoading={false}
@@ -173,11 +177,13 @@ describe("OutcomeDetails", () => {
     const abstract = screen.getByTestId("governance-action-abstract");
     expect(abstract.querySelector("br")).not.toBeNull();
     expect(abstract.querySelector(".katex")).not.toBeNull();
+    // A single $ is an amount, not maths.
+    expect(abstract).toHaveTextContent("costing $500 to $250");
   });
 
   it("dates the header by the status its pill shows", () => {
     render(
-      <MemoryRouter initialEntries={["/governance_actions/history/x#1"]}>
+      <MemoryRouter initialEntries={["/actions/history/x"]}>
         <OutcomeDetails
           action={{
             ...action,
@@ -196,7 +202,7 @@ describe("OutcomeDetails", () => {
   });
 
   it("words a DRep count tally as yes and no, not as the committee's", () => {
-    renderAt(`/governance_actions/history/${"ab".repeat(32)}?tab=votes#1`);
+    renderAt("/actions/history/x?tab=votes");
     const breakdown = screen.getByTestId("outcome-breakdown");
     expect(breakdown).not.toHaveTextContent("Constitutional:");
     expect(breakdown).toHaveTextContent("Yes Power:");

@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { Link as RouterLink, useLocation, useNavigate, useSearchParams } from "react-router";
+import { Link as RouterLink, useNavigate, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Box, ButtonBase, Menu, MenuItem, Skeleton } from "@mui/material";
 import { ChevronRight, EllipsisVertical } from "lucide-react";
@@ -9,7 +9,6 @@ import { DataMissingInfoBox } from "@/components/molecules/DataMissingInfoBox";
 import { GOV_ACTION_HISTORY_TYPE_FILTERS } from "@/consts/governanceActionHistory";
 import { GOV_ACTION_HISTORY_PATHS, PATHS } from "@/consts/paths";
 import { ds } from "@/consts/designTokens";
-import { useCardano } from "@/context/wallet";
 import { useSnackbar } from "@/context/snackbar";
 import type { EpochParams } from "@/models/api";
 import type { GovernanceActionRecord } from "@/models/governanceActions";
@@ -75,11 +74,9 @@ export const OutcomeDetails = ({
   isProposalLoading,
 }: Props) => {
   const { t } = useTranslation();
-  const { isEnabled } = useCardano();
   const { addErrorAlert, addSuccessAlert } = useSnackbar();
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { hash } = useLocation();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const requested = params.get("tab") as Tab | null;
   const tab: Tab = requested && TABS.includes(requested) ? requested : "overview";
@@ -110,13 +107,13 @@ export const OutcomeDetails = ({
   };
   const shownTitle = (metadataStatus && getMetadataDataMissingStatusTranslation(metadataStatus)) || title || t("govActions.card.untitled");
 
-  // The hash is the action's index (txHash#index), so it must survive.
+  // The path names the action (its CIP-129 id); only the tab changes.
   const setTab = (next: Tab) => {
     const nextParams = new URLSearchParams(params);
     if (next === "overview") nextParams.delete("tab");
     else nextParams.set("tab", next);
     const search = nextParams.toString();
-    navigate({ search: search ? `?${search}` : "", hash }, { replace: true });
+    navigate({ search: search ? `?${search}` : "" }, { replace: true });
   };
 
   // Ratified then Enacted, or how else it ended.
@@ -158,7 +155,7 @@ export const OutcomeDetails = ({
         }}
       />
       <Box aria-label="Breadcrumb" component="nav" sx={{ alignItems: "center", color: ds.gray["600"], display: "flex", flexWrap: "wrap", fontSize: 12, gap: 0.75 }}>
-        <Box component={RouterLink} sx={{ color: "inherit", textDecoration: "none", "&:hover": { textDecoration: "underline" } }} to={isEnabled ? PATHS.dashboardGovernanceActions : PATHS.governanceActions}>
+        <Box component={RouterLink} sx={{ color: "inherit", textDecoration: "none", "&:hover": { textDecoration: "underline" } }} to={PATHS.governanceActions}>
           {t("outcome.breadcrumbRoot")}
         </Box>
         <ChevronRight aria-hidden size={12} />

@@ -1,7 +1,7 @@
-import { GOV_ACTION_HISTORY_PATHS, PATHS } from "@/consts/paths";
+import { GOV_ACTION_HISTORY_PATHS } from "@/consts/paths";
 import type { GovernanceActionRecord, ProposalData } from "@/models";
 
-import { getFullGovActionId } from "./getGovActionId";
+import { getFullGovActionId, getGovActionPath } from "./getGovActionId";
 
 // Figures and events for the Governance Activity page, from the live list
 // and the newest decided actions.
@@ -93,7 +93,7 @@ export const activityEvents = (
       time: action.createdDate,
       type: action.type,
       title: action.title,
-      path: `${PATHS.governanceActions}/${id}`,
+      path: getGovActionPath(action.txHash, action.index),
     };
   });
 

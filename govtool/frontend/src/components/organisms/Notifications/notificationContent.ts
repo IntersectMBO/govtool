@@ -14,6 +14,7 @@ import { GOV_ACTION_HISTORY_PATHS, PATHS } from "@/consts/paths";
 import { ds } from "@/consts/designTokens";
 import type { GovToolNotification } from "@/models";
 import { correctAdaFormatWithSuffix } from "@/utils/adaFormat";
+import { getGovActionPath } from "@/utils/getGovActionId";
 import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { getGovernanceActionCIP129Id } from "@/utils/governanceActions";
 import { daysLeft, formatUtc } from "@/utils/governanceActivity";
@@ -48,7 +49,7 @@ export type NotificationContent = {
 export const safeHref = (url: string | null | undefined) =>
   (url && /^https?:\/\//i.test(url) ? url : undefined);
 
-const dRepPath = (id: string) => PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", id);
+const dRepPath = (id: string) => PATHS.dRepDirectoryDRep.replace(":dRepId", id);
 
 const historyPath = (actionId: string) => {
   const [txHash, index] = actionId.split("#");
@@ -56,6 +57,11 @@ const historyPath = (actionId: string) => {
     tx_hash: txHash,
     index: Number(index ?? 0),
   })}`;
+};
+
+const actionPath = (actionId: string) => {
+  const [txHash, index] = actionId.split("#");
+  return getGovActionPath(txHash, index ?? 0);
 };
 
 const actionContext = (actionType: string, actionId: string) => {
@@ -93,7 +99,7 @@ export const describeNotification = (
         body: k(`${data.change === "metadataUpdated" ? "updated" : data.change}Body`, params),
         reason: k("reason"),
         actions: [
-          ...(isUrgent ? [{ label: k("choose"), path: PATHS.dashboardDRepDirectory }] : []),
+          ...(isUrgent ? [{ label: k("choose"), path: PATHS.dRepDirectory }] : []),
           { label: k("viewProfile", { name }), path: dRepPath(data.dRepId) },
         ],
       };
@@ -121,7 +127,7 @@ export const describeNotification = (
         actions:
           !removed && data.target.type === "drep" && data.target.dRepId
             ? [{ label: k("viewProfile"), path: dRepPath(data.target.dRepId) }]
-            : [{ label: k("viewDirectory"), path: PATHS.dashboardDRepDirectory }],
+            : [{ label: k("viewDirectory"), path: PATHS.dRepDirectory }],
       };
     }
     case "actionActivity": {
@@ -165,7 +171,7 @@ export const describeNotification = (
             : k("matchedBody"),
         context: actionContext(data.actionType, data.actionId),
         actions: [
-          { label: k("review"), path: `${PATHS.dashboardGovernanceActions}/${data.actionId}` },
+          { label: k("review"), path: actionPath(data.actionId) },
         ],
       };
     }
@@ -181,7 +187,7 @@ export const describeNotification = (
         actions: [
           safeHref(data.url)
             ? { label: k("open"), href: safeHref(data.url) }
-            : { label: k("open"), path: PATHS.dashboardGovernanceActions },
+            : { label: k("open"), path: PATHS.governanceActions },
         ],
       };
     }

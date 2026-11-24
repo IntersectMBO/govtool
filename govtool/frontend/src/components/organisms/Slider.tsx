@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { generatePath, Link } from "react-router";
+import { Link } from "react-router";
 import { Box } from "@mui/material";
 import { KeenSliderOptions } from "keen-slider";
 import "keen-slider/keen-slider.min.css";
@@ -8,7 +8,7 @@ import { useCardano } from "@context";
 import { useScreenDimension, useTranslation, useSlider } from "@hooks";
 import { Button, Typography } from "@atoms";
 import { SliderArrows } from "@molecules";
-import { PATHS } from "@consts";
+import { getGovActionsTypePath } from "@utils";
 import { theme } from "@/theme";
 
 type SliderProps = {
@@ -116,14 +116,7 @@ export const Slider = ({
           {(notSlicedDataLength > 6 || (isMobile && isShowAll)) && (
             <Button
               component={Link}
-              to={`${generatePath(
-                  onDashboard
-                      ? PATHS.dashboardGovernanceActionsCategory
-                      : PATHS.governanceActionsCategory,
-                  {
-                    category: navigateKey,
-                  },
-              )}`}
+              to={getGovActionsTypePath(navigateKey)}
               variant="contained"
               size="medium"
               sx={{

@@ -45,14 +45,14 @@ describe("PageTabs", () => {
 });
 
 describe("useGovernanceActionTabs", () => {
-  it("uses the connected routes and ids for a connected wallet", () => {
+  it("uses the connected ids for a connected wallet, on the same routes", () => {
     const { result } = renderHook(() => useGovernanceActionTabs(true), {
-      wrapper: at("/connected/governance_actions"),
+      wrapper: at("/actions"),
     });
     const [proposed, live, outcomes] = result.current;
     expect(proposed.dataTestId).toBe("proposal-discussion-link");
     expect(live).toMatchObject({
-      to: "/connected/governance_actions",
+      to: "/actions",
       dataTestId: "governance-actions-live-voting-link",
       isActive: true,
     });
@@ -61,12 +61,12 @@ describe("useGovernanceActionTabs", () => {
 
   it("uses the public routes and ids without a wallet", () => {
     const { result } = renderHook(() => useGovernanceActionTabs(false), {
-      wrapper: at("/governance_actions/history"),
+      wrapper: at("/actions/history"),
     });
     const [proposed, live, outcomes] = result.current;
     expect(proposed.dataTestId).toBe("proposed-governance-actions-link");
     expect(live).toMatchObject({
-      to: "/governance_actions",
+      to: "/actions",
       dataTestId: "governance-actions-link",
       isActive: false,
     });
@@ -78,7 +78,7 @@ describe("useGovernanceActionTabs", () => {
 
   it("marks Proposed active on a forum page", () => {
     const { result } = renderHook(() => useGovernanceActionTabs(false), {
-      wrapper: at("/proposal_discussion/12"),
+      wrapper: at("/proposals/12"),
     });
     expect(result.current[0].isActive).toBe(true);
   });

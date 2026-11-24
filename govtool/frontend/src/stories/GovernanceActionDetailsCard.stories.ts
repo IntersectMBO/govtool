@@ -92,6 +92,9 @@ const cip129GovActionId = encodeCIP129Identifier({
   bech32Prefix: "gov_action",
 });
 
+// The story's dates are today; in November "Nov" also matches /no/i.
+const todayDate = formatDisplayDate(new Date());
+
 async function assertTooltip(tooltip: HTMLElement, expectedText: RegExp) {
   await userEvent.hover(tooltip);
   await waitFor(async () => {
@@ -105,7 +108,6 @@ async function assertGovActionDetails(
   canvas: ReturnType<typeof within>,
   args: React.ComponentProps<typeof GovernanceActionDetailsCard>,
 ) {
-  const todayDate = formatDisplayDate(new Date());
   await expect(canvas.getAllByText(todayDate)).toHaveLength(2);
   await expect(
     canvas.getByTestId(

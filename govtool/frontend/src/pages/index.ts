@@ -12,6 +12,7 @@ export * from "./ErrorPage";
 export * from "./GovernanceActionDetails";
 export * from "./GovernanceActions";
 export * from "./GovernanceActionsCategory";
+export * from "./GovernanceActionsIndex";
 export * from "./GovernanceActivity";
 export * from "./Home";
 export * from "./ProposalDiscussion";

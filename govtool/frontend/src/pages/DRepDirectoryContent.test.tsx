@@ -41,7 +41,7 @@ vi.mock("@atoms", () => ({
 
 vi.mock("@consts", () => ({
   DREP_DIRECTORY_FILTERS: [],
-  PATHS: { registerAsdRep: "/register_drep", dashboardDRepDirectoryDRep: "/connected/drep_directory/:dRepId" },
+  PATHS: { registerAsdRep: "/my/drep/register", dRepDirectoryDRep: "/dreps/:dRepId" },
 }));
 
 vi.mock("@utils", () => ({
@@ -57,7 +57,7 @@ vi.mock("@context", () => ({
     searchText: "",
     debouncedSearchText: "",
     setSearchText: vi.fn(),
-    lastPath: "/drep_directory",
+    lastPath: "/dreps",
     chosenFilters: [],
     chosenSorting: "VotingPower",
     setChosenFilters: vi.fn(),

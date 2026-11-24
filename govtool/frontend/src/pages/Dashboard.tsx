@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation, Outlet, useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { Box } from "@mui/material";
 
 import { Background, ScrollToManage } from "@atoms";
@@ -14,18 +14,16 @@ import { checkIsWalletConnected } from "@utils";
  */
 export const Dashboard = () => {
   const { isEnabled, stakeKey } = useCardano();
-  const { hash } = useLocation();
   const navigate = useNavigate();
 
+  // Pages other than /dashboard switch to their public layout on their own
+  // when the wallet goes; the dashboard has none.
   useEffect(() => {
-    if (!checkIsWalletConnected()) {
-      if (window.location.pathname === PATHS.dashboard) {
-        navigate(PATHS.home);
-      } else {
-        navigate(
-          window.location.pathname.replace("connected/", "") + hash || "",
-        );
-      }
+    if (
+      !checkIsWalletConnected() &&
+      window.location.pathname === PATHS.dashboard
+    ) {
+      navigate(PATHS.home);
     }
   }, [isEnabled, stakeKey]);
 

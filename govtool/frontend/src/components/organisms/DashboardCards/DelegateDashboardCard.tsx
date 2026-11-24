@@ -82,7 +82,7 @@ export const DelegateDashboardCard = ({
   });
 
   const onClickDelegateToAnotherDRep = () =>
-    navigate(PATHS.dashboardDRepDirectory);
+    navigate(PATHS.dRepDirectory);
 
   const ada = correctVoteAdaFormat(votingPower);
 
@@ -126,7 +126,7 @@ export const DelegateDashboardCard = ({
         {
           children: t("dashboard.cards.delegation.noDelegationActionButton"),
           dataTestId: "view-drep-directory-button",
-          onClick: () => navigate(PATHS.dashboardDRepDirectory),
+          onClick: () => navigate(PATHS.dRepDirectory),
           variant: "contained",
         },
         learnMoreButton,
@@ -139,7 +139,7 @@ export const DelegateDashboardCard = ({
   const navigateToDRepDetails = useCallback(
     () =>
       navigate(
-        PATHS.dashboardDRepDirectoryDRep.replace(
+        PATHS.dRepDirectoryDRep.replace(
           ":dRepId",
           displayedDelegationId ?? "",
         ),

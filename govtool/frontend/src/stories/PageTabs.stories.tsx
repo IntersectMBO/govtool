@@ -20,19 +20,19 @@ export const GovernanceActions: Story = {
     tabs: [
       {
         label: "Proposed Governance Actions",
-        to: "/proposal_discussion",
+        to: "/proposals",
         dataTestId: "proposed-governance-actions-link",
         isActive: false,
       },
       {
         label: "Live Voting",
-        to: "/governance_actions",
+        to: "/actions",
         dataTestId: "governance-actions-link",
         isActive: true,
       },
       {
         label: "Outcomes",
-        to: "/governance_actions/history",
+        to: "/actions/history",
         dataTestId: "governance-actions-governance-actions-link",
         isActive: false,
       },

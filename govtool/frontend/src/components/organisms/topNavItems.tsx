@@ -15,11 +15,9 @@ const GOVERNANCE_ACTION_IDS = ["governance-actions", "governance-actions-link"];
 
 export const isNavEntryActive = (entry: NavEntry, pathname: string) => {
   if (GOVERNANCE_ACTION_IDS.includes(entry.dataTestId)) {
-    return [
-      PATHS.governanceActions,
-      PATHS.dashboardGovernanceActions,
-      PDF_PATHS.proposalDiscussion,
-    ].some((path) => pathname.startsWith(path));
+    return [PATHS.governanceActions, PDF_PATHS.proposalDiscussion].some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    );
   }
   if (!entry.navTo) return false;
   if (entry.navTo === PATHS.home) return pathname === PATHS.home;

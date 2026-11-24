@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Box, Skeleton, Tooltip } from "@mui/material";
-import { Link, useLocation } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import { Clock, ExternalLink, Info } from "lucide-react";
 
@@ -12,6 +12,7 @@ import { useGetGovernanceActionRecordQuery, useTranslation } from "@hooks";
 import {
   formatDisplayDate,
   getFullGovActionId,
+  getGovActionPath,
   getProposalTypeLabel,
   getProposalTypeNoEmptySpaces,
 } from "@utils";
@@ -22,6 +23,7 @@ import {
   MetadataValidationStatus,
   ProposalData,
 } from "@models";
+import { GOVERNANCE_ACTION_TYPE_PARAM } from "@consts";
 import { ds, PILL_TONES, RADIUS, SHADOWS } from "@/consts/designTokens";
 import { timeLeft } from "@/utils/governanceActionFormat";
 import { GovernanceActionType } from "@/types/governanceAction";
@@ -97,9 +99,8 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
   const typeId = getProposalTypeNoEmptySpaces(type);
   const left = timeLeft(expiryDate);
 
-  const { pathname: currentPath } = useLocation();
-  const pathname = currentPath.replace(/governance_actions.*/g, "governance_actions");
-  const isCategoryView = currentPath.includes("category");
+  const [searchParams] = useSearchParams();
+  const isCategoryView = searchParams.has(GOVERNANCE_ACTION_TYPE_PARAM);
 
   return (
     <Box
@@ -199,7 +200,7 @@ export const GovernanceActionCard: FC<ActionTypeProps> = ({
               },
               openedFromCategoryPage: isCategoryView,
             }}
-            to={link?.to ?? `${pathname}/${govActionId}`}
+            to={link?.to ?? getGovActionPath(txHash, index)}
             sx={{
               color: "inherit",
               outline: "none",

@@ -3,10 +3,13 @@ import { Box, Skeleton } from "@mui/material";
 import { Link } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 
-import { GOV_ACTION_HISTORY_PATHS } from "@consts";
 import { useTranslation } from "@hooks";
 import type { VotedProposal } from "@models";
-import { getFullGovActionId, getProposalTypeLabel } from "@utils";
+import {
+  getFullGovActionId,
+  getGovActionHistoryPath,
+  getProposalTypeLabel,
+} from "@utils";
 import { PaginationFooter } from "@/components/molecules/PaginationFooter";
 import { ds, PILL_TONES, RADIUS, SHADOWS } from "@/consts/designTokens";
 
@@ -97,7 +100,7 @@ export const DRepActivityTable = ({ votes = [], isLoading, isError }: Props) => 
                         <Box
                           component={Link}
                           sx={{ color: ds.gray["900"], display: "block", fontSize: 14, fontWeight: 500, overflow: "hidden", textDecoration: "none", textOverflow: "ellipsis", whiteSpace: "nowrap", "&:hover": { color: ds.primary["600"], textDecoration: "underline" } }}
-                          to={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${actionId}`}
+                          to={getGovActionHistoryPath(proposal.txHash, proposal.index)}
                         >
                           {proposal.title || t("govActions.card.untitled")}
                         </Box>

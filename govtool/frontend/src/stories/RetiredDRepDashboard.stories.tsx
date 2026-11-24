@@ -88,7 +88,7 @@ export const Retired: Story = {
 export const ShareDialog: StoryObj<typeof ShareDRepDialog> = {
   render: () => (
     <SnackbarProvider>
-      <ShareDRepDialog link="https://gov.tools/drep_directory/drep1yfhj8e0n8l9xq3wtzpfe9k0d5j2r0k3m4h6z7g8f9e0d1c2b3a4qx2f" />
+      <ShareDRepDialog link="https://gov.tools/dreps/drep1yfhj8e0n8l9xq3wtzpfe9k0d5j2r0k3m4h6z7g8f9e0d1c2b3a4qx2f" />
     </SnackbarProvider>
   ),
   play: async ({ canvasElement }) => {

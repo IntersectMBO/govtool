@@ -88,7 +88,7 @@ describe("NotificationBell", () => {
     fireEvent.click(within(popover).getByTestId("notifications-mark-all-read"));
     expect((mocks.feed.markAllRead as ReturnType<typeof vi.fn>)).toHaveBeenCalled();
     fireEvent.click(within(popover).getByTestId("notifications-view-all"));
-    expect(mocks.navigate).toHaveBeenCalledWith("/notifications");
+    expect(mocks.navigate).toHaveBeenCalledWith("/my/notifications");
   });
 
   it("renders nothing rather than breaking the header when its data is unusable", () => {
@@ -103,7 +103,7 @@ describe("NotificationBell", () => {
     mocks.isMobile = true;
     renderIn(<NotificationBell />);
     fireEvent.click(screen.getByTestId("notifications-bell"));
-    expect(mocks.navigate).toHaveBeenCalledWith("/notifications");
+    expect(mocks.navigate).toHaveBeenCalledWith("/my/notifications");
     expect(screen.queryByTestId("notifications-popover")).toBeNull();
   });
 });

@@ -5,6 +5,7 @@ export * from "./useDebounce";
 export * from "./useDelegateToDrep";
 export * from "./useFetchNextPageDetector";
 export * from "./useGovernanceActionTabs";
+export * from "./useIsWalletConnected";
 export * from "./useOutsideClick";
 export * from "./usePrevious";
 export * from "./useSaveScrollPosition";

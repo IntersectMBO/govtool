@@ -161,10 +161,7 @@ test.describe("DRep dependent tests", () => {
   test("2P. Should enable sharing of DRep details", async ({
     page,
     context,
-    isMobile,
   }) => {
-    // The DRep page shows its share button from 1020px wide only.
-    test.skip(isMobile, "Share button is desktop only");
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
     const dRepDetailsPage = new DRepDetailsPage(page);
@@ -177,7 +174,7 @@ test.describe("DRep dependent tests", () => {
       navigator.clipboard.readText()
     );
     expect(copiedText).toEqual(
-      `${environments.frontendUrl}/drep_directory/${dRepId}`
+      `${environments.frontendUrl}/dreps/${dRepId}`
     );
   });
 
@@ -242,7 +239,7 @@ Object.values(["script drep", "drep"]).forEach((type, index) => {
       type === "drep" ? false : true
     );
 
-    await page.goto(`/drep_directory/${dRepId}`);
+    await page.goto(`/dreps/${dRepId}`);
     await responsePromise;
 
     await expect(

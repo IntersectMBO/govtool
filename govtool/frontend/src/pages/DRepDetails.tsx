@@ -63,9 +63,7 @@ export const DRepDetails = ({ isConnected = false }: DRepDetailsProps) => {
     <>
       <Breadcrumbs
         elementOne={t("dRepDirectory.title")}
-        elementOnePath={
-          isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory
-        }
+        elementOnePath={PATHS.dRepDirectory}
         elementTwo={dRep.givenName || `${dRep.view.slice(0, 12)}…`}
         isDataMissing={null}
       />
@@ -75,9 +73,7 @@ export const DRepDetails = ({ isConnected = false }: DRepDetailsProps) => {
         onClick={() =>
           (displayBackButton
             ? navigate(-1)
-            : navigate(
-                isConnected ? PATHS.dashboardDRepDirectory : PATHS.dRepDirectory,
-              ))
+            : navigate(PATHS.dRepDirectory))
         }
         type="button"
         sx={{

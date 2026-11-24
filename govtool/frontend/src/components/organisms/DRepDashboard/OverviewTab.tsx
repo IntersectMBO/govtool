@@ -5,10 +5,10 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Archive, PenLine } from "lucide-react";
 
 import { Button } from "@/components/atoms/Button";
-import { GOV_ACTION_HISTORY_PATHS, PATHS } from "@/consts/paths";
+import { PATHS } from "@/consts/paths";
 import { ds, RADIUS, SHADOWS } from "@/consts/designTokens";
 import { useDRepDelegators, useDRepVotingPowerHistory } from "@/hooks/queries/useDRepDashboard";
-import { getFullGovActionId } from "@/utils/getGovActionId";
+import { getFullGovActionId, getGovActionHistoryPath } from "@/utils/getGovActionId";
 import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { actionKey, actionOutcome } from "@/utils/drepDashboard";
 
@@ -158,7 +158,7 @@ export const RepresentationCard = ({ data }: { data: DashboardData }) => {
         <ArrowLink
           state={{ enteredFromWithinApp: true }}
           testId="view-drep-details-button"
-          to={PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", encodeURIComponent(dRep.view))}
+          to={PATHS.dRepDirectoryDRep.replace(":dRepId", encodeURIComponent(dRep.view))}
         >
           {t("drepDashboard.overview.representation.viewProfile")}
         </ArrowLink>
@@ -327,7 +327,7 @@ const RecentVotes = ({ data }: { data: DashboardData }) => {
     body = (
       <EmptyState
         actions={(
-          <Button component={RouterLink} endIcon={<ArrowRight aria-hidden size={16} />} size="medium" to={PATHS.dashboardGovernanceActions}>
+          <Button component={RouterLink} endIcon={<ArrowRight aria-hidden size={16} />} size="medium" to={PATHS.governanceActions}>
             {t("drepDashboard.overview.recent.browse")}
           </Button>
         )}
@@ -356,7 +356,7 @@ const RecentVotes = ({ data }: { data: DashboardData }) => {
             return (
               <tr key={id} data-testid="drep-recent-vote-row">
                 <Box component="td" sx={td}>
-                  <Box component={RouterLink} sx={{ color: ds.gray["900"], display: "block", fontWeight: 600, textDecoration: "none", "&:hover": { textDecoration: "underline" } }} to={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${id}`}>
+                  <Box component={RouterLink} sx={{ color: ds.gray["900"], display: "block", fontWeight: 600, textDecoration: "none", "&:hover": { textDecoration: "underline" } }} to={getGovActionHistoryPath(proposal.txHash, proposal.index)}>
                     {proposal.title || t("govActions.card.untitled")}
                   </Box>
                   <Box sx={{ color: ds.gray["600"], fontSize: 13 }}>{getProposalTypeLabel(proposal.type)}</Box>

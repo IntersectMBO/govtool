@@ -200,7 +200,7 @@ describe("WalletOptionButton", () => {
     mocks.cardano = { ...mocks.cardano, enable: vi.fn().mockResolvedValue({ status: "ok", stakeKey: false }) };
     renderButton();
     fireEvent.click(screen.getByTestId("lace-wallet-button"));
-    await waitFor(() => expect(mocks.navigate).toHaveBeenCalledWith("/stake_keys"));
+    await waitFor(() => expect(mocks.navigate).toHaveBeenCalledWith("/my/stake-key"));
     expect(mocks.closeModal).toHaveBeenCalled();
   });
 });

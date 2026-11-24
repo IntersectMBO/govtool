@@ -26,7 +26,7 @@ export default class LoginPage {
     // confirm-modal-button). Several: the stake key page opens instead.
     await Promise.race([
       this.acceptSanchoNetInfoBtn.waitFor({ state: "visible" }).catch(() => {}),
-      this.page.waitForURL(/stake_keys/).catch(() => {}),
+      this.page.waitForURL(/\/my\/stake-key/).catch(() => {}),
     ]);
     if (await this.acceptSanchoNetInfoBtn.isVisible()) {
       await this.acceptSanchoNetInfoBtn.click({ force: true });

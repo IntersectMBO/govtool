@@ -122,7 +122,7 @@ describe("ProfileMenu", () => {
     mocks.votes = [{ proposal: { txHash: "a", index: 0 } }];
     const menu = open();
     expect(within(menu).getByTestId("profile-role-direct-voter")).toHaveTextContent("Active");
-    expect(within(menu).getByTestId("profile-menu-voting")).toHaveAttribute("href", "/connected/governance_actions");
+    expect(within(menu).getByTestId("profile-menu-voting")).toHaveAttribute("href", "/actions");
     expect(within(menu).getByRole("img", { name: "2 actions to vote on" })).toHaveTextContent("2");
   });
 

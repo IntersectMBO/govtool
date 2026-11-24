@@ -124,20 +124,33 @@ diagnostic; Sentry is.
 fixtures (tests/govtool-frontend/playwright/tests/cip179/fixtures.ts) seed the
 same keys, so renaming one breaks the E2E suite and the CIP-179 check.
 
-Pages take one of two shapes. Governance actions and the DRep directory have a
-separate "/connected" path, and PublicRoute, GovernanceActionDetails and
-Dashboard rewrite between the two by string. Newer pages keep one path: App.tsx
-mounts the public route only while no wallet is enabled and the Dashboard route
-always, and the page switches its layout on isEnabled, as
-BudgetProposalsArchive.tsx does.
+Every page has one URL, with or without a wallet; there is no "/connected"
+path. App.tsx lists the pages that have both layouts once, in
+walletOptionalRoutes, and mounts them inside the Dashboard route or on their
+own as useIsWalletConnected says: a wallet is enabled, or a saved one is still
+reconnecting. Pages that pick their own chrome (the forum, budget archive and
+history) use the same hook. Every other page needs a wallet; the rule is
+utils/walletOnlyPath.ts (/dashboard, …/new and /my/… except /my/votes).
+
+URLs name resources: an action is /actions/gov_action1… (its CIP-129 id;
+build it with getGovActionCIP129Id or getGovActionPath, read it with
+parseGovActionCIP129Id), a type's list is /actions?type=…, and intents are
+/actions/new, /proposals/new or under /my.
+
+Old URLs (underscores, /connected, /actions/category/…, txHash#index, in any
+letter case) are rewritten by utils/getCurrentUrl.ts before any route renders.
+Only route names are renamed: a renamed first segment goes in
+LEGACY_PATH_SEGMENTS and a renamed second one in LEGACY_CHILD_SEGMENTS, both in
+src/consts/paths.ts.
 
 Wallet-only pages are top-level routes that redirect from a useEffect when no
 wallet is connected; copy CreateGovernanceAction.tsx.
 
-A new page touches src/consts/paths.ts, src/pages/index.ts, App.tsx (both
-branches when it has both), utils/getPageTitle.ts and en.json. It also needs
-NAV_ITEMS and CONNECTED_NAV_ITEMS in src/consts/navItems.tsx when it is in the
-nav.
+A new page touches src/consts/paths.ts, src/pages/index.ts, App.tsx
+(walletOptionalRoutes when it has both layouts), utils/getPageTitle.ts and
+en.json. It also needs NAV_ITEMS and CONNECTED_NAV_ITEMS in
+src/consts/navItems.tsx when it is in the nav. The redesigned Dashboard layout
+has no page title of its own, so nothing else names a page.
 
 Home's news section (organisms/Home/HomeNews, between Outcomes and the FAQ)
 lists the newsletter's four latest posts from its Ghost Content API, links to
@@ -153,8 +166,9 @@ nav, Connect Wallet or the wallet menu that holds disconnect-button), the page,
 Footer. Below 1024px the nav moves into the mobile drawer. Governance Actions is
 one nav link; its three destinations are the Proposed, Live Voting and Outcomes
 tabs (organisms/GovernanceActionsTabs.tsx), which reuse the old dropdown's test
-ids, public or connected. Governance Activity (pages/GovernanceActivity.tsx,
-organisms/GovernanceActivity/) is one public URL for everyone, built from the
+ids, public or connected. Governance Activity (/activity, pages/GovernanceActivity.tsx,
+organisms/GovernanceActivity/) is one public URL for everyone, mounted outside
+the Dashboard route like Home, built from the
 live list and the newest decided actions. FAQ is a footer link (faqs-link).
 
 TopNav's search button (organisms/GlobalSearch, Ctrl+K or ⌘K) opens one dialog
@@ -177,7 +191,9 @@ localStorage per stake key. Both modes share the model in models/notifications.t
 (kind plus data, copy in en.json), so a new kind needs the model, the
 contract table and notificationContent.ts. The bell renders only for connected
 wallets outside wallet flows; tests that render a connected TopNav stub it,
-since it needs a QueryClient.
+since it needs a QueryClient. The Notification Center and its preferences
+(/my/notifications, /my/notifications/preferences) are wallet-only pages
+inside the Dashboard route.
 
 A DRep directory card (organisms/DRepCard) shows participation from that DRep's
 votes, one /drep/getVotes request per card through the profile's query, and
@@ -246,7 +262,7 @@ Action, tabs) and a search, sort and filter-sidebar frame:
 GovernanceActionsListLayout for Live Voting, GovernanceActionHistorySearchFiltersSortBar
 for Outcomes, whose state lives in the URL (its status filter draws
 FilterSidebar's checkbox rows). An outcome's page is organisms/OutcomeDetails:
-tabs in ?tab=, which must keep the URL hash that holds the action index; each
+tabs in ?tab= (the action's CIP-129 id is the last path segment); each
 role section keeps the ${prefix}-voting-results-data and ${title}-expand-button
 ids and the Overall Outcome rows the ${prefix}-voting-results-indicator ids,
 which test:governance-action-aggregates reads. See all data is a modal dialog in
@@ -298,11 +314,11 @@ script path nor any governance action builder. Check those on tests/devnet.
 ## pdf-ui
 
 src/pdf-ui is vendored plain JavaScript with two entry points. App.jsx is the
-proposal discussion forum, lazy-loaded at /proposal_discussion only when the
+proposal discussion forum, lazy-loaded at /proposals only when the
 forum flag is on; it talks to govtool/govtool-pdf-backend through
 VITE_PDF_API_URL. BudgetArchiveApp.jsx is the read-only 2025 budget proposals
-archive, lazy-loaded by pages/BudgetProposalsArchive.tsx at /budget_discussion
-with no flag.
+archive, lazy-loaded by pages/BudgetProposalsArchive.tsx at /budget with no
+flag.
 
 Lint skips its .js and .jsx (--ext ts,tsx), and tsc compiles them without
 type-checking (allowJs, no checkJs). App.d.ts and BudgetArchiveApp.d.ts type

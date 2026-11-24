@@ -23,12 +23,12 @@ const GovernanceActionSubmittedModal = ({ open, onClose }) => {
                 label: 'Go to Dashboard',
                 variant: 'outlined',
                 sx: { borderRadius: '20px' },
-                onClick: () => navigate('/proposal_discussion'),
+                onClick: () => navigate('/proposals'),
                 dataTestId: 'ga-submitted-modal-dashboard-button',
             }}
         >
             <PdfModalCloseButton
-                onClick={() => navigate('/proposal_discussion')}
+                onClick={() => navigate('/proposals')}
                 dataTestId='ga-submitted-modal-close-button'
             />
         </PdfStatusModal>

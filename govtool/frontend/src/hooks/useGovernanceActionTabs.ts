@@ -34,8 +34,7 @@ export const useGovernanceActionTabs = (isConnected: boolean): PageTab[] => {
   );
   const isLive =
     !isOutcomes &&
-    (pathname.startsWith(PATHS.governanceActions) ||
-      pathname.startsWith(PATHS.dashboardGovernanceActions));
+    pathname.startsWith(PATHS.governanceActions);
 
   return [
     {
@@ -46,7 +45,7 @@ export const useGovernanceActionTabs = (isConnected: boolean): PageTab[] => {
     },
     {
       label: t("govActions.liveVotingTab"),
-      to: isConnected ? PATHS.dashboardGovernanceActions : PATHS.governanceActions,
+      to: PATHS.governanceActions,
       dataTestId: liveId,
       isActive: isLive,
     },

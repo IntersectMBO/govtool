@@ -21,7 +21,7 @@ test("4A_1. Should access Governance Actions page with connecting wallet", async
   // The connected nav's Governance Actions item opens Live Voting, whose
   // page tab keeps the old dropdown entry's id.
   await page.getByTestId("governance-actions-link").click();
-  await expect(page).toHaveURL(/\/connected\/governance_actions/);
+  await expect(page).toHaveURL(/\/actions(\?|$)/);
   await expect(
     page.getByTestId("governance-actions-live-voting-link")
   ).toHaveAttribute("aria-current", "page");

@@ -10,7 +10,7 @@ describe("Breadcrumbs", () => {
       <MemoryRouter>
         <Breadcrumbs
           elementOne="Governance Actions"
-          elementOnePath="/governance_actions"
+          elementOnePath="/actions"
           elementTwo="Reduce minPoolCost"
           isDataMissing={null}
         />

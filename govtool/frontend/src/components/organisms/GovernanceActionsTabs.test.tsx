@@ -31,7 +31,7 @@ describe("GovernanceActionsTabs", () => {
   });
 
   it("shows all three tabs with the public ids", () => {
-    renderAt("/governance_actions");
+    renderAt("/actions");
     expect(
       screen.getByTestId("proposed-governance-actions-link"),
     ).toBeInTheDocument();
@@ -43,14 +43,14 @@ describe("GovernanceActionsTabs", () => {
 
   it("hides the Proposed tab while the forum is off", () => {
     mocks.isForumEnabled = false;
-    renderAt("/governance_actions");
+    renderAt("/actions");
     expect(screen.queryByTestId("proposed-governance-actions-link")).toBeNull();
   });
 
   it("uses the connected ids for a connected wallet", () => {
     mocks.cardano.isEnabled = true;
     mocks.cardano.stakeKey = "stake1u9abc";
-    renderAt("/connected/governance_actions");
+    renderAt("/actions");
     expect(
       screen.getByTestId("governance-actions-live-voting-link"),
     ).toHaveAttribute("aria-current", "page");

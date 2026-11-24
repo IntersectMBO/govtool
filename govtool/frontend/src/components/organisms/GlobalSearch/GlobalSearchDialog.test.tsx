@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "@/i18n";
+import { getGovActionCIP129Id } from "@/utils/getGovActionId";
 
 import { GlobalSearchButton } from "./GlobalSearchButton";
 
@@ -122,7 +123,7 @@ describe("GlobalSearch", () => {
     openDialog();
     expect(screen.getByText("Browse by type")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("global-search-browse-dreps"));
-    expect(mocks.navigate).toHaveBeenCalledWith("/drep_directory");
+    expect(mocks.navigate).toHaveBeenCalledWith("/dreps");
   });
 
   it("leaves Proposals out while the forum is off", () => {
@@ -162,7 +163,7 @@ describe("GlobalSearch", () => {
     expect(screen.getAllByRole("option")[1]).toHaveAttribute("aria-selected", "true");
     fireEvent.keyDown(input, { key: "Enter" });
     expect(mocks.navigate).toHaveBeenCalledWith(
-      `/governance_actions/${"2".padStart(64, "a")}#0`,
+      `/actions/${getGovActionCIP129Id("2".padStart(64, "a"), 0)}`,
       expect.objectContaining({ state: expect.objectContaining({ proposal: action(2) }) }),
     );
     // The dialog closes, and the query is remembered for next time.

@@ -343,7 +343,7 @@ const EpochTable = ({ data }: { data: DashboardData }) => {
     <Panel testId="drep-activity-epochs" title={t("drepDashboard.activity.epochs.title")} titleId="drep-epochs-title">
       {!hasActivity ? (
         <EmptyState
-          actions={<Button component={RouterLink} size="medium" to={PATHS.dashboardGovernanceActions} variant="outlined">{t("drepDashboard.activity.epochs.viewActions")}</Button>}
+          actions={<Button component={RouterLink} size="medium" to={PATHS.governanceActions} variant="outlined">{t("drepDashboard.activity.epochs.viewActions")}</Button>}
           body={t("drepDashboard.activity.epochs.emptyBody")}
           framed={false}
           icon={<BarChart3 size={20} />}

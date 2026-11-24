@@ -89,7 +89,7 @@ export const CONNECTED_NAV_ITEMS = [
   {
     dataTestId: "drep-directory-link",
     label: i18n.t("dRepDirectory.title"),
-    navTo: PATHS.dashboardDRepDirectory,
+    navTo: PATHS.dRepDirectory,
     activeIcon: ICONS.dRepDirectoryActiveIcon,
     icon: ICONS.dRepDirectoryIcon,
     newTabLink: null,
@@ -97,7 +97,7 @@ export const CONNECTED_NAV_ITEMS = [
   {
     dataTestId: "governance-actions-link",
     label: i18n.t("govActions.categoryTitle"),
-    navTo: PATHS.dashboardGovernanceActions,
+    navTo: PATHS.governanceActions,
     activeIcon: ICONS.governanceActionsActiveIcon,
     icon: ICONS.governanceActionsIcon,
     newTabLink: null,
@@ -127,7 +127,7 @@ export const CONNECTED_NAV_ITEMS = [
       {
         dataTestId: "governance-actions-live-voting-link",
         label: i18n.t("govActions.liveVoting.title"),
-        navTo: PATHS.dashboardGovernanceActions,
+        navTo: PATHS.governanceActions,
         activeIcon: ICONS.governanceActionsActiveIcon,
         icon: ICONS.governanceActionsIcon,
         newTabLink: null,

@@ -56,7 +56,7 @@ describe('ProposalRow', () => {
         });
         expect(heading.querySelector('a')).toHaveAttribute(
             'href',
-            '/proposal_discussion/7'
+            '/proposals/7'
         );
     });
 

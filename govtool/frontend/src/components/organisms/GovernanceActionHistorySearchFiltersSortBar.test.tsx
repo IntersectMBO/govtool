@@ -15,7 +15,7 @@ vi.mock("@/hooks/queries/useDRepDashboard", () => ({
 
 const renderBar = () =>
   render(
-    <MemoryRouter initialEntries={["/governance_actions/history"]}>
+    <MemoryRouter initialEntries={["/actions/history"]}>
       <GovernanceActionHistorySearchFiltersSortBar>
         <p>list</p>
       </GovernanceActionHistorySearchFiltersSortBar>

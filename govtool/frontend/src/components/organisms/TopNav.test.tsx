@@ -113,7 +113,7 @@ describe("TopNav (desktop)", () => {
   });
 
   it("highlights Governance Actions in orange on its pages", () => {
-    renderAt("/governance_actions");
+    renderAt("/actions");
     expect(screen.getByTestId("governance-actions")).toHaveStyle({
       color: "#BF4B20",
     });
@@ -123,10 +123,10 @@ describe("TopNav (desktop)", () => {
   });
 
   it("links Governance Activity and highlights only it on its page", () => {
-    renderAt("/governance_activity");
+    renderAt("/activity");
     expect(screen.getByTestId("governance-activity-link")).toHaveAttribute(
       "href",
-      "/governance_activity",
+      "/activity",
     );
     expect(screen.getByTestId("governance-activity-link")).toHaveStyle({
       color: "#BF4B20",
@@ -137,7 +137,7 @@ describe("TopNav (desktop)", () => {
   });
 
   it("highlights Governance Actions on forum pages too", () => {
-    renderAt("/proposal_discussion");
+    renderAt("/proposals");
     expect(screen.getByTestId("governance-actions")).toHaveStyle({
       color: "#BF4B20",
     });
@@ -203,7 +203,7 @@ describe("TopNav (desktop)", () => {
 
     it("keeps the wallet connected when the logo is clicked", () => {
       mocks.cardano.disconnectWallet.mockClear();
-      renderAt("/connected/drep_directory");
+      renderAt("/dreps");
       const logo = screen.getByTestId("logo-button");
       expect(logo).toHaveAttribute("href", "/dashboard");
       fireEvent.click(logo);
@@ -222,7 +222,7 @@ describe("TopNav (desktop)", () => {
 
     it("hides the bell and the search inside a wallet flow", () => {
       render(
-        <MemoryRouter initialEntries={["/register_drep"]}>
+        <MemoryRouter initialEntries={["/my/drep/register"]}>
           <TopNav onNavigateAway={vi.fn()} />
         </MemoryRouter>,
       );
@@ -234,7 +234,7 @@ describe("TopNav (desktop)", () => {
       renderAt("/dashboard");
       expect(screen.getByTestId("governance-actions-link")).toHaveAttribute(
         "href",
-        "/connected/governance_actions",
+        "/actions",
       );
       expect(screen.getByTestId("dashboard-link")).toHaveAttribute(
         "href",
@@ -242,7 +242,7 @@ describe("TopNav (desktop)", () => {
       );
       expect(screen.getByTestId("governance-activity-link")).toHaveAttribute(
         "href",
-        "/governance_activity",
+        "/activity",
       );
     });
   });
@@ -266,7 +266,7 @@ describe("TopNav (mobile)", () => {
   });
 
   it("lists the nav items in the drawer, without FAQ", () => {
-    renderAt("/drep_directory");
+    renderAt("/dreps");
     fireEvent.click(screen.getByTestId("open-drawer-button"));
     expect(screen.getByTestId("drep-directory-link")).toHaveStyle({
       color: "#BF4B20",
@@ -291,7 +291,7 @@ describe("TopNav (mobile)", () => {
     mocks.cardano.isEnabled = true;
     mocks.cardano.stakeKey = "stake1u9abcdefghijklmnopqrstuvwxyz";
     render(
-      <MemoryRouter initialEntries={["/register_drep"]}>
+      <MemoryRouter initialEntries={["/my/drep/register"]}>
         <TopNav onNavigateAway={vi.fn()} />
       </MemoryRouter>,
     );
@@ -311,7 +311,7 @@ describe("TopNav in a wallet flow", () => {
   const LocationProbe = () => <span data-testid="location">{useLocation().pathname}</span>;
   const renderInFlow = (onNavigateAway: () => void) =>
     render(
-      <MemoryRouter initialEntries={["/create_governance_action"]}>
+      <MemoryRouter initialEntries={["/actions/new"]}>
         <TopNav onNavigateAway={onNavigateAway} />
         <LocationProbe />
       </MemoryRouter>,
@@ -329,7 +329,7 @@ describe("TopNav in a wallet flow", () => {
     renderInFlow(onNavigateAway);
     fireEvent.click(screen.getByTestId("logo-button"));
     expect(onNavigateAway).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("location")).toHaveTextContent("/create_governance_action");
+    expect(screen.getByTestId("location")).toHaveTextContent("/actions/new");
   });
 
   it("asks before a nav link leaves the flow", () => {
@@ -338,7 +338,7 @@ describe("TopNav in a wallet flow", () => {
     renderInFlow(onNavigateAway);
     fireEvent.click(screen.getByTestId("drep-directory-link"));
     expect(onNavigateAway).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("location")).toHaveTextContent("/create_governance_action");
+    expect(screen.getByTestId("location")).toHaveTextContent("/actions/new");
   });
 
   it("asks before a drawer link leaves the flow", () => {
@@ -348,6 +348,6 @@ describe("TopNav in a wallet flow", () => {
     fireEvent.click(screen.getByTestId("open-drawer-button"));
     fireEvent.click(screen.getByTestId("drep-directory-link"));
     expect(onNavigateAway).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("location")).toHaveTextContent("/create_governance_action");
+    expect(screen.getByTestId("location")).toHaveTextContent("/actions/new");
   });
 });

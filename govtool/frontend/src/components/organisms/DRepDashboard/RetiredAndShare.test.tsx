@@ -68,7 +68,7 @@ describe("RetiredDRepDashboard", () => {
     renderRetired();
     expect(screen.getByTestId("dashboard-role-pill")).toHaveTextContent("Retired");
     expect(screen.getByTestId("retired-drep-banner")).toBeInTheDocument();
-    expect(screen.getByTestId("register-button")).toHaveAttribute("href", "/register_drep");
+    expect(screen.getByTestId("register-button")).toHaveAttribute("href", "/my/drep/register");
     expect(screen.getByTestId("retired-total-votes")).toHaveTextContent("4 proposals");
     expect(screen.getAllByTestId("retired-archived-vote")).toHaveLength(3);
     expect(screen.getByText("cards")).toBeInTheDocument();
@@ -120,16 +120,16 @@ describe("ShareDRepDialog", () => {
         buttonTestId="share-button"
         copyTestId="copy-link-from-share-button"
         dRepId={id}
-        link={`https://gov.tools/drep_directory/${id}`}
+        link={`https://gov.tools/dreps/${id}`}
       />,
     );
     fireEvent.click(screen.getByTestId("share-button"));
     expect(screen.getByTestId("share-drep-url")).toHaveValue("drep1example7m4k2v…p2q9r6s3t8v5");
     fireEvent.click(screen.getByTestId("copy-link-from-share-button"));
-    expect(writeText).toHaveBeenCalledWith(`https://gov.tools/drep_directory/${id}`);
+    expect(writeText).toHaveBeenCalledWith(`https://gov.tools/dreps/${id}`);
   });
 
-  const link = "https://gov.tools/drep_directory/drep1abc";
+  const link = "https://gov.tools/dreps/drep1abc";
 
   it("copies the profile URL and offers encoded share links", async () => {
     const writeText = vi.fn(() => Promise.resolve());

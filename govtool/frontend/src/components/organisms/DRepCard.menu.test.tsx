@@ -90,7 +90,7 @@ describe("DRepCard", () => {
     ]);
     expect(menu.getByText("View Voting History").closest("a")).toHaveAttribute(
       "href",
-      `/drep_directory/${VIEW}#voting-history`,
+      `/dreps/${VIEW}#voting-history`,
     );
     fireEvent.click(menu.getByText("Copy Legacy DRep ID (CIP-105)"));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(VIEW));

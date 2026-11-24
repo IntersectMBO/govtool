@@ -45,7 +45,7 @@ describe("DashboardCards", () => {
   it("offers a direct voter to retire from the header", () => {
     mocks.voter = { ...base, isRegisteredAsSoleVoter: true };
     render(<MemoryRouter><DashboardCards /></MemoryRouter>);
-    expect(screen.getByTestId("retire-direct-voter-header-button")).toHaveAttribute("href", "/retire_direct_voter");
+    expect(screen.getByTestId("retire-direct-voter-header-button")).toHaveAttribute("href", "/my/direct-voter/retire");
   });
 
   it("hides it once the retire page reports the retirement", () => {

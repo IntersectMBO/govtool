@@ -13,7 +13,7 @@ import { supportPercent } from '../../lib/proposalList';
 import { formatIsoDate } from '../../lib/utils';
 import EditProposalDialog from '../EditProposalDialog';
 
-const DETAILS_PATH = '/proposal_discussion';
+const DETAILS_PATH = '/proposals';
 
 const focusRing = {
     '&.Mui-focusVisible, &:focus-visible': {

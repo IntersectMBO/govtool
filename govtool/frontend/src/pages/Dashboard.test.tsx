@@ -50,10 +50,10 @@ vi.mock("@/components/organisms/Notifications/NotificationBell", () => ({
 
 const renderDashboard = () =>
   render(
-    <MemoryRouter initialEntries={["/connected/drep_directory"]}>
+    <MemoryRouter initialEntries={["/dreps"]}>
       <Routes>
         <Route element={<Dashboard />}>
-          <Route path="/connected/drep_directory" element={<div>page</div>} />
+          <Route path="/dreps" element={<div>page</div>} />
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -80,20 +80,42 @@ describe("Dashboard layout", () => {
     expect(screen.queryByTestId("disconnect-button")).toBeNull();
   });
 
-  it("leaves for the public page when the wallet disconnects", () => {
+  // App.tsx moves a page with a public layout out of the Dashboard once the
+  // wallet goes; only the dashboard itself, which has none, sends the visitor
+  // home.
+  it("stays on a page with a public layout when the wallet disconnects", () => {
+    window.history.pushState({}, "", "/dreps");
     const { rerender } = renderDashboard();
     localStorage.clear();
     mocks.cardano.isEnabled = false;
     mocks.cardano.stakeKey = undefined;
     rerender(
-      <MemoryRouter initialEntries={["/connected/drep_directory"]}>
+      <MemoryRouter initialEntries={["/dreps"]}>
         <Routes>
           <Route element={<Dashboard />}>
-            <Route path="/connected/drep_directory" element={<div>page</div>} />
+            <Route path="/dreps" element={<div>page</div>} />
           </Route>
         </Routes>
       </MemoryRouter>,
     );
-    expect(mocks.navigate).toHaveBeenCalled();
+    expect(mocks.navigate).not.toHaveBeenCalled();
+  });
+
+  it("leaves the dashboard for home when the wallet disconnects", () => {
+    window.history.pushState({}, "", "/dashboard");
+    localStorage.clear();
+    mocks.cardano.isEnabled = false;
+    mocks.cardano.stakeKey = undefined;
+    render(
+      <MemoryRouter initialEntries={["/dashboard"]}>
+        <Routes>
+          <Route element={<Dashboard />}>
+            <Route path="/dashboard" element={<div>page</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(mocks.navigate).toHaveBeenCalledWith("/");
+    window.history.pushState({}, "", "/");
   });
 });

@@ -3,10 +3,14 @@ import { Box } from "@mui/material";
 
 import { Background, PageContainer } from "@atoms";
 import { Footer, TopNav } from "@organisms";
-import { checkIsWalletConnected } from "@utils";
 
-export const DRepDirectory = () => {
-  if (checkIsWalletConnected()) {
+type DRepDirectoryProps = {
+  isConnected?: boolean;
+};
+
+// The dashboard supplies its own chrome; the public page adds it here.
+export const DRepDirectory = ({ isConnected = false }: DRepDirectoryProps) => {
+  if (isConnected) {
     return (
       <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Outlet />

@@ -12,6 +12,7 @@ import {
 import type { ProposalData } from "@models";
 import {
   getFullGovActionId,
+  getGovActionPath,
   getGovernanceActionCIP129Id,
   getProposalTypeLabel,
 } from "@utils";
@@ -108,7 +109,7 @@ const ActionRow = ({ proposal }: { proposal: ProposalData }) => {
           dataTestId={`activity-${getFullGovActionId(proposal.txHash, proposal.index)}-details`}
           label={`${t("activity.active.details")}: ${title}`}
           state={{ proposal }}
-          to={`${PATHS.governanceActions}/${getFullGovActionId(proposal.txHash, proposal.index)}`}
+          to={getGovActionPath(proposal.txHash, proposal.index)}
         >
           {t("activity.active.details")}
         </TextLink>

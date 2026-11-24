@@ -2,15 +2,11 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router";
 
-import {
-  BUDGET_DISCUSSION_PATHS,
-  GOV_ACTION_HISTORY_PATHS,
-  PATHS,
-  PDF_PATHS,
-} from "@/consts/paths";
+import { PATHS } from "@/consts/paths";
 import { useModal } from "@/context/modal";
 import { useCardano } from "@/context/wallet";
 import { lovelaceFromCborValue } from "@/utils/profileMenu";
+import { isWalletOnlyPath } from "@/utils/walletOnlyPath";
 
 /** The connected wallet's ada, in lovelace, read from the wallet itself. */
 export const useWalletBalance = () => {
@@ -66,22 +62,11 @@ export const useDisconnectWallet = () => {
   const { disconnectWallet } = useCardano();
   const { openModal } = useModal();
   const navigate = useNavigate();
-  const { pathname, hash } = useLocation();
+  const { pathname } = useLocation();
 
-  // Pages that serve both states stay where they are.
+  // A page that works without a wallet stays; the rest need one.
   const leaveWalletOnlyPage = () => {
-    const path = window.location.pathname;
-    const keepsPage = [
-      BUDGET_DISCUSSION_PATHS.budgetDiscussion,
-      PDF_PATHS.proposalDiscussion,
-      GOV_ACTION_HISTORY_PATHS.governanceActionHistory,
-    ].some((page) => path.includes(page.replace("/", "")));
-    if (keepsPage) return;
-    navigate(
-      pathname.includes("/connected")
-        ? `${pathname.replace("/connected", "")}${hash ?? ""}`
-        : PATHS.home,
-    );
+    if (isWalletOnlyPath(pathname)) navigate(PATHS.home);
   };
 
   const disconnect = async () => {

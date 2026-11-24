@@ -101,7 +101,7 @@ export const GovernanceActionHistoryCard = ({ action }: GovernanceActionHistoryC
           <Box
             component={Link}
             data-testid={`${fullGovActionId}-view-details`}
-            to={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${fullGovActionId}`}
+            to={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${idCIP129}`}
             sx={{
               color: isDataMissing ? ds.error["600"] : ds.gray["900"],
               fontSize: 16,

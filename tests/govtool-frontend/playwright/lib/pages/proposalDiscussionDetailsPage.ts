@@ -45,7 +45,7 @@ export default class ProposalDiscussionDetailsPage {
 
   async goto(proposalId: number) {
     await this.page.goto(
-      `${environments.frontendUrl}/proposal_discussion/${proposalId}`
+      `${environments.frontendUrl}/proposals/${proposalId}`
     );
   }
 

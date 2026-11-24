@@ -28,7 +28,7 @@ import {
     getArchiveDiscussion,
 } from '../../../lib/budgetArchive';
 
-const LIST_PATH = '/budget_discussion';
+const LIST_PATH = '/budget';
 const COMMENTS_PAGE_SIZE = 25;
 
 // GovernanceActionDetailsCard shell: radius 20, boxShadow2, translucent body.

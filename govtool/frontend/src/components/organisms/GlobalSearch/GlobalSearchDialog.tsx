@@ -5,7 +5,7 @@ import { CloudOff, History, Pencil, RefreshCw, Search, SearchX, X } from "lucide
 
 import { Button } from "@atoms";
 import { GOV_ACTION_HISTORY_PATHS, PATHS, PDF_PATHS } from "@consts";
-import { useCardano, useFeatureFlag, useSnackbar } from "@context";
+import { useFeatureFlag, useSnackbar } from "@context";
 import { useDebounce, useTranslation } from "@hooks";
 import { useGlobalSearch, type SearchCategory } from "@/hooks/queries/useGlobalSearch";
 import { ds, RADIUS } from "@/consts/designTokens";
@@ -35,10 +35,8 @@ const BROWSE_PATHS: Partial<Record<SearchCategory, string>> = {
 const SearchPanel = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isEnabled, stakeKey } = useCardano();
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
   const { addSuccessAlert } = useSnackbar();
-  const isConnected = Boolean(isEnabled && stakeKey);
 
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<SearchCategory | null>(null);
@@ -58,7 +56,7 @@ const SearchPanel = ({ onClose }: { onClose: () => void }) => {
   const search = useGlobalSearch(debounced, {
     isForumEnabled: isProposalDiscussionForumEnabled,
   });
-  const results = toResults(search, { t, isConnected });
+  const results = toResults(search, { t });
   const categories = CATEGORY_ORDER.filter(
     (category) => category !== "proposals" || isProposalDiscussionForumEnabled,
   );

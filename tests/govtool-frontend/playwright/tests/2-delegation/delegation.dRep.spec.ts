@@ -7,7 +7,7 @@ import { createNewPageWithWallet } from "@helpers/page";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import { expect } from "@playwright/test";
 import { LinkType } from "@types";
-import { singleUseWalletName } from "lib/wallet/testWallets";
+import { adaBalance, singleUseWalletName } from "lib/wallet/testWallets";
 import { stakeRegisteredWallet } from "lib/wallet/transactions";
 
 test.beforeEach(async () => {
@@ -30,7 +30,12 @@ test("2N. Should show DRep information on details page", async ({
   const dRepPage = await createNewPageWithWallet(browser, { wallet });
 
   const dRepRegistrationPage = new DRepRegistrationPage(dRepPage);
+  // The app reads /network/info on load; its epochNo dates the registration.
+  const networkInfo = dRepPage.waitForResponse("**/network/info");
   await dRepRegistrationPage.goto();
+  const networkInfoUrl = (await networkInfo).url();
+  const currentEpoch = async (): Promise<number> =>
+    (await (await dRepPage.request.get(networkInfoUrl)).json()).epochNo;
 
   const name = faker.person.firstName();
   const objectives = faker.lorem.paragraph(2);
@@ -53,6 +58,7 @@ test("2N. Should show DRep information on details page", async ({
 
   await expect(dRepPage.getByTestId("alert-success")).not.toBeVisible();
 
+  const registrationEpoch = await currentEpoch();
   await dRepRegistrationPage.register({
     name,
     objectives,
@@ -85,7 +91,20 @@ test("2N. Should show DRep information on details page", async ({
     }
   );
   await expect(dRepPage.getByTestId("Active-pill")).toHaveText("Active");
-  await expect(dRepPage.getByTestId("voting-power")).toHaveText("₳ 0");
+  // Registering also delegates the wallet's own stake to the new DRep, which
+  // the ledger counts from the next epoch boundary. On preview's long epochs
+  // that is after this check, so it reads 0. Devnet's 60 s epochs can cross
+  // a boundary mid-test; then only the wallet's own stake is right, and only
+  // in a later epoch than the registration.
+  const votingPower = dRepPage.getByTestId("voting-power");
+  await expect(votingPower).toHaveText(/^₳ [\d,]+$/);
+  if ((await votingPower.textContent()) !== "₳ 0") {
+    expect(await currentEpoch()).toBeGreaterThan(registrationEpoch);
+    const ownStake = Number(
+      (await adaBalance(wallet)).toFixed(0)
+    ).toLocaleString("en-US");
+    await expect(votingPower).toHaveText(`₳ ${ownStake}`);
+  }
 
   await expect(
     dRepPage.getByTestId("objectives-info-item-description")

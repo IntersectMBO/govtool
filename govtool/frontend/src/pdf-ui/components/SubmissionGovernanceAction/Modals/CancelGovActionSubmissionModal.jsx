@@ -31,7 +31,7 @@ const CancelGovActionSubmissionModal = ({ open, onClose }) => {
                 label: 'Yes, cancel my proposal submission and take me to the to proposal list',
                 variant: 'text',
                 sx: { borderRadius: '20px' },
-                onClick: () => navigate('/proposal_discussion'),
+                onClick: () => navigate('/proposals'),
                 dataTestId: 'cancel-ga-submission-modal-yes-button',
             }}
         />

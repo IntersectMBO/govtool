@@ -228,7 +228,7 @@ test("4F. Should Disable DRep functionality upon wallet disconnection on governa
 
   await new LoginPage(dRepPage).logout();
 
-  await expect(dRepPage).toHaveURL("/governance_actions");
+  await expect(dRepPage).toHaveURL("/actions");
 
   const govActionDetailsPage = await governanceActionsPage.viewFirstProposal();
   await expect(govActionDetailsPage.voteBtn).not.toBeVisible();

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { GovernanceActionType } from "@/types/governanceAction";
 
+import { getGovActionCIP129Id } from "../getGovActionId";
+
 import {
   activityCounts,
   activityEvents,
@@ -119,9 +121,11 @@ describe("activityEvents", () => {
       "votingOpened",
       "ratified",
     ]);
-    expect(events[0].path).toBe("/governance_actions/history/7");
+    expect(events[0].path).toBe("/actions/history/7");
     expect(events[0].actionId).toBe(`${"bb".repeat(32)}#0`);
-    expect(events[2].path).toBe(`/governance_actions/${"aa".repeat(32)}#0`);
+    expect(events[2].path).toBe(
+      `/actions/${getGovActionCIP129Id("aa".repeat(32), 0)}`,
+    );
   });
 
   it("skips actions with no recorded times", () => {

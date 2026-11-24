@@ -13,6 +13,7 @@ import { PATHS } from "@consts";
 import { useCardano, useModal, useSnackbar } from "@context";
 import {
   useDelegateTodRep,
+  useGetAdaHolderVotingPowerQuery,
   useGetDRepVotesByIdQuery,
   useTranslation,
 } from "@hooks";
@@ -60,7 +61,11 @@ export const DRepDetailsCard = ({
   isMyDrep,
   isMyDrepInProgress,
 }: DRepDetailsProps) => {
-  const { pendingTransaction } = useCardano();
+  const { pendingTransaction, stakeKey } = useCardano();
+  const { votingPower: myVotingPower } =
+    useGetAdaHolderVotingPowerQuery(stakeKey);
+  // A DRep's own page leaves out what it delegated to itself (#3082).
+  const showMyDelegation = isMyDrep && !isMe && myVotingPower !== undefined;
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { openModal } = useModal();
@@ -244,7 +249,7 @@ export const DRepDetailsCard = ({
                 openModal({
                   type: "chooseWallet",
                   state: {
-                    pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+                    pathToNavigate: PATHS.dRepDirectoryDRep.replace(
                       ":dRepId",
                       view,
                     ),
@@ -261,7 +266,7 @@ export const DRepDetailsCard = ({
             buttonTestId="share-button"
             copyTestId="copy-link-from-share-button"
             dRepId={view}
-            link={`${window.location.origin}${window.location.pathname.replace(/^\/connected\//, "/")}`}
+            link={`${window.location.origin}${window.location.pathname}`}
           />
         </Box>
       </Box>
@@ -325,10 +330,18 @@ export const DRepDetailsCard = ({
             )}
           </Box>
           <Box>
-            <Box sx={{ color: isMyDrepInProgress ? ds.orange["700"] : ds.success["700"], fontSize: 14, fontWeight: 600 }}>
+            <Box
+              data-testid={showMyDelegation && !isMyDrepInProgress ? "my-delegation-amount" : undefined}
+              sx={{ color: isMyDrepInProgress ? ds.orange["700"] : ds.success["700"], fontSize: 14, fontWeight: 600 }}
+            >
               {isMyDrepInProgress
                 ? t("dRepProfile.delegationInProgress", { name })
-                : t("dRepProfile.delegatedTo", { name })}
+                : showMyDelegation
+                  ? t("dRepProfile.delegatedAmountTo", {
+                      ada: correctDRepDirectoryFormat(myVotingPower),
+                      name,
+                    })
+                  : t("dRepProfile.delegatedTo", { name })}
             </Box>
             <Box sx={{ color: isMyDrepInProgress ? ds.orange["700"] : ds.success["700"], fontSize: 13, mt: 0.5 }}>
               {t("dRepProfile.delegationNote")}

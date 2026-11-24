@@ -139,7 +139,7 @@ const tree = (path: string, client: QueryClient, pending: Record<string, unknown
     <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route element={dashboard(pending)} path="/dashboard" />
-        <Route element={<ProfileStub />} path="/connected/drep_directory/:dRepId" />
+        <Route element={<ProfileStub />} path="/dreps/:dRepId" />
       </Routes>
     </MemoryRouter>
   </QueryClientProvider>
@@ -229,7 +229,7 @@ describe("DRepDashboard", () => {
     expect(within(rows[0]).getByText("Enacted")).toBeInTheDocument();
     expect(screen.getByTestId("drep-recent-votes-view-all")).toHaveAttribute("href", "/dashboard?tab=governance");
     expect(screen.getByTestId("dRep-id-display-card-dashboard")).toHaveTextContent("drep1example");
-    expect(screen.getByTestId("retire-button")).toHaveAttribute("href", "/retire_drep");
+    expect(screen.getByTestId("retire-button")).toHaveAttribute("href", "/my/drep/retire");
   });
 
   it("hides the discussions tab while the forum is off", () => {

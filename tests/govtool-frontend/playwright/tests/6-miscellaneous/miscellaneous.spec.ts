@@ -25,9 +25,9 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
 
   const navbarLinks = [
     { testId: "dashboard-link", url: `${environments.frontendUrl}/` },
-    { testId: "drep-directory-link", urlPattern: /\/drep_directory/ },
-    { testId: "governance-actions", urlPattern: /\/governance_actions(\?|$)/ },
-    { testId: "governance-activity-link", urlPattern: /\/governance_activity/ },
+    { testId: "drep-directory-link", urlPattern: /\/dreps/ },
+    { testId: "governance-actions", urlPattern: /\/actions(\?|$)/ },
+    { testId: "governance-activity-link", urlPattern: /\/activity/ },
   ];
 
   for (const link of navbarLinks) {
@@ -48,16 +48,16 @@ test("6C. Navigation within the dApp", async ({ page, context }) => {
   const governanceActionTabs = [
     {
       testId: "proposed-governance-actions-link",
-      urlPattern: /\/proposal_discussion/,
+      urlPattern: /\/proposals/,
     },
-    { testId: "governance-actions-link", urlPattern: /\/governance_actions(\?|$)/ },
+    { testId: "governance-actions-link", urlPattern: /\/actions(\?|$)/ },
     {
       testId: "governance-actions-governance-actions-link",
-      urlPattern: /\/governance_actions\/history/,
+      urlPattern: /\/actions\/history/,
     },
   ];
 
-  await page.goto("/governance_actions");
+  await page.goto("/actions");
   for (const tab of governanceActionTabs) {
     await page.getByTestId(tab.testId).click();
     await expect(page).toHaveURL(tab.urlPattern);

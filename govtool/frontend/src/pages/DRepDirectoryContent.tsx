@@ -98,7 +98,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const [sortingSeed, setSortingSeed] = useState<string>(() => getStoredSeed());
 
   useEffect(() => {
-    if (lastPath && !lastPath.includes("drep_directory")) {
+    if (lastPath && !lastPath.includes("/dreps")) {
       const newSeed = makeSeed();
       setSortingSeed(newSeed);
       sessionStorage.setItem(SEED_STORAGE_KEY, newSeed);
@@ -116,7 +116,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
   const [reviewDRep, setReviewDRep] = useState<DRepData | undefined>();
 
   useEffect(() => {
-    if (!lastPath.includes("drep_directory")) {
+    if (!lastPath.includes("/dreps")) {
       setChosenFilters([DRepStatus.Active]);
       setSearchText("");
     }
@@ -203,7 +203,7 @@ export const DRepDirectoryContent: FC<DRepDirectoryContentProps> = ({
       onViewDRep={() =>
         reviewDRep &&
         navigate(
-          PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", reviewDRep.view),
+          PATHS.dRepDirectoryDRep.replace(":dRepId", reviewDRep.view),
         )
       }
     />

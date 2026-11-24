@@ -26,8 +26,8 @@ describe("describeNotification", () => {
     expect(content.body).toContain("₳ 1.84M");
     expect(content.status).toEqual({ label: "Action needed", tone: "error" });
     expect(content.actions.map((action) => action.path)).toEqual([
-      "/connected/drep_directory",
-      "/connected/drep_directory/drep1hazel",
+      "/dreps",
+      "/dreps/drep1hazel",
     ]);
   });
 
@@ -42,7 +42,7 @@ describe("describeNotification", () => {
       } as GovToolNotification,
       t,
     );
-    expect(content.actions[0].path).toMatch(/^\/governance_actions\/history\/gov_action1/);
+    expect(content.actions[0].path).toMatch(/^\/actions\/history\/gov_action1/);
     expect(content.body).toContain("Your recorded vote: Yes");
   });
 

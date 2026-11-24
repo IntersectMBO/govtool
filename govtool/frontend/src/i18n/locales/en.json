@@ -472,6 +472,7 @@
       "votedOnEpoch": "Voted on Epoch {{epoch}}"
     },
     "delegate": "Delegate voting power",
+    "delegatedAmountTo": "You have delegated ₳ {{ada}} to {{name}}.",
     "delegatedTo": "Your voting power is currently delegated to {{name}}.",
     "delegationInProgress": "Your delegation to {{name}} is being confirmed on Cardano.",
     "delegationNote": "Delegating moves voting rights only; your ADA stays in your wallet.",

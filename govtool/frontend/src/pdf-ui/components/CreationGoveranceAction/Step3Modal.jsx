@@ -108,7 +108,7 @@ const AddPollModal = ({ handleSaveDraft }) => {
                         onClick={() => {
                             if (proposalId) {
                                 navigation(
-                                    `/proposal_discussion/${proposalId}`
+                                    `/proposals/${proposalId}`
                                 );
                             } else {
                                 console.error(

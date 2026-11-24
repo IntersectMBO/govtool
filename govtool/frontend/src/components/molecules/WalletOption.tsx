@@ -3,12 +3,7 @@ import { To, useNavigate, useLocation } from "react-router";
 import { Box, ButtonBase } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import {
-  BUDGET_DISCUSSION_PATHS,
-  GOV_ACTION_HISTORY_PATHS,
-  PATHS,
-  PDF_PATHS,
-} from "@/consts/paths";
+import { PATHS } from "@/consts/paths";
 import { useModal } from "@/context/modal";
 import { useCardano } from "@/context/wallet";
 import { ds, PILL_TONES, RADIUS } from "@/consts/designTokens";
@@ -36,22 +31,13 @@ export const WalletOptionButton: FC<WalletOption> = ({
   pathToNavigate,
 }) => {
   const { t } = useTranslation();
-  const { pathname, hash, state } = useLocation();
+  const { pathname, state } = useLocation();
   const { enable, isEnableLoading } = useCardano();
   const { openModal, closeModal } = useModal();
   const navigate = useNavigate();
 
   const enableByWalletName = useCallback(async () => {
     if (isEnableLoading) return;
-    const isBudgetDiscussion = window.location.pathname.includes(
-      BUDGET_DISCUSSION_PATHS.budgetDiscussion.replace("/", ""),
-    );
-    const isProposalDiscussionForum = window.location.pathname.includes(
-      PDF_PATHS.proposalDiscussion.replace("/", ""),
-    );
-    const isGovernanceGovernanceActionHistoryPillar = window.location.pathname.includes(
-      GOV_ACTION_HISTORY_PATHS.governanceActionHistory.replace("/", ""),
-    );
     let result: Awaited<ReturnType<typeof enable>>;
     try {
       result = await enable(name);
@@ -67,16 +53,12 @@ export const WalletOptionButton: FC<WalletOption> = ({
       return;
     }
     if (result?.stakeKey) {
-      if (
-        !isBudgetDiscussion &&
-        !isProposalDiscussionForum &&
-        !isGovernanceGovernanceActionHistoryPillar
-      ) {
-        navigate(
-
-          pathToNavigate || (pathname === "/" ? "/dashboard" : `connected${pathname}${hash ?? ""}`),
-          { state },
-        );
+      // Any other page stays where it is: the same URL turns into the
+      // dashboard's view of it.
+      if (pathToNavigate) {
+        navigate(pathToNavigate, { state });
+      } else if (pathname === PATHS.home) {
+        navigate(PATHS.dashboard, { state });
       }
       openModal({ type: "walletConnection", state: { view: "checking" } });
       return;
@@ -92,7 +74,6 @@ export const WalletOptionButton: FC<WalletOption> = ({
     name,
     pathToNavigate,
     pathname,
-    hash,
     state,
   ]);
 

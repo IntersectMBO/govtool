@@ -71,6 +71,10 @@ import UserValidation from '../../../components/UserValidation/UserValidation';
 import { PdfModal } from '../../../components/PdfModal';
 import { PdfTextArea } from '../../../components/PdfFields';
 import { GOV_ACTION_HISTORY_PATHS } from '@/consts/paths';
+import {
+    getGovActionCIP129Id,
+    getGovActionPath,
+} from '@/utils/getGovActionId';
 import { useGetGovernanceActionRecordQuery } from '@/hooks/queries/useGetGovernanceActionRecordQuery';
 import { getGovernanceActionVoteEnd } from '@/utils/governanceActions';
 import {
@@ -408,7 +412,7 @@ const SingleGovernanceAction = ({ id }) => {
     const voteEnd = submittedAction ? getGovernanceActionVoteEnd(submittedAction) : null;
     const seeGovernanceAction = () =>
         navigate(
-            `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${submissionTxHash}#0`
+            `${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${getGovActionCIP129Id(submissionTxHash, 0)}`
         );
 
     const targetRef = useRef();
@@ -427,7 +431,7 @@ const SingleGovernanceAction = ({ id }) => {
     useEffect(() => {
         let domain = new URL(window.location.href);
         let origin = domain.origin;
-        setProposalLink(`${origin}/proposal_discussion/`);
+        setProposalLink(`${origin}/proposals/`);
     }, [proposalLink]);
 
     const disableShareClick = () => {
@@ -500,7 +504,7 @@ const SingleGovernanceAction = ({ id }) => {
             if (!response) return;
 
             handleCloseDeleteModal();
-            navigate('/proposal_discussion');
+            navigate('/proposals');
         } catch (error) {
             console.error('Failed to delete proposal:', error);
         } finally {
@@ -518,7 +522,7 @@ const SingleGovernanceAction = ({ id }) => {
             if (!response) return;
 
             if (response?.attributes?.content?.attributes?.is_draft) {
-                return navigate('/proposal_discussion');
+                return navigate('/proposals');
             }
             let totalLength =
                 response.attributes?.content?.attributes?.prop_abstract.length +
@@ -538,7 +542,7 @@ const SingleGovernanceAction = ({ id }) => {
                 error?.response?.data?.error?.details ===
                     'You can not access draft proposal details.'
             ) {
-                return navigate('/proposal_discussion');
+                return navigate('/proposals');
             }
             console.error(error);
         } finally {
@@ -884,7 +888,7 @@ const SingleGovernanceAction = ({ id }) => {
                     >
                         <Box
                             component={RouterLink}
-                            to='/proposal_discussion'
+                            to='/proposals'
                             sx={breadcrumbLinkSx}
                         >
                             Governance Actions
@@ -1540,7 +1544,10 @@ const SingleGovernanceAction = ({ id }) => {
                                         }
                                         onClick={() =>
                                             navigate(
-                                                `/connected/governance_actions/${content?.prop_submission_tx_hash}#0`
+                                                getGovActionPath(
+                                                    content?.prop_submission_tx_hash,
+                                                    0
+                                                )
                                             )
                                         }
                                     >

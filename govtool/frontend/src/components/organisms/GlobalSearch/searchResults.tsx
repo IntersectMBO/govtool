@@ -14,7 +14,7 @@ import type {
 import type { HandleObject } from "@/models/adaHandle";
 import { AutomatedVotingOptionCurrentDelegation } from "@/types/automatedVotingOptions";
 import { correctAdaFormatWithSuffix } from "@/utils/adaFormat";
-import { getFullGovActionId } from "@/utils/getGovActionId";
+import { getFullGovActionId, getGovActionPath } from "@/utils/getGovActionId";
 import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { getGovernanceActionCIP129Id } from "@/utils/governanceActions";
 import { decidedStatus } from "@/utils/governanceActionFormat";
@@ -38,13 +38,10 @@ export type SearchResult = {
   target: ResultTarget;
 };
 
-type Context = { t: TFunction; isConnected: boolean };
+type Context = { t: TFunction };
 
-const dRepPath = (view: string, isConnected: boolean) =>
-  (isConnected ? PATHS.dashboardDRepDirectoryDRep : PATHS.dRepDirectoryDRep).replace(
-    ":dRepId",
-    view,
-  );
+const dRepPath = (view: string) =>
+  PATHS.dRepDirectoryDRep.replace(":dRepId", view);
 
 const STATUS_TONES: Record<string, ResultBadge["tone"]> = {
   Active: "primary",
@@ -58,7 +55,7 @@ const OutcomeTitle = ({ record }: { record: GovernanceActionRecord }) => {
   return <>{record.title ?? metadata?.data?.title ?? getProposalTypeLabel(record.type)}</>;
 };
 
-const action = (proposal: ProposalData, { t, isConnected }: Context): SearchResult => {
+const action = (proposal: ProposalData, { t }: Context): SearchResult => {
   const id = getFullGovActionId(proposal.txHash, proposal.index);
   const cip129 = getGovernanceActionCIP129Id({ tx_hash: proposal.txHash, index: proposal.index });
   return {
@@ -72,13 +69,13 @@ const action = (proposal: ProposalData, { t, isConnected }: Context): SearchResu
     badge: { label: t("globalSearch.action.badge"), tone: "primary" },
     target: {
       kind: "navigate",
-      path: `${isConnected ? PATHS.dashboardGovernanceActions : PATHS.governanceActions}/${id}`,
+      path: getGovActionPath(proposal.txHash, proposal.index),
       state: { proposal },
     },
   };
 };
 
-const dRep = (item: DRepData, { t, isConnected }: Context): SearchResult => ({
+const dRep = (item: DRepData, { t }: Context): SearchResult => ({
   key: `dreps-${item.view}`,
   category: "dreps",
   title: item.givenName || shortId(item.view),
@@ -88,7 +85,7 @@ const dRep = (item: DRepData, { t, isConnected }: Context): SearchResult => ({
     t("globalSearch.votingPower", { amount: correctAdaFormatWithSuffix(item.votingPower) }),
   ].join(" · "),
   badge: { label: item.status, tone: STATUS_TONES[item.status] ?? "neutral" },
-  target: { kind: "navigate", path: dRepPath(item.view, isConnected) },
+  target: { kind: "navigate", path: dRepPath(item.view) },
 });
 
 const proposal = (item: ForumProposal, { t }: Context): SearchResult => {
@@ -150,7 +147,7 @@ const delegationLine = (lookup: StakeAddressLookup, t: TFunction) => {
   return t("globalSearch.address.delegatesTo", { target: shortId(view) });
 };
 
-const address = (lookup: StakeAddressLookup, { t, isConnected }: Context): SearchResult => {
+const address = (lookup: StakeAddressLookup, { t }: Context): SearchResult => {
   const view = lookup.delegation?.dRepView;
   const isDRep =
     !!view &&
@@ -176,17 +173,17 @@ const address = (lookup: StakeAddressLookup, { t, isConnected }: Context): Searc
           ? { label: t("globalSearch.address.registered"), tone: "primary" }
           : { label: t("globalSearch.address.notRegistered"), tone: "neutral" },
     target: isDRep
-      ? { kind: "navigate", path: dRepPath(view as string, isConnected) }
+      ? { kind: "navigate", path: dRepPath(view as string) }
       : { kind: "copy", value: lookup.stakeAddress },
   };
 };
 
-const handle = (item: HandleObject, { t, isConnected }: Context): SearchResult => {
+const handle = (item: HandleObject, { t }: Context): SearchResult => {
   const holderStake =
     stakeAddressOf(item.holder ?? "") ?? stakeAddressOf(item.resolved_addresses?.ada ?? "");
   const drep = item.drep?.cip_129;
   let target: ResultTarget = { kind: "copy", value: `$${item.name}` };
-  if (drep) target = { kind: "navigate", path: dRepPath(drep, isConnected) };
+  if (drep) target = { kind: "navigate", path: dRepPath(drep) };
   else if (holderStake) target = { kind: "search", query: holderStake };
   return {
     key: `handles-${item.name}`,

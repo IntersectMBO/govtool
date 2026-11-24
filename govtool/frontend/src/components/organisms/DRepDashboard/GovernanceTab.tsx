@@ -20,7 +20,7 @@ import {
 import { Button } from "@/components/atoms/Button";
 import { PaginationFooter } from "@/components/molecules/PaginationFooter";
 import { SortSelect } from "@/components/molecules/SortSelect";
-import { GOV_ACTION_HISTORY_PATHS, PATHS } from "@/consts/paths";
+import { PATHS } from "@/consts/paths";
 import { LINKS } from "@/consts/links";
 import { ds, PILL_TONES, RADIUS } from "@/consts/designTokens";
 import { useSnackbar } from "@/context/snackbar";
@@ -34,7 +34,7 @@ import {
 } from "@/hooks/queries/useDRepDashboard";
 import type { GovernanceActionRecord, VotedProposal } from "@/models";
 import { AutomatedVotingOptionCurrentDelegation } from "@/types/automatedVotingOptions";
-import { getFullGovActionId } from "@/utils/getGovActionId";
+import { getFullGovActionId, getGovActionHistoryPath } from "@/utils/getGovActionId";
 import { getProposalTypeLabel } from "@/utils/getProposalTypeLabel";
 import { openInNewTab } from "@/utils/openInNewTab";
 import {
@@ -330,7 +330,7 @@ const MyVotes = ({ data }: { data: DashboardData }) => {
                 return (
                   <tr key={id} data-testid="drep-vote-row">
                     <Box component="td" sx={{ ...td, maxWidth: 420 }}>
-                      <Box component={RouterLink} sx={{ borderBottom: `1px dashed ${ds.gray["400"]}`, color: ds.gray["900"], display: "inline-block", fontWeight: 500, maxWidth: "100%", overflow: "hidden", textDecoration: "none", textOverflow: "ellipsis", verticalAlign: "bottom", whiteSpace: "nowrap", "&:hover": { color: ds.primary["600"] } }} to={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${id}`}>
+                      <Box component={RouterLink} sx={{ borderBottom: `1px dashed ${ds.gray["400"]}`, color: ds.gray["900"], display: "inline-block", fontWeight: 500, maxWidth: "100%", overflow: "hidden", textDecoration: "none", textOverflow: "ellipsis", verticalAlign: "bottom", whiteSpace: "nowrap", "&:hover": { color: ds.primary["600"] } }} to={getGovActionHistoryPath(row.proposal.txHash, row.proposal.index)}>
                         {row.proposal.title || t("govActions.card.untitled")}
                       </Box>
                       <Box sx={{ color: ds.gray["600"], fontSize: 13 }}>
@@ -454,7 +454,7 @@ const SubmittedProposals = ({ data }: { data: DashboardData }) => {
                     <Box component="td" sx={td}><TypeChip type={record.type} /></Box>
                     <Box component="td" sx={td}><OutcomePill outcome={actionOutcome(record)} /></Box>
                     <Box component="td" sx={{ ...td, textAlign: "right" }}>
-                      <Box component={RouterLink} sx={{ color: ds.primary["600"], fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }} to={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/${id}`}>
+                      <Box component={RouterLink} sx={{ color: ds.primary["600"], fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }} to={getGovActionHistoryPath(record.tx_hash, record.index)}>
                         {t("drepDashboard.governance.proposals.view")} →
                       </Box>
                     </Box>
@@ -611,7 +611,7 @@ const MyDelegations = ({ data }: { data: DashboardData }) => {
       <EmptyState
         actions={(
           <>
-            <Button component={RouterLink} size="medium" to={PATHS.dashboardDRepDirectory}>{t("drepDashboard.governance.delegations.find")}</Button>
+            <Button component={RouterLink} size="medium" to={PATHS.dRepDirectory}>{t("drepDashboard.governance.delegations.find")}</Button>
             <Button component={RouterLink} size="medium" to={PATHS.registerAsDirectVoter} variant="outlined">{t("drepDashboard.governance.delegations.direct")}</Button>
           </>
         )}
@@ -647,7 +647,7 @@ const MyDelegations = ({ data }: { data: DashboardData }) => {
               <Box component="td" sx={{ ...td, color: ds.gray["600"] }}>{row.date ? formatShortDate(row.date) : "–"}</Box>
               <Box component="td" sx={{ ...td, textAlign: "right" }}>
                 {row.type === "drep" && row.dRepId && (
-                  <Box component={RouterLink} sx={{ color: ds.primary["600"], fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }} to={PATHS.dashboardDRepDirectoryDRep.replace(":dRepId", encodeURIComponent(row.dRepId))}>
+                  <Box component={RouterLink} sx={{ color: ds.primary["600"], fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }} to={PATHS.dRepDirectoryDRep.replace(":dRepId", encodeURIComponent(row.dRepId))}>
                     {t("drepDashboard.governance.delegations.viewProfile")} →
                   </Box>
                 )}

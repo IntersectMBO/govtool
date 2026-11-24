@@ -193,7 +193,7 @@ describe('SingleGovernanceAction', () => {
             fireEvent.click(screen.getByTestId('copy-link'));
         });
         expect(writeText).toHaveBeenCalledWith(
-            `${window.location.origin}/proposal_discussion/7`
+            `${window.location.origin}/proposals/7`
         );
         expect(screen.getByTestId('copy-link-text')).toHaveTextContent(
             'Link copied'

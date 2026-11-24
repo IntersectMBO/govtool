@@ -14,6 +14,7 @@ import type {
 import { getGovernanceActionRecord } from "@services";
 import {
   correctAdaFormatWithSuffix,
+  getGovActionPath,
   getProposalTypeLabel,
   toGovernanceActionId,
 } from "@utils";
@@ -88,7 +89,7 @@ const PulseRow = ({
         </Box>
         <Box
           component="button"
-          onClick={() => navigate(PATHS.governanceActionsAction.replace(":proposalId", proposal.id))}
+          onClick={() => navigate(getGovActionPath(proposal.txHash, proposal.index))}
           type="button"
           sx={{ background: "none", border: "none", color: ds.gray["900"], cursor: "pointer", display: "block", fontFamily: "inherit", fontSize: 16, fontWeight: 600, letterSpacing: "-0.18px", lineHeight: "24px", mt: 1, p: 0, textAlign: "left", "&:hover": { color: ds.primary["600"] } }}
         >

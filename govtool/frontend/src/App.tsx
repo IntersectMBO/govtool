@@ -1,5 +1,11 @@
-import { useCallback, useEffect } from "react";
-import { Route, Routes, useNavigate, useLocation } from "react-router";
+import { useCallback, useEffect, useReducer } from "react";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+} from "react-router";
 
 import { Modal, ScrollToTop } from "@atoms";
 import {
@@ -10,23 +16,18 @@ import {
   BUDGET_DISCUSSION_PATHS,
 } from "@consts";
 import { useCardano, useFeatureFlag, useModal } from "@context";
-import { useWalletConnectionListener } from "@hooks";
-import {
-  DashboardGovernanceActions,
-  DashboardGovernanceActionDetails,
-} from "@organisms";
+import { useIsWalletConnected, useWalletConnectionListener } from "@hooks";
+import { DashboardGovernanceActionDetails } from "@organisms";
 import {
   ChooseStakeKey,
   CreateGovernanceAction,
   Dashboard,
-  DashboardGovernanceActionsCategory,
   DRepDetails,
   DRepDirectory,
   DRepDirectoryContent,
   ErrorPage,
   GovernanceActionDetails,
-  GovernanceActions,
-  GovernanceActionsCategory,
+  GovernanceActionsIndex,
   GovernanceActivity,
   Home,
   NotificationPreferencesPage,
@@ -45,19 +46,27 @@ import {
   getItemFromLocalStorage,
   WALLET_LS_KEY,
   removeItemFromLocalStorage,
-  getPageTitle
+  getCurrentUrl,
+  getPageTitle,
+  isWalletOnlyPath,
 } from "@utils";
-import { PublicRoute } from "./pages/PublicRoute";
 import { TopBanners } from "./components/organisms/TopBanners";
 import { DashboardHome } from "./pages/DashboardHome";
 import { GovernanceActionHistoryPage } from "./pages/GovernanceActionHistory";
 
 export default () => {
   const { isProposalDiscussionForumEnabled } = useFeatureFlag();
-  const { enable, isEnabled } = useCardano();
+  const { enable } = useCardano();
+  // A saved wallet counts while it reconnects, so a reload does not flash
+  // the public layout before the dashboard.
+  const isWalletConnected = useIsWalletConnected();
+  // Re-renders once a saved wallet is dropped, as that changes no state.
+  const [, rerender] = useReducer((count: number) => count + 1, 0);
   const navigate = useNavigate();
   const { modal, openModal, modals } = useModal();
-  const { pathname } = useLocation();
+  const { pathname, search, hash, state } = useLocation();
+  // Links from before the URLs named resources are sent to the current one.
+  const currentUrl = getCurrentUrl({ pathname, search, hash });
 
   useWalletConnectionListener();
 
@@ -66,8 +75,8 @@ export default () => {
   }, []);
 
   useEffect(() => {
-    document.title = getPageTitle(pathname);
-  }, [pathname]);
+    document.title = getPageTitle(pathname, search);
+  }, [pathname, search]);
 
   const checkTheWalletIsActive = useCallback(() => {
     const isWalletAvailable = () =>
@@ -76,6 +85,7 @@ export default () => {
     const cleanUpWalletData = () => {
       removeItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
       removeItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`);
+      rerender();
     };
 
     const waitForWalletExtension = async () => {
@@ -94,21 +104,11 @@ export default () => {
         });
       }
 
-      if (!isOnAllowedPage) {
+      if (isWalletOnlyPath(window.location.pathname)) {
         navigate(PATHS.home);
       }
       cleanUpWalletData();
     };
-
-    const isOnAllowedPage = [
-      PATHS.home,
-      PATHS.governanceActions,
-      PATHS.governanceActionsAction,
-      PATHS.governanceActivity,
-    ]
-        .includes(window.location.pathname) ||
-      pathname === GOV_ACTION_HISTORY_PATHS.governanceActionHistory ||
-      pathname.startsWith(`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/`);
 
     const walletName = getItemFromLocalStorage(`${WALLET_LS_KEY}_name`);
 
@@ -125,126 +125,105 @@ export default () => {
     checkTheWalletIsActive();
   }, [checkTheWalletIsActive]);
 
+  // Pages with both layouts; the rest need a wallet or have no dashboard.
+  const walletOptionalRoutes = (
+    <>
+      {isProposalDiscussionForumEnabled && (
+        <Route
+          path={`${PDF_PATHS.proposalDiscussion}/*`}
+          element={<ProposalDiscussionPillar />}
+        />
+      )}
+      <Route
+        path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
+        element={<BudgetProposalsArchive />}
+      />
+      <Route
+        path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
+        element={<GovernanceActionHistoryPage />}
+      />
+      <Route
+        path={USER_PATHS.governanceActionsVotedByMe}
+        element={<GovernanceActionHistoryPage />}
+      />
+      <Route
+        path={PATHS.governanceActions}
+        element={<GovernanceActionsIndex isConnected={isWalletConnected} />}
+      />
+      <Route
+        path={PATHS.governanceActionsAction}
+        element={
+          isWalletConnected ? (
+            <DashboardGovernanceActionDetails />
+          ) : (
+            <GovernanceActionDetails />
+          )
+        }
+      />
+      <Route element={<DRepDirectory isConnected={isWalletConnected} />}>
+        <Route
+          path={PATHS.dRepDirectory}
+          element={<DRepDirectoryContent isConnected={isWalletConnected} />}
+        />
+        <Route
+          path={PATHS.dRepDirectoryDRep}
+          element={<DRepDetails isConnected={isWalletConnected} />}
+        />
+      </Route>
+    </>
+  );
+
   return (
     <TopBanners>
       <ScrollToTop />
-      <Routes>
-        <Route path={PATHS.home} element={<Home />} />
-        <Route path={PATHS.governanceActions} element={<GovernanceActions />} />
-        <Route
-          path={PATHS.governanceActionsCategory}
-          element={<GovernanceActionsCategory />}
-        />
-        <Route
-          path={PATHS.governanceActionsAction}
-          element={<GovernanceActionDetails />}
-        />
-        <Route
-          path={PATHS.governanceActivity}
-          element={<GovernanceActivity />}
-        />
-        {isProposalDiscussionForumEnabled && !isEnabled && (
+      {currentUrl ? (
+        <Navigate to={currentUrl} replace state={state} />
+      ) : (
+        <Routes>
+          <Route path={PATHS.home} element={<Home />} />
+          {/* One public page for everyone, with or without a wallet. */}
           <Route
-            path={`${PDF_PATHS.proposalDiscussion}/*`}
-            element={<ProposalDiscussionPillar />}
+            path={PATHS.governanceActivity}
+            element={<GovernanceActivity />}
           />
-        )}
-        {!isEnabled && (
-          <>
+          {/* One URL per page: the wallet picks the dashboard or the public
+          layout of the same routes. */}
+          <Route element={<Dashboard />}>
+            <Route path={PATHS.dashboard} element={<DashboardHome />} />
             <Route
-              path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
-              element={<BudgetProposalsArchive />}
+              path={PATHS.notifications}
+              element={<NotificationsPage />}
             />
             <Route
-              path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
-              element={<GovernanceActionHistoryPage />}
+              path={PATHS.notificationPreferences}
+              element={<NotificationPreferencesPage />}
             />
-            <Route
-              path={USER_PATHS.governanceActionsVotedByMe}
-              element={<GovernanceActionHistoryPage />}
-            />
-          </>
-        )}
-        <Route element={<Dashboard />}>
-          <Route path={PATHS.dashboard} element={<DashboardHome />} />
-          <Route path={PATHS.notifications} element={<NotificationsPage />} />
-          <Route
-            path={PATHS.notificationPreferences}
-            element={<NotificationPreferencesPage />}
-          />
-          {isProposalDiscussionForumEnabled && (
-            <Route
-              path={`${PDF_PATHS.proposalDiscussion}/*`}
-              element={<ProposalDiscussionPillar />}
-            />
-          )}
-          <Route
-            path={`${BUDGET_DISCUSSION_PATHS.budgetDiscussion}/*`}
-            element={<BudgetProposalsArchive />}
-          />
-          <Route
-            path={`${GOV_ACTION_HISTORY_PATHS.governanceActionHistory}/*`}
-            element={<GovernanceActionHistoryPage />}
-          />
-          <Route
-            path={USER_PATHS.governanceActionsVotedByMe}
-            element={<GovernanceActionHistoryPage />}
-          />
-          <Route
-            path={PATHS.dashboardGovernanceActions}
-            element={<DashboardGovernanceActions />}
-          />
-          <Route
-            path={PATHS.dashboardGovernanceActionsAction}
-            element={<DashboardGovernanceActionDetails />}
-          />
-          <Route
-            path={PATHS.dashboardGovernanceActionsCategory}
-            element={<DashboardGovernanceActionsCategory />}
-          />
-          <Route element={<DRepDirectory />}>
-            <Route
-              path={PATHS.dashboardDRepDirectory}
-              element={<DRepDirectoryContent isConnected />}
-            />
-            <Route
-              path={PATHS.dashboardDRepDirectoryDRep}
-              element={<DRepDetails isConnected />}
-            />
+            {isWalletConnected && walletOptionalRoutes}
           </Route>
-        </Route>
-        <Route
-          element={
-            <PublicRoute>
-              <DRepDirectory />
-            </PublicRoute>
-          }
-        >
+          {!isWalletConnected && walletOptionalRoutes}
           <Route
-            path={PATHS.dRepDirectory}
-            element={<DRepDirectoryContent />}
+            path={PATHS.createGovernanceAction}
+            element={<CreateGovernanceAction />}
           />
-          <Route path={PATHS.dRepDirectoryDRep} element={<DRepDetails />} />
-        </Route>
-        <Route
-          path={PATHS.createGovernanceAction}
-          element={<CreateGovernanceAction />}
-        />
-        <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
-        <Route path={PATHS.retireAsDrep} element={<RetireAsDrep />} />
-        <Route
-          path={PATHS.registerAsDirectVoter}
-          element={<RegisterAsDirectVoter />}
-        />
-        <Route
-          path={PATHS.retireAsDirectVoter}
-          element={<RetireAsDirectVoter />}
-        />
-        <Route path={PATHS.stakeKeys} element={<ChooseStakeKey />} />
-        <Route path={PATHS.editDrepMetadata} element={<EditDRepMetadata />} />
-        <Route path="*" element={<ErrorPage />} />
-        <Route path={PATHS.error} element={<ErrorPage />} />
-      </Routes>
+          <Route path={PATHS.registerAsdRep} element={<RegisterAsdRep />} />
+          <Route path={PATHS.retireAsDrep} element={<RetireAsDrep />} />
+          <Route
+            path={PATHS.registerAsDirectVoter}
+            element={<RegisterAsDirectVoter />}
+          />
+          <Route
+            path={PATHS.retireAsDirectVoter}
+            element={<RetireAsDirectVoter />}
+          />
+          <Route path={PATHS.stakeKeys} element={<ChooseStakeKey />} />
+          <Route
+            path={PATHS.editDrepMetadata}
+            element={<EditDRepMetadata />}
+          />
+          <Route path="*" element={<ErrorPage />} />
+          <Route path={PATHS.error} element={<ErrorPage />} />
+        </Routes>
+      )}
       {modals[modal.type]?.component && (
         <Modal
           open={Boolean(modals[modal.type].component)}

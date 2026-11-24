@@ -1,6 +1,5 @@
-import { PATHS } from "@consts";
 import { useAppContext } from "@context";
-import { getFullGovActionId } from "@utils";
+import { getFullGovActionId, getGovActionPath } from "@utils";
 import { GovernanceActionCard } from "./GovernanceActionCard";
 import {
   MetadataIssue,
@@ -36,10 +35,7 @@ export const GovernanceVotedOnCard = ({
       link={{
         dataTestId: `govaction-${govActionId}-change-your-vote`,
         state: { proposal, vote },
-        to: PATHS.dashboardGovernanceActionsAction.replace(
-          ":proposalId",
-          govActionId,
-        ),
+        to: getGovActionPath(proposal.txHash, proposal.index),
       }}
       metadataIssues={metadataIssues}
       metadataStatus={metadataStatus}

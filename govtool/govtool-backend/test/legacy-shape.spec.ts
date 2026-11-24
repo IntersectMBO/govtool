@@ -1005,6 +1005,8 @@ describe('GET /drep/list', () => {
       type: 'DRep',
       latestTxHash: 'c'.repeat(64),
       latestRegistrationDate: '2026-01-01T00:00:00.000Z',
+      // Optional on the provider; null where it supplies none.
+      delegatorCount: null,
       // Every field below is metadata-derived, and chain data carries none.
       metadataError: null,
       doNotList: false,
@@ -1020,6 +1022,20 @@ describe('GET /drep/list', () => {
       identityReferences: [],
       linkReferences: [],
     });
+  });
+
+  it("carries the provider's delegator count, zero included", async () => {
+    for (const delegatorCount of [920, 0]) {
+      const service = drepService({
+        governance: {
+          dreps: {
+            list: () => Promise.resolve(page([fullDRep({ delegatorCount })])),
+          },
+        },
+      });
+      const body = await service.list({ status: [], page: 0, pageSize: 10 });
+      expect(body.elements[0].delegatorCount).toBe(delegatorCount);
+    }
   });
 
   it('dates a row by its newest registration or update, as the Haskell backend did', async () => {

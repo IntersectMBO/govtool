@@ -1,10 +1,8 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
 import { Box } from "@mui/material";
 
 import { Background, PageContainer, ScrollToManage } from "@atoms";
-import { PATHS } from "@consts";
-import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
+import { useDataActionsBar, useFeatureFlag } from "@context";
 import {
   Footer,
   GovernanceActionsHeader,
@@ -12,20 +10,11 @@ import {
   GovernanceActionsToVote,
   TopNav,
 } from "@organisms";
-import { WALLET_LS_KEY, getItemFromLocalStorage } from "@utils";
 
 export const GovernanceActions = () => {
   const { ...dataActionsBarProps } = useDataActionsBar();
   const { chosenSorting, setChosenSorting } = dataActionsBarProps;
   const { governanceActionsSort } = useFeatureFlag();
-  const { isEnabled } = useCardano();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isEnabled && getItemFromLocalStorage(`${WALLET_LS_KEY}_stake_key`)) {
-      navigate(PATHS.dashboardGovernanceActions);
-    }
-  }, [isEnabled]);
 
   // `MostYesVotes` is the key Koios refuses. A selection carried in from an
   // earlier page must not survive into a provider that cannot honour it.

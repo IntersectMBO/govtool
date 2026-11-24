@@ -235,8 +235,8 @@ export const ProfileMenu = () => {
 
   const tab = new URLSearchParams(search).get("tab");
   const onDashboard = pathname === PATHS.dashboard;
-  const votingPath = isDRep ? `${PATHS.dashboard}?tab=governance` : PATHS.dashboardGovernanceActions;
-  const isVotingCurrent = isDRep ? onDashboard && tab === "governance" : pathname === PATHS.dashboardGovernanceActions;
+  const votingPath = isDRep ? `${PATHS.dashboard}?tab=governance` : PATHS.governanceActions;
+  const isVotingCurrent = isDRep ? onDashboard && tab === "governance" : pathname === PATHS.governanceActions;
 
   return (
     <>

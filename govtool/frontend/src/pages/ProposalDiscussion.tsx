@@ -21,7 +21,11 @@ import {
   useProposeHeaderControls,
 } from "@/components/organisms/ProposeHeaderControls";
 import { PDF_PATHS } from "@/consts/paths";
-import { useGetDRepVotingPowerList, useGetVoterInfo } from "@/hooks";
+import {
+  useGetDRepVotingPowerList,
+  useGetVoterInfo,
+  useIsWalletConnected,
+} from "@/hooks";
 import {
   getAdaHolderVotingPower,
   getAccount,
@@ -46,6 +50,8 @@ export const ProposalDiscussionPillar = () => {
   const { username, setUsername } = useProposalDiscussion();
   const snackbarContext = useSnackbar();
   const { pathname } = useLocation();
+  // The layout follows a saved wallet while it reconnects, as App.tsx does.
+  const isConnected = useIsWalletConnected();
   const [forumPropose, setForumPropose] = useState<ForumProposeState | null>(
     null,
   );
@@ -70,12 +76,12 @@ export const ProposalDiscussionPillar = () => {
         display: "flex",
         flexDirection: "column",
         flex: 1,
-        minHeight: !context.isEnabled ? "100vh" : "auto",
+        minHeight: !isConnected ? "100vh" : "auto",
       }}
     >
-      {!context.isEnabled && <TopNav />}
+      {!isConnected && <TopNav />}
       <PageContainer
-        component={context.isEnabled ? "div" : "main"}
+        component={isConnected ? "div" : "main"}
         sx={{ display: "flex", flex: 1, flexDirection: "column" }}
       >
         {isListPage && (
@@ -130,11 +136,11 @@ export const ProposalDiscussionPillar = () => {
           <ProposeActionBanner onPropose={onPropose} />
         )}
       </PageContainer>
-      {!context.isEnabled && <Footer />}
+      {!isConnected && <Footer />}
     </Box>
   );
 
   // Public GovTool pages sit on the orange and blue background; the
   // dashboard layout draws its own.
-  return context.isEnabled ? content : <Background>{content}</Background>;
+  return isConnected ? content : <Background>{content}</Background>;
 };

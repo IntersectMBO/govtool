@@ -64,7 +64,7 @@ const ProposedGovernanceActions = () => {
     }, []);
 
     useEffect(() => {
-        if (location.pathname.includes('propose')) {
+        if (location.pathname.includes('proposals/new')) {
             if (user?.user?.govtool_username) {
                 setShowCreateGADialog(true);
             } else if (user) {

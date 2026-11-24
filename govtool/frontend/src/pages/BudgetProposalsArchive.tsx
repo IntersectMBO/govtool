@@ -1,8 +1,11 @@
 import React, { Suspense } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import { Navigate, Route, Routes, useParams } from "react-router";
-import { useCardano } from "@/context";
-import { useScreenDimension, useTranslation } from "@/hooks";
+import {
+  useIsWalletConnected,
+  useScreenDimension,
+  useTranslation,
+} from "@/hooks";
 import { useGetDRepVotingPowerList } from "@/hooks/queries";
 import { Background, Typography } from "@/components/atoms";
 import { Footer, TopNav } from "@/components/organisms";
@@ -42,13 +45,13 @@ const ArchiveBanner = () => {
 const ArchiveView = (
   props: Omit<BudgetArchiveProps, "fetchDRepVotingPowerList">,
 ) => {
-  const { isEnabled } = useCardano();
+  const isConnected = useIsWalletConnected();
   const { fetchDRepVotingPowerList } = useGetDRepVotingPowerList();
   return (
     <BudgetArchiveApp
       {...props}
       // The dashboard titles the page from the sidebar entry.
-      showTitle={!isEnabled}
+      showTitle={!isConnected}
       fetchDRepVotingPowerList={fetchDRepVotingPowerList}
     />
   );
@@ -70,7 +73,7 @@ const CategoryRoute = () => {
  * is not behind the proposal discussion forum's feature flag.
  */
 export const BudgetProposalsArchive = () => {
-  const { isEnabled } = useCardano();
+  const isConnected = useIsWalletConnected();
   const { pagePadding } = useScreenDimension();
 
   const content = (
@@ -79,15 +82,15 @@ export const BudgetProposalsArchive = () => {
         display: "flex",
         flexDirection: "column",
         flex: 1,
-        minHeight: !isEnabled ? "100vh" : "auto",
+        minHeight: !isConnected ? "100vh" : "auto",
       }}
     >
-      {!isEnabled && <TopNav />}
+      {!isConnected && <TopNav />}
       <ArchiveBanner />
       <Box
-        component={isEnabled ? "div" : "main"}
+        component={isConnected ? "div" : "main"}
         sx={{
-          px: isEnabled ? { xxs: 2, md: 5 } : pagePadding,
+          px: isConnected ? { xxs: 2, md: 5 } : pagePadding,
           py: 3,
           display: "flex",
           flexDirection: "column",
@@ -137,9 +140,9 @@ export const BudgetProposalsArchive = () => {
           </Routes>
         </Suspense>
       </Box>
-      {!isEnabled && <Footer />}
+      {!isConnected && <Footer />}
     </Box>
   );
 
-  return isEnabled ? content : <Background>{content}</Background>;
+  return isConnected ? content : <Background>{content}</Background>;
 };

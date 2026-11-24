@@ -155,7 +155,7 @@ export const DRepCard = ({
     openModal({
       type: "chooseWallet",
       state: {
-        pathToNavigate: PATHS.dashboardDRepDirectoryDRep.replace(
+        pathToNavigate: PATHS.dRepDirectoryDRep.replace(
           ":dRepId",
           view,
         ),
@@ -192,9 +192,7 @@ export const DRepCard = ({
     validate();
   }, [url]);
 
-  const detailsPath = (
-    isConnected ? PATHS.dashboardDRepDirectoryDRep : PATHS.dRepDirectoryDRep
-  ).replace(":dRepId", view);
+  const detailsPath = PATHS.dRepDirectoryDRep.replace(":dRepId", view);
   const name = givenName || `${view.slice(0, 10)}…${view.slice(-6)}`;
   // Text from a document that failed validation is not shown.
   const summary = metadataStatus

@@ -19,4 +19,8 @@ describe("getPageTitle", () => {
   it("still names a governance action's own page", () => {
     expect(getPageTitle("/actions/abc")).toBe("Governance Action Details");
   });
+
+  it("names the Governance Activity page", () => {
+    expect(getPageTitle("/activity")).toBe("Governance Activity");
+  });
 });

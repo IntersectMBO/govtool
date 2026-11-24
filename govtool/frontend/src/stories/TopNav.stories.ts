@@ -1,4 +1,4 @@
-import { expect, userEvent, within, fn } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { TopNav } from "@organisms";
@@ -7,43 +7,31 @@ const meta = {
   title: "Example/TopNav",
   component: TopNav,
   tags: ["autodocs"],
+  // The actions addon would otherwise hand onNavigateAway a spy, which turns
+  // every link into the flow's "leave?" prompt.
+  args: { onNavigateAway: undefined },
 } satisfies Meta<typeof TopNav>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 const performCommonActions = async (canvas: ReturnType<typeof within>) => {
-  window.open = fn();
-
   const logoButton = canvas.getByTestId("logo-button");
   await userEvent.click(logoButton);
 
   const governanceActions = canvas.getByTestId("governance-actions");
+  await expect(governanceActions).not.toHaveAttribute("aria-current");
   await userEvent.click(governanceActions);
-
-  // governance actions link is injected outside the TopNav component, so we use querySelector
-  const governanceActionsLink = document.querySelector(
-    '[data-testid="governance-actions-link"]',
-  );
-  if (!governanceActionsLink)
-    throw new Error("governance-actions-link not found");
-  await expect(governanceActionsLink).not.toHaveClass("active");
-  await userEvent.click(governanceActionsLink);
-  await expect(governanceActions).not.toHaveClass("active");
-  await expect(governanceActionsLink).toHaveClass("active");
+  await expect(governanceActions).toHaveAttribute("aria-current", "page");
 
   const drepDirectoryLink = canvas.getByTestId("drep-directory-link");
-  await expect(drepDirectoryLink).not.toHaveClass("active");
+  await expect(drepDirectoryLink).not.toHaveAttribute("aria-current");
   await userEvent.click(drepDirectoryLink);
-  await expect(drepDirectoryLink).toHaveClass("active");
+  await expect(drepDirectoryLink).toHaveAttribute("aria-current", "page");
 
   const guidesLink = canvas.getByTestId("guides-link");
-  await userEvent.click(guidesLink);
-
-  const faqsLink = canvas.getByTestId("faqs-link");
-  await userEvent.click(faqsLink);
-
-  await expect(window.open).toHaveBeenCalledTimes(2);
+  await expect(guidesLink).toHaveAttribute("target", "_blank");
+  await expect(guidesLink).toHaveAttribute("rel", "noopener noreferrer");
 };
 
 export const TopNavComponent: Story = {

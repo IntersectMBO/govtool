@@ -10,6 +10,8 @@ import {
 
 import { useTranslation, useOnClickOutside } from "@hooks";
 
+import { ds } from "@/consts/designTokens";
+
 interface Props {
   chosenSorting: string;
   setChosenSorting: Dispatch<SetStateAction<string>>;
@@ -37,7 +39,7 @@ export const DataActionsSorting = ({
       flexDirection="column"
       position="absolute"
       sx={{
-        background: "#FBFBFF",
+        background: ds.gray["25"],
         boxShadow: "1px 2px 11px 0px #00123D5E",
         borderRadius: "10px",
         padding: "12px 0px",
@@ -53,7 +55,7 @@ export const DataActionsSorting = ({
     >
       <FormControl>
         <Box display="flex" justifyContent="space-between" px="20px">
-          <Typography sx={{ fontSize: 14, fontWeight: 500, color: "#9792B5" }}>
+          <Typography sx={{ fontSize: 14, fontWeight: 500, color: ds.gray["500"] }}>
             {t("sortBy")}
           </Typography>
           <Box sx={{ cursor: "pointer" }} onClick={() => setChosenSorting("")}>
@@ -77,9 +79,9 @@ export const DataActionsSorting = ({
                   margin: 0,
                   px: "20px",
                   bgcolor:
-                    chosenSorting === item.key ? "#FFF0E7" : "transparent",
+                    chosenSorting === item.key ? ds.orange["50"] : "transparent",
                 },
-                { "&:hover": { bgcolor: "#E6EBF7" } },
+                { "&:hover": { bgcolor: ds.gray["200"] } },
               ]}
               key={item.key}
               value={item.key}

@@ -7,6 +7,7 @@ import { createNewPageWithWallet } from "@helpers/page";
 import { waitForTxConfirmation } from "@helpers/transaction";
 import DRepRegistrationPage from "@pages/dRepRegistrationPage";
 import GovernanceActionsPage from "@pages/governanceActionsPage";
+import LoginPage from "@pages/loginPage";
 import { expect } from "@playwright/test";
 import DRepDirectoryPage from "@pages/dRepDirectoryPage";
 import { GovernanceActionType } from "@types";
@@ -44,7 +45,7 @@ test.describe("Logged in DReps", () => {
   }) => {
     await page.goto("/");
 
-    await expect(page.getByTestId("voting-power-chips")).toBeVisible({
+    await expect(page.getByTestId("drep-dashboard")).toBeVisible({
       timeout: 60_000,
     });
 
@@ -157,7 +158,7 @@ test.describe("Temporary DReps", () => {
     await dRepDirectoryPage.verifyDRepInList(wallet.dRepId);
 
     // disconnected state
-    await dRepPage.getByTestId("disconnect-button").click();
+    await new LoginPage(dRepPage).logout();
     await dRepDirectoryPage.verifyDRepInList(wallet.dRepId);
   });
 
@@ -169,6 +170,8 @@ test.describe("Temporary DReps", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
+    await dRepPage.getByTestId("retirement-ack-voting").check();
+    await dRepPage.getByTestId("retirement-ack-deposit").check();
     await dRepPage.getByTestId("continue-retirement-button").click();
 
     await expect(
@@ -186,6 +189,8 @@ test.describe("Temporary DReps", () => {
 
     await dRepPage.goto("/");
     await dRepPage.getByTestId("retire-button").click();
+    await dRepPage.getByTestId("retirement-ack-voting").check();
+    await dRepPage.getByTestId("retirement-ack-deposit").check();
     await waitForTxConfirmation(dRepPage, async () => {
       await dRepPage.getByTestId("continue-retirement-button").click();
       await expect(
@@ -194,7 +199,7 @@ test.describe("Temporary DReps", () => {
       await dRepPage.getByTestId("confirm-modal-button").click();
     });
 
-    await expect(dRepPage.getByTestId("voting-power-chips")).not.toBeVisible({
+    await expect(dRepPage.getByTestId("retired-drep-dashboard")).toBeVisible({
       timeout: 20_000,
     });
 

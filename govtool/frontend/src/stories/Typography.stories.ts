@@ -83,3 +83,29 @@ export const Caption: Story = {
     variant: "caption",
   },
 };
+
+export const Heading1: Story = { args: { variant: "heading1" } };
+
+export const Heading3: Story = { args: { variant: "heading3" } };
+
+export const Heading4: Story = { args: { variant: "heading4" } };
+
+export const Heading5: Story = { args: { variant: "heading5" } };
+
+export const Heading6: Story = { args: { variant: "heading6" } };
+
+export const ParagraphXL: Story = { args: { variant: "paragraphXL" } };
+
+export const ParagraphLG: Story = { args: { variant: "paragraphLG" } };
+
+export const ParagraphMD: Story = { args: { variant: "paragraphMD" } };
+
+export const ParagraphNormal: Story = { args: { variant: "paragraphNormal" } };
+
+export const ParagraphBase: Story = { args: { variant: "paragraphBase" } };
+
+export const ParagraphSM: Story = { args: { variant: "paragraphSM" } };
+
+export const ParagraphXS: Story = { args: { variant: "paragraphXS" } };
+
+export const Tagline: Story = { args: { variant: "tagline" } };

@@ -3,6 +3,7 @@ import CheckIcon from "@mui/icons-material/Check";
 
 import { Typography } from "@atoms";
 import { useTranslation } from "@hooks";
+import { PILL_TONES, RADIUS } from "@/consts/designTokens";
 
 export const GovernanceActionCardStatePill = ({
   variant = "voteSubmitted",
@@ -10,35 +11,37 @@ export const GovernanceActionCardStatePill = ({
   variant?: "inProgress" | "voteSubmitted";
 }) => {
   const { t } = useTranslation();
+  const tone = PILL_TONES[variant === "inProgress" ? "warning" : "success"];
 
   return (
     <Box
+      data-testid="action-state-pill"
       sx={{
-        // TODO: To decide on final state pill design
         position: "absolute",
-        top: -15,
+        top: -10,
         right: 30,
-        bgcolor: variant === "inProgress" ? "#F8ECD4" : "#E0F2DC",
+        bgcolor: tone.bg,
         border: 1,
-        borderColor: variant === "inProgress" ? "#DEA029" : "#62BC52",
-        px: 2.25,
-        py: 0.5,
-        borderRadius: 100,
+        borderColor: tone.border,
+        px: 1,
+        py: 0.25,
+        borderRadius: `${RADIUS.sm}px`,
       }}
     >
       <Typography
         sx={{
-          color: variant === "inProgress" ? "#DEA029" : "#62BC52",
+          color: tone.text,
           display: "flex",
           alignItems: "center",
           gap: 0.5,
         }}
-        variant="body2"
+        variant="tagline"
+        fontWeight={600}
       >
         {variant === "voteSubmitted" && (
           <CheckIcon
             sx={{
-              fontSize: "17px",
+              fontSize: "14px",
             }}
           />
         )}

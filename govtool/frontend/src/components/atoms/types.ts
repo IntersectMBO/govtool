@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import * as TooltipMUI from "@mui/material/Tooltip";
 
+import type { TypographyVariant } from "@/consts/typography";
+
 export type ButtonProps = Omit<MUIButtonProps, "size"> & {
   isLoading?: boolean;
   size?: "small" | "medium" | "large" | "extraLarge";
@@ -31,17 +33,7 @@ export type TypographyProps = Pick<
   children?: React.ReactNode;
   fontSize?: number;
   fontWeight?: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
-  variant?:
-    | "headline1"
-    | "headline2"
-    | "headline3"
-    | "headline4"
-    | "headline5"
-    | "title1"
-    | "title2"
-    | "body1"
-    | "body2"
-    | "caption";
+  variant?: TypographyVariant;
 };
 
 export type InputProps = InputBaseProps & {

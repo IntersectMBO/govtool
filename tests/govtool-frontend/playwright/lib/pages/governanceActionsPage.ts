@@ -4,6 +4,7 @@ import { GovernanceActionType, IProposal } from "@types";
 import environments from "lib/constants/environments";
 import GovernanceActionDetailsPage from "./governanceActionDetailsPage";
 import { functionWaitedAssert, waitedLoop } from "@helpers/waitedLoop";
+import { isMobile } from "@helpers/mobile";
 
 export default class GovernanceActionsPage {
   readonly filterBtn = this.page.getByTestId("filters-button");
@@ -105,6 +106,14 @@ export default class GovernanceActionsPage {
     return new GovernanceActionDetailsPage(this.page);
   }
 
+  // The type filter is a sidebar beside the list; phones open it with the
+  // Filters button.
+  async openFilters() {
+    if (isMobile(this.page)) {
+      await this.filterBtn.click();
+    }
+  }
+
   async filterProposalByNames(names: string[]) {
     for (const name of names) {
       const sanitizedProposalName = removeAllSpaces(name);
@@ -149,8 +158,13 @@ export default class GovernanceActionsPage {
     });
   }
 
+  // The sort menu closes after each choice, so reopen it when needed.
   async sortProposal(option: string) {
-    await this.page.getByTestId(`${option}-radio`).check();
+    const radio = this.page.getByTestId(`${option}-radio`);
+    if (!(await radio.isVisible())) {
+      await this.sortBtn.click();
+    }
+    await radio.check();
   }
 
   async sortAndValidate(

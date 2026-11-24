@@ -31,9 +31,9 @@ export const DRepDataForm = ({ control, errors, register, watch }: Props) => {
 
   return (
     <div>
-      <Box textAlign="center">
+      <Box>
         <InfoText label={t("dRepData.required")} />
-        <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
+        <Typography component="h1" sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
           {t("dRepData.dRepName")}
         </Typography>
         <Typography fontWeight={400} sx={{ mb: 4 }} variant="body1">
@@ -49,9 +49,9 @@ export const DRepDataForm = ({ control, errors, register, watch }: Props) => {
         rules={Rules.GIVEN_NAME}
       />
       <Spacer y={isMobile ? 5 : 6} />
-      <Box textAlign="center">
+      <Box>
         <InfoText label={t("dRepData.optional")} />
-        <Typography sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
+        <Typography component="h2" sx={{ mt: 0.5, mb: isMobile ? 3 : 4 }} variant="headline4">
           {t("dRepData.aboutYou")}
         </Typography>
       </Box>

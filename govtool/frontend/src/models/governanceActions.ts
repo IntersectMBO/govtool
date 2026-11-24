@@ -62,6 +62,12 @@ export type GovernanceActionRecord = {
   vote_aggregates?: GovernanceActionVoteAggregate[];
   prev_gov_action_index: string | number | null;
   prev_gov_action_tx_hash: string | null;
+  /**
+   * The reward address (bech32) the deposit returns to: the only proposer
+   * identity on chain. Not served yet; a DRep's "My Submitted Proposals"
+   * lists actions whose address is the connected wallet's.
+   */
+  deposit_return_address?: string | null;
 };
 
 /** Values use lovelace, member counts, or 0..1 fractions as declared. */
@@ -126,8 +132,10 @@ export type GovernanceActionProposalDiscussion = {
   id: number | string;
   attributes?: {
     createdAt?: string;
+    prop_comments_number?: number;
     content?: {
       attributes?: {
+        prop_name?: string;
         gov_action_type?: {
           attributes?: { gov_action_type_name?: string };
         };

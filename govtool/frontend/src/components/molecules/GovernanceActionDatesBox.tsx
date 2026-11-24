@@ -10,13 +10,15 @@ import {
   getGovernanceActionProposalStatus,
 } from "@utils";
 
+import { ds } from "@/consts/designTokens";
+
 type GovernanceActionDatesBoxProps = {
   action: GovernanceActionRecord;
   isCard?: boolean;
 };
 
 const InfoIcon = () => (
-  <InfoOutlinedIcon sx={{ fontSize: "19px", color: "#ADAEAD" }} />
+  <InfoOutlinedIcon sx={{ fontSize: "19px", color: ds.gray["400"] }} />
 );
 
 /**

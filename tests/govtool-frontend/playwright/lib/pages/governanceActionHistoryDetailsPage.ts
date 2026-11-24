@@ -109,14 +109,14 @@ export default class GovernanceActionHistoryDetailsPage {
               (scaled(aggregate.yes) * 10000n + denominator / 2n) /
               denominator;
             const yesPercent = Number(hundredths) / 100;
+            // The card shortens the figure (₳ 3.75B); the percentage is exact.
             await expect(
               section.getByTestId(`${title}-yes-votes-submitted`)
-            ).toHaveText(
-              `${format(aggregate.yes)} - ${yesPercent.toFixed(2)}%`
-            );
+            ).toContainText(`${yesPercent.toFixed(2)}%`);
           } else {
             await expect(section.getByRole("progressbar")).toHaveCount(0);
           }
+          // See all data opens a dialog with every figure, exactly.
           await section.getByTestId(`${title}-expand-button`).click();
           for (const [field, suffix] of [
             ["yes", "yes-votes"],
@@ -124,10 +124,11 @@ export default class GovernanceActionHistoryDetailsPage {
             ["notVoted", "not-voted-votes"],
             ["abstain", "abstain-votes"],
           ]) {
-            await expect(section.getByTestId(`${title}-${suffix}`)).toHaveText(
+            await expect(page.getByTestId(`${title}-${suffix}`)).toHaveText(
               format(aggregate[field])
             );
           }
+          await page.getByTestId("outcome-all-data-close").click();
         }
       } finally {
         await page.close();

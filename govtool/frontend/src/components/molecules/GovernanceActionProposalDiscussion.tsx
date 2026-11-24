@@ -7,6 +7,8 @@ import { useTranslation } from "@hooks";
 import { GovernanceActionProposalDiscussion as GovernanceActionProposalDiscussionData } from "@models";
 import { formatGovernanceActionTimestamp } from "@utils";
 
+import { ds } from "@/consts/designTokens";
+
 type GovernanceActionProposalDiscussionProps = {
   proposal?: GovernanceActionProposalDiscussionData | null;
   isLoading: boolean;
@@ -54,7 +56,7 @@ export const GovernanceActionProposalDiscussion = ({
       >
         <Box
           sx={{
-            backgroundColor: "#B8CDFF",
+            backgroundColor: ds.primary["200"],
             borderRadius: "14px",
             px: 1,
             py: 1,

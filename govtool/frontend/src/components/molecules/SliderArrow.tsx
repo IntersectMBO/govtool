@@ -3,6 +3,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import { theme } from "@/theme";
 
+import { ds } from "@/consts/designTokens";
+
 type SliderArrowProps = {
   disabled: boolean;
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -37,7 +39,7 @@ export const SliderArrow = ({ disabled, onClick, left }: SliderArrowProps) => {
       <ChevronRightIcon
         sx={{
           transform: `rotate(${left ? 180 : 0}deg)`,
-          color: disabled ? "#C1BED3" : primaryBlue,
+          color: disabled ? ds.gray["300"] : primaryBlue,
         }}
       />
     </Box>

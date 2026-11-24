@@ -75,18 +75,20 @@ export const GovernanceActionVoting = ({
         width="100%"
         mb={3}
       >
-        <Typography sx={{ fontWeight: 500, fontSize: 14, color: "#506288" }}>
+        <Typography sx={{ fontWeight: 500, fontSize: 13, color: "#475467" }}>
           {t("actionRecord.ratifiedStatus.title")}
         </Typography>
         <GovernanceActionStatusChip label={t(`actionRecord.status.${statusKey}`)} />
       </Box>
       <Typography
+        component="h2"
         sx={{
-          fontSize: 22,
+          color: "#101828",
+          fontSize: 16,
           fontWeight: 600,
           lineHeight: "24px",
           wordBreak: "break-word",
-          mb: 3,
+          mb: 2.5,
         }}
       >
         {t("actionRecord.votes.title")}
@@ -105,7 +107,7 @@ export const GovernanceActionVoting = ({
         </Box>
       ))}
       <Box mb={1}>
-        <Typography sx={{ fontWeight: 600, fontSize: 18, mb: 1.875 }}>
+        <Typography sx={{ color: "#101828", fontWeight: 600, fontSize: 15, mb: 1.5 }}>
           {t("actionRecord.label")}
         </Typography>
         <Box display="flex" justifyContent="space-between" width="100%" gap={1}>

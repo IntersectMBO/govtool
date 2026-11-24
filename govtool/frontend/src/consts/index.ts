@@ -1,5 +1,6 @@
 export * from "./CIP100Context";
 export * from "./colors";
+export * from "./designTokens";
 export * from "./dRepActions";
 export * from "./dRepDirectory";
 export * from "./externalDataModalConfig";
@@ -11,8 +12,8 @@ export * from "./governanceActionHistory";
 export * from "./paths";
 export * from "./placeholders";
 export * from "./queryKeys";
+export * from "./typography";
 
-export const DRAWER_WIDTH = 268;
 export const NETWORK_NAMES = {
   sanchonet: "SanchoNet",
   preview: "Preview",

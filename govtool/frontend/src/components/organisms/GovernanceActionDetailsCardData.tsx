@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { ReactNode, useMemo, useState, useEffect } from "react";
 import { Box, Tabs, Tab, styled, Skeleton, Link } from "@mui/material";
 import { useLocation } from "react-router";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -29,6 +29,7 @@ import {
   mapArrayToObjectByKeys,
   getGovActionCIP129Id,
   validateSignature,
+  formatDisplayDate,
 } from "@utils";
 import { MetadataIssue, MetadataValidationStatus, ProposalData } from "@models";
 import { Trans } from "react-i18next";
@@ -36,6 +37,8 @@ import { errorRed, successGreen } from "@/consts";
 import { GovernanceActionType } from "@/types/governanceAction";
 import { useAppContext } from "@/context";
 import { theme } from "@/theme";
+import { ds, FONT_FAMILY, RADIUS, SHADOWS } from "@/consts/designTokens";
+import { timeLeft } from "@/utils/governanceActionFormat";
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -56,38 +59,50 @@ const StyledTab = styled(({ isMobile, ...props }: StyledTabProps) => (
   <Tab disableRipple {...props} />
 ))(({ isMobile }) => ({
   textTransform: "none",
-  fontWeight: 600,
-  fontSize: 16,
+  fontWeight: 500,
+  fontSize: 14,
+  minHeight: 48,
   width: !isMobile ? "auto" : "50%",
-
-  color: "rgba(36, 34, 50, 0.5)",
+  color: ds.gray["500"],
   "&.Mui-selected": {
-    color: "rgba(38, 37, 45, 1)",
+    color: ds.primary["600"],
+    fontWeight: 600,
   },
 }));
 
 type GovernanceActionDetailsCardDataProps = {
-  isDashboard?: boolean;
   isDataMissing?: MetadataValidationStatus;
   /** Errors are listed with the failure; warnings alone get their own box. */
   metadataIssues?: MetadataIssue[];
-  isOneColumn: boolean;
   isValidating?: boolean;
   /** The action's document is being read for its authors. */
   isDocumentLoading?: boolean;
   /** Called when a retry makes the anchored metadata resolve. */
   onMetadataRecovered?: () => void;
   proposal: ProposalData;
+  /** Which part of the page to render: title block, reasoning column or side card. */
+  section?: "header" | "main" | "side";
+  /** The status pill shown beside the type in the header. */
+  statusPill?: ReactNode;
+};
+
+const detailsCardSx = {
+  backgroundColor: "#FFFFFF",
+  border: `1px solid ${ds.gray["200"]}`,
+  borderRadius: `${RADIUS.lg}px`,
+  boxShadow: SHADOWS.card,
+  minWidth: 0,
+  p: { xxs: 2, md: 2.75 },
 };
 
 export const GovernanceActionDetailsCardData = ({
-  isDashboard,
   isDataMissing,
   metadataIssues,
-  isOneColumn,
   isValidating,
   isDocumentLoading,
   onMetadataRecovered,
+  section = "main",
+  statusPill,
   proposal: {
     abstract,
     authors,
@@ -113,7 +128,6 @@ export const GovernanceActionDetailsCardData = ({
 }: GovernanceActionDetailsCardDataProps) => {
   const { epochParams } = useAppContext();
   const { t } = useTranslation();
-  const { screenWidth } = useScreenDimension();
   const { isMobile } = useScreenDimension();
   const { pathname, hash } = useLocation();
 
@@ -146,9 +160,6 @@ export const GovernanceActionDetailsCardData = ({
       ]),
     [updatableProtocolParams, mappedArraysToObjectsProtocolParams],
   );
-
-  const isModifiedPadding =
-    (isDashboard && screenWidth < 1168) ?? screenWidth < 900;
 
   const [selectedTab, setSelectedTab] = useState<number>(0);
 
@@ -251,98 +262,207 @@ export const GovernanceActionDetailsCardData = ({
     ],
   );
 
-  return (
-    <Box
-      sx={{
-        borderRadius: isOneColumn ? "20px 20px 0 0" : "20px 0 0 20px",
-        bgcolor: "rgba(255, 255, 255, 0.30)",
-        p: `40px ${isModifiedPadding ? "24px" : "40px"}`,
-        overflow: "hidden",
-      }}
-    >
-      <DataMissingHeader
-        isDataMissing={isDataMissing}
-        isValidating={isValidating}
-        title={title}
-        shareLink={govActionLinkToShare}
-      />
-      {/* The action's metadata fails the same whether or not this wallet has
-          voted on it, so neither the box nor the diagnostics hide on a vote. */}
-      <DataMissingInfoBox
-        isDataMissing={isDataMissing}
-        isValidating={isValidating}
-        issues={metadataIssues}
-        reportAction={
-          !!url &&
-          !!metadataHash && (
-            // Anyone may retry a governance action's metadata (D125).
-            <MetadataFailureDetails
-              anchor={{ url, hash: metadataHash }}
-              canRetry
-              onRecovered={onMetadataRecovered}
-            />
-          )
-        }
-      />
-      {!isDataMissing && !isValidating && (
-        <MetadataWarningInfoBox issues={metadataIssues} />
-      )}
-      <GovernanceActionCardElement
-        label={t("govActions.governanceActionType")}
-        text={label}
-        textVariant="pill"
-        dataTestId={`${getProposalTypeNoEmptySpaces(label)}-type`}
-        isValidating={isValidating}
-      />
-      <GovernanceActionsDatesBox
-        createdDate={createdDate}
-        expiryDate={expiryDate}
-        expiryEpochNo={expiryEpochNo}
-        createdEpochNo={createdEpochNo}
-        isValidating={isValidating}
-      />
-      {isDataMissing &&
-        (isValidating ? (
-          <Skeleton height="24px" width="128px" variant="text" />
-        ) : (
-          <ExternalModalButton
-            url={url}
-            label={t("govActions.seeExternalData")}
-          />
-        ))}
-      <GovernanceActionCardElement
-        label={t("govActions.cip129GovernanceActionId")}
-        text={cip129GovernanceActionId}
-        dataTestId={`${cip129GovernanceActionId}-id`}
-        isCopyButton
-        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
-        isValidating={isValidating}
-      />
-      <GovernanceActionCardElement
-        label={t("govActions.governanceActionId")}
-        text={govActionId}
-        isCopyButton
-        dataTestId={`${govActionId}-id`}
-        textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
-        isSemiTransparent
-        isValidating={isValidating}
-      />
+  const left = timeLeft(expiryDate);
 
-      {tabs?.length === 1 ? (
-        tabs[0].content
-      ) : (
-        <>
+  if (section === "header") {
+    return (
+      <Box data-testid="governance-action-details-header" sx={{ display: "flex", flexDirection: "column", gap: 1, minWidth: 0 }}>
+        <Box sx={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 1 }}>
+          {isValidating ? (
+            <Skeleton height="22px" variant="rounded" width="120px" />
+          ) : (
+            <Box
+              component="span"
+              data-testid={`${getProposalTypeNoEmptySpaces(label)}-type`}
+              sx={{ backgroundColor: "#FFFFFF", border: `1px solid ${ds.gray["200"]}`, borderRadius: `${RADIUS.xs}px`, color: ds.gray["900"], fontSize: 12, fontWeight: 500, lineHeight: "18px", px: 0.75 }}
+            >
+              {label}
+            </Box>
+          )}
+          {statusPill}
+        </Box>
+        <DataMissingHeader
+          isDataMissing={isDataMissing}
+          isValidating={isValidating}
+          shareLink={govActionLinkToShare}
+          title={title || t("govActions.card.untitled")}
+          titleStyle={{ ...(!isDataMissing && { color: ds.gray["900"] }), fontSize: { xxs: 26, md: 32 }, letterSpacing: "-0.6px", lineHeight: { xxs: "32px", md: "40px" } }}
+        />
+        <Box sx={{ alignItems: "center", color: ds.gray["600"], display: "flex", flexWrap: "wrap", fontSize: 13, gap: 0.75, lineHeight: "18px", mt: -1.5 }}>
+          {left && (
+            <>
+              <Box component="span" sx={{ color: ds.error["600"], fontFamily: FONT_FAMILY.mono, fontSize: 12, fontWeight: 500, textTransform: "uppercase" }}>
+                {t("govActions.details.votingEndsIn", { time: left })}
+              </Box>
+              <Box aria-hidden component="span">·</Box>
+            </>
+          )}
+          <span>
+            {t("govActions.details.submittedOn", {
+              date: formatDisplayDate(createdDate, "d MMM yyyy"),
+              epoch: createdEpochNo,
+            })}
+          </span>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (section === "side") {
+    return (
+      <Box
+        component="section"
+        data-testid="action-information"
+        sx={{ ...detailsCardSx, display: "flex", flexDirection: "column" }}
+      >
+        <Typography component="h2" sx={{ color: ds.gray["900"], fontSize: 16, fontWeight: 600, lineHeight: "24px", mb: 2 }}>
+          {t("govActions.details.actionInformation")}
+        </Typography>
+        <GovernanceActionCardElement
+          label={t("govActions.cip129GovernanceActionId")}
+          text={cip129GovernanceActionId}
+          dataTestId={`${cip129GovernanceActionId}-id`}
+          isCopyButton
+          isSliderCard
+          isValidating={isValidating}
+        />
+        <GovernanceActionCardElement
+          label={t("govActions.governanceActionId")}
+          text={govActionId}
+          isCopyButton
+          isSliderCard
+          dataTestId={`${govActionId}-id`}
+          isValidating={isValidating}
+        />
+        {/* NewConstitution metadata hash and url is visible in details tab */}
+        {!isValidating && type !== GovernanceActionType.NewConstitution && (
+          <>
+            <GovernanceActionCardElement
+              label={t("govActions.anchorURL")}
+              text={url}
+              dataTestId="anchor-url"
+              isLinkButton
+              isSliderCard
+              isValidating={isValidating}
+            />
+            <GovernanceActionCardElement
+              label={t("govActions.anchorHash")}
+              text={metadataHash}
+              dataTestId="anchor-hash"
+              isCopyButton
+              isSliderCard
+              isValidating={isValidating}
+            />
+          </>
+        )}
+        <GovernanceActionCardElement
+          label={t("govActions.authors.title")}
+          textVariant="longText"
+          dataTestId="authors"
+          isSliderCard
+          isValidating={isValidating || isDocumentLoading}
+        >
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+            {/* With none to list, a document that did not load leaves the
+                authors unknown, which is not the same as a document that
+                lists none. */}
+            {(authors ?? []).length <= 0
+              ? t(
+                  jsonContent == null
+                    ? "govActions.authors.notLoaded"
+                    : "govActions.authors.noDataAvailable",
+                )
+              : (authors ?? []).map((author) => (
+                <Box
+                  key={author.publicKey}
+                  sx={{ display: "flex", gap: 0.5, alignItems: "center" }}
+                >
+                  <AuthorSignatureStatus
+                    signature={author.signature}
+                    publicKey={author.publicKey}
+                    algorithm={author.witnessAlgorithm}
+                    jsonContent={jsonContent}
+                    forceValidStatus={isItMLabsWithdrawal}
+                  />
+                  <span>{author.name}</span>
+                  <Tooltip
+                    heading={`${t("govActions.authors.witnessAlgorithm")}: ${
+                        author.witnessAlgorithm
+                      }`}
+                    paragraphOne={`${t("govActions.authors.publicKey")}: ${
+                        author.publicKey
+                      }`}
+                    paragraphTwo={`${t("govActions.authors.signature")}: ${
+                        author.signature
+                      }`}
+                    placement="bottom-end"
+                    arrow
+                  >
+                    <InfoOutlinedIcon fontSize="small" />
+                  </Tooltip>
+                </Box>
+                ))}
+            {isItMLabsWithdrawal && authors && authors.length > 0 && <AuthorsVerificationInfoBox />}
+          </Box>
+        </GovernanceActionCardElement>
+        <GovernanceActionsDatesBox
+          createdDate={createdDate}
+          expiryDate={expiryDate}
+          expiryEpochNo={expiryEpochNo}
+          createdEpochNo={createdEpochNo}
+          isSliderCard
+          isValidating={isValidating}
+        />
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, minWidth: 0 }}>
+      <Box component="section" data-testid="governance-action-reasoning" sx={{ ...detailsCardSx, overflow: "hidden", p: 0 }}>
+        <Box sx={{ px: { xxs: 2, md: 2.75 }, pt: tabs.length > 1 ? 0 : { xxs: 2, md: 2.75 } }}>
+          {/* The action's metadata fails the same whether or not this wallet has
+              voted on it, so neither the box nor the diagnostics hide on a vote. */}
+          <DataMissingInfoBox
+            isDataMissing={isDataMissing}
+            isValidating={isValidating}
+            issues={metadataIssues}
+            reportAction={
+              !!url &&
+              !!metadataHash && (
+                // Anyone may retry a governance action's metadata (D125).
+                <MetadataFailureDetails
+                  anchor={{ url, hash: metadataHash }}
+                  canRetry
+                  onRecovered={onMetadataRecovered}
+                />
+              )
+            }
+          />
+          {!isDataMissing && !isValidating && (
+            <MetadataWarningInfoBox issues={metadataIssues} />
+          )}
+          {isDataMissing &&
+            (isValidating ? (
+              <Skeleton height="24px" width="128px" variant="text" />
+            ) : (
+              <ExternalModalButton
+                url={url}
+                label={t("govActions.seeExternalData")}
+              />
+            ))}
+        </Box>
+        {tabs.length > 1 && (
           <Tabs
+            aria-label={t("govActions.details.sections")}
+            onChange={handleChange}
             sx={{
-              marginY: 4,
-              display: "flex",
-              fontSize: 16,
-              fontWeight: 500,
+              borderBottom: `1px solid ${ds.gray["200"]}`,
+              minHeight: 48,
+              px: { xxs: 1, md: 1.5 },
+              "& .MuiTabs-indicator": { backgroundColor: ds.primary["600"], height: 2 },
             }}
             value={selectedTab}
-            indicatorColor="secondary"
-            onChange={handleChange}
-            aria-label="basic tabs example"
           >
             {tabs.map((tab) => (
               <StyledTab
@@ -353,101 +473,42 @@ export const GovernanceActionDetailsCardData = ({
               />
             ))}
           </Tabs>
-
-          {tabs.map((tab, tabIndex) => (
-            <CustomTabPanel
-              key={tab.label}
-              value={selectedTab}
-              index={tabIndex}
-            >
-              {tab.content}
-            </CustomTabPanel>
-          ))}
-        </>
-      )}
-      {!isValidating &&
-        details &&
-        type === GovernanceActionType.TreasuryWithdrawals &&
-        Array.isArray(details) &&
-        details.map((withdrawal) => (
-          <GovernanceActionCardTreasuryWithdrawalElement
-            key={withdrawal.receivingAddress}
-            receivingAddress={withdrawal.receivingAddress}
-            amount={withdrawal.amount}
-          />
-        ))}
-      {/* NewConstitution metadata hash and url is visible in details tab */}
-      {!isValidating && type !== GovernanceActionType.NewConstitution && (
-        <>
-          <GovernanceActionCardElement
-            label={t("govActions.anchorURL")}
-            text={url}
-            textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
-            dataTestId="anchor-url"
-            isLinkButton
-            isValidating={isValidating}
-          />
-          <GovernanceActionCardElement
-            label={t("govActions.anchorHash")}
-            text={metadataHash}
-            textVariant={screenWidth > 1600 ? "longText" : "oneLine"}
-            dataTestId="anchor-hash"
-            isCopyButton
-            isValidating={isValidating}
-          />
-        </>
-      )}
-      <GovernanceActionCardElement
-        label={t("govActions.authors.title")}
-        textVariant="longText"
-        dataTestId="authors"
-        isValidating={isValidating || isDocumentLoading}
-      >
-        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-          {/* With none to list, a document that did not load leaves the
-              authors unknown, which is not the same as a document that
-              lists none. */}
-          {(authors ?? []).length <= 0
-            ? t(
-                jsonContent == null
-                  ? "govActions.authors.notLoaded"
-                  : "govActions.authors.noDataAvailable",
-              )
-            : (authors ?? []).map((author) => (
-              <Box
-                key={author.publicKey}
-                sx={{ display: "flex", gap: 0.5, alignItems: "center" }}
+        )}
+        <Box sx={{ p: { xxs: 2, md: 2.75 }, pt: tabs.length > 1 ? { xxs: 2, md: 2.75 } : 0 }}>
+          {tabs.length === 1 && tabs[0].content}
+          {tabs.length > 1 &&
+            tabs.map((tab, tabIndex) => (
+              <CustomTabPanel
+                key={tab.label}
+                value={selectedTab}
+                index={tabIndex}
               >
-                <AuthorSignatureStatus
-                  signature={author.signature}
-                  publicKey={author.publicKey}
-                  algorithm={author.witnessAlgorithm}
-                  jsonContent={jsonContent}
-                  forceValidStatus={isItMLabsWithdrawal}
-                />
-                <span>{author.name}</span>
-                <Tooltip
-                  heading={`${t("govActions.authors.witnessAlgorithm")}: ${
-                      author.witnessAlgorithm
-                    }`}
-                  paragraphOne={`${t("govActions.authors.publicKey")}: ${
-                      author.publicKey
-                    }`}
-                  paragraphTwo={`${t("govActions.authors.signature")}: ${
-                      author.signature
-                    }`}
-                  placement="bottom-end"
-                  arrow
-                >
-                  <InfoOutlinedIcon fontSize="small" />
-                </Tooltip>
-              </Box>
-              ))}
-          {isItMLabsWithdrawal && authors && authors.length > 0 && <AuthorsVerificationInfoBox />}
+                {tab.content}
+              </CustomTabPanel>
+            ))}
+          {!isValidating &&
+            details &&
+            type === GovernanceActionType.TreasuryWithdrawals &&
+            Array.isArray(details) &&
+            details.map((withdrawal) => (
+              <GovernanceActionCardTreasuryWithdrawalElement
+                key={withdrawal.receivingAddress}
+                receivingAddress={withdrawal.receivingAddress}
+                amount={withdrawal.amount}
+              />
+            ))}
+          {!tabs.length && !isDataMissing && !isValidating && (
+            <Typography sx={{ color: ds.gray["500"], fontSize: 14 }}>
+              {t("govActions.details.noReasoning")}
+            </Typography>
+          )}
         </Box>
-      </GovernanceActionCardElement>
-
-      <GovernanceActionDetailsCardLinks links={references} />
+      </Box>
+      {!!references?.length && (
+        <Box component="section" sx={detailsCardSx}>
+          <GovernanceActionDetailsCardLinks links={references} />
+        </Box>
+      )}
     </Box>
   );
 };

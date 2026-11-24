@@ -22,12 +22,12 @@
     "retireAsDrep": {
       "failed": "Retirement transaction failed",
       "warning": "You have successfully retired from being a DRep! Please refresh the page.",
-      "success": "You have successfully retired from being a DRep!"
+      "success": "You have successfully retired as a DRep"
     },
     "retireAsDirectVoter": {
       "failed": "Retirement transaction failed",
       "warning": "You have successfully retired from being a Direct Voter! Please refresh the page.",
-      "success": "You have successfully retired from being a DirectVoter!"
+      "success": "You have successfully retired as a Direct Voter"
     },
     "updateMetaData": {
       "failed": "Update DRep metadata transaction failed",
@@ -39,10 +39,131 @@
     },
     "changesSaved": "Your changes have been saved",
     "copiedToClipboard": "Copied to clipboard",
+    "copyFailed": "Could not copy. Your browser blocked the clipboard.",
     "transactionInProgress": "Transaction in progress. Please wait.",
     "walletConnected": "Wallet connected"
   },
+  "activity": {
+    "title": "Governance Activity",
+    "description": "See how Cardano governance decisions progress, from proposal and voting to ratification and enactment.",
+    "howGovernanceWorks": "How governance works",
+    "updated": "Updated {{ago}} · {{at}}",
+    "justNow": "just now",
+    "overview": {
+      "title": "Governance overview",
+      "description": "A quick view of where attention is needed across Cardano governance.",
+      "viewAll": "View all Governance Actions",
+      "open": "Open Governance Actions",
+      "openDetail": "Open for voting now",
+      "openLink": "View open actions",
+      "deadlines": "Deadlines approaching",
+      "deadlinesDetail": "Within the next 7 days",
+      "deadlinesLink": "Review deadlines",
+      "ratified": "Recently ratified",
+      "ratifiedDetail": "In the past 30 days",
+      "ratifiedLink": "See ratified actions",
+      "enacted": "Recently enacted",
+      "enactedDetail": "Now in effect, past 30 days",
+      "enactedLink": "See enactments",
+      "unknown": "Not available while more than 50 actions are open",
+      "capped": "Not available: there are more decisions in the past 30 days than this page loads"
+    },
+    "timeline": {
+      "eyebrow": "Ecosystem-wide record",
+      "heading": "What’s happening now",
+      "headingDescription": "A chronological view of Governance Actions as they open for voting and are decided. Times are shown in UTC.",
+      "title": "Governance decision timeline",
+      "description": "Actions move through defined stages. Thresholds and constitutional checks determine whether they advance.",
+      "submitted": "Submitted",
+      "voting": "Voting",
+      "ratified": "Ratified",
+      "enacted": "Enacted",
+      "alternate": "If thresholds or checks are not met, an action may be Expired or Rejected."
+    },
+    "feed": {
+      "label": "Recent governance activity",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "loadMore": "Load earlier activity",
+      "empty": "No governance activity to show yet.",
+      "viewAction": "View action",
+      "ago": "{{ago}} · {{time}} UTC",
+      "kinds": {
+        "votingOpened": "Voting opened",
+        "ratified": "Ratified",
+        "enacted": "Enacted",
+        "expired": "Expired"
+      },
+      "details": {
+        "votingOpened": "DReps, SPOs and the Constitutional Committee can now vote on this action.",
+        "ratified": "The action met its voting thresholds and will be enacted at the next epoch boundary.",
+        "enacted": "The approved change is now in effect on the Cardano network.",
+        "expired": "The action closed without being ratified, so it will not take effect."
+      }
+    },
+    "ratified": {
+      "title": "Recently ratified",
+      "description": "Governance Actions that have passed the required voting thresholds and constitutional checks.",
+      "viewAll": "View ratified actions",
+      "label": "Ratified",
+      "enacted": "Enacted",
+      "outcome": "Vote outcome",
+      "yes": "{{role}} {{value}} Yes",
+      "roles": {
+        "drep": "DReps",
+        "spo": "SPOs",
+        "cc": "CC"
+      },
+      "viewAction": "View action"
+    },
+    "active": {
+      "eyebrow": "Decisions in progress",
+      "title": "Active Governance Actions",
+      "description": "Search and filter actions currently open for voting. Deadlines are shown in UTC.",
+      "explore": "Explore all actions",
+      "search": "Search title or Governance Action ID",
+      "all": "All",
+      "filtersLabel": "Filter by action type",
+      "count_one": "{{count}} active action",
+      "count_other": "{{count}} active actions",
+      "sortSoonest": "Deadline soonest",
+      "sortNewest": "Newest",
+      "voting": "Voting",
+      "submitted": "Submitted",
+      "deadline": "Voting deadline",
+      "daysLeft_one": "{{count}} day left",
+      "daysLeft_other": "{{count}} days left",
+      "lessThanDay": "Less than a day left",
+      "details": "Details",
+      "showing": "Showing {{from}}–{{to}} of {{total}}",
+      "previous": "Previous",
+      "next": "Next",
+      "empty": "No active Governance Actions match your search.",
+      "searchNotReady": "Search is not available yet. Try again in a moment."
+    }
+  },
   "dashboard": {
+    "currentEpoch": "Current epoch: {{epoch}}",
+    "role": {
+      "dRep": "DRep",
+      "directVoter": "Direct voter",
+      "notRegistered": "Not registered"
+    },
+    "wallet": {
+      "abstain": "Abstain from every vote",
+      "change": "Change",
+      "copyStakeKey": "Copy stake key {{key}}",
+      "delegateNow": "Delegate now",
+      "delegation": "Delegation",
+      "noConfidence": "No confidence on every vote",
+      "notDelegated": "Not delegated",
+      "title": "Your connected wallet",
+      "votingPower": "Wallet voting power",
+      "walletName": "{{name}} Wallet",
+      "yourself": "Yourself"
+    },
+    "welcome": "Welcome back",
+    "welcomeName": "Welcome back, {{name}}",
     "headingOne": "Your Participation",
     "headingTwo": "See Active Governance Actions",
     "title": "Home",
@@ -300,7 +421,114 @@
       "title": "Delegate to myself"
     }
   },
+  "delegationReview": {
+    "adaTransferred": "ADA transferred",
+    "back": "Back",
+    "checkExplorer": "Check the transaction in an explorer ↗",
+    "confirmedSubtitle": "Cardano has confirmed {{name}} as your DRep. Your ADA remains in your wallet.",
+    "confirmedTitle": "Voting delegation confirmed",
+    "continue": "Continue to wallet",
+    "copyTransactionId": "Copy transaction ID",
+    "destination": "Destination",
+    "directVoterNote": "You are registered as a direct voter. Delegating also retires that registration and returns its deposit.",
+    "dRepId": "DRep ID",
+    "hide": "Close",
+    "keyDeposit": "₳ {{amount}} stake key deposit (refundable)",
+    "none": "None",
+    "notConfirmedSubtitle": "GovTool stopped waiting before Cardano confirmed this delegation. If the transaction did not go through, your delegation is unchanged and you can try again.",
+    "notConfirmedTitle": "We could not confirm your delegation",
+    "note": "This delegation applies to all voting power associated with the selected stake credential. Only voting rights are delegated; your ADA stays in your wallet.",
+    "progress": {
+      "confirming": "Waiting for on-chain confirmation",
+      "signed": "Wallet signed",
+      "submitted": "Transaction submitted",
+      "title": "Progress"
+    },
+    "signingSubtitle": "Confirm the delegation in your wallet. The fee is shown there.",
+    "signingTitle": "Waiting for your wallet",
+    "subtitle": "Check these details before requesting your wallet signature.",
+    "summary": "Delegation summary",
+    "takingLongerSubtitle": "We have not received definitive confirmation or failure. A delay does not mean the transaction failed.",
+    "takingLongerTitle": "Taking longer than usual",
+    "title": "Review voting delegation",
+    "transactionId": "Transaction ID",
+    "viewDRep": "View your DRep",
+    "votingPower": "Voting power",
+    "waitingSubtitle": "Your signed delegation transaction has been submitted. We are checking for confirmation on Cardano.",
+    "waitingTitle": "Waiting for Cardano",
+    "wallet": "{{name}} wallet",
+    "walletHint": "Your wallet shows the transaction and its fee before you sign."
+  },
+  "dRepProfile": {
+    "about": "About {{name}}",
+    "activity": {
+      "action": "Governance action",
+      "empty": "This DRep has not voted yet.",
+      "error": "Votes could not be loaded right now.",
+      "subtitle": "The governance actions this DRep voted on, newest first.",
+      "title": "Activity",
+      "type": "Type",
+      "vote": "Vote",
+      "votedOnEpoch": "Voted on Epoch {{epoch}}"
+    },
+    "delegate": "Delegate voting power",
+    "delegatedAmountTo": "You have delegated ₳ {{ada}} to {{name}}.",
+    "delegatedTo": "Your voting power is currently delegated to {{name}}.",
+    "delegationInProgress": "Your delegation to {{name}} is being confirmed on Cardano.",
+    "delegationNote": "Delegating moves voting rights only; your ADA stays in your wallet.",
+    "howDelegationWorks": "How delegation works",
+    "howDelegationWorksBody": "Your DRep votes on governance actions on your behalf. You keep control of your wallet and can choose another DRep later.",
+    "identity": "Identity",
+    "keyBased": "Key based",
+    "readGuide": "Read the delegation guide ↗",
+    "registeredOn": "Registered {{date}}",
+    "scriptBased": "Script based",
+    "trend": {
+      "dayTooltip": "{{total}} votes · Yes {{yes}} · No {{no}} · Abstain {{abstain}}",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "empty_one": "No votes in the last day.",
+      "empty_other": "No votes in the last {{count}} days.",
+      "range": "Time range",
+      "subtitle_one": "Votes cast in the last day",
+      "subtitle_other": "Votes cast across the last {{count}} days",
+      "title": "Daily voting trend",
+      "total": "Total votes"
+    },
+    "type": "Credential",
+    "votesCast": "Votes cast"
+  },
   "dRepDirectory": {
+    "activeFilters": "Active filters:",
+    "becomeADRep": "Become a DRep",
+    "card": {
+      "copyId": "Copy DRep ID",
+      "copyLegacyId": "Copy Legacy DRep ID (CIP-105)",
+      "delegateVotingPower": "Delegate Voting Power",
+      "delegators": "Delegators",
+      "moreActions": "More actions",
+      "moreActionsFor": "More actions for {{name}}",
+      "noSummary": "This DRep has not published a profile summary.",
+      "participation": "Participation",
+      "registered": "Registered",
+      "viewProfile": "View Profile",
+      "viewVotingHistory": "View Voting History",
+      "yourDRep": "Your DRep"
+    },
+    "clearAll": "Clear all",
+    "delegationInProgress": "Delegation in progress",
+    "empty": {
+      "browseAll": "Browse all DReps",
+      "clearSearch": "Clear search",
+      "noMatchAfter": ". Try adjusting your search terms or removing some filters.",
+      "noMatchBefore": "We couldn't find any representatives matching "
+    },
+    "pageTitle": "Find your Delegate Representatives",
+    "pageDescription": "Find your designated Representative and explore their role, responsibilities, and representation of your constituency.",
+    "removeFilter": "Remove filter {{name}}",
+    "sortLabel": "Sort by:",
+    "statusAll": "All",
+    "statusLabel": "Status:",
     "abstainCardDefaultDescription": "Select this to vote ABSTAIN to every vote.",
     "abstainCardDefaultTitle": "Abstain from Every Vote",
     "automatedVotingOptions": "Automated Voting Options",
@@ -377,11 +605,25 @@
       "title": {}
     }
   },
+  "flow": {
+    "progress": "{{title}}, step {{step}} of {{count}}",
+    "stepOf": "Step {{step}} of {{count}}",
+    "steps": {
+      "details": "Details",
+      "prepareFile": "Prepare file",
+      "profile": "Profile",
+      "publish": "Publish",
+      "review": "Review",
+      "type": "Type",
+      "understand": "Understand"
+    }
+  },
   "footer": {
     "copyright": "© {{year}} GovTool",
     "privacyPolicy": "Privacy policy",
     "termOfService": "Terms of Use",
-    "subscribe": "Subscribe to updates"
+    "tagline": "A clearer connection to Cardano governance.",
+    "intersect": "Intersect ↗"
   },
   "forms": {
     "link": "Link",
@@ -566,7 +808,94 @@
       "proposedOn": "Proposed on:"
     }
   },
+  "globalSearch": {
+    "button": "Global Search",
+    "title": "Find anything in GovTool",
+    "description": "Search governance actions, DReps, proposals, outcomes, addresses or handles.",
+    "placeholder": "Search governance actions, DReps, addresses, handles…",
+    "inputLabel": "Search GovTool",
+    "clear": "Clear search",
+    "close": "Close search",
+    "recent": "Recent searches",
+    "clearAll": "Clear all",
+    "kinds": {
+      "keyword": "Keyword",
+      "handle": "Handle",
+      "address": "Address"
+    },
+    "browse": "Browse by type",
+    "browseHint": "Try a name, $handle, governance action ID, keyword or a pasted Cardano address.",
+    "addressHint": "Paste a full stake1… or addr1… address.",
+    "handleHint": "Type one word to look up a handle, like $intersect.",
+    "categoriesLabel": "Result types",
+    "categories": {
+      "actions": "Governance Actions",
+      "dreps": "DReps",
+      "proposals": "Proposals",
+      "outcomes": "Outcomes",
+      "addresses": "Addresses",
+      "handles": "Handles"
+    },
+    "loading": "Searching across {{count}} categories for “{{query}}”…",
+    "loadingRight": "Loading results",
+    "loadMore": "Load more",
+    "matches_one": "{{count}} match",
+    "matches_other": "{{count}} matches",
+    "matchesMore": "{{count}}+ matches",
+    "open": "Open",
+    "closeKey": "Close",
+    "noMatchesTitle": "No matches for “{{query}}”",
+    "noMatchesBody": "Check the spelling, try fewer words, or search by a governance action ID, $handle or complete Cardano address.",
+    "modify": "Modify search",
+    "errorTitle": "Search is temporarily unavailable",
+    "errorBody": "We couldn't complete this search. Your query is still here.",
+    "tryAgain": "Try again",
+    "categoryError": "These results could not be loaded.",
+    "notReady": "Search is not ready yet. Try again in a moment.",
+    "noStakePart": "This address has no stake part, so GovTool has nothing to show for it.",
+    "action": {
+      "badge": "Active",
+      "submitted": "Submitted {{date}}"
+    },
+    "votingPower": "₳ {{amount}} voting power",
+    "proposal": {
+      "submitted": "Submitted",
+      "discussion": "In discussion"
+    },
+    "outcome": {
+      "meta": "{{date}} · Epoch {{epoch}}"
+    },
+    "address": {
+      "title": "Stake address",
+      "registered": "Registered",
+      "notRegistered": "Not registered",
+      "delegatesTo": "Delegates to {{target}}",
+      "abstain": "Delegates to Abstain",
+      "noConfidence": "Delegates to No Confidence",
+      "notDelegated": "Not delegated",
+      "copyHint": "Enter copies the address"
+    },
+    "handle": {
+      "drep": "DRep",
+      "wallet": "Wallet",
+      "holder": "Holder: {{address}}",
+      "opensDRep": "Opens the DRep's profile",
+      "looksUp": "Looks up the holder's address"
+    }
+  },
   "governanceActionHistoryList": {
+    "outcome": {
+      "Enacted": "Enacted",
+      "Expired": "Expired",
+      "Live": "Live",
+      "NotRatified": "Not ratified",
+      "Ratified": "Ratified"
+    },
+    "roles": {
+      "cc": "CC",
+      "drep": "DReps",
+      "spo": "SPOs"
+    },
     "title": "Historical Actions",
     "noResults": {
       "title": "No governance actions found",
@@ -592,6 +921,15 @@
         "enacted": "Enacted",
         "ratified": "Ratified",
         "expired": "Expired"
+      },
+      "shortTypes": {
+        "InfoAction": "Info",
+        "TreasuryWithdrawals": "Treasury Withdrawal",
+        "ParameterChange": "Parameter Change",
+        "HardForkInitiation": "Hard Fork",
+        "NewConstitution": "New Constitution",
+        "NewCommittee": "New Committee",
+        "NoConfidence": "No Confidence"
       }
     },
     "sort": {
@@ -610,6 +948,192 @@
           "label": "Highest amount of yes votes",
           "displayLabel": "Yes votes"
         }
+      }
+    }
+  },
+  "listControls": {
+    "sortLabel": "Sort:",
+    "sortDefault": "Default",
+    "filters": "Filters",
+    "allTypes": "All Governance Actions",
+    "allStatuses": "All statuses",
+    "actionType": "Action type",
+    "status": "Status",
+    "searchActions": "Search Governance Actions"
+  },
+  "pagination": {
+    "label": "Pagination",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{count}}",
+    "previous": "Previous",
+    "rowsPerPage": "Rows per page:",
+    "showing": "Showing {{from}}–{{to}} of {{total}} results"
+  },
+  "notifications": {
+    "bell": "Notifications",
+    "bellUnread_one": "Notifications, {{count}} unread",
+    "bellUnread_other": "Notifications, {{count}} unread",
+    "popoverTitle": "Notifications",
+    "unread": "{{count}} unread",
+    "markAllRead": "Mark all as read",
+    "settings": "Notification settings",
+    "viewAll": "View all notifications",
+    "centerTitle": "Notification Center",
+    "centerDescription": "Updates about your delegation, participation and governance activity, newest first.",
+    "localNote": "Worked out in this browser from on-chain data each time you visit. Read status and settings stay in this browser.",
+    "filtersLabel": "Show notifications",
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "governanceActions": "Governance Actions",
+      "delegation": "Delegation",
+      "drep": "DRep",
+      "myActivity": "My activity"
+    },
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "groups": {
+      "today": "Today",
+      "week": "Earlier this week",
+      "older": "Older",
+      "olderDetail": "Before {{date}}"
+    },
+    "unreadChip": "Unread",
+    "markRead": "Mark as read",
+    "markUnread": "Mark as unread",
+    "time": "{{ago}} · {{at}}",
+    "showing": "Showing {{from}}–{{to}} of {{total}} notifications",
+    "loadMore": "Load {{count}} more",
+    "emptyTitle": "No notifications yet",
+    "emptyBody": "Updates about your delegation, votes and governance activity will appear here.",
+    "emptyFilteredTitle": "Nothing here",
+    "emptyFilteredBody": "No notifications match this filter.",
+    "reviewSettings": "Review notification settings",
+    "errorTitle": "Notifications could not be loaded",
+    "errorBody": "Your settings and read status are safe. Check your connection, then try again.",
+    "retry": "Retry feed",
+    "offTitle": "In-app notifications are off",
+    "offBody": "Turn them on in notification settings to see updates here.",
+    "signInTitle": "Sign in to see your notifications",
+    "signInBody": "Your wallet signs a short message to prove it is yours. This costs nothing and sends no transaction.",
+    "signIn": "Sign with wallet",
+    "signInFailed": "The wallet did not sign. Try again.",
+    "votingPower": "₳ {{amount}}",
+    "yourVotingPower": "your",
+    "kinds": {
+      "drepChange": {
+        "category": "DRep change",
+        "short": "DRep",
+        "actionNeeded": "Action needed",
+        "retiredTitle": "Your DRep, {{name}}, has retired",
+        "inactiveTitle": "Your DRep, {{name}}, is inactive",
+        "retiringTitle": "Your DRep, {{name}}, announced retirement",
+        "updatedTitle": "Your DRep, {{name}}, updated their profile",
+        "retiredBody": "Until you choose another DRep, {{power}} voting power is not represented.",
+        "inactiveBody": "An inactive DRep's votes no longer count. Until it votes again or you choose another DRep, {{power}} voting power is not represented.",
+        "retiringBody": "{{name}} plans to retire at epoch {{epoch}}. After that, {{power}} voting power is not represented until you choose another DRep.",
+        "updatedBody": "Review the profile to check it still matches how you want to be represented.",
+        "reason": "Why you received this: you delegate your voting power to this DRep.",
+        "choose": "Choose a new DRep",
+        "viewProfile": "View {{name}} profile"
+      },
+      "delegationChange": {
+        "category": "Delegation change",
+        "short": "Delegation",
+        "confirmed": "Confirmed",
+        "removed": "Removed",
+        "drepTitle": "Delegation to {{name}} confirmed",
+        "abstainTitle": "You now abstain from every vote",
+        "noConfidenceTitle": "You now signal no confidence on every vote",
+        "removedTitle": "Your delegation was removed",
+        "body": "{{power}} voting power now follows this choice.",
+        "removedBody": "Your voting power is not delegated to anyone.",
+        "viewProfile": "View DRep profile",
+        "viewDirectory": "Open the DRep directory"
+      },
+      "actionActivity": {
+        "category": "My Governance Action activity",
+        "dRepCategory": "Your DRep's votes",
+        "short": "Governance action",
+        "ratified": "Ratified",
+        "enacted": "Enacted",
+        "expired": "Expired",
+        "ratifiedTitle": "{{title}} was ratified",
+        "enactedTitle": "{{title}} was enacted",
+        "expiredTitle": "{{title}} expired without ratification",
+        "votedBody": "An action you voted on reached its outcome. Your recorded vote: {{vote}}.",
+        "dRepVotedBody": "Your DRep voted on this action: {{vote}}.",
+        "noVote": "none",
+        "votes": {
+          "yes": "Yes",
+          "no": "No",
+          "abstain": "Abstain"
+        },
+        "view": "View governance action"
+      },
+      "relevantAction": {
+        "category": "Relevant to you",
+        "short": "Governance action",
+        "daysLeft_one": "{{count}} day left",
+        "daysLeft_other": "{{count}} days left",
+        "lessThanDay": "Closes today",
+        "title": "{{title}} closes soon",
+        "body": "You have not voted on this action yet. Voting closes {{when}}.",
+        "matchedBody": "A new action matches what you follow.",
+        "review": "Review governance action"
+      },
+      "digest": {
+        "category": "All new actions digest",
+        "short": "Digest",
+        "title_one": "Weekly digest: {{count}} new Governance Action",
+        "title_other": "Weekly digest: {{count}} new Governance Actions",
+        "body": "Governance Actions submitted between {{from}} and {{to}} (UTC).",
+        "open": "Open Governance Actions"
+      },
+      "system": {
+        "category": "System information",
+        "short": "System",
+        "badge": "Product update",
+        "learnMore": "Learn what changed"
+      }
+    },
+    "preferences": {
+      "back": "Notification Center",
+      "title": "Notification preferences",
+      "description": "Choose which governance updates reach you.",
+      "reset": "Reset to defaults",
+      "save": "Save preferences",
+      "saved": "Preferences saved. New notification settings are active.",
+      "justNow": "Just now",
+      "saveFailed": "Preferences could not be saved. Try again.",
+      "channels": "Channels",
+      "channelsBody": "In-app shows updates in the header and the Notification Center.",
+      "inApp": "In-app",
+      "inAppBody": "Show updates in the header and Notification Center.",
+      "email": "Email",
+      "emailBody": "Digests and time-sensitive updates by email.",
+      "emailUnavailable": "Not available yet. Email needs GovTool's notification service, which is not running.",
+      "emailTo": "Send to {{address}}.",
+      "emailPending": "Waiting for you to confirm {{address}}.",
+      "emailAdd": "Add an email address",
+      "emailAddElsewhere": "Add an email address to your notification account to receive email.",
+      "events": "Events",
+      "eventsBody": "Choose the updates you want to see.",
+      "on": "On",
+      "off": "Off",
+      "eventNames": {
+        "drepChange": "DRep changes",
+        "delegationChange": "Delegation changes",
+        "actionActivity": "My Governance Action activity",
+        "relevantAction": "Relevant new Governance Actions",
+        "digest": "All new Governance Actions"
+      },
+      "eventBodies": {
+        "drepChange": "Retirement, inactivity and important profile changes for the DRep you delegate to.",
+        "delegationChange": "Confirmation when voting power is delegated to or removed from a DRep.",
+        "actionActivity": "Ratification, expiry and enactment of actions you or your DRep voted on.",
+        "relevantAction": "Actions closing soon that you have not voted on yet (DReps and direct voters).",
+        "digest": "A weekly roll-up of every newly submitted action."
       }
     }
   },
@@ -772,6 +1296,60 @@
         "label": "Info Action"
       }
     },
+    "liveVotingTab": "Live Voting",
+    "pageTitle": "Governance actions",
+    "pageDescription": "Explore proposals shaping Cardano. Review the details, follow voting progress and take part in decisions that move the ecosystem forward.",
+    "createAction": "Create Governance Action",
+    "propose": {
+      "button": "Propose a Governance Action",
+      "connectNotice": "To submit a proposal, you need to connect a Cardano Wallet.",
+      "connectAction": "Connect a Cardano wallet",
+      "verifyNotice": "To submit a proposal, you need to verify yourself by signing a transaction.",
+      "verifyAction": "Sign a transaction",
+      "usernameNotice": "To submit a proposal, you need to create a GovTool display name.",
+      "usernameAction": "Create a display name"
+    },
+    "stats": {
+      "label": "Governance action figures",
+      "total": "Total Actions",
+      "votingNow": "Voting Now",
+      "expiringSoon": "Expiring Soon",
+      "enacted": "Enacted",
+      "unknown": "Not available yet"
+    },
+    "card": {
+      "active": "Active",
+      "submitted": "Submitted",
+      "expires": "Expires",
+      "left": "{{time}} left",
+      "epoch": "Epoch {{epoch}}",
+      "youVoted": "You voted {{vote}}",
+      "untitled": "Untitled governance action"
+    },
+    "details": {
+      "actionInformation": "Action Information",
+      "closesAtEpoch": "Closes at epoch {{epoch}}",
+      "currentEpoch": "Current epoch",
+      "noReasoning": "This action has no abstract, motivation or rationale.",
+      "sections": "Governance action sections",
+      "submittedOn": "Submitted {{date}} (Epoch {{epoch}})",
+      "timeRemaining": "Time remaining",
+      "voteInProgress": "Vote in progress",
+      "voteOnAction": "Vote on this action",
+      "votingEndsIn": "Voting ends in {{time}}",
+      "votingOpen": "Voting open"
+    },
+    "proposeBanner": {
+      "cta": "Propose Action",
+      "description": "Create and submit a governance action for the community",
+      "stepCreate": "Create Proposal",
+      "stepReview": "Review",
+      "stepSubmit": "Submit On-chain",
+      "tag": "Create governance action",
+      "title": "Have an idea for Cardano governance?"
+    },
+    "outcomesTab": "Outcomes",
+    "proposedTab": "Proposed Governance Actions",
     "liveVoting": {
       "title": "Live Voting",
       "label": "Live Voting"
@@ -820,10 +1398,165 @@
       }
     }
   },
+  "landing": {
+    "eyebrow": "A clearer way into Cardano governance",
+    "titleLine1": "Good governance",
+    "titleLine2": "Starts with ",
+    "titleHighlight": "all of us.",
+    "description": "Participate in Cardano governance, understand what's being decided, and make your voice count.",
+    "viewGovernanceActions": "View Governance Actions",
+    "findDRep": "Find your DRep",
+    "noWalletNeeded": "Open to explore. No wallet needed to start.",
+    "snapshot": {
+      "title": "Governance Snapshot",
+      "subtitle": "Live signals · Updated just now",
+      "epoch": "Epoch {{epoch}}",
+      "activeActions": "Active actions",
+      "acrossTypes_one": "Across {{count}} type",
+      "acrossTypes_other": "Across {{count}} types",
+      "closingThisEpoch": "Ends this epoch",
+      "ofInVoting": "Of {{total}} in voting",
+      "recentlyRatified": "Recently ratified",
+      "lastThirtyDays": "In last 30 days",
+      "latestDecision": "Latest decision",
+      "decidedAgo": "{{status}} · {{ago}}",
+      "votingOn": "What's being voted on",
+      "endsOn": "Ends {{date}}",
+      "nothingYet": "Nothing yet"
+    },
+    "participation": {
+      "eyebrow": "Your participation, your choice",
+      "title": "Participation looks\ndifferent for everyone.",
+      "aside": "Choose the approach that fits you.\nYou don't need to have it all figured out.",
+      "delegate": {
+        "step": "01 / Explore",
+        "title": "Delegate your voice",
+        "description": "Find a DRep whose priorities align with yours and explore delegation."
+      },
+      "represent": {
+        "step": "02 / Connect",
+        "title": "Represent your community",
+        "description": "Learn about becoming a DRep and participating on behalf of others."
+      },
+      "direct": {
+        "step": "03 / Discover",
+        "title": "Take part directly",
+        "description": "Understand direct voting and what you need to get started."
+      }
+    },
+    "pulse": {
+      "eyebrow": "Proposed actions",
+      "title": "The pulse of Cardano governance.",
+      "seeAll": "See all governance proposals",
+      "votes_one": "{{count}} vote",
+      "votes_other": "{{count}} votes",
+      "yes": "Yes",
+      "no": "No",
+      "threshold": "Threshold",
+      "notEligible": "Not eligible",
+      "left": "{{time}} left",
+      "epoch": "Epoch {{epoch}}",
+      "untitled": "Untitled governance action",
+      "empty": "No governance actions are open for voting right now."
+    },
+    "leaderboard": {
+      "eyebrow": "DRep leaderboard",
+      "title": "Meet the DReps with the most voting power",
+      "description": "See the DReps holding the most delegated voting power in Cardano governance.",
+      "votingPower": "Voting power",
+      "viewProfile": "View Profile",
+      "anonymous": "Anonymous"
+    },
+    "outcomes": {
+      "eyebrow": "At a glance",
+      "title": "See how governance decisions progress on-chain",
+      "description": "Recently ratified and enacted actions — final tallies, execution status and audit trail.",
+      "viewOutcomes": "View Action Outcomes →",
+      "decidedThirtyDays": "Actions decided · 30 days",
+      "ratificationRate": "Ratification rate",
+      "votingParticipation": "DRep voting participation",
+      "ratified": "Ratified",
+      "enacted": "Enacted",
+      "expired": "Expired",
+      "notRatified": "Not Ratified"
+    },
+    "news": {
+      "eyebrow": "What is happening in Cardano",
+      "title": "Governance is already\nshaping Cardano.",
+      "subscribeCta": "Subscribe for Newsletter",
+      "readPost": "Read {{title}}",
+      "viewAll": "View all posts",
+      "error": "The newsletter's posts could not be loaded."
+    },
+    "newsletter": {
+      "eyebrow": "Stay in the loop",
+      "title": "The best ideas, delivered\nthoughtfully.",
+      "emailLabel": "Email address",
+      "placeholder": "you@example.com",
+      "subscribe": "Subscribe",
+      "sending": "Subscribing…",
+      "invalid": "Enter a valid email address.",
+      "sent": "Check your inbox and follow the link to confirm your subscription.",
+      "failed": "We could not subscribe you. Please try again.",
+      "legal": "No spam. Unsubscribe anytime. By subscribing, you agree to our",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "faq": {
+      "eyebrow": "A little clarity",
+      "title": "Questions?\nStart here.",
+      "aside": "Good participation starts\nwith understanding.",
+      "readMore": "Read all FAQs",
+      "items": {
+        "whatIsGovTool": {
+          "q": "What is GovTool?",
+          "a": "GovTool brings together tools for Cardano governance, including governance actions, the DRep directory, and budget proposals."
+        },
+        "needWallet": {
+          "q": "Do I need a wallet to get started?",
+          "a": "No. You can explore governance actions and the DRep directory without one. Connect a wallet when you want to delegate, vote or register."
+        },
+        "whatIsDRep": {
+          "q": "What is a DRep?",
+          "a": "Delegated Representatives (DReps) vote on governance actions on behalf of ADA holders who delegate their voting power to them."
+        },
+        "whatIsGovernance": {
+          "q": "What is Cardano governance?",
+          "a": "Cardano governance lets ADA holders have a say in the network's future: proposing changes, discussing them and voting on them on chain."
+        },
+        "whoCanParticipate": {
+          "q": "Who can participate?",
+          "a": "Any ADA holder. You can delegate to a DRep, register as a DRep, or register as a direct voter and vote with your own voting power."
+        },
+        "delegateVsDirect": {
+          "q": "What's the difference between delegating and voting directly?",
+          "a": "Delegating lets a DRep vote on your behalf. As a direct voter you vote on each governance action yourself, using your own voting power."
+        },
+        "needAda": {
+          "q": "Do I need ADA to participate?",
+          "a": "Exploring is free. Delegating, voting and registering are transactions from your wallet, which pay a fee in ADA; registering also takes a refundable deposit."
+        },
+        "whatCanIVote": {
+          "q": "What can I vote on?",
+          "a": "Governance actions submitted on chain: treasury withdrawals, protocol parameter changes, hard forks, updates to the constitution and the committee, motions of no confidence and info actions."
+        }
+      }
+    },
+    "drepBanner": {
+      "tag": "Governance",
+      "title": "What is a DRep? Shape Cardano's future with your voice.",
+      "description": "Delegated Representatives (DReps) vote on governance actions on behalf of ADA holders. Learn how you can make an impact in Cardano's on-chain democracy.",
+      "cta": "Learn about DReps"
+    }
+  },
   "menu": {
+    "close": "Close menu",
     "faqs": "FAQs",
+    "governanceActivity": "Governance Activity",
     "guides": "Guides",
-    "help": "Help"
+    "help": "Help",
+    "mainNav": "Main",
+    "skipToContent": "Skip to main content",
+    "open": "Open menu"
   },
   "metadataUpdate": {
     "description": "You can include extra information about yourself by adding a URL and its hash.",
@@ -984,10 +1717,6 @@
       "message": "The confirmation of your registration might take a bit of time but you can track it using",
       "title": "Registration Transaction Submitted!"
     },
-    "retirement": {
-      "message": "The confirmation of your retirement might take a bit of time but you can track it using",
-      "title": "Retirement Transaction Submitted!"
-    },
     "urlCannotBeFound": {
       "buttonText": "Go to Data Edit Screen",
       "cancelRegistrationText": "Cancel Registration",
@@ -1091,15 +1820,57 @@
       "description": "Looks like you cannot retire, because currently you are not a DRep."
     },
     "continue": "Continue to Retirement",
-    "retireAsDrep": "Retire as a Drep",
-    "whatRetirementMeansTitle": "What Retirement Means",
-    "whatRetirementMeansDescription": "By retiring you are giving up your voting rights. Voting Power that is delegated to you will remain in place.\n\nADA Holders that have delegated to be able to see that you are retired in the DRep directory. They will be able to re-delegate their Voting Power to another DRep.\n\nYou can still participate in Governance by proposing Governance Actions, by delegating your personal Voting Power to another DRep, or by coming out of retirement, and assuming your previous role as a DRep.\n\nIf you come out of retirement, your DRep ID will be the same as it was before retirement, and your Voting Power will consist of your own Ada balance and what delegated power that remains associated\nto your DRep ID."
+    "title": "Retire your DRep?",
+    "intro": "You are about to retire from your role as a Delegated Representative (DRep). This action will be submitted as a governance transaction on-chain.",
+    "points": {
+      "voting": {
+        "title": "Voting rights removed",
+        "body": "Retiring your DRep removes your ability to vote on Governance Actions. Voting Power delegated to your DRep ID remains associated with it."
+      },
+      "delegation": {
+        "title": "Delegation remains",
+        "body": "ADA Holders who delegated to you can see that your DRep is retired and may re-delegate their Voting Power to another DRep."
+      },
+      "id": {
+        "title": "DRep ID remains",
+        "body": "You can come out of retirement and resume your role as a DRep using the same DRep ID. Your Voting Power will include your own ADA balance and any Voting Power still delegated to your DRep ID."
+      }
+    },
+    "ackVoting": "I understand that retiring will remove my voting rights as a DRep. Voting Power delegated to my DRep ID will remain associated with it until redelegated.",
+    "ackDeposit": "I understand that my ₳{{deposit}} DRep deposit will be refunded to my wallet upon retirement.",
+    "ackDepositNoAmount": "I understand that my DRep deposit will be refunded to my wallet upon retirement.",
+    "progress": {
+      "confirming": "Confirming transaction…",
+      "title": "DRep retirement in progress",
+      "body": "Your DRep, {{name}}, is being retired. Once the transaction is confirmed, your ₳{{deposit}} deposit will be refunded to your wallet.",
+      "bodyNoName": "Your DRep is being retired. Once the transaction is confirmed, your ₳{{deposit}} deposit will be refunded to your wallet.",
+    "bodyUnknown": "Your DRep is being retired. Once the transaction is confirmed, your deposit will be refunded to your wallet.",
+      "learnMore": "Learn More",
+      "showTx": "Show transaction",
+      "close": "Go to dashboard"
+    },
+    "retireAsDrep": "Retire as a Drep"
   },
   "slider": {
     "showAll": "Show All",
     "viewAll": "View all"
   },
   "directVoter": {
+    "retireTitle": "Retire as Direct Voter?",
+    "retireIntro": "Retiring as a Direct Voter will remove your Direct Voter status. You will no longer be able to participate in governance votes as a Direct Voter.",
+    "retirePoints": {
+      "abstain": "You will give up your Voting Power, which will be delegated to Abstain on all votes. You will no longer be able to vote on Governance Actions.",
+      "again": "You can re-register as a Direct Voter at any time, delegate your Voting Power to someone else, or become a DRep.",
+      "deposit": "Your {{deposit}} ADA deposit will be refunded to your wallet once you retire as a Direct Voter.",
+      "depositNoAmount": "Your deposit will be refunded to your wallet once you retire as a Direct Voter."
+    },
+    "retireContinue": "Continue to Retirement",
+    "progressTitle": "Direct Voter retirement in progress",
+    "progressBody": "Once the transaction is confirmed, your ₳{{deposit}} deposit will be refunded to your wallet.",
+    "progressBodyNoAmount": "Once the transaction is confirmed, your deposit will be refunded to your wallet.",
+    "retiredBanner": "You have successfully retired as a Direct Voter",
+    "dismiss": "Dismiss",
+    "headerRetire": "Retire as Direct Voter",
     "alreadyRegistered": {
       "title": "You already are a Direct Voter",
       "description": "Looks like you have already successfully completed your registration and you currently are a Direct Voter."
@@ -1111,8 +1882,6 @@
     },
     "registerDescription": "A Direct Voter is someone that can vote on any Governance Action with their own Voting Power. They do not wish to campaign for delegations from others or be shown via the DRep Directory. <0>Learn More</0> about Direct Voter.\n\nDirect Voters are not explicitly supported by the protocol but are instead an abstraction over the on-chain DReps. Direct Voters are not expected to link and host metadata.\n\nBecoming a Direct Voter will require a refundable deposit of ₳<strong>{{deposit}}</strong>. Your deposit will be refunded if you retire. You can decide to become a DRep at anytime if you are a Direct Voter you will not need to pay another deposit.",
     "registerHeading": "What this Means",
-    "retirementDescription": "By Retiring you are giving up your Voting Power. You will not be able to vote on any Governance Actions. Your deposit of {{deposit}} ada will be refunded.\n\nYou can at any time in the future re-register to become a Direct Voter, or you can delegate your Voting Power to someone else, or become a DRep.\n\nThese options are listed in our Guides here: <0>Voting options and Roles</0>",
-    "retirementHeading": "What Retirement Means",
     "retireDirectVoter": "Retire as a Direct Voter"
   },
   "system": {
@@ -1278,5 +2047,871 @@
   "thisLink": "this link",
   "viewDetails": "View details",
   "votingPower": "Voting power",
-  "yourself": "Yourself"
+  "yourself": "Yourself",
+  "topNav": {
+    "profile": "Your governance profile"
+  },
+  "walletConnect": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "notConnected": "Not connected",
+    "supported": "Supported",
+    "supportedWallets": "Supported Wallets",
+    "browserWallet": "Browser wallet",
+    "chooser": {
+      "title": "Connect your Wallet",
+      "body": "Connect a compatible wallet to view your governance profile and participate in GovTool.",
+      "connectionOnlyTitle": "Connection only",
+      "connectionOnlyBody": "Connecting shares your public wallet identity. It does not submit a transaction or charge fees.",
+      "more": "For more information please check the supported wallets list or visit our official documentation.",
+      "learnMore": "Learn more"
+    },
+    "none": {
+      "status": "No wallet found",
+      "title": "No Cardano wallet detected",
+      "body": "GovTool could not find a supported browser wallet on this device.",
+      "notDetected": "Not detected",
+      "mobileTitle": "Using a mobile device?",
+      "mobileBody": "Open GovTool from your wallet's in-app browser, or install a supported desktop extension.",
+      "retry": "Try Again",
+      "install": "Install Wallet"
+    },
+    "approve": {
+      "status": "Action needed",
+      "title": "Approve in {{wallet}}",
+      "body": "A {{wallet}} window is waiting for you. Review the requesting site and approve account access.",
+      "waitingTitle": "Waiting for your approval",
+      "waitingBody": "Complete the prompt in the {{wallet}} window.",
+      "onlyTitle": "Approve connection only",
+      "onlyBody": "Do not approve a transaction. GovTool only needs permission to read your public wallet identity.",
+      "waiting": "Waiting for approval…"
+    },
+    "network": {
+      "status": "Wrong network",
+      "title": "Switch to {{network}}",
+      "currentTitle": "Current network: {{network}}",
+      "currentBody": "Switch networks inside your wallet, then connect again. This does not submit a transaction.",
+      "retry": "Try Again"
+    },
+    "declined": {
+      "status": "Not connected",
+      "title": "Connection request declined",
+      "body": "The request was rejected in your wallet, so GovTool did not connect to it.",
+      "nothingTitle": "Nothing changed",
+      "nothingBody": "No wallet access was granted and no transaction was submitted."
+    },
+    "unsupported": {
+      "status": "Unsupported",
+      "title": "Wallet is not supported",
+      "body": "This wallet cannot connect to this version of GovTool.",
+      "chooseTitle": "Choose a supported wallet",
+      "chooseBody": "GovTool needs a wallet with the CIP-30 and CIP-95 extensions.",
+      "viewSupported": "View supported wallets"
+    },
+    "generic": {
+      "status": "Connection failed",
+      "title": "Couldn't connect your wallet",
+      "body": "The wallet returned an unexpected connection error. Your account remains unchanged.",
+      "detailTitle": "Wallet message",
+      "detailFallback": "Check that the wallet is open and up to date, then try the connection again."
+    },
+    "chooseAnother": "Choose Another Wallet",
+    "tryAgain": "Try Again",
+    "checking": {
+      "title": "Checking your wallet",
+      "body": "We're verifying your stake key and loading your governance information. This may take a moment.",
+      "progress": "Verification progress",
+      "walletConnected": "Wallet connected",
+      "stakeKey": "Stake key verified",
+      "votingPower": "Voting power loaded",
+      "governance": "Governance status checked",
+      "complete": "Complete",
+      "inProgress": "In progress",
+      "pending": "Pending"
+    },
+    "success": {
+      "title": "Wallet connected",
+      "body": "Your wallet is connected and ready for governance on {{network}} with ₳{{power}} voting power.",
+      "bodyNoPower": "Your wallet is connected and ready for governance on {{network}}.",
+      "stakeKey": "Stake key",
+      "summary": "Connection summary",
+      "verified": "Verified",
+      "votingPower": "Voting power",
+      "network": "Network",
+      "governance": "Governance status",
+      "viewProfile": "View your profile"
+    },
+    "status": {
+      "drep": "Registered DRep",
+      "directVoter": "Direct voter",
+      "delegated": "Delegated",
+      "notDelegated": "Not delegated"
+    },
+    "disconnect": {
+      "status": "Confirm disconnect",
+      "title": "Disconnect {{wallet}} from GovTool?",
+      "body": "GovTool will stop reading this wallet and end access to the current connected session.",
+      "accessEnds": "GovTool's current wallet access ends",
+      "chainUnchanged": "On-chain governance and funds stay unchanged",
+      "warningTitle": "On-chain data stays unchanged",
+      "warningBody": "Your funds, votes, DRep registration, and delegation remain on-chain. You can reconnect this wallet later.",
+      "confirm": "Disconnect",
+      "cancel": "Cancel"
+    },
+    "stakeKeys": {
+      "title": "Select stake key",
+      "body": "This wallet has multiple stake keys. Select the one you want to use for governance.",
+      "connected": "{{wallet}} · Connected",
+      "connectedPill": "Connected",
+      "choose": "Choose a stake key",
+      "available_one": "{{count}} available",
+      "available_other": "{{count}} available",
+      "key": "Stake key {{n}}",
+      "copy": "Copy",
+      "copyLabel": "Copy stake key {{n}}",
+      "votingPower": "Voting power",
+      "cancel": "Cancel",
+      "continue": "Continue"
+    },
+    "viewProfile": "View profile"
+  },
+  "accountMenu": {
+    "walletLabel": "Your connected wallet",
+    "walletName": "{{name}} Wallet",
+    "walletFallback": "Connected wallet",
+    "switchWallet": "Switch wallet",
+    "stakeAddress": "stake address",
+    "balance": "Wallet balance",
+    "votingPower": "Voting power",
+    "unknown": "Not available",
+    "connected": "Connected",
+    "viewProfile": "View Profile",
+    "disconnect": "Disconnect",
+    "profileLabel": "Your governance profile",
+    "account": "My account",
+    "roles": "Governance roles",
+    "directVoter": "Direct voter",
+    "drep": "DRep",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "retired": "Retired"
+    },
+    "overview": "Overview",
+    "overviewBody": "Your governance dashboard",
+    "votingActivity": "Voting activity",
+    "toVote_one": "{{count}} action to vote on",
+    "toVote_other": "{{count}} actions to vote on",
+    "myProposals": "My proposals",
+    "historyLog": "History Log",
+    "logout": "Logout"
+  },
+  "createGA": {
+    "steps": {
+      "understand": "Understand",
+      "type": "Action Type",
+      "details": "Action details",
+      "review": "Review",
+      "prepareFile": "Prepare file",
+      "confirm": "Confirm"
+    },
+    "intro": {
+      "title": "Create a Governance Action",
+      "body": "Propose changes to Cardano governance. Governance Actions allow you to put forward proposals for the community to review and vote on.",
+      "ackTitle": "Acknowledgement",
+      "ackBody": "Before you begin, there are a few things you need to know.",
+      "points": {
+        "provide": "Provide the information required to create your Governance Action.",
+        "store": "Store the metadata of your Governance Action at your own expense.",
+        "deposit": "Pay a refundable deposit of ₳{{deposit}}.",
+        "depositNoAmount": "Pay a refundable deposit.",
+        "returned": "Your deposit will be returned to your wallet when the Governance Action is enacted or expires."
+      },
+      "info": "The deposit will not affect your Voting Power. Once submitted, your Governance Action will be available for voting for {{epochs}} epochs, starting from the epoch after submission.",
+      "infoNoEpochs": "The deposit will not affect your Voting Power. Once submitted, your Governance Action will be available for voting from the epoch after submission.",
+      "accept": "Accept & Continue"
+    },
+    "type": {
+      "title": "Select Action Type",
+      "body": "Select one governance action type below. Each option is explained so you can choose the right path for your proposal.",
+      "search": "Search for Governance Action type",
+      "selected": "Selected",
+      "available": "Available",
+      "noMatch": "No action type matches this search.",
+      "names": {
+        "TreasuryWithdrawals": "Treasury requests",
+        "ParameterChange": "Protocol Parameter Change",
+        "HardForkInitiation": "Hard Fork",
+        "NewConstitution": "Updates to the Constitution",
+        "NewCommittee": "Committee Change",
+        "NoConfidence": "Motion of No Confidence",
+        "InfoAction": "Info Action"
+      },
+      "descriptions": {
+        "TreasuryWithdrawals": "Request funds from the treasury for a project, initiative, or reimbursement. This action is used when the proposal needs treasury resources.",
+        "ParameterChange": "Update a protocol parameter, such as a fee, reward, or network setting. This action changes how the protocol operates.",
+        "HardForkInitiation": "Propose a hard fork, which changes the protocol rules and may require a network upgrade. Use this for major architectural changes.",
+        "NewConstitution": "Update the constitution or governance guardrails, which define the rules and limits of the governance process.",
+        "NewCommittee": "Add or remove Constitutional Committee members, or change the committee's quorum.",
+        "NoConfidence": "Declare no confidence in the current Constitutional Committee.",
+        "InfoAction": "Share information, announce a decision, or provide context without requesting funds or changing protocol rules."
+      }
+    },
+    "details": {
+      "title": "Governance Action details",
+      "body": "Complete the information below to explain your governance action to the community.",
+      "identity": "Identity",
+      "about": "About Action",
+      "parameters": "Action Details",
+      "address": "Address",
+      "addressBody": "Where the requested funds are paid, and how much.",
+      "survey": "Linked survey",
+      "links": "Links & References",
+      "required": "Required",
+      "optional": "Optional",
+      "typeHint": "To change the Governance Action Type go back to the previous page.",
+      "addLink": "Add Link",
+      "removeLink": "Remove link {{index}}",
+      "continue": "Continue & Preview"
+    },
+    "review": {
+      "title": "Review Governance Action",
+      "body": "Check the information below before preparing your metadata file.",
+      "type": "Governance Action Type",
+      "edit": "Back to Edit",
+      "continue": "Continue"
+    },
+    "storeData": {
+      "title": "Store your metadata",
+      "body": "Your Governance Action's metadata must be hosted at a public URL before it can be submitted."
+    },
+    "confirm": {
+      "title": "Submit Governance Action",
+      "body": "Add the URL of your stored metadata, check the details below, then approve the request in your connected wallet.",
+      "typeLabel": "Governance Action Type:",
+      "transaction": "Transaction Details",
+      "deposit": "Governance action deposit",
+      "network": "Network",
+      "wallet": "Connected Wallet",
+      "connected": "Connected",
+      "signatureTitle": "Your wallet will request a signature",
+      "signatureBody": "Your wallet will open after you continue. Review and sign the transaction there to submit this governance action for community review.",
+      "storageTitle": "Prepare your metadata file",
+      "edit": "Back to edit",
+      "submit": "Continue to wallet"
+    },
+    "modals": {
+      "successTitle": "Action submitted successfully",
+      "successBody": "Your Governance Action has been submitted to the Cardano blockchain. It will appear in Live Voting once it has been processed.",
+      "successLink": "View transaction on explorer",
+      "backToDashboard": "Back to Dashboard",
+      "cancelledTitle": "Submission cancelled",
+      "cancelledBody": "The signature request was declined in your wallet, so nothing was submitted. Your details are still on this page, so you can try again when you're ready.",
+      "failedTitle": "Submission failed",
+      "failedBody": "Your Governance Action could not be submitted. Your details are still on this page, so you can try again.",
+      "reason": "Details: {{reason}}",
+      "close": "Close",
+      "tryAgain": "Try again",
+      "cancelTitle": "Do you want to cancel your Governance Action submission?",
+      "cancelBody": "It will cancel your proposed Governance Action and it will not be submitted.",
+      "cancelConfirm": "Yes, cancel submission",
+      "cancelBack": "Back"
+    }
+  },
+  "drepDashboard": {
+    "share": {
+      "open": "Share DRep profile",
+      "title": "Share DRep",
+      "body": "This profile is public. Anyone can view it, no wallet connection required.",
+      "urlLabel": "DRep profile URL",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "hint": "Copies the full URL, including the DRep identifier.",
+      "via": "Or share via",
+      "x": "X",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "email": "Email",
+      "text": "My DRep profile on GovTool",
+      "close": "Close"
+    },
+    "retired": {
+      "role": "Retired",
+      "reactivate": "Reactivate as DRep",
+      "banner": "Your DRep status is retired. You can no longer vote on governance actions or receive delegation. Your history remains visible.",
+      "returnTitle": "Ready to return to governance?",
+      "returnBody": "Reactivate your status as a DRep to start participating in upcoming proposals. You will need to re-submit your registration with the standard {{deposit}} ADA deposit.",
+      "returnBodyNoDeposit": "Reactivate your status as a DRep to start participating in upcoming proposals. You will need to re-submit your registration with the standard DRep deposit.",
+      "finalStats": "Final Representation Stats",
+      "finalPower": "Final Delegated ADA",
+      "links": "Previously Registered Links",
+      "profileTitle": "Previous DRep Profile (Inactive)",
+      "record": "Retired historical record",
+      "summary": "Tenure & Retirement Summary",
+      "tenure": "Tenure Duration",
+      "tenureMonths_one": "{{count}} month",
+      "tenureMonths_other": "{{count}} months",
+      "registeredOn": "Registered",
+      "totalVotes": "Total Votes Cast",
+      "totalVotesValue_one": "{{count}} proposal",
+      "totalVotesValue_other": "{{count}} proposals",
+      "peak": "Peak Delegation",
+      "final": "Final Voting Power",
+      "deposit": "Your {{deposit}} ADA DRep deposit was returned to your wallet when the retirement was confirmed.",
+      "depositNoAmount": "Your DRep deposit was returned to your wallet when the retirement was confirmed.",
+      "archive": "Voting History (Archived Tenure)",
+      "archived": "Vote archived • {{date}}",
+      "noVotes": "No votes were cast during this tenure."
+    },
+    "reRegister": {
+      "title": "Register as a DRep again",
+      "body": "Your previous DRep registration was retired. You can register again to become an active DRep and continue participating in governance.",
+      "nextTitle": "What happens next",
+      "next1": "By continuing, you'll submit a new DRep registration transaction through your connected wallet. Once the transaction is confirmed on-chain, your DRep status will become Active.",
+      "next2": "Your existing DRep identity and profile will remain associated with your registration unless you update your metadata.",
+      "beforeTitle": "Before you continue",
+      "before": "Make sure your wallet is connected and has enough funds to cover the registration deposit and transaction fee. Your wallet will ask you to review and approve the transaction.",
+      "cancel": "Cancel",
+      "continue": "Continue to Register again"
+    },
+    "registrationError": {
+      "title": "Registration wasn't completed",
+      "body": "Your wallet didn't confirm the registration transaction. Check your wallet, then try again.",
+      "reason": "Wallet message: {{reason}}",
+      "close": "Close",
+      "retry": "Try Again"
+    },
+    "welcome": "Welcome, {{name}}",
+    "welcomeAnonymous": "Welcome",
+    "role": {
+      "drep": "DRep",
+      "newDrep": "New DRep"
+    },
+    "registered": "Registered:",
+    "currentEpoch": "Current Epoch:",
+    "editProfile": "Edit Profile",
+    "retire": "Retire as DRep",
+    "welcomeBanner": "Congratulations on registering as a DRep! Here's how to get started.",
+    "dismiss": "Dismiss",
+    "pending": {
+      "retire": "Your DRep retirement is being processed.",
+      "update": "Your DRep profile update is being processed.",
+      "viewTx": "View transaction"
+    },
+    "tabs": {
+      "label": "DRep dashboard",
+      "overview": "Overview",
+      "governance": "Governance",
+      "discussions": "Discussions",
+      "activity": "Activity Report",
+      "history": "History Log"
+    },
+    "copy": "Copy {{label}}",
+    "lastUpdated": "Last updated: {{ago}}",
+    "exportCsv": "Export CSV",
+    "retry": "Try again",
+    "status": "Status:",
+    "sortBy": "Sort by:",
+    "all": "All",
+    "outcome": {
+      "active": "Active",
+      "ratified": "Ratified",
+      "enacted": "Enacted",
+      "expired": "Expired",
+      "dropped": "Closed",
+      "unknown": "Unknown"
+    },
+    "vote": {
+      "yes": "Yes",
+      "no": "No",
+      "abstain": "Abstain"
+    },
+    "overview": {
+      "representation": {
+        "title": "Your representation",
+          "trend": "Voting power over the last {{count}} epochs",
+        "votingPower": "Delegated Voting Power",
+        "delegators": "Delegators:",
+        "note": "As you participate in governance, ADA holders can delegate their voting power to you.",
+        "viewProfile": "View public profile"
+      },
+      "identity": {
+        "title": "Identity",
+        "drepId": "DRep ID",
+        "paymentAddress": "Payment Address",
+        "paymentHint": "This address will receive rewards for your active governance participation.",
+        "metadataUrl": "Metadata URL",
+        "metadataHash": "Metadata Hash",
+        "links": "Links",
+        "addLinks": "Add Identity Links",
+        "noLinks": "No identity links added yet. Link your X, GitHub, or Discord account to build community trust."
+      },
+      "references": {
+        "title": "References",
+        "add": "Add References",
+        "empty": "No references added yet. Add external URLs like personal sites or Cardano forum profiles."
+      },
+      "details": {
+        "title": "Your details",
+        "edit": "Edit your details",
+        "objectives": "Objective",
+        "motivations": "Motivations",
+        "qualifications": "Qualifications",
+        "notProvided": "Not provided yet."
+      },
+      "recent": {
+        "title": "Recent voting activity",
+        "subtitle": "Your latest on-chain votes from this connected stake credential.",
+        "viewAll": "View full voting history",
+        "totals": "{{total}} Total Votes · {{epoch}} This Epoch",
+        "action": "Governance action",
+        "vote": "Your vote",
+        "castOn": "Cast on",
+        "outcome": "Outcome",
+        "castOnValue": "{{date}} · Epoch {{epoch}}",
+        "emptyTitle": "No votes yet",
+        "emptyBody": "Once you start voting on governance actions, your voting history will appear here.",
+        "browse": "Browse Governance Actions",
+        "error": "We couldn't load your votes."
+      }
+    },
+    "governance": {
+      "history": {
+        "title": "Voting History",
+        "totals": "{{total}} Total Votes",
+        "yes": "Yes: {{count}} ({{pct}}%)",
+        "no": "No: {{count}} ({{pct}}%)",
+        "abstain": "Abstain: {{count}} ({{pct}}%)"
+      },
+      "distribution": {
+        "title": "Delegation Distribution",
+        "subtitle": "Breakdown of delegated voting power across your largest delegators",
+        "others": "Others",
+        "share": "{{name}} ({{pct}}%)",
+        "topShare": "Top {{count}} delegators hold {{pct}}% of your total voting power."
+      },
+      "activity": {
+        "title": "Activity",
+        "tabsLabel": "Activity",
+        "subtitles": {
+          "votes": "Every governance action you voted on, with its outcome.",
+          "proposals": "Track governance proposals submitted by your connected wallet.",
+          "delegators": "The ADA holders who delegate their voting power to you.",
+          "delegations": "Where your own voting power is delegated."
+        },
+        "tabs": {
+          "votes": "My Votes",
+          "proposals": "My Submitted Proposals",
+          "delegators": "Delegators",
+          "delegations": "My Delegations"
+        }
+      },
+      "votes": {
+        "showing_one": "Showing {{count}} vote",
+        "showing_other": "Showing {{count}} votes",
+        "action": "Governance action",
+        "vote": "Vote",
+        "outcome": "Outcome",
+        "type": "Type",
+        "rationale": "Rationale",
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "votedOn": "Voted on Epoch {{epoch}}",
+        "viewRationale": "View Rationale",
+        "noRationale": "No rationale",
+        "emptyTitle": "No voting history",
+        "emptyBody": "Your voting record will be displayed here after you cast your first vote.",
+        "noMatch": "No votes match this filter.",
+        "error": "We couldn't load your votes."
+      },
+      "rationale": {
+        "voted": "Voted",
+        "close": "Close",
+        "error": "We couldn't load this rationale.",
+        "invalid": "This rationale doesn't match the hash recorded on-chain.",
+        "showAll": "Show all rationale",
+        "showLess": "Show less",
+        "empty": "This rationale has no text.",
+        "openFile": "Open rationale file"
+      },
+      "proposals": {
+        "search": "Search by title or proposal ID…",
+        "count_one": "{{count}} proposal",
+        "count_other": "{{count}} proposals",
+        "newest": "Newest submitted",
+        "oldest": "Oldest submitted",
+        "proposal": "Proposal",
+        "submitted": "Submitted",
+        "type": "Type",
+        "outcome": "Current stage / Outcome",
+        "view": "View Proposal",
+        "emptyTitle": "No proposals submitted yet",
+        "emptyBody": "Proposals submitted with this connected wallet will appear here. Start a new governance action when you are ready, or review the submission guide first.",
+        "submit": "Submit a proposal",
+        "learn": "Learn how proposals work",
+        "unknownTitle": "Submitted proposals aren't available yet",
+        "unknownBody": "GovTool can't yet tell which governance actions this wallet submitted. They will appear here once the backend reports each action's deposit return address.",
+        "noMatch": "No proposals match this search.",
+        "error": "We couldn't load governance actions."
+      },
+      "delegators": {
+        "showing_one": "Showing {{count}} delegator",
+        "showing_other": "Showing {{count}} delegators",
+        "rank": "#",
+        "delegator": "Delegator",
+        "votingPower": "Voting power (₳)",
+        "since": "Delegation date",
+        "emptyTitle": "No delegators yet",
+        "emptyBody": "You don't have any delegators yet. Share your DRep profile to let others discover and delegate their voting power to you.",
+        "share": "Share DRep profile",
+        "unavailableTitle": "Delegator details aren't available yet",
+        "unavailableBody": "GovTool will list your delegators here once the backend provides them.",
+        "error": "We couldn't load your delegators."
+      },
+      "delegations": {
+        "showing_one": "Showing {{count}} delegation",
+        "showing_other": "Showing {{count}} delegations",
+        "drep": "DRep",
+        "power": "Delegated power (₳)",
+        "since": "Delegation date",
+        "status": "DRep status",
+        "viewProfile": "View Profile",
+        "current": "Current",
+        "abstain": "Abstain on every vote",
+        "noConfidence": "No confidence on every vote",
+        "yourself": "Yourself",
+        "emptyTitle": "You haven't delegated your voting power yet",
+        "emptyBody": "Delegating to a DRep lets someone you trust vote on governance proposals on your behalf. Your ADA stays in your wallet — only your voting power is delegated.",
+        "find": "Find a DRep",
+        "direct": "Become a Direct Voter",
+        "historyNote": "Only your current delegation is shown until GovTool can read your delegation history.",
+        "error": "We couldn't load your delegations."
+      }
+    },
+    "discussions": {
+      "title": "Governance Discussions",
+      "count_one": "{{count}} thread",
+      "count_other": "{{count}} threads",
+      "topic": "Topic:",
+      "allTopics": "All Topics",
+      "mostRecent": "Most Recent",
+      "mostReplies": "Most Replies",
+      "postedBy": "Posted by {{name}}",
+      "you": "(You)",
+      "anonymous": "Anonymous",
+      "youReplied": "You Replied",
+      "replies_one": "{{count}} reply",
+      "replies_other": "{{count}} replies",
+      "likes_one": "{{count}} like",
+      "likes_other": "{{count}} likes",
+      "lastReply": "Your last reply · {{ago}}",
+      "untitled": "Untitled thread",
+      "emptyTitle": "No discussions yet",
+      "emptyBody": "Join the conversation! Participate in governance discussions to share your perspective, engage with the community, and build your reputation.",
+      "start": "Start a Discussion",
+      "note": "Threads appear here after you post or comment on the forum as a DRep.",
+      "error": "We couldn't load your discussions."
+    },
+    "activity": {
+      "participation": "Participation Rate",
+      "participationDetail": "{{voted}} of {{votable}} actions since registration",
+      "responseTime": "Average Response Time",
+      "responseValue": "{{days}} days",
+      "responseDetail": "From submission to your vote",
+      "streak": "Consecutive Epochs Active",
+      "streakValue_one": "{{count}} Epoch",
+      "streakValue_other": "{{count}} Epochs",
+      "streakDetail": "On-chain voting streak",
+      "noValue": "–",
+      "heatmap": {
+        "title": "Voting Activity — Epoch {{epoch}}",
+        "titleNoEpoch": "Voting Activity",
+        "summary": "{{count}} votes cast over the last 12 months.",
+        "day_one": "{{count}} vote on {{date}}",
+        "day_other": "{{count}} votes on {{date}}",
+        "less": "Less",
+        "more": "More",
+        "weekdays": {
+          "sun": "Sun",
+          "mon": "Mon",
+          "tue": "Tue",
+          "wed": "Wed",
+          "thu": "Thu",
+          "fri": "Fri",
+          "sat": "Sat"
+        }
+      },
+      "pattern": {
+        "title": "Voting Pattern by Category",
+        "value": "{{pct}}% ({{voted}} / {{votable}})",
+        "categories": {
+          "treasury": "Treasury Actions",
+          "protocol": "Protocol Parameters",
+          "info": "Info Actions",
+          "committee": "Constitution and Committee"
+        }
+      },
+      "growth": {
+        "title": "Delegation Growth",
+        "summary": "₳ {{ada}} total · {{delegators}} delegators",
+        "summaryNoDelegators": "₳ {{ada}} total",
+        "ada": "Delegated ADA",
+        "point": "Epoch {{epoch}}: ₳ {{ada}}",
+        "emptyTitle": "No delegation activity yet",
+        "emptyBody": "As you participate in governance, ADA holders may begin delegating to you. Your delegation history will appear here.",
+        "error": "We couldn't load your delegation growth."
+      },
+      "recent": {
+        "title": "Recently Voted",
+        "badge": "Most Recent",
+        "viewAll": "View All Votes",
+        "emptyTitle": "No activity data yet",
+        "emptyBody": "Your votes will be listed here. Participate in governance actions to build your activity history."
+      },
+      "epochs": {
+        "title": "Epoch-by-Epoch Activity",
+        "epoch": "Epoch",
+        "available": "Actions Available",
+        "votes": "Votes Cast",
+        "participation": "Participation",
+        "status": "Status",
+        "current": "{{epoch}} (Current)",
+        "proposals_one": "{{count}} proposal",
+        "proposals_other": "{{count}} proposals",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "emptyTitle": "No activity data yet",
+        "emptyBody": "Your epoch-by-epoch voting activity will be tracked here. Participate in governance actions to build your activity history.",
+        "viewActions": "View Available Actions"
+      },
+      "error": "We couldn't load your activity."
+    },
+    "history": {
+      "title": "DRep History",
+      "subtitle": "A chronological record of registration, profile, metadata, and status changes published on-chain.",
+      "activity": "Activity:",
+      "allActivities": "All activities",
+      "noFilters": "No filters applied",
+      "filters_one": "{{count}} filter applied",
+      "filters_other": "{{count}} filters applied",
+      "sort": "Sort:",
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "records_one": "{{count}} activity record",
+      "records_other": "{{count}} activity records",
+      "order": {
+        "desc": "Newest activity first",
+        "asc": "Oldest activity first"
+      },
+      "date": "Date & Time",
+      "activityColumn": "Activity",
+      "status": "Status",
+      "metadata": "Metadata",
+      "transaction": "Transaction",
+      "loading": "Loading activity",
+      "viewMetadata": "View metadata",
+      "kinds": {
+        "registered": {
+          "title": "Registered",
+          "body": "Initial DRep registration"
+        },
+        "reregistered": {
+          "title": "Re-registered",
+          "body": "DRep credential restored"
+        },
+        "updated": {
+          "title": "Profile updated",
+          "body": "Profile metadata published on-chain"
+        },
+        "retired": {
+          "title": "Retired",
+          "body": "DRep retirement submitted"
+        },
+        "statusChanged": {
+          "title": "Status changed",
+          "inactive": "Participation threshold not met",
+          "active": "Voting activity resumed",
+          "retired": "DRep retired"
+        }
+      },
+      "statuses": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "retired": "Retired"
+      },
+      "details": {
+        "summary": {
+          "registered": "DRep credential registered",
+          "reregistered": "DRep credential restored",
+          "updated": "DRep metadata updated",
+          "retired": "DRep credential retired",
+          "statusChanged": "DRep status changed"
+        },
+        "tx": "Transaction hash",
+        "epoch": "Epoch",
+        "copy": "Copy hash",
+        "view": "View externally",
+        "close": "Close",
+        "open": "Show details for {{activity}} on {{date}}",
+        "noTx": "No transaction: the ledger changed this status at an epoch boundary."
+      },
+      "emptyTitle": "No DRep activity yet",
+      "emptyBody": "Activity will appear here after this DRep registers or makes an on-chain update.",
+      "noMatch": "No activity matches these filters.",
+      "errorTitle": "We couldn't load DRep activity",
+      "errorBody": "Something interrupted the request. Your DRep information is safe—please try loading the history again.",
+      "partial": "GovTool shows only your latest registration until your full DRep history is available."
+    }
+  },
+  "shareDialog": {
+    "action": {
+      "open": "Share governance action",
+      "title": "Share Governance Action",
+      "body": "This governance action is public. Anyone can view it, no wallet connection required.",
+      "urlLabel": "Governance action URL",
+      "hint": "Copies the full URL, including the governance action ID.",
+      "text": "A governance action on GovTool"
+    },
+    "proposal": {
+      "open": "Share proposal",
+      "title": "Share Proposal",
+      "body": "This proposal is public. Anyone can read it and its discussion, no wallet connection required.",
+      "urlLabel": "Proposal URL",
+      "hint": "Copies the full URL of the proposal's discussion.",
+      "text": "A governance action proposal on GovTool"
+    }
+  },
+  "outcome": {
+    "breadcrumbRoot": "Governance Actions",
+    "breadcrumbOutcome": "Outcome",
+    "more": "More actions",
+    "copyId": "Copy governance action ID",
+    "copyId129": "Copy CIP-129 governance action ID",
+    "copyAddress": "Copy receiving address",
+    "copyAddressNumbered": "Copy receiving address {{n}}",
+    "openMetadata": "Open the metadata document",
+    "submitted": "Submitted",
+    "votingEnds": "Voting ends",
+    "expiredOn": "Expired on",
+    "enactedOn": "Enacted on",
+    "ratifiedOn": "Ratified on",
+    "droppedOn": "Dropped on",
+    "dateEpoch": "{{date}}, (Epoch {{epoch}})",
+    "tabs": {
+      "label": "Governance action sections",
+      "overview": "Overview",
+      "discussions": "Discussions",
+      "votes": "Votes",
+      "activity": "Activity"
+    },
+    "sections": {
+      "label": "Overview sections",
+      "reasoning": "Reasoning",
+      "parameters": "Parameters",
+      "links": "Supporting links"
+    },
+    "abstract": "Abstract",
+    "motivation": "Motivation",
+    "rationale": "Rationale",
+    "readMore": "Read more...",
+    "readLess": "Show less",
+    "noReasoning": "This action has no abstract, motivation or rationale.",
+    "supportingLinks": "Supporting links",
+    "noLinks": "This action lists no supporting links.",
+    "pass": "Pass",
+    "fail": "Fail",
+    "noVote": "No vote",
+    "noThreshold": "No threshold",
+    "notEligible": "Not Eligible",
+    "pending": "Not counted",
+    "statuses": {
+      "enacted": "Enacted",
+      "ratified": "Ratified",
+      "expired": "Expired",
+      "dropped": "Not Ratified",
+      "live": "In Progress"
+    },
+    "votes": {
+      "title": "Votes submitted for this Governance Action",
+      "yes": "Yes",
+      "no": "No",
+      "threshold": "Threshold",
+      "totalActive": "Total Active Stake",
+      "totalAbstain": "Total Abstain",
+      "thresholdStake": "Ratification Threshold Stake",
+      "totalActiveMembers": "Total Active Members",
+      "thresholdMembers": "Ratification Threshold Members",
+      "notVoted": "Not Voted",
+      "seeAll": "See all data",
+      "metric": "Metric",
+      "value": "Value",
+      "close": "Close",
+      "unavailable": "The tally for this group is not available.",
+      "spoNotVoting": "SPOs do not vote on this type of action",
+      "ccNotVoting": "CC do not vote on this type of action",
+      "constitutional": "Constitutional",
+      "unconstitutional": "Unconstitutional",
+      "membersThreshold": "Threshold: {{percent}}% required",
+      "overall": "Overall Outcome",
+      "overallBody": "Final conclusion across all voting groups",
+      "outcome": "Outcome: {{status}}"
+    },
+    "info": {
+      "title": "Action Information",
+      "id105": "Governance Action ID",
+      "id129": "(CIP-129) Governance Action ID",
+      "anchorLink": "Metadata anchor link",
+      "anchorHash": "Metadata anchor hash",
+      "receivingAddress": "Receiving Address",
+      "amount": "Amount",
+      "epoch": "Epoch",
+      "submitted": "Submitted",
+      "votingEndsOn": "Voting Ends on"
+    },
+    "discussions": {
+      "forumTitle": "Discussion forum",
+      "empty": "No discussion for this action in GovTool.",
+      "linked": "This action was discussed in the GovTool forum before it was submitted.",
+      "comments_one": "{{count}} comment",
+      "comments_other": "{{count}} comments",
+      "open": "Open the discussion",
+      "ctaTitle": "Take part in this Conversation and Make your voice heard",
+      "ctaBody": "Connect your wallet and sign in with a verified on-chain role to participate in the discussion.",
+      "ctaConnect": "Connect wallet to Join",
+      "ctaForum": "Go to the forum"
+    },
+    "breakdown": {
+      "title": "Breakdown by Voter Groups",
+      "dreps": "Delegated Representatives (DReps)",
+      "spos": "Stake Pool Operators (SPOs)",
+      "cc": "Constitutional Committee (CC)",
+      "yesPower": "Yes Power:",
+      "noPower": "No Power:",
+      "complete": "Voting Complete",
+      "active": "Active Voting",
+      "notRequired": "Not Required"
+    },
+    "voters": {
+      "title": "Votes by voter",
+      "dreps": "DReps",
+      "spos": "SPOs",
+      "cc": "CC",
+      "unavailable": "Individual votes are not available yet. GovTool shows each voter here once the backend serves an action's votes."
+    },
+    "additional": {
+      "title": "Additional Information",
+      "discussions": "Discussions",
+      "lastActivity": "Last activity",
+      "none": "None yet"
+    },
+    "activity": {
+      "title": "Activity",
+      "submitted": "Submitted on chain",
+      "ratified": "Ratified",
+      "enacted": "Enacted",
+      "expired": "Expired",
+      "dropped": "Dropped",
+      "epoch": "Epoch {{epoch}}"
+    }
+  }
 }

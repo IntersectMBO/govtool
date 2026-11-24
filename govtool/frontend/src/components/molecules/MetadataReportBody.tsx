@@ -9,6 +9,7 @@ import {
   ReportBody,
 } from "@models";
 import { buildHighlightedLines } from "@utils";
+import { ds, FONT_FAMILY } from "@/consts/designTokens";
 
 import { REPORT_LABEL } from "./metadataReportStyles";
 
@@ -113,9 +114,9 @@ export const MetadataReportBody = ({ body, issues }: MetadataReportBodyProps) =>
           sx={{
             maxHeight: 420,
             overflow: "auto",
-            border: "1px solid #D6D8FF",
+            border: `1px solid ${ds.primary["100"]}`,
             borderRadius: 1,
-            bgcolor: "#FBFBFF",
+            bgcolor: ds.gray["25"],
             fontFamily: "monospace",
             fontSize: 12,
             lineHeight: "18px",
@@ -125,9 +126,9 @@ export const MetadataReportBody = ({ body, issues }: MetadataReportBodyProps) =>
               minWidth: "3.5em",
               pr: 1.5,
               textAlign: "right",
-              color: "#8E908E",
+              color: ds.gray["500"],
               userSelect: "none",
-              borderRight: "1px solid #E6E6F0",
+              borderRight: `1px solid ${ds.gray["200"]}`,
               mr: 1,
             },
             "& .mr-text": { whiteSpace: "pre", pr: 1 },
@@ -233,7 +234,7 @@ export const MetadataReportBody = ({ body, issues }: MetadataReportBodyProps) =>
                     </Box>
                   )}
                   {issue.reason}
-                  <Box component="span" sx={{ color: "#8E908E" }}>
+                  <Box component="span" sx={{ color: ds.gray["500"] }}>
                     {` (${position})`}
                   </Box>
                 </>
@@ -249,7 +250,7 @@ export const MetadataReportBody = ({ body, issues }: MetadataReportBodyProps) =>
                       sx={{
                         textAlign: "left",
                         fontSize: 14,
-                        fontFamily: "Poppins",
+                        fontFamily: FONT_FAMILY.sans,
                         color: "primary.main",
                         textDecoration: "underline",
                       }}

@@ -29,8 +29,8 @@ const authorsLine = (overrides: Partial<ProposalData>) => {
   render(
     <MemoryRouter>
       <GovernanceActionDetailsCardData
-        isOneColumn
         proposal={{ ...proposal, ...overrides }}
+        section="side"
       />
     </MemoryRouter>,
   );

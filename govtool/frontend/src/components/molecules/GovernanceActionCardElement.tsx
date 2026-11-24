@@ -10,8 +10,10 @@ import "./tableMarkdown.css";
 
 import { Typography, Tooltip, CopyButton, TooltipProps } from "@atoms";
 import { removeMarkdown } from "@/utils";
+import { markdownLineBreaks } from "@/utils/markdownLineBreaks";
 import { ICONS } from "@/consts";
 import { useModal } from "@/context";
+import { ds, FONT_FAMILY } from "@/consts/designTokens";
 
 type BaseProps = {
   label: string;
@@ -61,7 +63,7 @@ export const GovernanceActionCardElement = ({
         {...tooltipProps}
       >
         <InfoOutlinedIcon
-          sx={{ ml: 0.7, mb: 0.1, color: "#ADAEAD", fontSize: "small" }}
+          sx={{ ml: 0.7, mb: 0.1, color: ds.gray["400"], fontSize: "small" }}
         />
       </Tooltip>
     );
@@ -151,19 +153,7 @@ export const GovernanceActionCardElement = ({
   };
 
   const renderMarkdown = (markdownText: string | number) => {
-    const formattedText = markdownText
-      .toString()
-      .replace(/\r\n|\r/g, "\n")
-      .replace(
-        /\n\n+/g,
-        (match) =>
-          `\n\n${Array(match.length - 1)
-            .fill("&nbsp;  \n")
-            .join("")}\n`,
-      )
-      .split("\n")
-      .map((line) => `${line}  `)
-      .join("\n");
+    const formattedText = markdownLineBreaks(markdownText);
 
     return (
       <Markdown
@@ -260,7 +250,7 @@ export const GovernanceActionCardElement = ({
           alignItems={isMarkdown ? "unset" : "center"}
           overflow="hidden"
           flexDirection={isMarkdown ? "column" : "row"}
-          fontFamily="Poppins, Arial"
+          fontFamily={FONT_FAMILY.sans}
         >
           {renderTextOrChildren()}
         </Box>

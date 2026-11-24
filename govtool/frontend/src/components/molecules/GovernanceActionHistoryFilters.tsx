@@ -20,6 +20,8 @@ import { getCurrentSearchParams } from "@utils";
 
 import { GovernanceActionHistoryMenuButton } from "./GovernanceActionHistoryMenuButton";
 
+import { ds } from "@/consts/designTokens";
+
 type FilterParam = "type" | "status";
 
 const getValues = (params: URLSearchParams, name: FilterParam) =>
@@ -78,8 +80,8 @@ export const GovernanceActionHistoryFilters = () => {
       data-testid={`${testId}-checkbox-wrapper`}
       key={value}
       paddingX="20px"
-      sx={{ cursor: "pointer", "&:hover": { bgcolor: "#E6EBF7" } }}
-      bgcolor={isChecked(name, value) ? "#FFF0E7" : "transparent"}
+      sx={{ cursor: "pointer", "&:hover": { bgcolor: ds.gray["200"] } }}
+      bgcolor={isChecked(name, value) ? ds.orange["50"] : "transparent"}
       onClick={() => toggle(name, value)}
     >
       <FormControlLabel

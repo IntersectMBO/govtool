@@ -50,3 +50,5 @@ export * from "./getCurrentUrl";
 export * from "./walletOnlyPath";
 export * from "./getPageTitle";
 export * from "./metadataReportHighlight";
+export * from "./globalSearch";
+export * from "./notifications";

@@ -1,34 +1,36 @@
-import { useTheme } from '@emotion/react';
-import {
-    IconChatAlt,
-    IconDocumentSearch,
-    IconLink,
-    IconReply,
-    IconShare,
-    IconThumbDown,
-    IconThumbUp,
-} from '@intersect.mbo/intersectmbo.org-icons-set';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { ICONS } from '@/consts/icons';
-import {
-    getGovActionCIP129Id,
-    getGovActionPath,
-} from '@/utils/getGovActionId';
-import {
-    Badge,
-    Box,
-    IconButton,
-    Menu,
-    MenuItem,
-    Stack,
-    Link,
-} from '@mui/material';
-import { Button, Tooltip, Typography } from '@atoms';
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router';
+import { Link as RouterLink, useNavigate } from 'react-router';
+import { Box, ButtonBase, Menu, MenuItem } from '@mui/material';
+import {
+    ArrowRight,
+    ArrowUpDown,
+    Check,
+    ChevronRight,
+    EllipsisVertical,
+    ExternalLink,
+    MessageCircle,
+    Pencil,
+    Reply,
+    ThumbsDown,
+    ThumbsUp,
+    Trash2,
+} from 'lucide-react';
+import { Button, Tooltip, Typography } from '@atoms';
+import { ShareDialog } from '@/components/organisms/DRepDashboard/ShareDRepDialog';
+import {
+    Card,
+    CardTitle,
+    Divider,
+    HEADER_TINTS,
+    MonoTag,
+} from '@/components/organisms/OutcomeDetails/parts';
+import {
+    ds,
+    FONT_FAMILY,
+    PILL_TONES,
+    RADIUS,
+    SHADOWS,
+} from '@/consts/designTokens';
 import {
     CommentCard,
     EditProposalDialog,
@@ -50,8 +52,6 @@ import {
     getPolls,
 } from '../../../lib/api';
 import {
-    correctVoteAdaFormat,
-    decodeJWT,
     formatIsoDate,
     GA_SUBMISSION_FEE_ADA,
     getGovActionDepositAda,
@@ -70,142 +70,292 @@ import MarkdownTypography from '../../../lib/markdownRenderer';
 import UserValidation from '../../../components/UserValidation/UserValidation';
 import { PdfModal } from '../../../components/PdfModal';
 import { PdfTextArea } from '../../../components/PdfFields';
-import { cyan, errorRed, gray } from '@/consts/colors';
 import { GOV_ACTION_HISTORY_PATHS } from '@/consts/paths';
+import {
+    getGovActionCIP129Id,
+    getGovActionPath,
+} from '@/utils/getGovActionId';
 import { useGetGovernanceActionRecordQuery } from '@/hooks/queries/useGetGovernanceActionRecordQuery';
 import { getGovernanceActionVoteEnd } from '@/utils/governanceActions';
+import {
+    cappedCount,
+    proposalActionKind,
+    proposalStatus,
+    sentimentButton,
+    typeDetailsKind,
+} from './detailsState';
 
-// Layout follows GovTool's GovernanceActionDetailsCard: a two-column card
-// (data on the left, actions on the right) with radius 20 and boxShadow2.
-const detailsCardSx = {
-    borderRadius: '20px',
-    display: 'grid',
-    gridTemplateColumns: { xxs: '1fr', xl: '0.55fr 0.45fr' },
-    width: '100%',
-    position: 'relative',
-    boxShadow: '2px 2px 20px 0px rgba(47, 98, 220, 0.20)',
-};
+// Laid out as the redesigned governance action pages (OutcomeDetails): a
+// tinted header with the breadcrumb, pills, title and dates, then the
+// content beside a 340px side column of action, sentiment and information
+// cards. Below lg the side column sits between the content and the
+// discussion, so the actions stay near the top on a phone.
 
-const detailsDataColumnSx = {
-    borderRadius: { xxs: '20px 20px 0 0', xl: '20px 0 0 20px' },
-    bgcolor: 'rgba(255, 255, 255, 0.30)',
-    p: { xxs: '32px 24px', md: '40px' },
-    overflow: 'hidden',
-    minWidth: 0,
-};
-
-const detailsActionsColumnSx = {
-    borderRadius: { xxs: '0 0 20px 20px', xl: '0 20px 20px 0' },
-    bgcolor: 'rgba(255, 255, 255, 0.60)',
-    p: { xxs: '32px 24px', md: '40px', xl: '40px 64px' },
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-};
-
-// GovTool list-card shell (GovernanceActionCard).
-const sectionCardSx = {
-    borderRadius: '20px',
-    bgcolor: 'rgba(255, 255, 255, 0.30)',
-    boxShadow: '0px 4px 15px 0px #DDE3F5',
-    p: 3,
-};
-
-const commentComposerSx = {
-    borderRadius: '20px',
-    bgcolor: 'rgba(255, 255, 255, 0.60)',
-    boxShadow: '2px 2px 20px 0px rgba(47, 98, 220, 0.20)',
-    p: { xxs: 3, md: 4 },
-};
-
-// GovernanceActionCardElement value text.
-const valueSx = {
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: '24px',
-    wordBreak: 'break-word',
-};
-
-const markdownValueSx = {
-    ...valueSx,
-    '& p': { m: 0 },
-    '& a': { color: 'primaryBlue' },
-};
-
-// GovernanceActionCardElement "pill" text variant.
-const pillSx = {
-    display: 'inline-flex',
-    maxWidth: '100%',
-    padding: '6px 18px',
-    overflow: 'hidden',
-    bgcolor: 'lightBlue',
-    borderRadius: 100,
-};
-
-const readMoreSx = {
-    textTransform: 'none',
-    padding: '0',
-    minWidth: 0,
-    marginTop: '8px',
-    color: 'primary.main',
-    fontWeight: 600,
-    '&:hover': {
-        backgroundColor: 'transparent',
-        textDecoration: 'underline',
+const focusRing = {
+    '&.Mui-focusVisible, &:focus-visible': {
+        outline: `2px solid ${ds.primary['600']}`,
+        outlineOffset: 2,
     },
 };
 
-const textLinkSx = {
-    width: 'max-content',
-    cursor: 'pointer',
-    color: 'primaryBlue',
-    fontSize: 14,
+// The status tag, as on the proposals list (ProposalRow).
+const tagSx = (tone) => ({
+    backgroundColor: PILL_TONES[tone].bg,
+    borderRadius: `${RADIUS.xs}px`,
+    color: PILL_TONES[tone].text,
+    fontSize: 11,
     fontWeight: 500,
-    lineHeight: '20px',
-    textDecorationColor: 'currentColor',
+    lineHeight: '16px',
+    px: 0.75,
+    py: 0.25,
+});
+
+const breadcrumbLinkSx = {
+    borderRadius: `${RADIUS.xs}px`,
+    color: 'inherit',
+    textDecoration: 'none',
+    '&:hover': { textDecoration: 'underline' },
+    ...focusRing,
 };
 
-// GovTool Share button look: round, light hover with a soft shadow.
-const roundIconButtonSx = {
-    width: 48,
-    height: 48,
-    borderRadius: 50,
-    transition: 'all 0.3s',
-    '&:hover': {
-        bgcolor: '#F7F9FB',
-        boxShadow: (theme) => theme.shadows[1],
+// The round header buttons, sized as ShareDialog's.
+const roundButtonSx = {
+    border: `1px solid ${ds.gray['200']}`,
+    borderRadius: '50%',
+    color: ds.gray['700'],
+    flexShrink: 0,
+    height: 40,
+    width: 40,
+    '&:hover': { backgroundColor: ds.gray['50'] },
+    ...focusRing,
+};
+
+const textButtonSx = {
+    borderRadius: `${RADIUS.xs}px`,
+    color: ds.primary['600'],
+    fontFamily: 'inherit',
+    fontSize: 13,
+    fontWeight: 600,
+    '&:hover': { textDecoration: 'underline' },
+    ...focusRing,
+};
+
+const bodyTextSx = {
+    color: ds.gray['600'],
+    fontSize: 14,
+    lineHeight: '20px',
+    m: 0,
+};
+
+const sectionTitleSx = {
+    color: ds.gray['900'],
+    fontSize: 20,
+    fontWeight: 600,
+    lineHeight: '28px',
+    m: 0,
+};
+
+const stackSx = { display: 'flex', flexDirection: 'column', gap: 2 };
+
+const countPillSx = {
+    backgroundColor: ds.gray['100'],
+    borderRadius: `${RADIUS.pill}px`,
+    color: ds.gray['700'],
+    fontSize: 12,
+    fontWeight: 600,
+    lineHeight: '18px',
+    minWidth: 24,
+    px: 0.75,
+    textAlign: 'center',
+};
+
+const monoValueSx = {
+    fontFamily: FONT_FAMILY.mono,
+    fontSize: 13,
+    wordBreak: 'break-all',
+};
+
+// The constitution and guardrails values keep their markdown rendering.
+const markdownValueSx = {
+    ...monoValueSx,
+    '& p': { m: 0 },
+    '& a': { color: ds.primary['600'] },
+};
+
+// The vendored comment and poll cards keep their own shells elsewhere; on
+// this page they take the redesign's card.
+const cardShellSx = {
+    '& > .MuiCard-root': {
+        backgroundColor: '#FFFFFF',
+        border: `1px solid ${ds.gray['200']}`,
+        borderRadius: `${RADIUS.lg}px`,
+        boxShadow: SHADOWS.card,
     },
 };
 
-const sentimentButtonSx = {
-    width: 48,
-    height: 48,
-    borderRadius: 50,
+const DETAILS_TITLES = {
+    withdrawals: 'Treasury withdrawal',
+    constitution: 'New constitution',
+    hardFork: 'Hard fork',
 };
 
-const DetailLabel = ({ children, sx }) => (
-    <Typography
-        component='p'
-        sx={{
-            fontSize: 14,
-            fontWeight: 600,
-            lineHeight: '20px',
-            color: 'neutralGray',
-            mb: '4px',
-            ...sx,
-        }}
-    >
-        {children}
-    </Typography>
-);
-
-// Label/value row in the GovernanceActionCardElement style.
-const DetailRow = ({ label, children, mb = 4 }) => (
-    <Box mb={mb}>
-        <DetailLabel>{label}</DetailLabel>
-        {children}
+// A header date, as OutcomeDetails' DateItem.
+const DateItem = ({ label, children }) => (
+    <Box sx={{ minWidth: 0 }}>
+        <Box
+            sx={{
+                color: ds.gray['600'],
+                fontSize: 11,
+                fontWeight: 500,
+                letterSpacing: '0.3px',
+                textTransform: 'uppercase',
+            }}
+        >
+            {label}
+        </Box>
+        <Box
+            sx={{
+                alignItems: 'baseline',
+                color: ds.gray['900'],
+                columnGap: 1.5,
+                display: 'flex',
+                flexWrap: 'wrap',
+                fontSize: 13,
+                mt: 0.25,
+            }}
+        >
+            {children}
+        </Box>
     </Box>
 );
+
+// A labelled value in a details card.
+const Field = ({ label, children }) => (
+    <Box sx={{ minWidth: 0 }}>
+        <Box sx={{ color: ds.gray['600'], fontSize: 12, fontWeight: 500 }}>
+            {label}
+        </Box>
+        <Box
+            sx={{
+                color: ds.gray['900'],
+                fontSize: 14,
+                lineHeight: '20px',
+                mt: 0.5,
+                overflowWrap: 'anywhere',
+            }}
+        >
+            {children}
+        </Box>
+    </Box>
+);
+
+// A row of the side column's information card.
+const InfoRow = ({ label, children }) => (
+    <Box
+        sx={{
+            alignItems: 'baseline',
+            display: 'flex',
+            fontSize: 13,
+            gap: 2,
+            justifyContent: 'space-between',
+        }}
+    >
+        <Box component='dt' sx={{ color: ds.gray['600'], flexShrink: 0 }}>
+            {label}
+        </Box>
+        <Box
+            component='dd'
+            sx={{
+                color: ds.gray['900'],
+                fontWeight: 500,
+                m: 0,
+                minWidth: 0,
+                overflow: 'hidden',
+                textAlign: 'right',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+            }}
+        >
+            {children}
+        </Box>
+    </Box>
+);
+
+// One of Abstract, Motivation and Rationale.
+const ReasoningSection = ({ title, children }) => (
+    <Box>
+        <Box
+            component='h2'
+            sx={{ color: ds.gray['900'], fontSize: 15, fontWeight: 600, m: 0 }}
+        >
+            {title}
+        </Box>
+        <Box sx={{ mt: 0.75, overflowWrap: 'anywhere' }}>{children}</Box>
+    </Box>
+);
+
+// The like or dislike button with its count. Its own vote shows in the
+// success (like) or error (dislike) tone.
+const SentimentButton = ({ like, state, count, onClick, dimmed }) => {
+    const Icon = like ? ThumbsUp : ThumbsDown;
+    const tone = PILL_TONES[like ? 'success' : 'error'];
+    return (
+        <Tooltip
+            paragraphOne={
+                <span style={{ whiteSpace: 'pre-line' }}>{state.tooltip}</span>
+            }
+        >
+            <Box component='span' sx={{ display: 'flex', minWidth: 0 }}>
+                <ButtonBase
+                    aria-pressed={state.active}
+                    data-testid={like ? 'like-button' : 'dislike-button'}
+                    disabled={state.disabled}
+                    onClick={onClick}
+                    sx={{
+                        alignItems: 'center',
+                        backgroundColor: state.active ? tone.bg : '#FFFFFF',
+                        border: `1px solid ${
+                            state.active ? tone.border : ds.gray['200']
+                        }`,
+                        borderRadius: `${RADIUS.md}px`,
+                        color: state.active ? tone.text : ds.gray['800'],
+                        flex: 1,
+                        fontFamily: 'inherit',
+                        fontSize: 14,
+                        fontWeight: 500,
+                        gap: 1,
+                        height: 44,
+                        justifyContent: 'center',
+                        opacity: dimmed ? 0.5 : 1,
+                        px: 1.5,
+                        '&:hover': {
+                            backgroundColor: state.active
+                                ? tone.bg
+                                : ds.gray['50'],
+                        },
+                        ...focusRing,
+                    }}
+                >
+                    <Icon aria-hidden size={16} />
+                    {like ? 'Like' : 'Dislike'}
+                    <Box
+                        component='span'
+                        data-testid={like ? 'like-count' : 'dislike-count'}
+                        sx={{
+                            ...countPillSx,
+                            ...(state.active && {
+                                backgroundColor: '#FFFFFF',
+                                color: tone.text,
+                            }),
+                        }}
+                    >
+                        {cappedCount(count)}
+                    </Box>
+                </ButtonBase>
+            </Box>
+        </Tooltip>
+    );
+};
 
 const SingleGovernanceAction = ({ id }) => {
     const MAX_COMMENT_LENGTH = 15000;
@@ -225,7 +375,6 @@ const SingleGovernanceAction = ({ id }) => {
         epochParams,
     } = useAppContext();
 
-    const theme = useTheme();
     // Without epoch params the deposit is unknown, so submission stays blocked.
     const govActionDepositAda = getGovActionDepositAda(epochParams);
     const hasBalanceForGASubmission = (balance) =>
@@ -292,9 +441,14 @@ const SingleGovernanceAction = ({ id }) => {
         }, 2000);
     };
 
-    function copyToClipboard(value) {
-        navigator.clipboard.writeText(value);
-    }
+    // ShareDialog copies the link itself. A click on its copy button reaches
+    // this wrapper through React's tree (the dialog is a portal), so the page
+    // still confirms the copy beside the share button, as its menu did.
+    const handleShareDialogClick = (event) => {
+        if (event.target?.closest?.('[data-testid="copy-link"]')) {
+            disableShareClick();
+        }
+    };
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -306,11 +460,6 @@ const SingleGovernanceAction = ({ id }) => {
         setAnchorEl(null);
     };
 
-    const [shareAnchorEl, setShareAnchorEl] = useState(null);
-    const openShare = Boolean(shareAnchorEl);
-    const handleShareClick = (event) => {
-        setShareAnchorEl(event.currentTarget);
-    };
     // Read More / Show Less logic
     const [showFullText, setShowFullText] = useState(true);
     const [truncatedText, setTruncatedText] = useState('');
@@ -326,9 +475,6 @@ const SingleGovernanceAction = ({ id }) => {
             setTruncatedText(AbstractMarkdownText);
         }
     }, [AbstractMarkdownText, maxLength]);
-    const handleShareClose = () => {
-        setShareAnchorEl(null);
-    };
 
     const handleEditProposal = () => {
         setOpenEditDialog(true);
@@ -577,6 +723,26 @@ const SingleGovernanceAction = ({ id }) => {
         }
     };
 
+    const handleSubmitAsGA = async () => {
+        const balance = await fetchCurrentWalletBalance();
+        if (hasBalanceForGASubmission(balance)) {
+            await loginUserToApp({
+                wallet: walletAPI,
+                setUser,
+                setOpenUsernameModal,
+                callBackFn: () => {
+                    setOpenGASubmissionDialog(true);
+                },
+                clearStates,
+                addErrorAlert,
+                addSuccessAlert,
+                addChangesSavedAlert,
+            });
+        } else {
+            setOpenAlertDialog(true);
+        }
+    };
+
     useEffect(() => {
         if (!mounted) {
             setMounted(true);
@@ -605,632 +771,445 @@ const SingleGovernanceAction = ({ id }) => {
         }
     }, [commentsSortType]);
 
+    const content = proposal?.attributes?.content?.attributes;
+    const isSubmitted = content?.prop_submitted;
+    // The page's long-standing ownership check, by forum user id.
+    const isAuthor =
+        user?.user?.id?.toString() ===
+        proposal?.attributes?.user_id?.toString();
+    const typeName = content?.gov_action_type?.attributes?.gov_action_type_name;
+    const username = proposal?.attributes?.user_govtool_username;
+    const status = proposalStatus(isSubmitted);
+    const detailsKind = typeDetailsKind(content);
+    const constitution = content?.proposal_constitution_content?.data?.attributes;
+    const hardFork = content?.proposal_hard_fork_content?.data?.attributes;
+    const actionKind = proposalActionKind({
+        submitted: isSubmitted,
+        hasUser: Boolean(user),
+        isAuthor,
+        voteEnded: Boolean(voteEnd),
+    });
+    const needsValidation = checkShowValidation(false, walletAPI, user);
+    const showGovernanceValidation = !isSubmitted && needsValidation;
+    const showAddPoll =
+        !isSubmitted &&
+        user &&
+        +user?.user?.id === +proposal?.attributes?.user_id &&
+        !activePoll;
+    const hasPolls = Boolean(activePoll) || unactivePollList?.length > 0;
+    const commentsCount = proposal?.attributes?.prop_comments_number;
+
+    const sentimentState = (like) =>
+        sentimentButton({
+            like,
+            submitted: isSubmitted,
+            hasWallet: Boolean(walletAPI?.address),
+            user,
+            isAuthor,
+            vote: userProposalVote,
+        });
+    const likeState = sentimentState(true);
+    const dislikeState = sentimentState(false);
+    const sentimentClick = (like, state) => {
+        if (state.action === 'username') {
+            return () =>
+                setOpenUsernameModal({
+                    open: true,
+                    callBackFn: () => {},
+                });
+        }
+        if (state.action === 'vote') {
+            return () =>
+                updateLikesOrDislikes({
+                    like,
+                    loggedInUser: user,
+                });
+        }
+        return null;
+    };
+
+    const governanceValidation = showGovernanceValidation ? (
+        <UserValidation
+            type='governance'
+            drepCheck={false}
+            drepRequired={false}
+        />
+    ) : null;
+
     return !proposal ? null : proposal?.attributes?.content?.attributes
           ?.is_draft ? null : (
         <>
-            <Typography variant='body1' fontWeight={400}>
-                {openEditDialog ? (
+            {openEditDialog ? (
+                <Typography variant='body1' fontWeight={400}>
                     <EditProposalDialog
                         proposal={proposal}
                         openEditDialog={openEditDialog}
                         handleCloseEditDialog={handleCloseEditDialog}
                         setMounted={setMounted}
                     />
-                ) : (
-                    <Box>
-                        <Box mt={3}>
-                            <Button
-                                variant='text'
-                                size='small'
-                                startIcon={
-                                    <ArrowBackIosIcon
-                                        color='primary'
-                                        sx={{ fontSize: 14 }}
-                                    />
-                                }
-                                onClick={() => navigate(`/proposals`)}
-                                sx={{
-                                    px: 0,
-                                    minWidth: 0,
-                                    fontSize: 14,
-                                    fontWeight: 400,
-                                    lineHeight: '20px',
-                                    '& .MuiButton-startIcon': { mr: 0.5 },
-                                    '&:hover': {
-                                        backgroundColor: 'transparent',
-                                        textDecoration: 'underline',
-                                    },
-                                }}
-                            >
-                                Back
-                            </Button>
+                </Typography>
+            ) : (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'column',
+                        gap: 2.5,
+                        isolation: 'isolate',
+                        position: 'relative',
+                    }}
+                >
+                    {/* The header's full-width tint, as on a live action. */}
+                    <Box
+                        aria-hidden
+                        sx={{
+                            background: `linear-gradient(180deg, ${HEADER_TINTS.live} 0%, rgba(255, 255, 255, 0) 100%)`,
+                            height: 380,
+                            left: '50%',
+                            position: 'absolute',
+                            top: { xxs: -24, md: -40 },
+                            transform: 'translateX(-50%)',
+                            width: '100vw',
+                            zIndex: -1,
+                        }}
+                    />
+
+                    <Box
+                        aria-label='Breadcrumb'
+                        component='nav'
+                        sx={{
+                            alignItems: 'center',
+                            color: ds.gray['600'],
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            fontSize: 12,
+                            gap: 0.75,
+                        }}
+                    >
+                        <Box
+                            component={RouterLink}
+                            to='/proposals'
+                            sx={breadcrumbLinkSx}
+                        >
+                            Governance Actions
                         </Box>
+                        <ChevronRight aria-hidden size={12} />
+                        <span>Proposed</span>
+                        <ChevronRight aria-hidden size={12} />
+                        <Box
+                            aria-current='page'
+                            component='span'
+                            sx={{
+                                color: ds.gray['900'],
+                                fontWeight: 600,
+                                maxWidth: { xxs: '100%', md: 420 },
+                                minWidth: 0,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
+                            {content?.prop_name}
+                        </Box>
+                    </Box>
 
-                        {/* <Box mt={4}>
-                            <Card
-                                variant='outlined'
-                                sx={{
-                                    backgroundColor: (theme) => alpha(theme.palette.neutralWhite, 0.3),
-                                }}
+                    <Box
+                        component='header'
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1.5,
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                alignItems: 'center',
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 1,
+                                lineHeight: '16px',
+                            }}
+                        >
+                            <MonoTag testId='governance-action-type-content'>
+                                {typeName}
+                            </MonoTag>
+                            <Box
+                                component='span'
+                                data-testid='proposal-status'
+                                sx={tagSx(status.tone)}
                             >
-                                <CardHeader
-                                    sx={{
-                                        pt: 1,
-                                        pb: 1,
-                                        backgroundColor: alpha(fadedPurple.c50, 0.7),
-                                    }}
-                                    title={
-                                        <Box
-                                            display={'flex'}
-                                            justifyContent={'center'}
-                                            alignItems={'center'}
-                                            flexDirection={'row'}
-                                        >
-                                            <Typography
-                                                variant='caption'
-                                                component='p'
-                                            >
-                                                {proposal?.attributes?.content
-                                                    ?.attributes?.prop_submitted
-                                                    ? `Submitted for vote on: ${formatIsoDate(proposal?.attributes?.content?.attributes?.prop_submission_date)}`
-                                                    : `Proposed on: ${formatIsoDate(
-                                                          proposal?.attributes
-                                                              ?.createdAt
-                                                      )}`}
-                                            </Typography>
-                                            <Tooltip
-                                                title={
-                                                    proposal?.attributes
-                                                        ?.content?.attributes
-                                                        ?.prop_submitted ? (
-                                                        <span
-                                                            style={{
-                                                                whiteSpace:
-                                                                    'pre-line',
-                                                            }}
-                                                        >
-                                                            {`Proposal Date\n\nThe date
-                                                        when Proposal was
-                                                        submitted as Governance
-                                                        Action.`}
-                                                        </span>
-                                                    ) : (
-                                                        'Proposal Date'
-                                                    )
-                                                }
-                                            >
-                                                <Box>
-                                                    <InfoOutlinedIcon sx={{ fontSize: 16, color: gray.c300 }} />
-                                                </Box>
-                                            </Tooltip>
-                                        </Box>
-                                    }
-                                ></CardHeader>
-                                {
-                                    <CardContent>
-                                        <Box
-                                            display='flex'
-                                            alignItems='center'
-                                            justifyContent='space-between'
-                                            flexDirection={{
-                                                xxs: 'column',
-                                                lg: 'row',
-                                            }}
-                                            gap={1}
-                                        >
-                                            <Box
-                                                textAlign={{
-                                                    xxs: 'center',
-                                                    lg: 'left',
-                                                }}
-                                            >
-                                                {proposal?.attributes?.content
-                                                    ?.attributes
-                                                    ?.prop_submitted ? (
-                                                    <Typography
-                                                        variant='caption'
-                                                        sx={{
-                                                            textWrap: 'balance',
-                                                        }}
-                                                    >
-                                                        This proposal has been
-                                                        submitted on-chain as a
-                                                        Governance Action to get
-                                                        voted on.
-                                                    </Typography>
-                                                ) : (
-                                                    <>
-                                                        <Typography variant='body2'>
-                                                            Your Action:
-                                                        </Typography>
-                                                        <Typography
-                                                            variant='caption'
-                                                            sx={{
-                                                                textWrap:
-                                                                    'balance',
-                                                            }}
-                                                        >
-                                                            {user &&
-                                                            user?.user?.id?.toString() ===
-                                                                proposal?.attributes?.user_id?.toString()
-                                                                ? `If your are ready, submit this proposal as a governance action to get voted on.`
-                                                                : `Help make the proposal better by commenting`}
-                                                        </Typography>
-                                                    </>
-                                                )}
-                                            </Box>
-
-                                            <Box>
-                                                {proposal?.attributes?.content
-                                                    ?.attributes
-                                                    ?.prop_submitted ? (
-                                                    <Button
-                                                        variant='outlined'
-                                                        data-testid='review-and-vote-button'
-                                                        onClick={() =>
-                                                            navigate(
-                                                                getGovActionPath(proposal?.attributes?.content?.attributes?.prop_submission_tx_hash, 0)
-                                                            )
-                                                        }
-                                                        endIcon={
-                                                            <IconDocumentSearch
-                                                                width={18}
-                                                                height={18}
-                                                                fill={
-                                                                    theme
-                                                                        .palette
-                                                                        .primary
-                                                                        .main
-                                                                }
-                                                            />
-                                                        }
-                                                        sx={{
-                                                            width: 'max-content',
-                                                        }}
-                                                    >
-                                                        Review and Vote
-                                                    </Button>
-                                                ) : user &&
-                                                  user?.user?.id?.toString() ===
-                                                      proposal?.attributes?.user_id?.toString() ? (
-                                                    <Button
-                                                        variant='outlined'
-                                                        data-testid='submit-as-GA-button'
-                                                        sx={{
-                                                            width: 'max-content',
-                                                        }}
-                                                        onClick={async () => {
-                                                            const balance =
-                                                                await fetchCurrentWalletBalance();
-                                                            if (
-                                                                hasBalanceForGASubmission(
-                                                                    balance
-                                                                )
-                                                            ) {
-                                                                await loginUserToApp(
-                                                                    {
-                                                                        wallet: walletAPI,
-                                                                        setUser,
-                                                                        setOpenUsernameModal,
-                                                                        callBackFn:
-                                                                            () => {
-                                                                                setOpenGASubmissionDialog(
-                                                                                    true
-                                                                                );
-                                                                            },
-                                                                        clearStates,
-                                                                        addErrorAlert,
-                                                                        addSuccessAlert,
-                                                                        addChangesSavedAlert,
-                                                                    }
-                                                                );
-                                                            } else {
-                                                                setOpenAlertDialog(
-                                                                    true
-                                                                );
-                                                            }
-                                                        }}
-                                                    >
-                                                        Submit as Governance
-                                                        Action
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        variant='outlined'
-                                                        data-testid='proposal-details-header-comment-button'
-                                                        onClick={() =>
-                                                            scrollToComponent()
-                                                        }
-                                                        sx={{
-                                                            width: 'max-content',
-                                                        }}
-                                                    >
-                                                        Comment
-                                                    </Button>
-                                                )}
-                                            </Box>
-                                        </Box>
-                                    </CardContent>
-                                }
-                            </Card>
-                        </Box> */}
-                        {!proposal?.attributes?.content?.attributes
-                            ?.prop_submitted && (
-                            <Box display={'flex'} justifyContent={'flex-end'}>
-                                {checkShowValidation(
-                                    false,
-                                    walletAPI,
-                                    user
-                                ) && (
-                                    <UserValidation
-                                        type='governance'
-                                        drepCheck={false}
-                                        drepRequired={false}
-                                    />
-                                )}
+                                {status.label}
                             </Box>
-                        )}
-
-                        {/* Details card: data column and actions column */}
-                        <Box mt={3} sx={detailsCardSx}>
-                            <Box sx={detailsDataColumnSx}>
-                                {/* HEADER */}
+                        </Box>
+                        <Box
+                            sx={{
+                                alignItems: 'flex-start',
+                                display: 'flex',
+                                gap: 2,
+                                justifyContent: 'space-between',
+                            }}
+                        >
+                            <Box sx={{ minWidth: 0 }}>
                                 <Box
+                                    component='h1'
+                                    data-testid='title-content'
                                     sx={{
-                                        display: 'grid',
-                                        gridTemplateColumns: '1fr auto',
-                                        gap: 2,
-                                        alignItems: 'flex-start',
-                                        mb: 1,
+                                        color: ds.gray['900'],
+                                        fontSize: { xxs: 24, md: 28 },
+                                        fontWeight: 600,
+                                        letterSpacing: '-0.5px',
+                                        lineHeight: { xxs: '30px', md: '36px' },
+                                        m: 0,
+                                        wordBreak: 'break-word',
                                     }}
                                 >
-                                    <Box sx={{ minWidth: 0 }}>
-                                        <Typography
-                                            variant='title2'
-                                            component='h2'
-                                            data-testid='title-content'
-                                            sx={{
-                                                fontWeight: 600,
-                                                wordBreak: 'break-word',
-                                            }}
-                                        >
-                                            {
-                                                proposal?.attributes?.content
-                                                    ?.attributes?.prop_name
-                                            }
-                                        </Typography>
-                                        <Typography
-                                            variant='body2'
-                                            fontWeight={400}
-                                            component={'h5'}
-                                            sx={{
-                                                color: (theme) =>
-                                                    theme?.palette?.neutralGray,
-                                                mt: 0.5,
-                                            }}
-                                        >
-                                            @
-                                            {
-                                                proposal?.attributes
-                                                    ?.user_govtool_username
-                                            }
-                                        </Typography>
+                                    {content?.prop_name}
+                                </Box>
+                                <Box
+                                    sx={{
+                                        alignItems: 'center',
+                                        color: ds.gray['700'],
+                                        display: 'flex',
+                                        fontSize: 14,
+                                        gap: 0.75,
+                                        mt: 1,
+                                    }}
+                                >
+                                    <Box
+                                        aria-hidden
+                                        sx={{
+                                            alignItems: 'center',
+                                            backgroundColor: ds.primary['50'],
+                                            borderRadius: '50%',
+                                            color: ds.primary['700'],
+                                            display: 'flex',
+                                            flexShrink: 0,
+                                            fontSize: 11,
+                                            fontWeight: 600,
+                                            height: 22,
+                                            justifyContent: 'center',
+                                            width: 22,
+                                        }}
+                                    >
+                                        {(username || '?')
+                                            .charAt(0)
+                                            .toUpperCase()}
                                     </Box>
                                     <Box
-                                        display='flex'
-                                        alignItems='center'
-                                        justifyContent='flex-end'
+                                        component='span'
+                                        sx={{
+                                            minWidth: 0,
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}
                                     >
-                                        {/* SHARE BUTTON */}
-
-                                            <Tooltip
-                                                heading='Share proposal'
-                                                paragraphOne='Click to share this proposal on social media.'
-                                            >
-                                                <IconButton
-                                                    id='share-button'
-                                                    data-testid='share-button'
-                                                    sx={{
-                                                        ...roundIconButtonSx,
-                                                        ...(openShare && {
-                                                            bgcolor: '#F7F9FB',
-                                                            boxShadow: (theme) =>
-                                                                theme.shadows[1],
-                                                        }),
-                                                    }}
-                                                    aria-controls={
-                                                        openShare
-                                                            ? 'share-menu'
-                                                            : undefined
-                                                    }
-                                                    aria-haspopup='true'
-                                                    aria-expanded={
-                                                        openShare
-                                                            ? 'true'
-                                                            : undefined
-                                                    }
-                                                    onClick={handleShareClick}
-                                                >
-                                                    <IconShare
-                                                        width='24'
-                                                        height='24'
-                                                        fill={
-                                                            openShare
-                                                                ? theme?.palette
-                                                                      ?.primary
-                                                                      ?.main
-                                                                : theme?.palette?.textBlack
-                                                        }
-                                                    />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Menu
-                                                id='share-menu'
-                                                anchorEl={shareAnchorEl}
-                                                open={openShare}
-                                                onClose={handleShareClose}
-                                                MenuListProps={{
-                                                    'aria-labelledby':
-                                                        'share-button',
-                                                    sx: {
-                                                        width: 148,
-                                                        py: 1.5,
-                                                    },
-                                                }}
-                                                slotProps={{
-                                                    paper: {
-                                                        elevation: 4,
-                                                        sx: {
-                                                            overflow: 'visible',
-                                                            mt: 1,
-                                                            borderRadius: 3,
-                                                            width: 148,
-                                                        },
-                                                    },
-                                                }}
-                                                transformOrigin={{
-                                                    horizontal: 'right',
-                                                    vertical: 'top',
-                                                }}
-                                                anchorOrigin={{
-                                                    horizontal: 'right',
-                                                    vertical: 'bottom',
-                                                }}
-                                            >
-                                                <Stack
-                                                    direction={'column'}
-                                                    alignItems={'center'}
-                                                    px={3}
-                                                >
-                                                    <Typography
-                                                        variant='body1'
-                                                        fontWeight={400}
-                                                        component={'p'}
-                                                        sx={{
-                                                            alignSelf:
-                                                                'flex-start',
-                                                        }}
-                                                    >
-                                                        Share
-                                                    </Typography>
-                                                    <Stack
-                                                        direction={'column'}
-                                                        alignItems={'center'}
-                                                        sx={{
-                                                            marginTop:
-                                                                '0 !important',
-                                                        }}
-                                                    >
-                                                        <IconButton
-                                                            onClick={() => {
-                                                                copyToClipboard(
-                                                                    `${proposalLink}${id}`
-                                                                ),
-                                                                    disableShareClick();
-                                                            }}
-                                                            color='primary'
-                                                            disabled={
-                                                                disableShare
-                                                            }
-                                                            sx={{
-                                                                width: 48,
-                                                                height: 48,
-                                                                mt: 1.5,
-                                                                mb: 1,
-                                                                bgcolor:
-                                                                    disableShare
-                                                                        ? 'neutralWhite'
-                                                                        : 'lightBlue',
-                                                                boxShadow: (
-                                                                    theme
-                                                                ) =>
-                                                                    theme
-                                                                        .shadows[1],
-                                                                '&:hover': {
-                                                                    bgcolor:
-                                                                        'lightBlue',
-                                                                },
-                                                                '&.Mui-disabled':
-                                                                    {
-                                                                        bgcolor:
-                                                                            'neutralWhite',
-                                                                    },
-                                                            }}
-                                                            data-testid='copy-link'
-                                                        >
-                                                            <IconLink
-                                                                fill={
-                                                                    !disableShare
-                                                                        ? theme
-                                                                              ?.palette
-                                                                              ?.primary
-                                                                              ?.main
-                                                                        : gray.c300
-                                                                }
-                                                                height={24}
-                                                                width={24}
-                                                            />
-                                                        </IconButton>
-                                                        <Typography
-                                                            variant='caption'
-                                                            component={'p'}
-                                                            sx={{
-                                                                color: (
-                                                                    theme
-                                                                ) =>
-                                                                    theme.palette.textBlack,
-                                                            }}
-                                                            data-testid='copy-link-text'
-                                                        >
-                                                            {disableShare
-                                                                ? 'Link copied'
-                                                                : 'Click to copy link'}
-                                                        </Typography>
-                                                    </Stack>
-                                                </Stack>
-                                            </Menu>
-
-                                            {user &&
-                                                user?.user?.id?.toString() ===
-                                                    proposal?.attributes?.user_id?.toString() &&
-                                                !proposal?.attributes?.content
-                                                    ?.attributes
-                                                    ?.prop_submitted && (
-                                                    <Box
-                                                        display='flex'
-                                                        justifyContent='flex-end'
-                                                    >
-                                                        <IconButton
-                                                            id='menu-button'
-                                                            sx={
-                                                                roundIconButtonSx
-                                                            }
-                                                            aria-controls={
-                                                                open
-                                                                    ? 'proposal-menu'
-                                                                    : undefined
-                                                            }
-                                                            aria-haspopup='true'
-                                                            aria-expanded={
-                                                                open
-                                                                    ? 'true'
-                                                                    : undefined
-                                                            }
-                                                            ref={menuRef}
-                                                            onClick={() => {
-                                                                handleClick();
-                                                            }}
-                                                            data-testid='menu-button'
-                                                        >
-                                                            <MoreVertIcon sx={{ fontSize: 24, color: open ? 'primary.main' : 'textBlack' }} />
-                                                        </IconButton>
-                                                        <Menu
-                                                            id='proposal-menu'
-                                                            anchorEl={anchorEl}
-                                                            open={open}
-                                                            onClose={
-                                                                handleClose
-                                                            }
-                                                            MenuListProps={{
-                                                                'aria-labelledby':
-                                                                    'menu-button',
-                                                            }}
-                                                            slotProps={{
-                                                                paper: {
-                                                                    elevation: 4,
-                                                                    sx: {
-                                                                        overflow:
-                                                                            'visible',
-                                                                        mt: 1,
-                                                                    },
-                                                                },
-                                                            }}
-                                                            transformOrigin={{
-                                                                horizontal:
-                                                                    'right',
-                                                                vertical: 'top',
-                                                            }}
-                                                            anchorOrigin={{
-                                                                horizontal:
-                                                                    'right',
-                                                                vertical:
-                                                                    'bottom',
-                                                            }}
-                                                            data-testid='proposal-menu'
-                                                        >
-                                                            <MenuItem
-                                                                onClick={() =>
-                                                                    handleEditProposal()
-                                                                }
-                                                                data-testid='edit-proposal'
-                                                            >
-                                                                <Stack
-                                                                    direction={
-                                                                        'row'
-                                                                    }
-                                                                    spacing={2}
-                                                                    alignItems={
-                                                                        'center'
-                                                                    }
-                                                                >
-                                                                    <img src={ICONS.editIcon} alt='' width={24} height={24} />
-                                                                    <Typography variant='body1' fontWeight={400}>
-                                                                        Edit
-                                                                        Proposal
-                                                                    </Typography>
-                                                                </Stack>
-                                                            </MenuItem>
-                                                            <MenuItem
-                                                                onClick={() =>
-                                                                    handleOpenDeleteModal()
-                                                                }
-                                                                data-testid='delete-proposal'
-                                                            >
-                                                                <Stack
-                                                                    direction={
-                                                                        'row'
-                                                                    }
-                                                                    spacing={2}
-                                                                    alignItems={
-                                                                        'center'
-                                                                    }
-                                                                >
-                                                                    <DeleteOutlineIcon sx={{ fontSize: 24, color: 'textBlack' }} />
-                                                                    <Typography variant='body1' fontWeight={400}>
-                                                                        Delete
-                                                                        Proposal
-                                                                    </Typography>
-                                                                </Stack>
-                                                            </MenuItem>
-                                                        </Menu>
-                                                    </Box>
-                                                )}
+                                        @{username}
                                     </Box>
                                 </Box>
-
-                                <DetailRow label='Governance Action Type'>
-                                    <Box sx={pillSx}>
-                                        <Typography
-                                            variant='caption'
-                                            data-testid='governance-action-type-content'
+                            </Box>
+                            <Box
+                                sx={{
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                    flexShrink: 0,
+                                    gap: 1,
+                                }}
+                            >
+                                {disableShare && (
+                                    <Box
+                                        component='span'
+                                        data-testid='copy-link-text'
+                                        role='status'
+                                        sx={{
+                                            alignItems: 'center',
+                                            color: ds.success['700'],
+                                            display: 'inline-flex',
+                                            fontSize: 13,
+                                            fontWeight: 500,
+                                            gap: 0.5,
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        <Check aria-hidden size={14} />
+                                        Link copied
+                                    </Box>
+                                )}
+                                <Box
+                                    component='span'
+                                    onClick={handleShareDialogClick}
+                                    sx={{ display: 'inline-flex' }}
+                                >
+                                    <ShareDialog
+                                        buttonTestId='share-button'
+                                        copyTestId='copy-link'
+                                        kind='proposal'
+                                        link={`${proposalLink}${id}`}
+                                    />
+                                </Box>
+                                {user && isAuthor && !isSubmitted && (
+                                    <>
+                                        <ButtonBase
+                                            id='menu-button'
+                                            aria-label='More actions'
+                                            aria-controls={
+                                                open
+                                                    ? 'proposal-menu'
+                                                    : undefined
+                                            }
+                                            aria-haspopup='true'
+                                            aria-expanded={
+                                                open ? 'true' : undefined
+                                            }
+                                            ref={menuRef}
+                                            onClick={() => {
+                                                handleClick();
+                                            }}
+                                            data-testid='menu-button'
                                             sx={{
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap',
+                                                ...roundButtonSx,
+                                                ...(open && {
+                                                    backgroundColor:
+                                                        ds.gray['50'],
+                                                }),
                                             }}
                                         >
-                                            {
-                                                proposal?.attributes?.content
-                                                    ?.attributes
-                                                    ?.gov_action_type
-                                                    ?.attributes
-                                                    ?.gov_action_type_name
-                                            }
-                                        </Typography>
-                                    </Box>
-                                </DetailRow>
+                                            <EllipsisVertical
+                                                aria-hidden
+                                                size={18}
+                                            />
+                                        </ButtonBase>
+                                        <Menu
+                                            id='proposal-menu'
+                                            anchorEl={anchorEl}
+                                            open={open}
+                                            onClose={handleClose}
+                                            MenuListProps={{
+                                                'aria-labelledby':
+                                                    'menu-button',
+                                            }}
+                                            slotProps={{
+                                                paper: {
+                                                    elevation: 4,
+                                                    sx: {
+                                                        borderRadius: `${RADIUS.md}px`,
+                                                        minWidth: 200,
+                                                        mt: 1,
+                                                    },
+                                                },
+                                            }}
+                                            transformOrigin={{
+                                                horizontal: 'right',
+                                                vertical: 'top',
+                                            }}
+                                            anchorOrigin={{
+                                                horizontal: 'right',
+                                                vertical: 'bottom',
+                                            }}
+                                            data-testid='proposal-menu'
+                                        >
+                                            <MenuItem
+                                                onClick={() =>
+                                                    handleEditProposal()
+                                                }
+                                                data-testid='edit-proposal'
+                                                sx={{
+                                                    color: ds.gray['800'],
+                                                    fontSize: 14,
+                                                    gap: 1.25,
+                                                }}
+                                            >
+                                                <Pencil aria-hidden size={16} />
+                                                Edit proposal
+                                            </MenuItem>
+                                            <MenuItem
+                                                onClick={() =>
+                                                    handleOpenDeleteModal()
+                                                }
+                                                data-testid='delete-proposal'
+                                                sx={{
+                                                    color: ds.error['700'],
+                                                    fontSize: 14,
+                                                    gap: 1.25,
+                                                }}
+                                            >
+                                                <Trash2 aria-hidden size={16} />
+                                                Delete proposal
+                                            </MenuItem>
+                                        </Menu>
+                                    </>
+                                )}
+                            </Box>
+                        </Box>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: { xxs: 2, md: 0 },
+                                '& > *': { pr: { md: 3 } },
+                                '& > * + *': {
+                                    borderLeft: {
+                                        md: `1px solid ${ds.gray['200']}`,
+                                    },
+                                    pl: { md: 3 },
+                                },
+                            }}
+                        >
+                            <DateItem label='Proposed on'>
+                                {formatIsoDate(proposal?.attributes?.createdAt)}
+                            </DateItem>
+                            {isSubmitted && (
+                                <DateItem label='Submitted on'>
+                                    {`${formatIsoDate(content?.prop_submission_date)}${
+                                        submittedAction
+                                            ? ` (Epoch ${submittedAction.epoch_no})`
+                                            : ''
+                                    }`}
+                                </DateItem>
+                            )}
+                            <DateItem label='Last edit'>
+                                <span>{formatIsoDate(content?.createdAt)}</span>
+                                <ButtonBase
+                                    onClick={() => handleOpenReviewVersions()}
+                                    data-testid='review-version'
+                                    sx={textButtonSx}
+                                >
+                                    Review versions
+                                </ButtonBase>
+                            </DateItem>
+                        </Box>
+                        <ReviewVersions
+                            open={reviewVersionsOpen}
+                            onClose={handleCloseReviewVersions}
+                            id={id}
+                        />
+                    </Box>
 
-                                <DetailRow label='Abstract'>
+                    <Box
+                        sx={{
+                            alignItems: 'start',
+                            display: 'grid',
+                            gap: 2.5,
+                            gridTemplateAreas: {
+                                xxs: '"main" "side" "discussion"',
+                                lg: '"main side" "discussion side"',
+                            },
+                            gridTemplateColumns: {
+                                xxs: 'minmax(0, 1fr)',
+                                lg: 'minmax(0, 1fr) 340px',
+                            },
+                            gridTemplateRows: { lg: 'auto 1fr' },
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                ...stackSx,
+                                gap: 2.5,
+                                gridArea: 'main',
+                                minWidth: 0,
+                            }}
+                        >
+                            <Card sx={stackSx}>
+                                <ReasoningSection title='Abstract'>
                                     <MarkdownTypography
                                         content={
                                             showFullText || !maxLength
@@ -1239,1121 +1218,698 @@ const SingleGovernanceAction = ({ id }) => {
                                         }
                                         testId={`abstract-content`}
                                     />
-                                    {/* <ReactMarkdown data-testid='abstract-content'>
-                                            {showFullText || !maxLength
-                                                ? AbstractMarkdownText
-                                                : truncatedText}
-                                        </ReactMarkdown> */}
-                                    {!showFullText &&
-                                        totalCharLength > maxLength && (
-                                            <Box>
-                                                <Button
-                                                    size='medium'
-                                                    variant='text'
-                                                    onClick={() =>
-                                                        setShowFullText(
-                                                            !showFullText
-                                                        )
-                                                    }
-                                                    sx={readMoreSx}
-                                                >
-                                                    {showFullText
-                                                        ? 'Show less'
-                                                        : 'Read more'}
-                                                </Button>
-                                            </Box>
-                                        )}
-                                </DetailRow>
+                                </ReasoningSection>
                                 {showFullText && (
-                                    <DetailRow label='Motivation'>
-                                        <div>
-                                            <MarkdownTypography
-                                                content={
-                                                    proposal?.attributes
-                                                        ?.content?.attributes
-                                                        ?.prop_motivation || ''
-                                                }
-                                                testId={`motivation-content`}
-                                            />
-                                        </div>
-                                    </DetailRow>
-                                )}
-                                {showFullText && (
-                                    <DetailRow label='Rationale'>
-                                        <div>
-                                            <MarkdownTypography
-                                                content={
-                                                    proposal?.attributes
-                                                        ?.content?.attributes
-                                                        ?.prop_rationale || ''
-                                                }
-                                                testId={`rationale-content`}
-                                            />
-                                        </div>
-                                    </DetailRow>
-                                )}
-                                {showFullText &&
-                                proposal?.attributes?.content?.attributes
-                                    ?.gov_action_type_id == 2
-                                    ? proposal?.attributes?.content?.attributes.proposal_withdrawals?.map(
-                                          (withdrawal, index) => (
-                                              <Box key={index}>
-                                                  <DetailRow label='Receiving address'>
-                                                      <Typography
-                                                          variant='body1'
-                                                          sx={valueSx}
-                                                          data-testid={`receiving-address-${index}-content`}
-                                                      >
-                                                          {
-                                                              withdrawal.prop_receiving_address
-                                                          }
-                                                      </Typography>
-                                                  </DetailRow>
-                                                  <DetailRow label='Amount'>
-                                                      <Typography
-                                                          variant='body1'
-                                                          sx={valueSx}
-                                                          data-testid={`amount-${index}-content`}
-                                                      >
-                                                          ₳{' '}
-                                                          {
-                                                              withdrawal.prop_amount
-                                                          }
-                                                      </Typography>
-                                                  </DetailRow>
-                                              </Box>
-                                          )
-                                      )
-                                    : null}
-                                {showFullText &&
-                                proposal?.attributes?.content?.attributes
-                                    ?.gov_action_type_id == 3 &&
-                                proposal?.attributes?.content?.attributes
-                                    ?.proposal_constitution_content?.data ? (
-                                    <div>
-                                        <DetailRow label='New constitution URL'>
-                                            <Box
-                                                sx={markdownValueSx}
-                                                data-testid='new-constitution-url-content'
-                                            >
-                                                <ReactMarkdown>
-                                                    {proposal?.attributes
-                                                        ?.content?.attributes
-                                                        ?.proposal_constitution_content
-                                                        ?.data?.attributes
-                                                        ?.prop_constitution_url ||
-                                                        ''}
-                                                </ReactMarkdown>
-                                            </Box>
-                                        </DetailRow>
-                                        {proposal?.attributes?.content
-                                            ?.attributes
-                                            ?.proposal_constitution_content
-                                            ?.data?.attributes
-                                            ?.prop_have_guardrails_script ===
-                                        true ? (
-                                            <div>
-                                                <DetailRow label='Guardrails script URL'>
-                                                    <Box
-                                                        sx={markdownValueSx}
-                                                        data-testid='guardrails-script-url-content'
-                                                    >
-                                                        <ReactMarkdown>
-                                                            {proposal
-                                                                ?.attributes
-                                                                ?.content
-                                                                ?.attributes
-                                                                ?.proposal_constitution_content
-                                                                ?.data
-                                                                ?.attributes
-                                                                ?.prop_guardrails_script_url ||
-                                                                ''}
-                                                        </ReactMarkdown>
-                                                    </Box>
-                                                </DetailRow>
-                                                <DetailRow label='Guardrails script hash'>
-                                                    <Box
-                                                        sx={markdownValueSx}
-                                                        data-testid='guardrails-script-hash-content'
-                                                    >
-                                                        <ReactMarkdown>
-                                                            {proposal
-                                                                ?.attributes
-                                                                ?.content
-                                                                ?.attributes
-                                                                ?.proposal_constitution_content
-                                                                ?.data
-                                                                ?.attributes
-                                                                ?.prop_guardrails_script_hash ||
-                                                                ''}
-                                                        </ReactMarkdown>
-                                                    </Box>
-                                                </DetailRow>
-                                            </div>
-                                        ) : null}
-                                    </div>
-                                ) : null}
-                                {showFullText &&
-                                proposal?.attributes?.content?.attributes
-                                    ?.gov_action_type_id == 6 ? (
-                                    <>
-                                        <DetailRow label='Previous Gov Action Hash'>
-                                            <Typography
-                                                variant='body1'
-                                                sx={valueSx}
-                                                data-testid={`previous-gov-action-hash-content`}
-                                            >
-                                                {proposal?.attributes?.content
-                                                    ?.attributes
-                                                    ?.proposal_hard_fork_content
-                                                    ?.data?.attributes
-                                                    ?.previous_ga_hash || ''}
-                                            </Typography>
-                                        </DetailRow>
-                                        <DetailRow label='Previous Gov Action ID'>
-                                            <Typography
-                                                variant='body1'
-                                                sx={valueSx}
-                                                data-testid={`previous-gov-action-id-content`}
-                                            >
-                                                {proposal?.attributes?.content
-                                                    ?.attributes
-                                                    ?.proposal_hard_fork_content
-                                                    ?.data?.attributes
-                                                    ?.previous_ga_id || ''}
-                                            </Typography>
-                                        </DetailRow>
-                                        <DetailRow label='Major version'>
-                                            <Typography
-                                                variant='body1'
-                                                sx={valueSx}
-                                                data-testid={`major-version-content`}
-                                            >
-                                                {proposal?.attributes?.content
-                                                    ?.attributes
-                                                    ?.proposal_hard_fork_content
-                                                    ?.data?.attributes?.major ||
-                                                    ''}
-                                            </Typography>
-                                        </DetailRow>
-                                        <DetailRow label='Minor version'>
-                                            <Typography
-                                                variant='body1'
-                                                sx={valueSx}
-                                                data-testid={`minor-version-content`}
-                                            >
-                                                {proposal?.attributes?.content
-                                                    ?.attributes
-                                                    ?.proposal_hard_fork_content
-                                                    ?.data?.attributes?.minor ||
-                                                    ''}
-                                            </Typography>
-                                        </DetailRow>
-                                    </>
-                                ) : null}
-                                {showFullText &&
-                                    totalCharLength > maxLength && (
-                                        <Box mb={4}>
-                                            <Button
-                                                size='medium'
-                                                variant='text'
-                                                onClick={() =>
-                                                    setShowFullText(
-                                                        !showFullText
-                                                    )
-                                                }
-                                                sx={readMoreSx}
-                                            >
-                                                {showFullText
-                                                    ? 'Show less'
-                                                    : 'Read more'}
-                                            </Button>
-                                        </Box>
-                                    )}
-                                {proposal?.attributes?.content?.attributes
-                                    ?.proposal_links?.length > 0 && (
-                                    <Box>
-                                        <DetailLabel sx={{ my: 2 }}>
-                                            Supporting links
-                                        </DetailLabel>
-
-                                        <Box
-                                            display='flex'
-                                            flexDirection='column'
-                                            alignItems='flex-start'
-                                            gap={1}
-                                        >
-                                            {proposal?.attributes?.content?.attributes?.proposal_links?.map(
-                                                (item, index) => (
-                                                    <Button
-                                                        variant='text'
-                                                        size='medium'
-                                                        key={index}
-                                                        sx={{
-                                                            p: 0,
-                                                            minWidth: 0,
-                                                            maxWidth: '100%',
-                                                            justifyContent:
-                                                                'flex-start',
-                                                            '& .MuiButton-endIcon':
-                                                                { ml: 1 },
-                                                            '&:hover': {
-                                                                backgroundColor:
-                                                                    'transparent',
-                                                            },
-                                                        }}
-                                                        endIcon={
-                                                            <img
-                                                                src={
-                                                                    ICONS.externalLinkIcon
-                                                                }
-                                                                alt=''
-                                                                width={20}
-                                                                height={20}
-                                                            />
-                                                        }
-                                                        onClick={() =>
-                                                            openLink(
-                                                                item?.prop_link
-                                                            )
-                                                        }
-                                                        // data-testid={
-                                                        //     'link-${index}-text-content'
-                                                        // }
-                                                    >
-                                                        <Typography
-                                                            variant='body1'
-                                                            fontWeight={400}
-                                                            component={'p'}
-                                                            style={{
-                                                                margin: 0,
-                                                                textOverflow:
-                                                                    'ellipsis',
-                                                                overflow:
-                                                                    'hidden',
-                                                                whiteSpace:
-                                                                    'nowrap',
-                                                                maxWidth:
-                                                                    '800px',
-                                                            }}
-                                                            sx={{
-                                                                color: 'primaryBlue',
-                                                            }}
-                                                            data-testid={`link-${index}-text-content`}
-                                                        >
-                                                            {
-                                                                item?.prop_link_text
-                                                            }
-                                                        </Typography>
-                                                    </Button>
-                                                )
-                                            )}
-                                        </Box>
-                                    </Box>
-                                )}
-                            </Box>
-
-                            <Box sx={detailsActionsColumnSx}>
-                                <DetailRow
-                                    label={
-                                        proposal?.attributes?.content
-                                            ?.attributes?.prop_submitted
-                                            ? `Submitted on:`
-                                            : `Proposed on:`
-                                    }
-                                >
-                                    <Typography variant='body1' sx={valueSx}>
-                                        {proposal?.attributes?.content
-                                            ?.attributes?.prop_submitted
-                                            ? `${formatIsoDate(proposal?.attributes?.content?.attributes?.prop_submission_date)}${
-                                                  submittedAction
-                                                      ? ` (Epoch ${submittedAction.epoch_no})`
-                                                      : ''
-                                              }`
-                                            : `${formatIsoDate(
-                                                  proposal?.attributes
-                                                      ?.createdAt
-                                              )}`}
-                                    </Typography>
-                                </DetailRow>
-                                {voteEnd && (
-                                    <>
-                                        <DetailRow label='Vote ended on:'>
-                                            <Typography
-                                                variant='body1'
-                                                sx={valueSx}
-                                                data-testid='vote-ended-date'
-                                            >
-                                                {`${formatIsoDate(voteEnd.time) || '-'} (Epoch ${voteEnd.epoch ?? '-'})`}
-                                            </Typography>
-                                        </DetailRow>
-                                        <DetailRow label='Voting result:'>
-                                            <Typography
-                                                variant='body1'
-                                                sx={valueSx}
-                                                data-testid='vote-outcome'
-                                            >
-                                                {`Voting has been completed for this Action. This action was ${voteEnd.outcome.toLowerCase()}.`}
-                                            </Typography>
-                                        </DetailRow>
-                                    </>
-                                )}
-                                {proposal?.attributes?.content?.attributes
-                                    ?.prop_submitted && (
-                                    <DetailRow label='Proposed on:'>
-                                        <Typography
-                                            variant='body1'
-                                            sx={valueSx}
-                                        >
-                                            {formatIsoDate(
-                                                proposal?.attributes?.createdAt
-                                            )}
-                                        </Typography>
-                                    </DetailRow>
-                                )}
-                                <DetailRow label='Last Edit:'>
-                                    <Box
-                                        display='flex'
-                                        alignItems='center'
-                                        flexWrap='wrap'
-                                        columnGap={2}
-                                        rowGap={0.5}
-                                    >
-                                        <Typography
-                                            variant='body1'
-                                            sx={valueSx}
-                                        >
-                                            {formatIsoDate(
-                                                proposal?.attributes?.content
-                                                    ?.attributes?.createdAt
-                                            )}
-                                        </Typography>
-                                        <Link
-                                            variant='outlined'
-                                            onClick={() =>
-                                                handleOpenReviewVersions()
+                                    <ReasoningSection title='Motivation'>
+                                        <MarkdownTypography
+                                            content={
+                                                content?.prop_motivation || ''
                                             }
-                                            data-testid='review-version'
-                                            sx={textLinkSx}
-                                        >
-                                            Review Versions
-                                        </Link>
-                                    </Box>
+                                            testId={`motivation-content`}
+                                        />
+                                    </ReasoningSection>
+                                )}
+                                {showFullText && (
+                                    <ReasoningSection title='Rationale'>
+                                        <MarkdownTypography
+                                            content={
+                                                content?.prop_rationale || ''
+                                            }
+                                            testId={`rationale-content`}
+                                        />
+                                    </ReasoningSection>
+                                )}
+                                {totalCharLength > maxLength && (
+                                    <ButtonBase
+                                        aria-expanded={showFullText}
+                                        onClick={() =>
+                                            setShowFullText(!showFullText)
+                                        }
+                                        sx={{
+                                            ...textButtonSx,
+                                            alignSelf: 'flex-start',
+                                            fontSize: 14,
+                                        }}
+                                    >
+                                        {showFullText
+                                            ? 'Show less'
+                                            : 'Read more'}
+                                    </ButtonBase>
+                                )}
+                            </Card>
 
-                                    <ReviewVersions
-                                        open={reviewVersionsOpen}
-                                        onClose={handleCloseReviewVersions}
-                                        id={id}
-                                    />
-                                </DetailRow>
-
-                                <Box
-                                    mb={4}
-                                    display='flex'
-                                    flexDirection='column'
-                                    alignItems='flex-start'
-                                    gap={1}
-                                >
-                                            {user &&
-                                            proposal?.attributes?.content
-                                                ?.attributes?.prop_submitted ===
-                                                false &&
-                                            //proposal?.attributes?.prop_submitted &&
-                                            user?.user?.id?.toString() ===
-                                                proposal?.attributes?.user_id?.toString() ? (
-                                                <Link
-                                                    variant='outlined'
-                                                    data-testid='submit-as-GA-button'
-                                                    sx={textLinkSx}
-                                                    onClick={async () => {
-                                                        const balance =
-                                                            await fetchCurrentWalletBalance();
-                                                        if (
-                                                            hasBalanceForGASubmission(
-                                                                balance
-                                                            )
-                                                        ) {
-                                                            await loginUserToApp(
-                                                                {
-                                                                    wallet: walletAPI,
-                                                                    setUser,
-                                                                    setOpenUsernameModal,
-                                                                    callBackFn:
-                                                                        () => {
-                                                                            setOpenGASubmissionDialog(
-                                                                                true
-                                                                            );
-                                                                        },
-                                                                    clearStates,
-                                                                    addErrorAlert,
-                                                                    addSuccessAlert,
-                                                                    addChangesSavedAlert,
-                                                                }
-                                                            );
-                                                        } else {
-                                                            setOpenAlertDialog(
-                                                                true
-                                                            );
-                                                        }
+                            {detailsKind && (
+                                <Card sx={stackSx}>
+                                    <CardTitle>
+                                        {DETAILS_TITLES[detailsKind]}
+                                    </CardTitle>
+                                    {detailsKind === 'withdrawals' &&
+                                        content?.proposal_withdrawals?.map(
+                                            (withdrawal, index) => (
+                                                <Box
+                                                    key={index}
+                                                    sx={{
+                                                        display: 'grid',
+                                                        gap: 2,
+                                                        gridTemplateColumns: {
+                                                            xxs: 'minmax(0, 1fr)',
+                                                            md: 'minmax(0, 1fr) auto',
+                                                        },
+                                                        ...(index > 0 && {
+                                                            borderTop: `1px solid ${ds.gray['200']}`,
+                                                            pt: 2,
+                                                        }),
                                                     }}
                                                 >
-                                                    Submit as Governance Action
-                                                </Link>
-                                            ) : null}
-                                            {proposal?.attributes?.content
-                                                ?.attributes?.prop_submitted ? (
-                                                voteEnd ? (
-                                                    <Link
-                                                        variant='outlined'
-                                                        data-testid='see-outcome-link'
-                                                        onClick={seeGovernanceAction}
-                                                        sx={textLinkSx}
-                                                    >
-                                                        See voting result
-                                                    </Link>
-                                                ) : (
-                                                <Link
-                                                    variant='outlined'
-                                                    data-testid='review-and-vote-link'
-                                                    onClick={() =>
-                                                        navigate(
-                                                            getGovActionPath(proposal?.attributes?.content?.attributes?.prop_submission_tx_hash, 0)
-                                                        )
-                                                    }
-                                                    sx={textLinkSx}
+                                                    <Field label='Receiving address'>
+                                                        <Box
+                                                            component='span'
+                                                            data-testid={`receiving-address-${index}-content`}
+                                                            sx={monoValueSx}
+                                                        >
+                                                            {
+                                                                withdrawal.prop_receiving_address
+                                                            }
+                                                        </Box>
+                                                    </Field>
+                                                    <Field label='Amount'>
+                                                        <Box
+                                                            component='span'
+                                                            data-testid={`amount-${index}-content`}
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                whiteSpace:
+                                                                    'nowrap',
+                                                            }}
+                                                        >
+                                                            ₳{' '}
+                                                            {
+                                                                withdrawal.prop_amount
+                                                            }
+                                                        </Box>
+                                                    </Field>
+                                                </Box>
+                                            )
+                                        )}
+                                    {detailsKind === 'constitution' && (
+                                        <>
+                                            <Field label='New constitution URL'>
+                                                <Box
+                                                    sx={markdownValueSx}
+                                                    data-testid='new-constitution-url-content'
                                                 >
-                                                    Vote
-                                                </Link>
-                                                )
+                                                    <ReactMarkdown>
+                                                        {constitution?.prop_constitution_url ||
+                                                            ''}
+                                                    </ReactMarkdown>
+                                                </Box>
+                                            </Field>
+                                            {constitution?.prop_have_guardrails_script ===
+                                            true ? (
+                                                <>
+                                                    <Field label='Guardrails script URL'>
+                                                        <Box
+                                                            sx={markdownValueSx}
+                                                            data-testid='guardrails-script-url-content'
+                                                        >
+                                                            <ReactMarkdown>
+                                                                {constitution?.prop_guardrails_script_url ||
+                                                                    ''}
+                                                            </ReactMarkdown>
+                                                        </Box>
+                                                    </Field>
+                                                    <Field label='Guardrails script hash'>
+                                                        <Box
+                                                            sx={markdownValueSx}
+                                                            data-testid='guardrails-script-hash-content'
+                                                        >
+                                                            <ReactMarkdown>
+                                                                {constitution?.prop_guardrails_script_hash ||
+                                                                    ''}
+                                                            </ReactMarkdown>
+                                                        </Box>
+                                                    </Field>
+                                                </>
                                             ) : null}
-                                </Box>
+                                        </>
+                                    )}
+                                    {detailsKind === 'hardFork' && (
+                                        <Box
+                                            sx={{
+                                                display: 'grid',
+                                                gap: 2,
+                                                gridTemplateColumns: {
+                                                    xxs: 'minmax(0, 1fr)',
+                                                    md: 'repeat(2, minmax(0, 1fr))',
+                                                },
+                                            }}
+                                        >
+                                            <Field label='Previous Gov Action Hash'>
+                                                <Box
+                                                    component='span'
+                                                    data-testid={`previous-gov-action-hash-content`}
+                                                    sx={monoValueSx}
+                                                >
+                                                    {hardFork?.previous_ga_hash ||
+                                                        ''}
+                                                </Box>
+                                            </Field>
+                                            <Field label='Previous Gov Action ID'>
+                                                <Box
+                                                    component='span'
+                                                    data-testid={`previous-gov-action-id-content`}
+                                                    sx={monoValueSx}
+                                                >
+                                                    {hardFork?.previous_ga_id ||
+                                                        ''}
+                                                </Box>
+                                            </Field>
+                                            <Field label='Major version'>
+                                                <Box
+                                                    component='span'
+                                                    data-testid={`major-version-content`}
+                                                >
+                                                    {hardFork?.major || ''}
+                                                </Box>
+                                            </Field>
+                                            <Field label='Minor version'>
+                                                <Box
+                                                    component='span'
+                                                    data-testid={`minor-version-content`}
+                                                >
+                                                    {hardFork?.minor || ''}
+                                                </Box>
+                                            </Field>
+                                        </Box>
+                                    )}
+                                </Card>
+                            )}
 
+                            {content?.proposal_links?.length > 0 && (
+                                <Card sx={{ ...stackSx, gap: 1.5 }}>
+                                    <CardTitle>Supporting links</CardTitle>
+                                    {content?.proposal_links?.map(
+                                        (item, index) => (
+                                            <ButtonBase
+                                                key={index}
+                                                onClick={() =>
+                                                    openLink(item?.prop_link)
+                                                }
+                                                sx={{
+                                                    alignItems: 'center',
+                                                    border: `1px solid ${ds.gray['200']}`,
+                                                    borderRadius: `${RADIUS.md}px`,
+                                                    fontFamily: 'inherit',
+                                                    gap: 1.5,
+                                                    justifyContent:
+                                                        'space-between',
+                                                    px: 1.5,
+                                                    py: 1.25,
+                                                    textAlign: 'left',
+                                                    '&:hover': {
+                                                        backgroundColor:
+                                                            ds.gray['50'],
+                                                    },
+                                                    ...focusRing,
+                                                }}
+                                            >
+                                                <Box
+                                                    component='span'
+                                                    sx={{
+                                                        flex: 1,
+                                                        minWidth: 0,
+                                                    }}
+                                                >
+                                                    <Box
+                                                        component='span'
+                                                        data-testid={`link-${index}-text-content`}
+                                                        sx={{
+                                                            color: ds.gray['900'],
+                                                            display: 'block',
+                                                            fontSize: 14,
+                                                            fontWeight: 500,
+                                                            overflow: 'hidden',
+                                                            textOverflow:
+                                                                'ellipsis',
+                                                            whiteSpace:
+                                                                'nowrap',
+                                                        }}
+                                                    >
+                                                        {item?.prop_link_text}
+                                                    </Box>
+                                                    <Box
+                                                        component='span'
+                                                        data-testid={`link-${index}-url-content`}
+                                                        sx={{
+                                                            color: ds.primary['600'],
+                                                            display: 'block',
+                                                            fontSize: 13,
+                                                            mt: 0.25,
+                                                            overflow: 'hidden',
+                                                            textOverflow:
+                                                                'ellipsis',
+                                                            whiteSpace:
+                                                                'nowrap',
+                                                        }}
+                                                    >
+                                                        {item?.prop_link}
+                                                    </Box>
+                                                </Box>
+                                                <ExternalLink
+                                                    aria-hidden
+                                                    color={ds.gray['600']}
+                                                    size={16}
+                                                    style={{ flexShrink: 0 }}
+                                                />
+                                            </ButtonBase>
+                                        )
+                                    )}
+                                </Card>
+                            )}
+                        </Box>
+
+                        <Box
+                            component='aside'
+                            aria-label='Proposal actions'
+                            sx={{
+                                ...stackSx,
+                                gap: 2.5,
+                                gridArea: 'side',
+                                minWidth: 0,
+                            }}
+                        >
+                            {actionKind === 'submit' && (
+                                <Card sx={stackSx}>
+                                    <CardTitle>Ready to submit?</CardTitle>
+                                    <Box component='p' sx={bodyTextSx}>
+                                        If you are ready, submit this proposal
+                                        as a governance action to get it
+                                        voted on.
+                                    </Box>
+                                    {governanceValidation}
+                                    <Button
+                                        variant='contained'
+                                        fullWidth
+                                        data-testid='submit-as-GA-button'
+                                        onClick={handleSubmitAsGA}
+                                    >
+                                        Submit as governance action
+                                    </Button>
+                                </Card>
+                            )}
+                            {actionKind === 'discuss' && (
+                                <Card sx={stackSx}>
+                                    <CardTitle>Join the discussion</CardTitle>
+                                    <Box component='p' sx={bodyTextSx}>
+                                        Help make this proposal better by
+                                        commenting on it.
+                                    </Box>
+                                    {governanceValidation}
+                                </Card>
+                            )}
+                            {actionKind === 'vote' && (
+                                <Card sx={stackSx}>
+                                    <CardTitle>Submitted for vote</CardTitle>
+                                    <Box component='p' sx={bodyTextSx}>
+                                        This proposal has been submitted
+                                        on-chain as a governance action to get
+                                        voted on.
+                                    </Box>
+                                    <Button
+                                        variant='contained'
+                                        fullWidth
+                                        data-testid='review-and-vote-link'
+                                        endIcon={
+                                            <ArrowRight aria-hidden size={16} />
+                                        }
+                                        onClick={() =>
+                                            navigate(
+                                                getGovActionPath(
+                                                    content?.prop_submission_tx_hash,
+                                                    0
+                                                )
+                                            )
+                                        }
+                                    >
+                                        Review and vote
+                                    </Button>
+                                </Card>
+                            )}
+                            {actionKind === 'outcome' && (
+                                <Card sx={stackSx}>
+                                    <CardTitle>Voting ended</CardTitle>
+                                    <Field label='Vote ended on'>
+                                        <Box
+                                            component='span'
+                                            data-testid='vote-ended-date'
+                                        >
+                                            {`${formatIsoDate(voteEnd.time) || '-'} (Epoch ${voteEnd.epoch ?? '-'})`}
+                                        </Box>
+                                    </Field>
+                                    <Field label='Voting result'>
+                                        <Box
+                                            component='span'
+                                            data-testid='vote-outcome'
+                                        >
+                                            {`Voting has been completed for this Action. This action was ${voteEnd.outcome.toLowerCase()}.`}
+                                        </Box>
+                                    </Field>
+                                    <Button
+                                        variant='outlined'
+                                        fullWidth
+                                        data-testid='see-outcome-link'
+                                        onClick={seeGovernanceAction}
+                                    >
+                                        See outcome
+                                    </Button>
+                                </Card>
+                            )}
+
+                            <Card sx={stackSx}>
+                                <CardTitle>Sentiment</CardTitle>
+                                <Box component='p' sx={bodyTextSx}>
+                                    Show whether you support this proposal.
+                                </Box>
                                 <Box
-                                    mt='auto'
-                                    pt={3}
                                     sx={{
-                                        borderTop: (theme) =>
-                                            `1px solid ${theme.palette.lightBlue}`,
+                                        display: 'grid',
+                                        gap: 1,
+                                        gridTemplateColumns:
+                                            'repeat(2, minmax(0, 1fr))',
+                                    }}
+                                >
+                                    <SentimentButton
+                                        like
+                                        state={likeState}
+                                        count={proposal?.attributes?.prop_likes}
+                                        onClick={sentimentClick(
+                                            true,
+                                            likeState
+                                        )}
+                                        dimmed={needsValidation}
+                                    />
+                                    <SentimentButton
+                                        like={false}
+                                        state={dislikeState}
+                                        count={
+                                            proposal?.attributes?.prop_dislikes
+                                        }
+                                        onClick={sentimentClick(
+                                            false,
+                                            dislikeState
+                                        )}
+                                        dimmed={needsValidation}
+                                    />
+                                </Box>
+                                {needsValidation && (
+                                    <UserValidation
+                                        type='sentiment'
+                                        drepCheck={checkIfDrepIsSignedIn()}
+                                        drepRequired={false}
+                                    />
+                                )}
+                            </Card>
+
+                            <Card sx={stackSx}>
+                                <CardTitle>Proposal information</CardTitle>
+                                <Box
+                                    component='dl'
+                                    sx={{ ...stackSx, gap: 1.25, m: 0 }}
+                                >
+                                    <InfoRow label='Proposal ID'>
+                                        {`#${proposal?.id}`}
+                                    </InfoRow>
+                                    <InfoRow label='Author'>
+                                        @{username}
+                                    </InfoRow>
+                                    <InfoRow label='Type'>{typeName}</InfoRow>
+                                </Box>
+                                <Divider />
+                                <Box
+                                    component='dl'
+                                    sx={{ ...stackSx, gap: 1.25, m: 0 }}
+                                >
+                                    <InfoRow label='Proposed on'>
+                                        {formatIsoDate(
+                                            proposal?.attributes?.createdAt
+                                        )}
+                                    </InfoRow>
+                                    <InfoRow label='Last edit'>
+                                        {formatIsoDate(content?.createdAt)}
+                                    </InfoRow>
+                                    <InfoRow label='Comments'>
+                                        {cappedCount(commentsCount)}
+                                    </InfoRow>
+                                </Box>
+                            </Card>
+                        </Box>
+
+                        <Box
+                            sx={{
+                                ...stackSx,
+                                gap: 4,
+                                gridArea: 'discussion',
+                                minWidth: 0,
+                            }}
+                        >
+                            {(hasPolls || showAddPoll) && (
+                                <Box
+                                    component='section'
+                                    aria-label='Polls'
+                                    sx={stackSx}
+                                >
+                                    <Box component='h2' sx={sectionTitleSx}>
+                                        Polls
+                                    </Box>
+                                    {showAddPoll ? (
+                                        <Card
+                                            testId='add-poll-card'
+                                            sx={{
+                                                alignItems: {
+                                                    md: 'center',
+                                                },
+                                                display: 'flex',
+                                                flexDirection: {
+                                                    xxs: 'column',
+                                                    md: 'row',
+                                                },
+                                                gap: 2,
+                                                justifyContent:
+                                                    'space-between',
+                                            }}
+                                        >
+                                            <Box sx={{ minWidth: 0 }}>
+                                                <CardTitle as='h3'>
+                                                    Do you want to check if
+                                                    your proposal is ready to
+                                                    be submitted as a
+                                                    Governance Action?
+                                                </CardTitle>
+                                                <Box
+                                                    component='p'
+                                                    sx={{
+                                                        ...bodyTextSx,
+                                                        mt: 0.75,
+                                                    }}
+                                                >
+                                                    The poll will be pinned to
+                                                    the top of your comments
+                                                    list, and you can close it
+                                                    whenever you like. Opening
+                                                    a new poll will
+                                                    automatically close the
+                                                    previous one, which will
+                                                    then appear as a comment in
+                                                    the comments feed.
+                                                </Box>
+                                            </Box>
+                                            <Button
+                                                variant='contained'
+                                                onClick={addPoll}
+                                                data-testid='add-poll-button'
+                                                sx={{
+                                                    alignSelf: {
+                                                        xxs: 'flex-end',
+                                                        md: 'center',
+                                                    },
+                                                    flexShrink: 0,
+                                                }}
+                                            >
+                                                Add poll
+                                            </Button>
+                                        </Card>
+                                    ) : null}
+                                    {activePoll && (
+                                        <Box sx={cardShellSx}>
+                                            <Poll
+                                                proposalUserId={
+                                                    proposal?.attributes
+                                                        ?.user_id
+                                                }
+                                                proposalAuthorUsername={
+                                                    username
+                                                }
+                                                proposalSubmitted={isSubmitted}
+                                                poll={activePoll}
+                                                fetchActivePoll={
+                                                    fetchActivePoll
+                                                }
+                                                fetchUnactivePolls={
+                                                    fetchUnactivePolls
+                                                }
+                                            />
+                                        </Box>
+                                    )}
+                                    {unactivePollList?.map((poll, index) => (
+                                        <Box key={index} sx={cardShellSx}>
+                                            <Poll
+                                                proposalUserId={
+                                                    proposal?.attributes
+                                                        ?.user_id
+                                                }
+                                                proposalAuthorUsername={
+                                                    username
+                                                }
+                                                proposalSubmitted={isSubmitted}
+                                                poll={poll}
+                                            />
+                                        </Box>
+                                    ))}
+                                </Box>
+                            )}
+
+                            <Box
+                                component='section'
+                                aria-labelledby='proposal-comments-title'
+                                sx={stackSx}
+                            >
+                                <Box
+                                    sx={{
+                                        alignItems: 'center',
+                                        display: 'flex',
+                                        flexWrap: 'wrap',
+                                        gap: 1.5,
+                                        justifyContent: 'space-between',
                                     }}
                                 >
                                     <Box
-                                        display={'flex'}
-                                        flexDirection={'row'}
-                                        flexWrap={'wrap'}
-                                        alignItems={'center'}
-                                        justifyContent={'space-between'}
-                                        gap={2}
+                                        sx={{
+                                            alignItems: 'center',
+                                            display: 'flex',
+                                            gap: 1,
+                                        }}
                                     >
-                                        <Tooltip paragraphOne='Total comments number'>
-                                            <span>
-                                                <Box
-                                                    display={'flex'}
-                                                    alignItems={'center'}
-                                                >
-                                                    <IconButton
-                                                        disabled
-                                                        sx={sentimentButtonSx}
-                                                    >
-                                                        <Badge
-                                                            slotProps={{
-                                                                badge: {
-                                                                    'data-testid':
-                                                                        'comment-count',
-                                                                },
-                                                            }}
-                                                            badgeContent={
-                                                                proposal
-                                                                    ?.attributes
-                                                                    ?.prop_comments_number ||
-                                                                0
-                                                            }
-                                                            aria-label='proposal comments'
-                                                            showZero
-                                                            sx={{
-                                                                transform:
-                                                                    'translate(30px, -20px)',
-                                                                '& .MuiBadge-badge':
-                                                                    {
-                                                                        color: 'neutralWhite',
-                                                                        backgroundColor:
-                                                                            (
-                                                                                theme
-                                                                            ) =>
-                                                                                theme.palette.primary.main,
-                                                                    },
-                                                            }}
-                                                        ></Badge>
-                                                        <IconChatAlt />
-                                                    </IconButton>
-                                                </Box>
-                                            </span>
-                                        </Tooltip>
                                         <Box
-                                            style={{
+                                            component='h2'
+                                            id='proposal-comments-title'
+                                            sx={sectionTitleSx}
+                                        >
+                                            Comments
+                                        </Box>
+                                        <Box
+                                            component='span'
+                                            data-testid='comment-count'
+                                            sx={countPillSx}
+                                        >
+                                            {cappedCount(commentsCount)}
+                                        </Box>
+                                    </Box>
+                                    <ButtonBase
+                                        aria-label={`Sort comments, ${
+                                            commentsSortType === 'desc'
+                                                ? 'newest first'
+                                                : 'oldest first'
+                                        }`}
+                                        onClick={() =>
+                                            proposal?.attributes
+                                                ?.prop_comments_number === 0
+                                                ? null
+                                                : setCommentsSortType((prev) =>
+                                                      prev === 'desc'
+                                                          ? 'asc'
+                                                          : 'desc'
+                                                  )
+                                        }
+                                        data-testid='sort-comments'
+                                        sx={{
+                                            alignItems: 'center',
+                                            backgroundColor: '#FFFFFF',
+                                            border: `1px solid ${ds.gray['200']}`,
+                                            borderRadius: `${RADIUS.md}px`,
+                                            color: ds.gray['800'],
+                                            fontFamily: 'inherit',
+                                            fontSize: 13,
+                                            fontWeight: 500,
+                                            gap: 0.75,
+                                            height: 36,
+                                            px: 1.5,
+                                            '&:hover': {
+                                                backgroundColor: ds.gray['50'],
+                                            },
+                                            ...focusRing,
+                                        }}
+                                    >
+                                        <ArrowUpDown aria-hidden size={15} />
+                                        {commentsSortType === 'desc'
+                                            ? 'Newest first'
+                                            : 'Oldest first'}
+                                    </ButtonBase>
+                                </Box>
+
+                                {isSubmitted ? null : (
+                                    <Card sx={{ ...stackSx, gap: 1.5 }}>
+                                        <CardTitle as='h3'>
+                                            Add a comment
+                                        </CardTitle>
+                                        <PdfTextArea
+                                            value={newCommentText || ''}
+                                            onChange={(e) => handleChange(e)}
+                                            onKeyDown={handleKeyDown}
+                                            onBlur={handleBlur}
+                                            maxLength={MAX_COMMENT_LENGTH}
+                                            spellCheck='false'
+                                            autoCorrect='off'
+                                            autoCapitalize='none'
+                                            autoComplete='off'
+                                            aria-label='Add a comment'
+                                            dataTestId='comment-input'
+                                        />
+                                        <Box
+                                            ref={targetRef}
+                                            sx={{
+                                                alignItems: {
+                                                    xxs: 'stretch',
+                                                    md: 'center',
+                                                },
                                                 display: 'flex',
-                                                flexDirection: 'row',
-                                                flexWrap: 'wrap',
-                                                gap: '12px',
-                                                alignItems: 'center',
+                                                flexDirection: {
+                                                    xxs: 'column',
+                                                    md: 'row',
+                                                },
+                                                gap: 2,
                                                 justifyContent: 'flex-end',
                                             }}
                                         >
                                             {checkShowValidation(
-                                                false,
+                                                true,
                                                 walletAPI,
                                                 user
                                             ) && (
-                                                <UserValidation
-                                                    type='sentiment'
-                                                    drepCheck={checkIfDrepIsSignedIn()}
-                                                    drepRequired={false}
-                                                />
+                                                <Box
+                                                    sx={{
+                                                        flex: 1,
+                                                        minWidth: 0,
+                                                    }}
+                                                >
+                                                    <UserValidation
+                                                        type='budget'
+                                                        drepCheck={checkIfDrepIsSignedIn(
+                                                            walletAPI
+                                                        )}
+                                                        drepRequired={true}
+                                                    />
+                                                </Box>
                                             )}
-                                            <Box display={'flex'} gap={2}>
-                                                {/* LIKE BUTTON */}
-                                                <Tooltip
-                                                    paragraphOne={
-                                                        <span
-                                                            style={{
-                                                                whiteSpace:
-                                                                    'pre-line',
-                                                            }}
-                                                        >
-                                                            {proposal
-                                                                ?.attributes
-                                                                ?.content
-                                                                ?.attributes
-                                                                ?.prop_submitted
-                                                                ? `Proposal Submitted\n\nYou can't like this proposal`
-                                                                : walletAPI?.address
-                                                                  ? user
-                                                                      ? user?.user?.id?.toString() ===
-                                                                        proposal?.attributes?.user_id?.toString()
-                                                                          ? `You can't like your proposal`
-                                                                          : userProposalVote
-                                                                            ? userProposalVote
-                                                                                  ?.attributes
-                                                                                  ?.vote_result ===
-                                                                              true
-                                                                                ? `You already liked this proposal`
-                                                                                : 'Like this proposal\n\nClick to like this proposal'
-                                                                            : 'Like this proposal\n\nClick to like this proposal'
-                                                                      : 'Verify yourself to like this proposal'
-                                                                  : 'Connect wallet to like this proposal'}
-                                                        </span>
-                                                    }
-                                                >
-                                                    <span>
-                                                        <IconButton
-                                                            sx={{
-                                                                ...sentimentButtonSx,
-                                                                border: (
-                                                                    theme
-                                                                ) =>
-                                                                    `1px solid ${theme.palette.lightBlue}`,
-                                                                opacity:
-                                                                    checkShowValidation(
-                                                                        false,
-                                                                        walletAPI,
-                                                                        user
-                                                                    )
-                                                                        ? 0.5
-                                                                        : 1,
-                                                            }}
-                                                            data-testid='like-button'
-                                                            disabled={
-                                                                walletAPI?.address
-                                                                    ? proposal
-                                                                          ?.attributes
-                                                                          ?.content
-                                                                          ?.attributes
-                                                                          ?.prop_submitted
-                                                                        ? true
-                                                                        : user
-                                                                          ? user?.user?.id?.toString() ===
-                                                                            proposal?.attributes?.user_id?.toString()
-                                                                              ? true
-                                                                              : userProposalVote
-                                                                                ? userProposalVote
-                                                                                      ?.attributes
-                                                                                      ?.vote_result ===
-                                                                                  true
-                                                                                    ? true
-                                                                                    : false
-                                                                                : false
-                                                                          : false
-                                                                    : true
-                                                            }
-                                                            onClick={
-                                                                proposal
-                                                                    ?.attributes
-                                                                    ?.content
-                                                                    ?.attributes
-                                                                    ?.prop_submitted
-                                                                    ? null
-                                                                    : user
-                                                                      ? !user
-                                                                            ?.user
-                                                                            ?.govtool_username
-                                                                          ? () =>
-                                                                                setOpenUsernameModal(
-                                                                                    {
-                                                                                        open: true,
-                                                                                        callBackFn:
-                                                                                            () => {},
-                                                                                    }
-                                                                                )
-                                                                          : user?.user?.id?.toString() ===
-                                                                              proposal?.attributes?.user_id?.toString()
-                                                                            ? null
-                                                                            : userProposalVote
-                                                                              ? userProposalVote
-                                                                                    ?.attributes
-                                                                                    ?.vote_result ===
-                                                                                null
-                                                                                  ? null
-                                                                                  : () =>
-                                                                                        updateLikesOrDislikes(
-                                                                                            {
-                                                                                                like: true,
-                                                                                                loggedInUser:
-                                                                                                    user,
-                                                                                            }
-                                                                                        )
-                                                                              : () =>
-                                                                                    updateLikesOrDislikes(
-                                                                                        {
-                                                                                            like: true,
-                                                                                            loggedInUser:
-                                                                                                user,
-                                                                                        }
-                                                                                    )
-                                                                      : () =>
-                                                                            updateLikesOrDislikes(
-                                                                                {
-                                                                                    like: true,
-                                                                                    loggedInUser:
-                                                                                        user,
-                                                                                }
-                                                                            )
-                                                            }
-                                                        >
-                                                            <Badge
-                                                                badgeContent={
-                                                                    proposal
-                                                                        ?.attributes
-                                                                        ?.prop_likes ||
-                                                                    0
-                                                                }
-                                                                data-testid='like-count'
-                                                                showZero
-                                                                aria-label='proposal likes'
-                                                                sx={{
-                                                                    transform:
-                                                                        'translate(30px, -20px)',
-                                                                    '& .MuiBadge-badge':
-                                                                        {
-                                                                            color: 'neutralWhite',
-                                                                            backgroundColor:
-                                                                                cyan.c400,
-                                                                        },
-                                                                }}
-                                                            ></Badge>
-                                                            <IconThumbUp
-                                                                fill={
-                                                                    user
-                                                                        ? userProposalVote
-                                                                            ? userProposalVote
-                                                                                  ?.attributes
-                                                                                  ?.vote_result ===
-                                                                              true
-                                                                                ? theme
-                                                                                      ?.palette
-                                                                                      ?.primary
-                                                                                      ?.main
-                                                                                : theme?.palette?.textBlack
-                                                                            : theme?.palette?.textBlack
-                                                                        : theme?.palette?.textBlack
-                                                                }
-                                                            />
-                                                        </IconButton>
-                                                    </span>
-                                                </Tooltip>
-                                                {/* DISLIKE BUTTON */}
-                                                <Tooltip
-                                                    paragraphOne={
-                                                        <span
-                                                            style={{
-                                                                whiteSpace:
-                                                                    'pre-line',
-                                                            }}
-                                                        >
-                                                            {proposal
-                                                                ?.attributes
-                                                                ?.content
-                                                                ?.attributes
-                                                                ?.prop_submitted
-                                                                ? `Proposal Submitted\n\nYou can't dislike this proposal`
-                                                                : walletAPI?.address
-                                                                  ? user
-                                                                      ? user?.user?.id?.toString() ===
-                                                                        proposal?.attributes?.user_id?.toString()
-                                                                          ? `You can't dislike your proposal`
-                                                                          : userProposalVote
-                                                                            ? userProposalVote
-                                                                                  ?.attributes
-                                                                                  ?.vote_result ===
-                                                                              false
-                                                                                ? `You already disliked this proposal`
-                                                                                : 'Dislike this proposal\n\nClick to dislike this proposal'
-                                                                            : 'Dislike this proposal\n\nClick to dislike this proposal'
-                                                                      : 'Verify yourself to dislike this proposal'
-                                                                  : 'Connect wallet to dislike this proposal'}
-                                                        </span>
-                                                    }
-                                                >
-                                                    <span>
-                                                        <IconButton
-                                                            sx={{
-                                                                ...sentimentButtonSx,
-                                                                border: (
-                                                                    theme
-                                                                ) =>
-                                                                    `1px solid ${theme.palette.lightBlue}`,
-                                                                opacity:
-                                                                    checkShowValidation(
-                                                                        false,
-                                                                        walletAPI,
-                                                                        user
-                                                                    )
-                                                                        ? 0.5
-                                                                        : 1,
-                                                            }}
-                                                            data-testid='dislike-button'
-                                                            disabled={
-                                                                walletAPI?.address
-                                                                    ? proposal
-                                                                          ?.attributes
-                                                                          ?.content
-                                                                          ?.attributes
-                                                                          ?.prop_submitted
-                                                                        ? true
-                                                                        : user
-                                                                          ? user?.user?.id?.toString() ===
-                                                                            proposal?.attributes?.user_id?.toString()
-                                                                              ? true
-                                                                              : userProposalVote
-                                                                                ? userProposalVote
-                                                                                      ?.attributes
-                                                                                      ?.vote_result ===
-                                                                                  false
-                                                                                    ? true
-                                                                                    : false
-                                                                                : false
-                                                                          : false
-                                                                    : true
-                                                            }
-                                                            onClick={
-                                                                proposal
-                                                                    ?.attributes
-                                                                    ?.content
-                                                                    ?.attributes
-                                                                    ?.prop_submitted
-                                                                    ? null
-                                                                    : user
-                                                                      ? !user
-                                                                            ?.user
-                                                                            ?.govtool_username
-                                                                          ? () =>
-                                                                                setOpenUsernameModal(
-                                                                                    {
-                                                                                        open: true,
-                                                                                        callBackFn:
-                                                                                            () => {},
-                                                                                    }
-                                                                                )
-                                                                          : user?.user?.id?.toString() ===
-                                                                              proposal?.attributes?.user_id?.toString()
-                                                                            ? null
-                                                                            : userProposalVote
-                                                                              ? userProposalVote
-                                                                                    ?.attributes
-                                                                                    ?.vote_result ===
-                                                                                null
-                                                                                  ? null
-                                                                                  : () =>
-                                                                                        updateLikesOrDislikes(
-                                                                                            {
-                                                                                                like: false,
-                                                                                                loggedInUser:
-                                                                                                    user,
-                                                                                            }
-                                                                                        )
-                                                                              : () =>
-                                                                                    updateLikesOrDislikes(
-                                                                                        {
-                                                                                            like: false,
-                                                                                            loggedInUser:
-                                                                                                user,
-                                                                                        }
-                                                                                    )
-                                                                      : () =>
-                                                                            updateLikesOrDislikes(
-                                                                                {
-                                                                                    like: false,
-                                                                                    loggedInUser:
-                                                                                        user,
-                                                                                }
-                                                                            )
-                                                            }
-                                                        >
-                                                            <Badge
-                                                                badgeContent={
-                                                                    proposal
-                                                                        ?.attributes
-                                                                        ?.prop_dislikes ||
-                                                                    0
-                                                                }
-                                                                data-testid='dislike-count'
-                                                                showZero
-                                                                aria-label='proposal dislikes'
-                                                                sx={{
-                                                                    transform:
-                                                                        'translate(30px, -20px)',
-                                                                    '& .MuiBadge-badge':
-                                                                        {
-                                                                            color: 'neutralWhite',
-                                                                            backgroundColor:
-                                                                                errorRed.c300,
-                                                                        },
-                                                                }}
-                                                            ></Badge>
-                                                            <IconThumbDown
-                                                                fill={
-                                                                    user
-                                                                        ? userProposalVote
-                                                                            ? userProposalVote
-                                                                                  ?.attributes
-                                                                                  ?.vote_result ===
-                                                                              false
-                                                                                ? theme
-                                                                                      ?.palette
-                                                                                      ?.primary
-                                                                                      ?.main
-                                                                                : theme?.palette?.textBlack
-                                                                            : theme?.palette?.textBlack
-                                                                        : theme?.palette?.textBlack
-                                                                }
-                                                            />
-                                                        </IconButton>
-                                                    </span>
-                                                </Tooltip>
-                                            </Box>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Box>
-
-                        <Box
-                            mt={5}
-                            display='flex'
-                            alignItems='center'
-                            justifyContent='space-between'
-                        >
-                            {activePoll && (
-                                <Typography
-                                    variant='title2'
-                                    component='h3'
-                                    sx={{ fontWeight: 600 }}
-                                >
-                                    Polls
-                                </Typography>
-                            )}
-                        </Box>
-                        {proposal?.attributes?.content?.attributes
-                            ?.prop_submitted ? null : user &&
-                          +user?.user?.id === +proposal?.attributes?.user_id &&
-                          !activePoll ? (
-                            <Box mt={3}>
-                                <Box
-                                    data-testid='add-poll-card'
-                                    sx={sectionCardSx}
-                                >
-                                    <Typography
-                                        variant='body1'
-                                        fontWeight={600}
-                                    >
-                                        Do you want to check if your proposal is
-                                        ready to be submitted as a Governance
-                                        Action?
-                                    </Typography>
-
-                                    <Typography
-                                        variant='body2'
-                                        fontWeight={400}
-                                        mt={1.5}
-                                        sx={{ color: 'textBlack' }}
-                                    >
-                                        The poll will be pinned to the top of
-                                        your comments list, and you can close it
-                                        whenever you like. Opening a new poll
-                                        will automatically close the previous
-                                        one, which will then appear as a comment
-                                        in the comments feed.
-                                    </Typography>
-
-                                    <Box
-                                        mt={3}
-                                        display='flex'
-                                        justifyContent='flex-end'
-                                    >
-                                        <Button
-                                            variant='contained'
-                                            onClick={addPoll}
-                                            data-testid='add-poll-button'
-                                        >
-                                            Add Poll
-                                        </Button>
-                                    </Box>
-                                </Box>
-                            </Box>
-                        ) : null}
-
-                        {activePoll && (
-                            <Box mt={3}>
-                                <Poll
-                                    proposalUserId={
-                                        proposal?.attributes?.user_id
-                                    }
-                                    proposalAuthorUsername={
-                                        proposal?.attributes
-                                            ?.user_govtool_username
-                                    }
-                                    proposalSubmitted={
-                                        proposal?.attributes?.content
-                                            ?.attributes?.prop_submitted
-                                    }
-                                    poll={activePoll}
-                                    fetchActivePoll={fetchActivePoll}
-                                    fetchUnactivePolls={fetchUnactivePolls}
-                                />
-                            </Box>
-                        )}
-
-                        {unactivePollList?.length > 0 && (
-                            <Box mt={3}>
-                                {unactivePollList?.map((poll, index) => (
-                                    <Box key={index} mb={4}>
-                                        <Poll
-                                            proposalUserId={
-                                                proposal?.attributes?.user_id
-                                            }
-                                            proposalAuthorUsername={
-                                                proposal?.attributes
-                                                    ?.user_govtool_username
-                                            }
-                                            proposalSubmitted={
-                                                proposal?.attributes?.content
-                                                    ?.attributes?.prop_submitted
-                                            }
-                                            poll={poll}
-                                        />
-                                    </Box>
-                                ))}
-                            </Box>
-                        )}
-                        <Box
-                            mt={5}
-                            display='flex'
-                            alignItems='center'
-                            justifyContent='space-between'
-                        >
-                            <Typography
-                                variant='title2'
-                                component='h3'
-                                sx={{ fontWeight: 600 }}
-                            >
-                                Comments
-                            </Typography>
-
-                            <IconButton
-                                sx={roundIconButtonSx}
-                                onClick={() =>
-                                    proposal?.attributes
-                                        ?.prop_comments_number === 0
-                                        ? null
-                                        : setCommentsSortType((prev) =>
-                                              prev === 'desc' ? 'asc' : 'desc'
-                                          )
-                                }
-                                data-testid='sort-comments'
-                            >
-                                <img
-                                    src={ICONS.sortIcon}
-                                    alt=''
-                                    width={24}
-                                    height={24}
-                                />
-                            </IconButton>
-                        </Box>
-                        {proposal?.attributes?.content?.attributes
-                            ?.prop_submitted ? null : (
-                            <Box mt={3}>
-                                <Box sx={commentComposerSx}>
-                                    <Typography
-                                        component='h6'
-                                        sx={{
-                                            fontSize: 14,
-                                            fontWeight: 500,
-                                            lineHeight: '20px',
-                                        }}
-                                    >
-                                        Submit a comment
-                                    </Typography>
-
-                                    <PdfTextArea
-                                        value={newCommentText || ''}
-                                        onChange={(e) => handleChange(e)}
-                                        onKeyDown={handleKeyDown}
-                                        onBlur={handleBlur}
-                                        maxLength={MAX_COMMENT_LENGTH}
-                                        spellCheck='false'
-                                        autoCorrect='off'
-                                        autoCapitalize='none'
-                                        autoComplete='off'
-                                        dataTestId='comment-input'
-                                        layoutStyles={{ mt: 1.5, mb: 1 }}
-                                    />
-
-                                    <Box
-                                        mt={2}
-                                        display='flex'
-                                        justifyContent={'flex-end'}
-                                        alignItems={{
-                                            xxs: 'stretch',
-                                            md: 'center',
-                                        }}
-                                        flexDirection={{
-                                            xxs: 'column',
-                                            md: 'row',
-                                        }}
-                                        gap={2}
-                                        ref={targetRef}
-                                    >
-                                        {checkShowValidation(
-                                            true,
-                                            walletAPI,
-                                            user
-                                        ) && (
-                                            <UserValidation
-                                                type='budget'
-                                                drepCheck={checkIfDrepIsSignedIn(
-                                                    walletAPI
-                                                )}
-                                                drepRequired={true}
-                                            />
-                                        )}
                                             <Button
                                                 variant='contained'
                                                 onClick={() =>
@@ -2374,117 +1930,121 @@ const SingleGovernanceAction = ({ id }) => {
                                                     )
                                                 }
                                                 endIcon={
-                                                    <IconReply
-                                                        height={18}
-                                                        width={18}
-                                                        fill={
-                                                            !newCommentText ||
-                                                            !walletAPI?.address
-                                                                ? gray.c300
-                                                                : theme.palette.neutralWhite
-                                                        }
+                                                    <Reply
+                                                        aria-hidden
+                                                        size={16}
                                                     />
                                                 }
                                                 data-testid='comment-button'
+                                                sx={{
+                                                    alignSelf: {
+                                                        xxs: 'flex-end',
+                                                        md: 'center',
+                                                    },
+                                                    flexShrink: 0,
+                                                }}
                                             >
                                                 Comment
                                             </Button>
+                                        </Box>
+                                    </Card>
+                                )}
+
+                                {commentsCount === 0 ? (
+                                    <Card
+                                        sx={{
+                                            alignItems: 'center',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 0.75,
+                                            py: { xxs: 3, md: 4 },
+                                            textAlign: 'center',
+                                        }}
+                                    >
+                                        <MessageCircle
+                                            aria-hidden
+                                            color={ds.gray['500']}
+                                            size={22}
+                                        />
+                                        <CardTitle as='h3'>
+                                            No comments yet
+                                        </CardTitle>
+                                        <Box component='p' sx={bodyTextSx}>
+                                            Be the first to share your thoughts
+                                            on this proposal.
+                                        </Box>
+                                    </Card>
+                                ) : null}
+
+                                {commentsList?.map((comment, index) => (
+                                    <Box key={index} sx={cardShellSx}>
+                                        <CommentCard
+                                            comment={comment}
+                                            proposal={proposal}
+                                            fetchComments={fetchComments}
+                                            checkShowComments={checkShowValidation(
+                                                false,
+                                                walletAPI,
+                                                user
+                                            )}
+                                            drepCheck={checkIfDrepIsSignedIn(
+                                                walletAPI
+                                            )}
+                                            user={user}
+                                        />
                                     </Box>
-                                </Box>
-                            </Box>
-                        )}
-                        {proposal?.attributes?.prop_comments_number === 0 ? (
-                            <Box sx={{ ...sectionCardSx, my: 3 }}>
-                                <Stack
-                                    display={'flex'}
-                                    direction={'column'}
-                                    alignItems={'center'}
-                                    justifyContent={'center'}
-                                    textAlign={'center'}
-                                    gap={1}
-                                >
-                                    <Typography
-                                        variant='title2'
-                                        component='h6'
-                                        color='textBlack'
-                                        fontWeight={600}
+                                ))}
+                                {commentsCurrentPage < commentsPageCount && (
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                        }}
                                     >
-                                        No Comments yet
-                                    </Typography>
-                                    <Typography
-                                        variant='body1'
-                                        fontWeight={400}
-                                        color='textBlack'
-                                    >
-                                        Be the first to share your thoughts on
-                                        this proposal.
-                                    </Typography>
-                                </Stack>
+                                        <Button
+                                            variant='outlined'
+                                            size='medium'
+                                            onClick={() => {
+                                                fetchComments(
+                                                    commentsCurrentPage + 1
+                                                );
+                                                setCommentsCurrentPage(
+                                                    (prev) => prev + 1
+                                                );
+                                            }}
+                                        >
+                                            Load more comments
+                                        </Button>
+                                    </Box>
+                                )}
                             </Box>
-                        ) : null}
-
-                        {commentsList?.map((comment, index) => (
-                            <Box mt={3} key={index}>
-                                <CommentCard
-                                    comment={comment}
-                                    proposal={proposal}
-                                    fetchComments={fetchComments}
-                                    checkShowComments={checkShowValidation(
-                                        false,
-                                        walletAPI,
-                                        user
-                                    )}
-                                    drepCheck={checkIfDrepIsSignedIn(walletAPI)}
-                                    user={user}
-                                />
-                            </Box>
-                        ))}
-                        {commentsCurrentPage < commentsPageCount && (
-                            <Box
-                                marginY={3}
-                                display={'flex'}
-                                justifyContent={'center'}
-                            >
-                                <Button
-                                    variant='outlined'
-                                    size='medium'
-                                    onClick={() => {
-                                        fetchComments(commentsCurrentPage + 1);
-                                        setCommentsCurrentPage(
-                                            (prev) => prev + 1
-                                        );
-                                    }}
-                                >
-                                    Load more comments
-                                </Button>
-                            </Box>
-                        )}
-
-                        <DeleteProposalModal
-                            open={openDeleteModal}
-                            onClose={handleCloseDeleteModal}
-                            handleDeleteProposal={handleDeleteProposal}
-                        />
-
-                        <ProposalSubmissionDialog
-                            proposal={proposal}
-                            openEditDialog={openGASubmissionDialog}
-                            handleCloseSubmissionDialog={() =>
-                                setOpenGASubmissionDialog(false)
-                            }
-                            handleGoToDataEdit={() => {
-                                setOpenGASubmissionDialog(false);
-                                handleEditProposal();
-                            }}
-                        />
-
-                        <ProposalOwnModal
-                            open={ownProposalModal}
-                            onClose={() => setOwnProposalModal(false)}
-                        />
+                        </Box>
                     </Box>
-                )}
-            </Typography>
+
+                    <DeleteProposalModal
+                        open={openDeleteModal}
+                        onClose={handleCloseDeleteModal}
+                        handleDeleteProposal={handleDeleteProposal}
+                    />
+
+                    <ProposalSubmissionDialog
+                        proposal={proposal}
+                        openEditDialog={openGASubmissionDialog}
+                        handleCloseSubmissionDialog={() =>
+                            setOpenGASubmissionDialog(false)
+                        }
+                        handleGoToDataEdit={() => {
+                            setOpenGASubmissionDialog(false);
+                            handleEditProposal();
+                        }}
+                    />
+
+                    <ProposalOwnModal
+                        open={ownProposalModal}
+                        onClose={() => setOwnProposalModal(false)}
+                    />
+                </Box>
+            )}
             <PdfModal open={openAlertDialog} onClose={handleAlertDialogClose}>
                 <Box
                     sx={{

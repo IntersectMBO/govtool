@@ -11,6 +11,7 @@ import { VoteContextFormValues, useTranslation } from "@hooks";
 import { LINKS } from "@/consts/links";
 import { ICONS } from "@/consts/icons";
 import { primaryBlue } from "@/consts";
+import { FONT_FAMILY } from "@/consts/designTokens";
 
 interface PostIpfsResponse {
   ipfsCid: string;
@@ -77,7 +78,7 @@ export const VoteContextGovTool = ({
           cursor: "pointer",
           fontSize: 16,
           fontWeight: 500,
-          fontFamily: "Poppins",
+          fontFamily: FONT_FAMILY.sans,
           my: 2,
           textAlign: "center",
           textDecoration: "none",

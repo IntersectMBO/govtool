@@ -28,7 +28,10 @@ import {
   ErrorPage,
   GovernanceActionDetails,
   GovernanceActionsIndex,
+  GovernanceActivity,
   Home,
+  NotificationPreferencesPage,
+  NotificationsPage,
   RegisterAsdRep,
   RegisterAsDirectVoter,
   RetireAsDrep,
@@ -178,10 +181,23 @@ export default () => {
       ) : (
         <Routes>
           <Route path={PATHS.home} element={<Home />} />
+          {/* One public page for everyone, with or without a wallet. */}
+          <Route
+            path={PATHS.governanceActivity}
+            element={<GovernanceActivity />}
+          />
           {/* One URL per page: the wallet picks the dashboard or the public
           layout of the same routes. */}
           <Route element={<Dashboard />}>
             <Route path={PATHS.dashboard} element={<DashboardHome />} />
+            <Route
+              path={PATHS.notifications}
+              element={<NotificationsPage />}
+            />
+            <Route
+              path={PATHS.notificationPreferences}
+              element={<NotificationPreferencesPage />}
+            />
             {isWalletConnected && walletOptionalRoutes}
           </Route>
           {!isWalletConnected && walletOptionalRoutes}

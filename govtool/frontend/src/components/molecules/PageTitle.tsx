@@ -1,24 +1,39 @@
-import { useScreenDimension } from "@hooks";
-import { FC } from "react";
-import { Typography, PagePaddingBox, ContentBox } from "@/components/atoms";
+import { ReactNode } from "react";
+import { Box } from "@mui/material";
 
-interface PageTitleProps {
+import { Typography } from "@/components/atoms";
+import { ds } from "@/consts/designTokens";
+
+type PageTitleProps = {
   title: string;
-}
-
-export const PageTitle: FC<PageTitleProps> = ({ title }) => {
-  const { isMobile } = useScreenDimension();
-
-  return (
-    <PagePaddingBox
-      borderBottom={(theme) => `1px solid ${theme.palette.neutralWhite}`}
-      py={3}
-    >
-      <ContentBox>
-        <Typography variant={isMobile ? "title1" : "headline5"}>
-          {title}
-        </Typography>
-      </ContentBox>
-    </PagePaddingBox>
-  );
+  description?: string;
+  action?: ReactNode;
 };
+
+export const PageTitle = ({ title, description, action }: PageTitleProps) => (
+  <Box
+    sx={{
+      alignItems: "center",
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 2,
+      justifyContent: "space-between",
+    }}
+  >
+    <Box>
+      <Typography color={ds.gray["900"]} component="h1" variant="paragraphXL">
+        {title}
+      </Typography>
+      {description && (
+        <Typography
+          color={ds.gray["500"]}
+          sx={{ maxWidth: 467, mt: 1 }}
+          variant="paragraphSM"
+        >
+          {description}
+        </Typography>
+      )}
+    </Box>
+    {action}
+  </Box>
+);

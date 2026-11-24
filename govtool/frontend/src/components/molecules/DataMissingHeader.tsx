@@ -7,7 +7,7 @@ import {
   getMetadataDataMissingStatusTranslation,
 } from "@/utils";
 import { ICONS } from "@/consts";
-import { Share } from "./Share";
+import { ShareDialog } from "@/components/organisms/DRepDashboard/ShareDRepDialog";
 
 type DataMissingHeaderProps = {
   isDataMissing?: MetadataValidationStatus;
@@ -94,7 +94,12 @@ export const DataMissingHeader = ({
           </Typography>
         )}
       </Box>
-      <Share link={shareLink ?? window.location.href} />
+      <ShareDialog
+        buttonTestId="share-button"
+        copyTestId="copy-link-from-share-button"
+        kind={isDRep ? "drep" : "action"}
+        link={shareLink ?? window.location.href}
+      />
     </Box>
   );
 };

@@ -1,9 +1,20 @@
+/**
+ * The GovTool newsletter, a Ghost site. CONTENT_KEY is its Content API key:
+ * read-only, for published posts only, and printed in every page the site
+ * serves (Ghost's search script), so it is not a secret.
+ */
+export const NEWSLETTER = {
+  SITE: "https://newsletter.gov.tools",
+  CONTENT_KEY: "896d614e96f501eb3f1d2fdb9a",
+};
+
 export const LINKS = {
   NEWSLETTER_SIGNUP: "https://newsletter.gov.tools/#/portal/signup",
   USING_GOVTOOL: "https://docs.gov.tools/cardano-govtool/using-govtool",
   COMPATIBLE_WALLETS:
     "https://docs.gov.tools/cardano-govtool/using-govtool/getting-started/compatible-wallets",
   FAQS: "https://docs.gov.tools/cardano-govtool/faqs",
+  INTERSECT: "https://www.intersectmbo.org/",
   SUPPORT: "https://docs.gov.tools/cardano-govtool/support",
   DREP_ERROR_CONDITIONS:
     "https://docs.gov.tools/cardano-govtool/using-govtool/dreps/drep-error-conditions",

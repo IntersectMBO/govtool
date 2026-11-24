@@ -1,7 +1,7 @@
 import { Chip } from "@mui/material";
 
-import { errorRed, primaryBlue, successGreen } from "@consts";
 import { useTranslation } from "@hooks";
+import { PILL_TONES, PillTone, RADIUS } from "@/consts/designTokens";
 
 type GovernanceActionStatusChipProps = {
   label: string;
@@ -15,32 +15,34 @@ export const GovernanceActionStatusChip = ({
 }: GovernanceActionStatusChipProps) => {
   const { t } = useTranslation();
 
-  const statusColors: Record<string, string> = {
-    [t("actionRecord.status.inProgress")]: successGreen.c100,
-    [t("actionRecord.status.ratified")]: successGreen.c100,
-    [t("actionRecord.status.enacted")]: successGreen.c100,
-    [t("actionRecord.status.expired")]: errorRed.c100,
-    [t("actionRecord.status.dropped")]: primaryBlue.c100,
+  const statusTones: Record<string, PillTone> = {
+    [t("actionRecord.status.inProgress")]: "success",
+    [t("actionRecord.status.ratified")]: "primary",
+    [t("actionRecord.status.enacted")]: "primary",
+    [t("actionRecord.status.expired")]: "error",
+    [t("actionRecord.status.dropped")]: "neutral",
   };
+  const tone = PILL_TONES[statusTones[label] ?? "neutral"];
 
   return (
     <Chip
       label={label}
       sx={{
-        backgroundColor: bgColor ?? statusColors[label],
-        borderRadius: 100,
-        height: "auto",
-        py: 0.75,
-        px: 2.25,
+        backgroundColor: bgColor ?? tone.bg,
+        border: `1px solid ${bgColor ?? tone.border}`,
+        borderRadius: `${RADIUS.sm}px`,
+        height: 20,
         "& .MuiChip-label": {
+          color: tone.text,
           fontSize: 12,
-          fontWeight: 500,
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis",
+          fontWeight: 600,
+          letterSpacing: "0.01px",
+          lineHeight: "18px",
           overflow: "hidden",
-          color: "textBlack",
-          px: 0,
+          px: 0.5,
           py: 0,
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
         },
       }}
     />

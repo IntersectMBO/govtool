@@ -48,7 +48,7 @@ export const EditDRepStorageInformation = ({
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("editMetadata.storingInformationTitle")}
       </Typography>
       <Button
@@ -68,7 +68,7 @@ export const EditDRepStorageInformation = ({
       >
         {t("editMetadata.storingInformationStep2Link")}
       </Button>
-      <Typography fontWeight={400} sx={{ textAlign: "center" }} variant="body1">
+      <Typography fontWeight={400} variant="body1">
         {t("editMetadata.storingInformationDescription")}
       </Typography>
       <Box sx={{ my: 4 }}>

@@ -9,6 +9,8 @@ import {
 
 import { useOnClickOutside, useScreenDimension } from "@hooks";
 
+import { ds } from "@/consts/designTokens";
+
 interface Props {
   chosenFilters: string[];
   setChosenFilters: Dispatch<SetStateAction<string[]>>;
@@ -51,7 +53,7 @@ export const DataActionsFilters = ({
       flexDirection="column"
       position="absolute"
       sx={{
-        background: "#FBFBFF",
+        background: ds.gray["25"],
         boxShadow: "1px 2px 11px 0px #00123D5E",
         borderRadius: "10px",
         padding: "12px 0px",
@@ -70,7 +72,7 @@ export const DataActionsFilters = ({
           sx={{
             fontSize: 14,
             fontWeight: 500,
-            color: "#9792B5",
+            color: ds.gray["500"],
             paddingX: "20px",
           }}
         >
@@ -81,9 +83,9 @@ export const DataActionsFilters = ({
         <Box
           key={item.key}
           paddingX="20px"
-          sx={[{ "&:hover": { bgcolor: "#E6EBF7" } }]}
+          sx={[{ "&:hover": { bgcolor: ds.gray["200"] } }]}
           bgcolor={
-            chosenFilters?.includes(item.key) ? "#FFF0E7" : "transparent"
+            chosenFilters?.includes(item.key) ? ds.orange["50"] : "transparent"
           }
         >
           <FormControlLabel

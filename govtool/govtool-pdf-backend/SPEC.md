@@ -1273,6 +1273,7 @@ values. §11.2 case 4 sends each one unencoded.
 **Proposals** (`GET /api/proposals?`):
 - `filters[$and][0][gov_action_type_id]=${typeId}&filters[$and][1][prop_name][$containsi]=${search}&pagination[page]=${page}&pagination[pageSize]=25&sort[${fieldId}]=${DIR}&populate[0]=proposal_links&populate[1]=proposal_withdrawals&populate[2]=proposal_constitution_content&populate[3]=proposal`
 - the same with `&filters[$and][2][prop_submitted]=${true|false}` after the `$containsi` filter
+- the GovTool redesign's single list: `filters[$and][0][prop_name][$containsi]=${encodedSearch}` then, for the chosen types, `&filters[$and][1][gov_action_type_id][$in][${i}]=${typeId}`, then optionally `&filters[$and][2][prop_submitted]=${true|false}`, then `&pagination[page]=${page}&pagination[pageSize]=10&sort[${fieldId}]=${DIR}&populate[0]=proposal_links&populate[1]=proposal_withdrawals&populate[2]=proposal_constitution_content&populate[3]=proposal`
 - `filters[$and][2][is_draft]=true&pagination[page]=${page}&pagination[pageSize]=25&sort[createdAt]=desc&populate[0]=proposal_links&populate[1]=proposal_withdrawals&populate[2]=proposal_constitution_content`
 - `filters[$and][2][is_draft]=true&filters[$and][3][prop_submitted]=${bool}&…` (unreachable in the UI; still accepted)
 - `filters[$and][0][is_draft]=true&pagination[page]=1&pagination[pageSize]=1`

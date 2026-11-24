@@ -1,119 +1,103 @@
+import { useEffect, useState } from "react";
 import { Box, CircularProgress } from "@mui/material";
 
 import { Typography } from "@atoms";
 import { useCardano, useDataActionsBar } from "@context";
-import {
-  useFetchNextPageDetector,
-  useGetProposalsInfiniteQuery,
-  useSaveScrollPosition,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
+import { useGetProposalsPageQuery, useTranslation } from "@hooks";
 import { SearchNotReady } from "@molecules";
-import { removeDuplicatedProposals } from "@utils";
 import { ValidatedGovernanceActionCard } from "@organisms";
-import { useMemo, useRef } from "react";
+import { PaginationFooter } from "@/components/molecules/PaginationFooter";
+import { ds } from "@/consts/designTokens";
+import { clampPage } from "@/utils/clampPage";
+
+const PAGE_SIZE = 10;
 
 type GovernanceActionsToVoteProps = {
   onDashboard?: boolean;
 };
 
+/** The live governance actions as rows, one page at a time. */
 export const GovernanceActionsToVote = ({
   onDashboard = true,
 }: GovernanceActionsToVoteProps) => {
   const { pendingTransaction, isEnableLoading } = useCardano();
-  const { isMobile, screenWidth } = useScreenDimension();
-  const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
-  const { chosenSorting, chosenFilters } = dataActionsBarProps;
+  const { debouncedSearchText, chosenSorting, chosenFilters } =
+    useDataActionsBar();
   const { t } = useTranslation();
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchText, chosenSorting, chosenFilters]);
 
   const {
-    isProposalsFetching,
-    isProposalsFetchingNextPage,
+    proposals,
+    proposalsTotal,
     isProposalsLoading,
     isSearchNotReady,
-    proposals,
-    proposalsfetchNextPage,
-    proposalsHaveNextPage,
-  } = useGetProposalsInfiniteQuery({
+  } = useGetProposalsPageQuery({
     filters: chosenFilters,
-    sorting: chosenSorting,
+    page,
+    pageSize: PAGE_SIZE,
     searchPhrase: debouncedSearchText,
+    sorting: chosenSorting,
   });
-  const loadNextPageRef = useRef(null);
 
-  useFetchNextPageDetector(
-    proposalsfetchNextPage,
-    isProposalsLoading || isProposalsFetchingNextPage,
-    proposalsHaveNextPage,
-  );
+  // An action can expire, or be voted on, while its last page is open; move
+  // back to a page that still has rows rather than strand the user.
+  useEffect(() => {
+    if (!proposals) return;
+    const lastPage = clampPage(page, proposalsTotal, PAGE_SIZE);
+    if (lastPage !== page) setPage(lastPage);
+  }, [proposals, proposalsTotal, page]);
 
-  const saveScrollPosition = useSaveScrollPosition(
-    isProposalsLoading,
-    isProposalsFetching,
-  );
+  if (isSearchNotReady) return <SearchNotReady />;
 
-  const mappedProposals = useMemo(
-    () => removeDuplicatedProposals(proposals),
-    [proposals, isProposalsFetchingNextPage],
-  );
+  if (!proposals || isEnableLoading || isProposalsLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!proposals.length) {
+    return (
+      <Typography
+        color={ds.gray["600"]}
+        data-testid="governance-actions-empty"
+        sx={{ py: 4 }}
+        variant="paragraphSM"
+      >
+        {t("govActions.noResultsForTheSearch")}
+      </Typography>
+    );
+  }
 
   return (
-    <>
-      {isSearchNotReady ? (
-        <SearchNotReady />
-      ) : !mappedProposals || isEnableLoading || isProposalsLoading ? (
-        <Box
-          sx={{
-            alignItems: "center",
-            display: "flex",
-            flex: 1,
-            justifyContent: "center",
-            py: 4,
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      ) : !mappedProposals?.length ? (
-        <Typography fontWeight={300} sx={{ py: 4 }}>
-          {t("govActions.noResultsForTheSearch")}
-        </Typography>
-      ) : (
-        <Box
-          columnGap="20px"
-          display="grid"
-          gridTemplateColumns={`repeat(auto-fill, minmax(${
-            screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
-          }, 1fr))`}
-        >
-          {mappedProposals.map((item) => (
-            <Box pb={4.25} key={item.txHash + item.index}>
-              <ValidatedGovernanceActionCard
-                {...item}
-                inProgress={
-                  onDashboard &&
-                  pendingTransaction.vote?.resourceId ===
-                    `${item.txHash ?? ""}${item.index ?? ""}`
-                }
-                onClick={() => {
-                  saveScrollPosition();
-                }}
-                txHash={item.txHash}
-              />
-            </Box>
-          ))}
-          {proposalsHaveNextPage && isProposalsFetchingNextPage && (
-            <Box
-              display="flex"
-              justifyContent="center"
-              py={4}
-              ref={loadNextPageRef}
-            >
-              <CircularProgress />
-            </Box>
-          )}
-        </Box>
-      )}
-    </>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {proposals.map((item) => (
+        <ValidatedGovernanceActionCard
+          key={item.txHash + item.index}
+          {...item}
+          inProgress={
+            onDashboard &&
+            pendingTransaction.vote?.resourceId ===
+              `${item.txHash ?? ""}${item.index ?? ""}`
+          }
+          txHash={item.txHash}
+        />
+      ))}
+      <PaginationFooter
+        onPageChange={(next) => {
+          setPage(next);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        onPageSizeChange={() => {}}
+        page={page}
+        pageSize={PAGE_SIZE}
+        total={proposalsTotal}
+      />
+    </Box>
   );
 };

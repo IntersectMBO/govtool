@@ -26,7 +26,8 @@ type PaginationProviderProps = {
 
 const PaginationProvider: FC<PaginationProviderProps> = ({ children }) => {
   const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(5);
+  // A multiple of the directory grid's 1, 2 and 3 columns.
+  const [pageSize, setPageSize] = useState<number>(12);
 
   const contextValue = useMemo(
     () => ({

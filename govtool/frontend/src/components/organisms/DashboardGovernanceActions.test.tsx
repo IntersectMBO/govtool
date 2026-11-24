@@ -22,9 +22,21 @@ vi.mock("@context", () => ({
   }),
 }));
 
-vi.mock("@molecules", () => ({ DataActionsBar: () => null }));
+vi.mock("@atoms", () => ({
+  PageContainer: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+}));
 
-vi.mock("@atoms", () => ({ Button: () => null }));
+// The header and the list frame read the wallet and the lists' queries.
+vi.mock("./GovernanceActionsHeader", () => ({
+  GovernanceActionsHeader: () => null,
+}));
+vi.mock("./GovernanceActionsListLayout", () => ({
+  GovernanceActionsListLayout: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+}));
 
 // The lists are out of scope: show which one the page renders.
 vi.mock("@organisms", () => ({

@@ -1,11 +1,12 @@
 import { NavLink, To } from "react-router";
 import { Box, Skeleton } from "@mui/material";
-import Divider from "@mui/material/Divider";
+import { ChevronRight } from "lucide-react";
 
 import { useScreenDimension } from "@hooks";
 import { Typography } from "@atoms";
 import { getMetadataDataMissingStatusTranslation } from "@/utils";
 import { MetadataValidationStatus } from "@/models";
+import { ds } from "@/consts/designTokens";
 
 type BreadcrumbsProps = {
   elementOne: string;
@@ -32,30 +33,32 @@ export const Breadcrumbs = ({
         margin: `2px 0 ${isMobile ? "44px" : "24px"}`,
       }}
     >
-      <NavLink to={elementOnePath} style={{ textDecorationColor: "#0033AD" }}>
+      <NavLink to={elementOnePath} style={{ textDecoration: "none" }}>
         <Typography
-          color="primary"
-          variant="caption"
+          color={ds.gray["500"]}
+          variant="tagline"
           sx={{
             whiteSpace: "nowrap",
+            "&:hover": { color: ds.gray["900"] },
           }}
         >
           {elementOne}
         </Typography>
       </NavLink>
-      <Divider
-        orientation="vertical"
-        flexItem
-        color="textBlack"
-        sx={{ margin: "0 6px" }}
-      />
+      <Box
+        component="span"
+        sx={{ color: ds.gray["400"], display: "inline-flex", mx: 1 }}
+      >
+        <ChevronRight aria-hidden size={12} />
+      </Box>
       {isMetadataLoading ? (
         <Skeleton variant="rounded" width={200} height={15} />
       ) : (
         <Typography
-          variant="caption"
+          color={ds.gray["900"]}
+          variant="tagline"
+          fontWeight={600}
           sx={{
-            fontWeight: 500,
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",

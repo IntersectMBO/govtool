@@ -16,7 +16,8 @@ export async function fetchFirstActiveDRepDetails(page: Page) {
   let dRepGivenName: string;
   let dRepId: string;
   let dRepDirectoryPage: DRepDirectoryPage;
-  let routePath = "**/drep/list?page=0&pageSize=5&sort=Activity&**";
+  // The directory shows 12 DReps a page.
+  let routePath = "**/drep/list?page=0&pageSize=12&sort=Activity&**";
   await page.route(
     routePath,
     async (route) => {

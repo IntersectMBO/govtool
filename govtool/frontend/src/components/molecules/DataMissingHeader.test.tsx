@@ -16,8 +16,8 @@ vi.mock("@atoms", () => ({
   ),
 }));
 
-vi.mock("./Share", () => ({
-  Share: ({ link }: { link: string }) => (
+vi.mock("@/components/organisms/DRepDashboard/ShareDRepDialog", () => ({
+  ShareDialog: ({ link }: { link: string }) => (
     <button type="button" data-testid="share-button" data-link={link}>
       share
     </button>

@@ -124,7 +124,7 @@ export const RegisterAsDirectVoter = () => {
 
   return (
     <CenteredBoxPageWrapper pageTitle={pageTitle}>
-      <Typography sx={{ mt: 1, textAlign: "center" }} variant="headline4">
+      <Typography component="h1" sx={{ mt: 1 }} variant="headline4">
         {t("directVoter.registerHeading")}
       </Typography>
       <Typography
@@ -132,7 +132,6 @@ export const RegisterAsDirectVoter = () => {
         sx={{
           mb: 7,
           mt: isMobile ? 4 : 10,
-          textAlign: "center",
           whiteSpace: "pre-line",
         }}
         variant="body1"

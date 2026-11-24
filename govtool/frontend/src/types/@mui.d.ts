@@ -3,6 +3,7 @@ import {
   ThemeOptions as MuiThemeOptions,
   PaletteOptions as MuiPalette,
 } from "@mui/material/styles";
+import type { DesignScales } from "@/consts/designTokens";
 
 declare module "@mui/material/styles" {
   type BreakpointOverrides = {
@@ -20,6 +21,7 @@ declare module "@mui/material/styles" {
     boxShadow1: string;
     boxShadow2: string;
     darkPurple: string;
+    ds: DesignScales;
     errorRed: string;
     highlightBlue: string;
     inputRed: string;
@@ -47,5 +49,11 @@ declare module "@mui/material/styles" {
   interface ThemeOptions extends MuiThemeOptions {
     breakpoints: { values: BreakpointOverrides };
     palette: Palette;
+  }
+}
+
+declare module "@mui/material/Button" {
+  interface ButtonPropsVariantOverrides {
+    soft: true;
   }
 }

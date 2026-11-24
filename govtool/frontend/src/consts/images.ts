@@ -8,6 +8,7 @@ export const IMAGES = {
   govActionDelegateImage: "/images/GovActionDelegate.webp",
   govActionListImage: "/images/GovActionList.webp",
   govActionRegisterImage: "/images/GovActionRegister.webp",
+  govToolLogo: "/images/GovToolLogo.svg",
   heroImage: "/images/HeroImage.webp",
   proposeGovActionImage: "/images/ProposeGovAction.webp",
   directVoterImage: "/images/GovActionsDirectVoter.webp",

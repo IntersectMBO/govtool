@@ -12,6 +12,8 @@ export default class DRepDirectoryPage {
   readonly searchInput = this.page.getByTestId("search-input");
   readonly filterBtn = this.page.getByTestId("filters-button");
   readonly sortBtn = this.page.getByTestId("sort-button");
+  readonly statusFilterBtn = this.page.getByTestId("status-filter-button");
+  readonly continueToWalletBtn = this.page.getByTestId("continue-to-wallet-button");
   readonly showMoreBtn = this.page.getByTestId("show-more-button");
   readonly abstainInfoButton = this.page.getByTestId(
     "abstain-from-every-vote-info-button"
@@ -61,6 +63,8 @@ export default class DRepDirectoryPage {
     const delegateBtn = this.page.getByTestId(`${dRepId}-delegate-button`);
     await expect(delegateBtn).toBeVisible();
     await this.page.getByTestId(`${dRepId}-delegate-button`).click();
+    // Delegate opens a review dialog; the wallet is asked from there.
+    await this.continueToWalletBtn.click();
   }
 
   async resetDRepForm() {
@@ -69,31 +73,22 @@ export default class DRepDirectoryPage {
     }
     await this.dRepInput.clear();
   }
-  async filterDReps(filterOptions: string[]) {
-    for (const option of filterOptions) {
-      await this.page.getByTestId(`${option}-checkbox`).click();
+  // Status is a single choice in a "Status:" menu; "" is All.
+  // Choosing the status already selected changes nothing and leaves the
+  // menu open over the page, so close it instead.
+  async filterByStatus(status: string) {
+    await this.statusFilterBtn.click();
+    const radio = this.page.getByTestId(`${status}-radio`);
+    if (await radio.isChecked()) {
+      await this.page.keyboard.press("Escape");
+      return;
     }
+    await radio.check();
   }
 
-  async unFilterDReps(filterOptions: string[]) {
-    for (const option of filterOptions) {
-      await this.page.getByTestId(`${option}-checkbox`).click();
-    }
-  }
-
-  async validateFilters(filters: string[], filterOptions: string[]) {
+  async validateFilters(filters: string[]) {
     await functionWaitedAssert(async () => {
-      const excludedFilters = filterOptions.filter(
-        (filter) => !filters.includes(filter)
-      );
-
       const dRepList = await this.getAllListedDReps();
-
-      for (const filter of excludedFilters) {
-        await expect(this.page.getByTestId(`${filter}-checkbox`)).toHaveCount(
-          1
-        );
-      }
 
       for (const dRep of dRepList) {
         if (await dRep.isVisible()) {
@@ -132,7 +127,12 @@ export default class DRepDirectoryPage {
       response.url().includes(`&sort=${option}`)
     );
 
-    await this.page.getByTestId(`${option}-radio`).click();
+    // The sort menu closes after each choice, so reopen it when needed.
+    const radio = this.page.getByTestId(`${option}-radio`);
+    if (!(await radio.isVisible())) {
+      await this.sortBtn.click();
+    }
+    await radio.click();
     const response = await responsePromise;
 
     return (await response.json()).elements;

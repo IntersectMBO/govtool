@@ -57,7 +57,7 @@ export const GovernanceActionHistoryList = () => {
             display: "flex",
             flex: 1,
             justifyContent: "center",
-            minHeight: "75vh",
+            minHeight: "40vh",
           }}
         >
           <CircularProgress />
@@ -76,14 +76,12 @@ export const GovernanceActionHistoryList = () => {
       )}
 
       {actions.length > 0 && (
-        <Box className="governance-actions-grid">
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {actions.map((action) => (
-            <Box
+            <GovernanceActionHistoryCard
               key={`${action.id}-${action.tx_hash}`}
-              sx={{ display: "flex", minWidth: 0 }}
-            >
-              <GovernanceActionHistoryCard action={action} />
-            </Box>
+              action={action}
+            />
           ))}
         </Box>
       )}

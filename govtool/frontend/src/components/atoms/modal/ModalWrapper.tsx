@@ -1,9 +1,10 @@
 import { SxProps, styled } from "@mui/material/styles";
 
-import { ICONS } from "@consts";
+import { X } from "lucide-react";
 import { useModal } from "@context";
 import { callAll } from "@utils";
 import { forwardRef } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   variant?: "modal" | "popup";
@@ -15,15 +16,16 @@ interface Props {
 }
 
 export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
-  box-shadow: 1px 2px 11px 0px #00123d5e;
+  box-shadow: 0px 24px 48px -12px rgba(16, 24, 40, 0.18);
+  border: 1px solid #e5e9f0;
   max-height: 90vh;
   position: fixed;
   top: 50%;
   left: 50%;
   display: flex;
   flex-direction: column;
-  background: #fbfbff;
-  border-radius: 24px;
+  background: #ffffff;
+  border-radius: 16px;
   transform: translate(-50%, -50%);
 
   ${({ variant }) => {
@@ -31,7 +33,7 @@ export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
       return `
         width: 80vw;
         max-width: 510px;
-        padding: 52px 24px 34px 24px;
+        padding: 40px 24px 32px 24px;
         max-height: 80vh;
         overflow: auto;
       `;
@@ -45,11 +47,27 @@ export const BaseWrapper = styled("div")<Pick<Props, "variant">>`
   }}
 `;
 
-export const CloseButton = styled("img")`
+export const CloseButton = styled("button")`
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: #475467;
   cursor: pointer;
+  display: flex;
+  height: 36px;
+  justify-content: center;
+  padding: 0;
   position: absolute;
-  top: 24px;
-  right: 24px;
+  right: 14px;
+  top: 14px;
+  width: 36px;
+  &:hover {
+    background: #f2f4f7;
+  }
+  &:focus-visible {
+    outline: 2px solid #1447e6;
+  }
 `;
 
 export const ModalWrapper = forwardRef<HTMLDivElement, Props>(
@@ -65,16 +83,19 @@ export const ModalWrapper = forwardRef<HTMLDivElement, Props>(
     ref,
   ) => {
     const { closeModal } = useModal();
+    const { t } = useTranslation();
 
     return (
       <BaseWrapper variant={variant} data-testid={dataTestId} sx={sx} ref={ref}>
         {variant !== "popup" && !hideCloseButton && (
           <CloseButton
+            aria-label={t("close")}
             data-testid="close-modal-button"
-            alt="close"
             onClick={callAll(closeModal, onClose)}
-            src={ICONS.closeIcon}
-          />
+            type="button"
+          >
+            <X aria-hidden size={18} />
+          </CloseButton>
         )}
         {children}
       </BaseWrapper>

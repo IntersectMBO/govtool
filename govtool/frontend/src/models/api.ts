@@ -171,6 +171,8 @@ export type DrepDataDTO = {
   url?: string;
   view: string;
   votingPower?: number;
+  /** Current delegators, where the backend's provider counts them; else null. */
+  delegatorCount?: number | null;
   imageUrl: string | null;
   identityReferences: Reference[];
   linkReferences: Reference[];

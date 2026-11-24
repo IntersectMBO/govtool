@@ -6,6 +6,8 @@ import { Tooltip, Typography } from "@atoms";
 import { useScreenDimension, useTranslation } from "@hooks";
 import { formatDisplayDate } from "@/utils";
 
+import { ds } from "@/consts/designTokens";
+
 type GovernanceActionsDatesBoxProps = {
   createdDate: string;
   expiryDate: string | undefined;
@@ -85,7 +87,7 @@ export const GovernanceActionsDatesBox = ({
                 sx={{
                   ml: 0.5,
                   fontSize: isFontSizeSmaller ? "18px" : "19px",
-                  color: "#ADAEAD",
+                  color: ds.gray["400"],
                 }}
               />
             </Tooltip>
@@ -131,7 +133,7 @@ export const GovernanceActionsDatesBox = ({
                 sx={{
                   ml: 0.5,
                   fontSize: isFontSizeSmaller ? "18px" : "19px",
-                  color: "#ADAEAD",
+                  color: ds.gray["400"],
                 }}
               />
             </Tooltip>

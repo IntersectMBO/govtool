@@ -12,16 +12,18 @@ type ColorKey =
 
 type ColorType = Record<ColorKey, string>;
 
+// Mapped to the redesign's primary scale (src/consts/designTokens.ts);
+// c500 is the brand blue, primary/600.
 export const primaryBlue: ColorType = {
-  c50: "#E6EBF7",
-  c100: "#D6E2FF",
-  c200: "#99ADDE",
-  c300: "#6685CE",
-  c400: "#335CBD",
-  c500: "#0033AD",
-  c600: "#002682",
-  c700: "#001A57",
-  c800: "#000D2B",
+  c50: "#EEF3FF",
+  c100: "#E0E9FF",
+  c200: "#C6D5FF",
+  c300: "#9DB5FF",
+  c400: "#668BFF",
+  c500: "#1447E6",
+  c600: "#0038C7",
+  c700: "#12369B",
+  c800: "#142F82",
   c900: "#000511",
 };
 

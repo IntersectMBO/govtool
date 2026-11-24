@@ -7,6 +7,8 @@ import {
 
 import { Typography } from "@atoms";
 
+import { ds } from "@/consts/designTokens";
+
 type GovernanceActionHistoryMenuButtonProps = {
   id: string;
   menuId: string;
@@ -63,7 +65,7 @@ export const GovernanceActionHistoryMenuButton = ({
       <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
         <Typography
           sx={{
-            color: isHovered || isOpen ? "textBlack" : "#506288",
+            color: isHovered || isOpen ? "textBlack" : ds.gray["600"],
             fontSize: 14,
             fontWeight: 400,
             paddingX: 0.5,

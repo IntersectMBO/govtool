@@ -1,121 +1,142 @@
-import { Box, Link } from "@mui/material";
+import { Box, ButtonBase } from "@mui/material";
 
-import { Button, Typography } from "@atoms";
-import { ICONS } from "@consts";
+import { IMAGES } from "@consts";
 import { useChatwoot } from "@context";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { openInNewTab, testIdFromLabel } from "@utils";
+import { useTranslation } from "@hooks";
+import { testIdFromLabel } from "@utils";
 import { LINKS } from "@/consts/links";
+import { ds } from "@/consts/designTokens";
 
-type FooterLinkProps = {
-  label: string;
-  onClick: () => void;
+const linkSx = {
+  background: "none",
+  border: "none",
+  color: ds.gray["500"],
+  cursor: "pointer",
+  fontFamily: "inherit",
+  fontSize: 12,
+  fontWeight: 400,
+  letterSpacing: "0.01px",
+  lineHeight: "18px",
+  p: 0,
+  textDecoration: "none",
+  "&:hover": { color: ds.gray["900"] },
+  "&:focus-visible, &.Mui-focusVisible": {
+    borderRadius: "2px",
+    outline: `2px solid ${ds.primary["600"]}`,
+    outlineOffset: 2,
+  },
 };
 
-const FooterLink = ({ label, onClick }: FooterLinkProps) => (
-  <Link
-    data-testid={`${testIdFromLabel(label)}-footer-link`}
-    onClick={onClick}
-    sx={{
-      color: "textBlack",
-      cursor: "pointer",
-      fontFamily: "Poppins",
-      fontSize: 12,
-      fontWeight: 400,
-      textDecoration: "none",
-      "&:hover": { color: "primaryBlue" },
-    }}
+type FooterLinkProps = {
+  href: string;
+  label: string;
+  dataTestId?: string;
+};
+
+const FooterLink = ({ href, label, dataTestId }: FooterLinkProps) => (
+  <Box
+    component="a"
+    data-testid={dataTestId ?? `${testIdFromLabel(label)}-footer-link`}
+    href={href}
+    rel="noopener noreferrer"
+    sx={linkSx}
+    target="_blank"
   >
     {label}
-  </Link>
+  </Box>
 );
 
+const rowSx = {
+  alignItems: { xxs: "flex-start", md: "center" },
+  display: "flex",
+  flexDirection: { xxs: "column", md: "row" },
+  gap: 2,
+  justifyContent: "space-between",
+};
+
+const linkGroupSx = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 3,
+};
+
 export const Footer = () => {
-  const { screenWidth } = useScreenDimension();
   const { t } = useTranslation();
   const { openFeedbackWindow } = useChatwoot();
 
-  const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
-
-  const onClickSubscribe = () => openInNewTab(LINKS.NEWSLETTER_SIGNUP);
-
-  const onClickPrivacyPolicy = () => openInNewTab(LINKS.PRIVACY_POLICY);
-
-  const onClickTermOfService = () => openInNewTab(LINKS.TERMS_OF_USE);
-
-  const onClickFeedback = () => openFeedbackWindow();
-
   return (
-    <>
-      <Box
-        component="footer"
-        sx={{
-          alignItems: screenWidth < 640 ? undefined : "center",
-          display: "flex",
-          flexDirection: screenWidth < 640 ? "column" : "row",
-          justifyContent: "space-between",
-          px: screenWidth < 640 ? 2 : 5,
-          py: 2,
-        }}
-      >
-        <Typography fontWeight={500} variant="caption">
-          {t("footer.copyright", { year: new Date().getFullYear() })}
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 3,
-            mt: screenWidth < 640 ? 1.5 : 0,
-          }}
-        >
-          <FooterLink
-            label={t("footer.privacyPolicy")}
-            onClick={onClickPrivacyPolicy}
+    <Box
+      component="footer"
+      sx={{
+        backgroundColor: "#FCFCFA",
+        pt: 7,
+        px: { xxs: 2, lg: 3 },
+      }}
+    >
+      <Box sx={{ maxWidth: 1128, mx: "auto" }}>
+        <Box sx={{ ...rowSx, pb: 4.5 }}>
+          <img
+            alt="Cardano GovTool"
+            height={32}
+            src={IMAGES.govToolLogo}
+            width={158}
           />
-          <FooterLink
-            label={t("footer.termOfService")}
-            onClick={onClickTermOfService}
-          />
+          <Box
+            component="p"
+            sx={{ ...linkSx, cursor: "default", m: 0, "&:hover": {} }}
+          >
+            {t("footer.tagline")}
+          </Box>
+          <Box sx={linkGroupSx}>
+            <FooterLink href={LINKS.USING_GOVTOOL} label={t("menu.guides")} />
+            <FooterLink
+              dataTestId="faqs-link"
+              href={LINKS.FAQS}
+              label={t("menu.faqs")}
+            />
+            <FooterLink
+              dataTestId="intersect-footer-link"
+              href={LINKS.INTERSECT}
+              label={t("footer.intersect")}
+            />
+          </Box>
         </Box>
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: 3,
-            justifyContent: screenWidth < 640 ? "space-between" : undefined,
-            mt: screenWidth < 640 ? 1.5 : 0,
+            ...rowSx,
+            borderTop: `1px solid ${ds.gray["200"]}`,
+            pb: "30px",
+            pt: "23px",
           }}
         >
-          <Button
-            data-testid="help-footer-button"
-            onClick={onClickHelp}
-            size="small"
-            startIcon={<img alt="helpIcon" src={ICONS.helpIcon} />}
-            sx={{ color: "#26252D" }}
-            variant="text"
-          >
-            {t("menu.help")}
-          </Button>
-          <Button
-            data-testid="newsletter-footer-button"
-            onClick={onClickSubscribe}
-            size="small"
-            variant="outlined"
-          >
-            {t("footer.subscribe")}
-          </Button>
-          <Button
-            data-testid="feedback-footer-button"
-            onClick={onClickFeedback}
-            size="small"
-            variant="outlined"
-          >
-            {t("feedback")}
-          </Button>
+          <Box component="p" sx={{ ...linkSx, cursor: "default", m: 0 }}>
+            {t("footer.copyright", { year: new Date().getFullYear() })}
+          </Box>
+          <Box sx={linkGroupSx}>
+            <FooterLink
+              href={LINKS.PRIVACY_POLICY}
+              label={t("footer.privacyPolicy")}
+            />
+            <FooterLink
+              href={LINKS.TERMS_OF_USE}
+              label={t("footer.termOfService")}
+            />
+            <FooterLink
+              dataTestId="help-footer-button"
+              href={LINKS.SUPPORT}
+              label={t("menu.help")}
+            />
+            <ButtonBase
+              data-testid="feedback-footer-button"
+              disableRipple
+              onClick={openFeedbackWindow}
+              sx={linkSx}
+            >
+              {t("feedback")}
+            </ButtonBase>
+          </Box>
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };

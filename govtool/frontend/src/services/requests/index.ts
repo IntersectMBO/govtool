@@ -29,3 +29,7 @@ export * from "./getDRepVotingPowerList";
 export * from "./getAccount";
 export * from "./metadataReports";
 export * from "./getEnactedProposalDetails";
+export * from "./globalSearch";
+export * from "./notifications";
+export * from "./drepDashboard";
+export * from "./walletConnect";

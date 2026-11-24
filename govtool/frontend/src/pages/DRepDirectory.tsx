@@ -1,9 +1,7 @@
 import { Outlet } from "react-router";
 import { Box } from "@mui/material";
 
-import { Background, PagePaddingBox, ContentBox } from "@atoms";
-import { useTranslation } from "@hooks";
-import { PageTitle } from "@molecules";
+import { Background, PageContainer } from "@atoms";
 import { Footer, TopNav } from "@organisms";
 
 type DRepDirectoryProps = {
@@ -12,15 +10,11 @@ type DRepDirectoryProps = {
 
 // The dashboard supplies its own chrome; the public page adds it here.
 export const DRepDirectory = ({ isConnected = false }: DRepDirectoryProps) => {
-  const { t } = useTranslation();
-
   if (isConnected) {
     return (
-      <PagePaddingBox
-        sx={{ display: "flex", flex: 1, flexDirection: "column", py: 2 }}
-      >
+      <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Outlet />
-      </PagePaddingBox>
+      </PageContainer>
     );
   }
 
@@ -30,18 +24,9 @@ export const DRepDirectory = ({ isConnected = false }: DRepDirectoryProps) => {
         sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
       >
         <TopNav />
-
-        <PageTitle title={t("dRepDirectory.title")} />
-
-        <PagePaddingBox sx={{ display: "flex", flex: 1, py: 2 }}>
-          <ContentBox
-            sx={{ display: "flex", flex: 1, flexDirection: "column" }}
-          >
-            <Outlet />
-          </ContentBox>
-        </PagePaddingBox>
-        {/* FIXME: Footer should be on top of the layout.
-        Should not be rerendered across the pages */}
+        <PageContainer component="main" sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+          <Outlet />
+        </PageContainer>
         <Footer />
       </Box>
     </Background>

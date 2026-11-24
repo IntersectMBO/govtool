@@ -65,7 +65,6 @@ export const DirectVoterDashboardCard = ({
             children: t("dashboard.cards.directVoter.retire"),
             dataTestId: "retire-as-sole-voter-button",
             onClick: () => navigate(PATHS.retireAsDirectVoter),
-            sx: { backgroundColor: "arcticWhite" },
           },
           { ...learnMoreButton, variant: "text" },
         ],

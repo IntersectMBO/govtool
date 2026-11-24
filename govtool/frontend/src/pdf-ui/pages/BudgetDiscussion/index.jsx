@@ -56,7 +56,7 @@ const chipButtonSx = (open) => ({
 const menuPaperSx = {
     overflow: 'visible',
     mt: 1,
-    background: '#FBFBFF',
+    background: '#FCFCFD',
     boxShadow: '1px 2px 11px 0px #00123D5E',
     borderRadius: '10px',
     padding: '12px 0px',

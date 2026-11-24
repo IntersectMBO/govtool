@@ -11,6 +11,7 @@ import { QUERY_KEYS, successGreen } from "@consts";
 import { useTranslation } from "@hooks";
 import { postGovernanceActionVerifySignature } from "@services";
 
+import { ds } from "@/consts/designTokens";
 // A CIP-108 author field is a plain string or a JSON-LD `{ "@value": … }`.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getValue = (field: any): string => {
@@ -83,7 +84,7 @@ const GovernanceActionAuthor = ({ author, metadataUrl }: GovernanceActionAuthorP
         }
       >
         <Box display="flex">
-          <IconXCircle fill="#ef4444" width={19} height={19} />
+          <IconXCircle fill={ds.error["600"]} width={19} height={19} />
         </Box>
       </Tooltip>
     );
@@ -98,7 +99,7 @@ const GovernanceActionAuthor = ({ author, metadataUrl }: GovernanceActionAuthorP
         paragraphOne={`${t("actionRecord.authors.publicKey")}: ${publicKey}`}
         paragraphTwo={`${t("actionRecord.authors.signature")}: ${signature}`}
       >
-        <InfoOutlinedIcon sx={{ fontSize: "19px", color: "#ADAEAD" }} />
+        <InfoOutlinedIcon sx={{ fontSize: "19px", color: ds.gray["400"] }} />
       </Tooltip>
     </Box>
   );

@@ -227,12 +227,15 @@ test.describe("Multiple delegations", () => {
     await dRepDirectoryPage.searchInput.fill(dRepIdFirst);
 
     await page.getByTestId(`${dRepIdFirst}-delegate-button`).click();
+    await page.getByTestId("continue-to-wallet-button").click();
+
     await expect(page.getByTestId("alert-warning")).toHaveText(/in progress/i, {
       timeout: 60_000,
     });
 
     await dRepDirectoryPage.searchInput.fill(dRepIdSecond);
     await page.getByTestId(`${dRepIdSecond}-delegate-button`).click();
+    await page.getByTestId("continue-to-wallet-button").click();
 
     await expect(page.getByTestId("transaction-inprogress-modal")).toBeVisible({
       timeout: 60_000,

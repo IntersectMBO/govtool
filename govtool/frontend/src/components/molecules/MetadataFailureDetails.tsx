@@ -27,6 +27,7 @@ import {
 import { openInNewTab } from "@utils";
 import { LINKS } from "@/consts/links";
 import { errorRed } from "@/consts/colors";
+import { ds, FONT_FAMILY } from "@/consts/designTokens";
 
 import { MetadataReportView } from "./MetadataReportView";
 import { MetadataRetryButton } from "./MetadataRetryButton";
@@ -155,7 +156,7 @@ export const MetadataFailureDetails = ({
             borderRadius: 50,
             bgcolor: errorRed.c100,
             color: errorRed.c700,
-            fontFamily: "Poppins",
+            fontFamily: FONT_FAMILY.sans,
             fontSize: "16px",
             "&:hover": { bgcolor: errorRed.c200 },
           }}
@@ -286,7 +287,7 @@ export const MetadataFailureDetails = ({
               gap: 1.5,
               px: 3,
               py: 2,
-              bgcolor: "#F3F4F8",
+              bgcolor: ds.gray["50"],
               borderTop: REPORT_BORDER,
             }}
           >
@@ -297,9 +298,9 @@ export const MetadataFailureDetails = ({
               onClick={() => openInNewTab(LINKS.DREP_ERROR_CONDITIONS)}
               sx={{
                 bgcolor: "neutralWhite",
-                borderColor: "#D6D8E0",
+                borderColor: ds.gray["200"],
                 color: "textBlack",
-                "&:hover": { bgcolor: "neutralWhite", borderColor: "#B8BBC6" },
+                "&:hover": { bgcolor: "neutralWhite", borderColor: ds.gray["400"] },
               }}
             >
               {t("metadataReport.readDocumentation")}

@@ -73,7 +73,6 @@ export const DelegateDashboardCard = ({
     children: t("learnMore"),
     dataTestId: "delegate-learn-more-button",
     onClick: () => openInNewTab(LINKS.DELEGATING),
-    sx: { backgroundColor: "arcticWhite" },
   };
 
   const displayedDelegationId = getDisplayedDelegationId({
@@ -112,7 +111,6 @@ export const DelegateDashboardCard = ({
                 children: t("dashboard.cards.delegation.delegateToAnotherDRep"),
                 dataTestId: "delegate-to-another-drep-button",
                 onClick: onClickDelegateToAnotherDRep,
-                sx: { backgroundColor: "arcticWhite" },
               },
             ]
           : [learnMoreButton],

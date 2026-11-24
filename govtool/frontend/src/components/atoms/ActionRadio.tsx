@@ -6,6 +6,8 @@ import { useScreenDimension } from "@hooks";
 import { Tooltip } from ".";
 import { theme } from "@/theme";
 
+import { ds } from "@/consts/designTokens";
+
 type ActionRadioProps = {
   dataTestId?: string;
   isChecked?: boolean;
@@ -68,7 +70,7 @@ export const ActionRadio: FC<ActionRadioProps> = ({ ...props }) => {
             >
               <InfoOutlinedIcon
                 style={{
-                  color: isChecked ? "white" : "#ADAEAD",
+                  color: isChecked ? "white" : ds.gray["400"],
                 }}
                 sx={{ ml: 1 }}
                 fontSize="small"

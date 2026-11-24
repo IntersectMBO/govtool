@@ -1,16 +1,15 @@
 import { Dispatch, SetStateAction } from "react";
-import { Box, Link } from "@mui/material";
+import { Box, ButtonBase } from "@mui/material";
+import { ExternalLink } from "lucide-react";
 
-import { Spacer, Typography } from "@atoms";
-import {
-  useCreateGovernanceActionForm,
-  useScreenDimension,
-  useTranslation,
-} from "@hooks";
+import { useCreateGovernanceActionForm, useTranslation } from "@hooks";
 import { CenteredBoxBottomButtons } from "@molecules";
 import { ControlledField } from "@organisms";
 import { openInNewTab } from "@utils";
 import { LINKS } from "@/consts/links";
+import { ds, RADIUS } from "@/consts/designTokens";
+
+import { SectionCard, StepHeading } from "./parts";
 
 type StoreDataInfoProps = {
   setStep: Dispatch<SetStateAction<number>>;
@@ -19,49 +18,49 @@ type StoreDataInfoProps = {
 export const StoreDataInfo = ({ setStep }: StoreDataInfoProps) => {
   const { t } = useTranslation();
   const { control, errors, watch } = useCreateGovernanceActionForm();
-  const { isMobile } = useScreenDimension();
 
   const openLink = () => openInNewTab(LINKS.STORING_INFORMATION_OFFLINE);
 
   const isContinueDisabled = !watch("storeData");
 
-  const onClickContinue = () => setStep(6);
-
-  const onClickBack = () => setStep(4);
-
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
-        {t("createGovernanceAction.storeDataTitle")}
-      </Typography>
-      <Link
-        data-testid="storing-information-link"
-        onClick={openLink}
-        sx={{
-          cursor: "pointer",
-          fontSize: 16,
-          fontWeight: 500,
-          fontFamily: "Poppins",
-          my: 4,
-          textAlign: "center",
-          textDecoration: "none",
-        }}
-      >
-        {t("createGovernanceAction.storeDataLink")}
-      </Link>
-      <ControlledField.Checkbox
-        {...{ control, errors }}
-        data-testid="storing-information-checkbox"
-        name="storeData"
-        label={t("createGovernanceAction.storeDataCheckboxLabel")}
-      />
-      <Spacer y={isMobile ? 4 : 12.5} />
-      <Box display="flex" flex={1} />
+      <StepHeading body={t("createGA.storeData.body")} title={t("createGA.storeData.title")} />
+      <SectionCard testId="create-ga-store-data" title={t("createGovernanceAction.storeDataTitle")}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+          <ButtonBase
+            data-testid="storing-information-link"
+            onClick={openLink}
+            sx={{
+              alignSelf: "flex-start",
+              borderRadius: `${RADIUS.sm}px`,
+              color: ds.primary["600"],
+              fontFamily: "inherit",
+              fontSize: 15,
+              fontWeight: 500,
+              gap: 0.75,
+              "&:hover": { textDecoration: "underline" },
+              "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 },
+            }}
+          >
+            {t("createGovernanceAction.storeDataLink")}
+            <ExternalLink aria-hidden size={15} />
+          </ButtonBase>
+          <Box sx={{ borderTop: `1px solid ${ds.gray["100"]}` }} />
+          <ControlledField.Checkbox
+            {...{ control, errors }}
+            data-testid="storing-information-checkbox"
+            label={t("createGovernanceAction.storeDataCheckboxLabel")}
+            labelStyles={{ color: ds.gray["800"], fontSize: 14 }}
+            name="storeData"
+          />
+        </Box>
+      </SectionCard>
       <CenteredBoxBottomButtons
-        onActionButton={onClickContinue}
+        backButtonText={t("back")}
         disableActionButton={isContinueDisabled}
-        onBackButton={onClickBack}
-        backButtonText={t("cancel")}
+        onActionButton={() => setStep(6)}
+        onBackButton={() => setStep(4)}
       />
     </>
   );

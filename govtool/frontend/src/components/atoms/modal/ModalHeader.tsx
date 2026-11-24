@@ -8,9 +8,13 @@ interface Props {
 
 export const ModalHeader = ({ children, sx }: Props) => (
   <Typography
+    color="#101828"
+    component="h2"
+    fontSize="22px"
+    fontWeight="600"
+    letterSpacing="-0.3px"
+    lineHeight="30px"
     marginBottom="8px"
-    fontSize="28px"
-    fontWeight="500"
     textAlign="center"
     sx={sx}
   >

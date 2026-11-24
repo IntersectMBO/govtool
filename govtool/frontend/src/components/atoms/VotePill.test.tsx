@@ -8,8 +8,8 @@ describe("VotePill", () => {
     const voteText = getByText("Yes");
     expect(voteText).toBeInTheDocument();
     expect(voteText.parentNode).toHaveStyle({
-      borderColor: "#C0E4BA",
-      backgroundColor: "#F0F9EE",
+      borderColor: "#D1FADF",
+      backgroundColor: "#E3F8EA",
     });
   });
 
@@ -18,8 +18,8 @@ describe("VotePill", () => {
     const voteText = getByText("No");
     expect(voteText).toBeInTheDocument();
     expect(voteText.parentNode).toHaveStyle({
-      borderColor: "#EDACAC",
-      backgroundColor: "#FBEBEB",
+      borderColor: "#FEE4E2",
+      backgroundColor: "#FEF3F2",
     });
   });
 
@@ -28,8 +28,8 @@ describe("VotePill", () => {
     const voteText = getByText("Abstain");
     expect(voteText).toBeInTheDocument();
     expect(voteText.parentNode).toHaveStyle({
-      borderColor: "#99ADDE",
-      backgroundColor: "#E6EBF7",
+      borderColor: "#F1F4F9",
+      backgroundColor: "#F1F4F9",
     });
   });
 

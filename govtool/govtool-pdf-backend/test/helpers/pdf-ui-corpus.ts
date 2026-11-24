@@ -1,6 +1,7 @@
-// SPEC Appendix A: the query strings pdf-ui 1.0.18-beta builds, with sample
-// values interpolated, exactly as sent (never URL-encoded). The unit corpus
-// test parses each against its allowlist; e2e sends each unencoded.
+// SPEC Appendix A: the query strings pdf-ui builds, with sample values
+// interpolated, exactly as sent. The 1.0.18-beta strings were never
+// URL-encoded; the redesigned list encodes its search. The unit corpus test
+// parses each against its allowlist; e2e sends each as written.
 
 export interface CorpusEntry {
   /** Route under /api, without the query. */
@@ -15,6 +16,14 @@ const ID = 1;
 
 const proposalsList = (sort: string, extra = '') =>
   `filters[$and][0][gov_action_type_id]=${TYPE_ID}&filters[$and][1][prop_name][$containsi]=${SEARCH}${extra}&pagination[page]=1&pagination[pageSize]=25&${sort}&populate[0]=proposal_links&populate[1]=proposal_withdrawals&populate[2]=proposal_constitution_content&populate[3]=proposal`;
+
+// The redesigned list: one request across the chosen types (pdf-ui
+// lib/proposalList.js), the search URL-encoded.
+const POPULATE_ALL =
+  'populate[0]=proposal_links&populate[1]=proposal_withdrawals&populate[2]=proposal_constitution_content&populate[3]=proposal';
+const proposalsFeed = (search: string, extra = '') =>
+  `filters[$and][0][prop_name][$containsi]=${search}${extra}&pagination[page]=1&pagination[pageSize]=10&sort[createdAt]=DESC&${POPULATE_ALL}`;
+const TYPES_IN = '&filters[$and][1][gov_action_type_id][$in][0]=1&filters[$and][1][gov_action_type_id][$in][1]=2';
 
 export const PROPOSAL_SORTS = [
   'sort[createdAt]=DESC',
@@ -43,6 +52,10 @@ export const CORPUS: CorpusEntry[] = [
     route: 'proposals',
     query: proposalsList('sort[createdAt]=DESC', '&filters[$and][2][prop_submitted]=false'),
   },
+  { route: 'proposals', query: proposalsFeed('') },
+  { route: 'proposals', query: proposalsFeed(SEARCH, TYPES_IN) },
+  { route: 'proposals', query: proposalsFeed('Demo%20%26%5Bx%5D', `${TYPES_IN}&filters[$and][2][prop_submitted]=false`) },
+  { route: 'proposals', query: proposalsFeed(SEARCH, '&filters[$and][2][prop_submitted]=true') },
   {
     route: 'proposals',
     query:

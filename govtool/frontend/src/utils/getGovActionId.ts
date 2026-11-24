@@ -1,6 +1,10 @@
 import { generatePath } from "react-router";
 
-import { GOVERNANCE_ACTION_TYPE_PARAM, PATHS } from "@/consts/paths";
+import {
+  GOV_ACTION_HISTORY_PATHS,
+  GOVERNANCE_ACTION_TYPE_PARAM,
+  PATHS,
+} from "@/consts/paths";
 
 import {
   decodeCIP129Identifier,
@@ -50,6 +54,15 @@ export const parseGovActionCIP129Id = (id: string) => {
 export const getGovActionPath = (txHash: string, index: number | string) =>
   generatePath(PATHS.governanceActionsAction, {
     proposalId: getGovActionCIP129Id(txHash, index),
+  });
+
+/** An outcome's page, /actions/history/gov_action1…. */
+export const getGovActionHistoryPath = (
+  txHash: string,
+  index: number | string,
+) =>
+  generatePath(GOV_ACTION_HISTORY_PATHS.governanceActionHistoryDetail, {
+    id: getGovActionCIP129Id(txHash, index),
   });
 
 /** The governance actions list filtered to one type, /actions?type=…. */

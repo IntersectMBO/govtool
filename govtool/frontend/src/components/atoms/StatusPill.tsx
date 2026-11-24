@@ -1,7 +1,7 @@
 import { Chip, ChipProps, styled } from "@mui/material";
-import { cyan, errorRed, successGreen } from "@/consts";
+
+import { ds, RADIUS } from "@/consts/designTokens";
 import { DRepStatus } from "@/models";
-import { theme } from "@/theme";
 
 interface StatusPillProps {
   status: DRepStatus;
@@ -10,6 +10,14 @@ interface StatusPillProps {
   size?: "small" | "medium";
   sx?: ChipProps["sx"];
 }
+
+// DRep status pills as the redesign's DRep cards draw them.
+const COLORS: Record<DRepStatus, { bg: string; text: string }> = {
+  [DRepStatus.Active]: { bg: ds.primary["50"], text: ds.primary["600"] },
+  [DRepStatus.Inactive]: { bg: ds.error["50"], text: ds.error["600"] },
+  [DRepStatus.Retired]: { bg: ds.gray["100"], text: ds.gray["600"] },
+  [DRepStatus.Yourself]: { bg: ds.primary["50"], text: ds.primary["600"] },
+};
 
 export const StatusPill = ({
   dataTestId,
@@ -23,37 +31,19 @@ export const StatusPill = ({
     status={status}
     size={size}
     label={label}
-    sx={{
-      px: status === DRepStatus.Yourself ? 0.75 : 0.5,
-      py: 0.5,
-      height: 24,
-      ...sx,
-    }}
+    sx={sx}
   />
 );
 
-const bgColor = {
-  [DRepStatus.Active]: successGreen.c200,
-  [DRepStatus.Inactive]: errorRed.c100,
-  [DRepStatus.Retired]: cyan.c100,
-  [DRepStatus.Yourself]: theme.palette.lightBlue,
-};
-
-const textColor = {
-  [DRepStatus.Active]: successGreen.c700,
-  [DRepStatus.Inactive]: errorRed.c500,
-  [DRepStatus.Retired]: cyan.c500,
-  [DRepStatus.Yourself]: theme.palette.textBlack,
-};
-
-const StyledChip = styled(Chip)<{ status: DRepStatus }>(
-  ({ theme: themeStyles, status }) => ({
-    backgroundColor: bgColor[status],
-    color: textColor[status],
-    fontSize: "0.75rem",
-    textTransform: "capitalize",
-    ...(status !== DRepStatus.Yourself && {
-      border: `2px solid ${themeStyles.palette.neutralWhite}`,
-    }),
-  }),
-);
+const StyledChip = styled(Chip)<{ status: DRepStatus }>(({ status }) => ({
+  backgroundColor: COLORS[status].bg,
+  borderRadius: RADIUS.xs,
+  color: COLORS[status].text,
+  fontSize: 12,
+  fontWeight: 600,
+  height: 18,
+  letterSpacing: "0.01px",
+  lineHeight: "18px",
+  textTransform: "capitalize",
+  "& .MuiChip-label": { padding: "0 4px" },
+}));

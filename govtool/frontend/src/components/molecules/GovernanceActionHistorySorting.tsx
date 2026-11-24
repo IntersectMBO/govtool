@@ -18,6 +18,7 @@ import { getCurrentSearchParams } from "@utils";
 
 import { GovernanceActionHistoryMenuButton } from "./GovernanceActionHistoryMenuButton";
 
+import { ds } from "@/consts/designTokens";
 /** The sort order, kept in the `sort` URL parameter. */
 export const GovernanceActionHistorySorting = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -80,8 +81,8 @@ export const GovernanceActionHistorySorting = () => {
                 data-testid={`${option.dataTestId}-radio-wrapper`}
                 key={option.value}
                 paddingX="20px"
-                sx={{ cursor: "pointer", "&:hover": { bgcolor: "#E6EBF7" } }}
-                bgcolor={sort === option.value ? "#FFF0E7" : "transparent"}
+                sx={{ cursor: "pointer", "&:hover": { bgcolor: ds.gray["200"] } }}
+                bgcolor={sort === option.value ? ds.orange["50"] : "transparent"}
                 onClick={() => setSort(option.value)}
               >
                 <FormControlLabel

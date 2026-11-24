@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { expect, userEvent, within, fn } from "storybook/test";
+import { expect, within } from "storybook/test";
 
 import { Footer } from "@/components/organisms";
 
@@ -17,20 +17,20 @@ export const FooterComponent: Story = {
   args: {},
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    window.open = fn();
 
     const nowDate = new Date();
     await expect(
       canvas.getByText(`© ${nowDate.getFullYear()} GovTool`),
     ).toBeInTheDocument();
-    await userEvent.click(canvas.getByTestId("privacy-policy-footer-link"));
-    await expect(window.open).toHaveBeenCalledTimes(1);
 
-    await userEvent.click(canvas.getByTestId("terms-of-use-footer-link"));
-    await expect(window.open).toHaveBeenCalledTimes(2);
-
-    await userEvent.click(canvas.getByTestId("help-footer-button"));
-    await expect(window.open).toHaveBeenCalledTimes(3);
+    [
+      "faqs-link",
+      "privacy-policy-footer-link",
+      "terms-of-use-footer-link",
+      "help-footer-button",
+    ].forEach((id) =>
+      expect(canvas.getByTestId(id)).toHaveAttribute("target", "_blank"),
+    );
 
     await expect(canvas.getByTestId("feedback-footer-button")).toBeEnabled();
   },

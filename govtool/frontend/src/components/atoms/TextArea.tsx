@@ -2,17 +2,18 @@ import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { TextareaAutosize, styled } from "@mui/material";
 
 import { useScreenDimension } from "@hooks";
+import { ds, FONT_FAMILY, RADIUS } from "@/consts/designTokens";
 
 import { TextAreaProps } from "./types";
 
 const TextAreaBase = styled(TextareaAutosize)(
   () => `
-  font-family: "Poppins";
+  font-family: ${FONT_FAMILY.sans};
   font-weight: 400;
     ::placeholder {
-      font-family: "Poppins";
+      font-family: ${FONT_FAMILY.sans};
       font-weight: 400;
-      color: #a6a6a6;
+      color: ${ds.gray["500"]};
     }
     `,
 );
@@ -77,9 +78,9 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     return (
       <TextAreaBase
         style={{
-          border: `1px solid ${errorMessage ? "red" : "#6F99FF"}`,
-          backgroundColor: errorMessage ? "#FAEAEB" : "white",
-          borderRadius: "24px",
+          border: `1px solid ${errorMessage ? ds.error["500"] : ds.gray["200"]}`,
+          backgroundColor: errorMessage ? ds.error["50"] : "#FFFFFF",
+          borderRadius: `${RADIUS.md}px`,
           height: getTexAreaHeight(),
           outline: "none",
           padding: "12px 14px",

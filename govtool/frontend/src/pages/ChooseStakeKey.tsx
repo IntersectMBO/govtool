@@ -8,7 +8,7 @@ export const ChooseStakeKey = () => (
   <Background>
     <Box display="flex" flexDirection="column" minHeight="100vh">
       <TopNav isConnectButton={false} />
-      <Box display="flex" flex={1} justifyContent="center">
+      <Box component="main" display="flex" flex={1} justifyContent="center">
         <ChooseStakeKeyPanel />
       </Box>
       {/* FIXME: Footer should be on top of the layout.

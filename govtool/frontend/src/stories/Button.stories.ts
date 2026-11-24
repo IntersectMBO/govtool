@@ -56,6 +56,31 @@ export const Text: Story = {
   },
 };
 
+export const Soft: Story = {
+  args: { size: "medium", variant: "soft", children: "Connect Wallet" },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByRole("button")).toHaveTextContent("Connect Wallet");
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(args.onClick).toHaveBeenCalled();
+  },
+};
+
+export const Accent: Story = {
+  args: {
+    size: "large",
+    variant: "contained",
+    color: "secondary",
+    children: "Become a DRep",
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByRole("button")).toHaveTextContent("Become a DRep");
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(args.onClick).toHaveBeenCalled();
+  },
+};
+
 export const LoadingButton: Story = {
   args: {
     children: "Button",

@@ -95,7 +95,6 @@ export const DRepDashboardCard = ({
             dataTestId: "view-drep-details-button",
             onClick: navigateToDrepDirectory,
             variant: "outlined",
-            sx: { backgroundColor: "arcticWhite" },
           },
           {
             children: t("dashboard.cards.drep.retire"),

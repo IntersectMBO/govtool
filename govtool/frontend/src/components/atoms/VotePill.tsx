@@ -2,19 +2,13 @@ import { useTranslation } from "react-i18next";
 import { Box, Typography } from "@mui/material";
 
 import { Vote } from "@models";
+import { PILL_TONES, PillTone, RADIUS } from "@/consts/designTokens";
 
-const borderColorMap: Record<string, string> = {
-  yes: "#C0E4BA",
-  no: "#EDACAC",
-  abstain: "#99ADDE",
-  notvoted: "#EAE9F0",
-};
-
-const bgColorMap: Record<string, string> = {
-  yes: "#F0F9EE",
-  no: "#FBEBEB",
-  abstain: "#E6EBF7",
-  notvoted: "#F5F5F8",
+const VOTE_TONES: Record<string, PillTone> = {
+  yes: "success",
+  no: "error",
+  abstain: "neutral",
+  notvoted: "neutral",
 };
 
 const voteLabelKey: Record<string, string> = {
@@ -47,28 +41,30 @@ export const VotePill = ({
   const { t } = useTranslation();
   const voteKey = vote.toLocaleLowerCase();
 
-  const bgColor = bgColorMap[voteKey];
-  const borderColor = borderColorMap[voteKey];
+  const tone = PILL_TONES[VOTE_TONES[voteKey] ?? "neutral"];
   const labelKey = isCC ? ccVoteLabelKey[voteKey] : voteLabelKey[voteKey];
 
   return (
     <Box
-      py={0.75}
-      px={2.25}
+      alignItems="center"
       border={1}
-      borderColor={borderColor}
-      bgcolor={bgColor}
-      borderRadius={100}
-      textAlign="center"
+      borderColor={tone.border}
+      bgcolor={tone.bg}
+      borderRadius={`${RADIUS.sm}px`}
+      display="inline-flex"
+      height={20}
+      justifyContent="center"
       minWidth="50px"
       maxWidth={maxWidth ? `${maxWidth}px` : "auto"}
+      px={1}
       width={width ? `${width}px` : "auto"}
     >
       <Typography
-        textTransform="uppercase"
+        color={tone.text}
         fontSize={12}
-        fontWeight={400}
-        lineHeight="16px"
+        fontWeight={600}
+        letterSpacing="0.01px"
+        lineHeight="18px"
         whiteSpace="nowrap"
         textOverflow="ellipsis"
         overflow="hidden"

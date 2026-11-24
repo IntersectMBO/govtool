@@ -1,119 +1,174 @@
-import { Box, Link, Typography } from "@mui/material";
-import { forwardRef, useMemo } from "react";
-
-import { ModalContents, ModalHeader, ModalWrapper } from "@atoms";
-import { useModal } from "@context";
-import type { WalletOption } from "@molecules";
-import { WalletOptionButton } from "@molecules";
-import { openInNewTab } from "@utils";
-import { useTranslation } from "@hooks";
+import { forwardRef, useMemo, useState } from "react";
+import { Box, ButtonBase, CircularProgress } from "@mui/material";
 import { To } from "react-router";
+import { useTranslation } from "react-i18next";
+import { ArrowRight, ChevronRight, Download, MousePointerClick, RefreshCw, SearchX, Wallet } from "lucide-react";
+
+import { ModalWrapper } from "@/components/atoms/modal/ModalWrapper";
+import { WalletOptionButton, type WalletOption } from "@/components/molecules/WalletOption";
 import { LINKS } from "@/consts/links";
+import { ds, RADIUS } from "@/consts/designTokens";
+import { useModal } from "@/context/modal";
+import { useCardano } from "@/context/wallet";
+import { openInNewTab } from "@/utils/openInNewTab";
+import { KNOWN_WALLETS } from "@/utils/walletConnect";
+
+import {
+  Callout,
+  PrimaryAction,
+  SecondaryAction,
+  WalletRow,
+  WalletStateFrame,
+} from "../WalletConnect/walletParts";
 
 type ChooseWalletModalState = {
   pathToNavigate?: To;
 };
 
+type CardanoExtension = {
+  icon?: string;
+  name?: string;
+  supportedExtensions?: { cip: number }[];
+};
+
+/** CIP-95 wallets in window.cardano, one per display name. */
+const readWallets = (): WalletOption[] => {
+  const extensions = (window as unknown as { cardano?: Record<string, CardanoExtension> }).cardano;
+  if (!extensions) return [];
+  const result: WalletOption[] = [];
+  Object.keys(extensions).forEach((key) => {
+    const { icon, name, supportedExtensions } = extensions[key] ?? {};
+    if (!icon || !name || !supportedExtensions) return;
+    const isDuplicate = result.some((wallet) => wallet.label === name);
+    const hasCip95 = supportedExtensions.some((extension) => extension.cip === 95);
+    if (!isDuplicate && hasCip95) {
+      result.push({ icon, label: name, name: key, cip95Available: true });
+    }
+  });
+  return result;
+};
+
 export const ChooseWalletModal = forwardRef<HTMLDivElement>((_, ref) => {
   const { t } = useTranslation();
-  const { state } = useModal<ChooseWalletModalState>();
+  const { state, closeModal } = useModal<ChooseWalletModalState>();
+  const { isEnableLoading } = useCardano();
+  const [scan, setScan] = useState(0);
+  const walletOptions = useMemo(readWallets, [scan]);
+  const connecting = walletOptions.find((wallet) => wallet.name === isEnableLoading);
 
-  const walletOptions: WalletOption[] = useMemo(() => {
-    if (!window.cardano) return [];
-    const keys = Object.keys(window.cardano);
-    const resultWallets: WalletOption[] = [];
-    keys.forEach((k: string) => {
-      const { icon, name, supportedExtensions } = window.cardano[k];
-      if (icon && name && supportedExtensions) {
-        // Check if the name already exists in resultWallets
-        const isNameDuplicate = resultWallets.some(
-          (wallet) => wallet.label === name,
-        );
-        // Check if the supportedExtensions array contains an entry with cip === 95
-        const isCip95Available = Boolean(
-          supportedExtensions?.find((i) => i.cip === 95),
-        );
-        // If the name is not a duplicate and cip === 95 is available, add it to resultWallets
-        if (!isNameDuplicate && isCip95Available) {
-          resultWallets.push({
-            icon,
-            label: name,
-            name: k,
-            cip95Available: true,
-          });
-        }
-      }
-    });
-    return resultWallets;
-  }, [window]);
-
-  return (
-    <ModalWrapper dataTestId="connect-your-wallet-modal" ref={ref}>
-      <ModalHeader>{t("wallet.connectYourWallet")}</ModalHeader>
-      <ModalContents>
-        <Typography
-          sx={{
-            fontSize: "16px",
-            fontWeight: "500",
-            marginBottom: "24px",
-            textAlign: "center",
-          }}
-        >
-          {t("wallet.chooseWallet")}
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            maxHeight: "500px",
-            overflow: "auto",
-            width: "100%",
-            padding: "8px",
-          }}
-        >
-          {!walletOptions.length ? (
-            <Typography
-              color="primary"
-              variant="body2"
-              fontWeight={600}
-              sx={{ textAlign: "center" }}
-            >
-              {t("wallet.noWalletsToConnect")}
-            </Typography>
-          ) : (
-            walletOptions.map(({ icon, label, name, cip95Available }) => (
+  let content;
+  if (connecting) {
+    const wallet = connecting.label;
+    content = (
+      <WalletStateFrame
+        body={t("walletConnect.approve.body", { wallet })}
+        footer={(
+          <>
+            <SecondaryAction onClick={closeModal}>{t("walletConnect.cancel")}</SecondaryAction>
+            <PrimaryAction disabled testId="waiting-for-approval-button">
+              <CircularProgress aria-hidden size={14} sx={{ color: "inherit" }} />
+              {t("walletConnect.approve.waiting")}
+            </PrimaryAction>
+          </>
+        )}
+        icon={MousePointerClick}
+        onClose={closeModal}
+        status={t("walletConnect.approve.status")}
+        title={t("walletConnect.approve.title", { wallet })}
+        titleId="choose-wallet-title"
+        tone="warning"
+      >
+        <WalletRow icon={connecting.icon} name={wallet} selected />
+        <Box role="status" sx={{ alignItems: "center", backgroundColor: ds.primary["25"], borderRadius: `${RADIUS.md}px`, display: "flex", gap: 1.5, px: 2, py: 1.5 }}>
+          <CircularProgress aria-hidden size={20} sx={{ color: ds.orange["500"] }} />
+          <Box>
+            <Box sx={{ color: ds.gray["900"], fontSize: 14, fontWeight: 600 }}>{t("walletConnect.approve.waitingTitle")}</Box>
+            <Box sx={{ color: ds.gray["600"], fontSize: 13 }}>{t("walletConnect.approve.waitingBody", { wallet })}</Box>
+          </Box>
+        </Box>
+        <Callout body={t("walletConnect.approve.onlyBody")} title={t("walletConnect.approve.onlyTitle")} tone="warning" />
+      </WalletStateFrame>
+    );
+  } else if (!walletOptions.length) {
+    content = (
+      <WalletStateFrame
+        body={t("walletConnect.none.body")}
+        footer={(
+          <>
+            <SecondaryAction onClick={() => setScan((count) => count + 1)} testId="rescan-wallets-button">
+              <RefreshCw aria-hidden size={15} />
+              {t("walletConnect.none.retry")}
+            </SecondaryAction>
+            <PrimaryAction onClick={() => openInNewTab(KNOWN_WALLETS[0].url)}>
+              <Download aria-hidden size={15} />
+              {t("walletConnect.none.install")}
+            </PrimaryAction>
+          </>
+        )}
+        icon={SearchX}
+        onClose={closeModal}
+        status={t("walletConnect.none.status")}
+        title={t("walletConnect.none.title")}
+        titleId="choose-wallet-title"
+        tone="warning"
+      >
+        <Box component="ul" data-testid="no-wallet-detected" sx={{ display: "flex", flexDirection: "column", gap: 1, listStyle: "none", m: 0, p: 0 }}>
+          {KNOWN_WALLETS.map((wallet) => (
+            <Box key={wallet.name} component="li">
+              <Box component="a" href={wallet.url} rel="noopener noreferrer" sx={{ color: "inherit", display: "block", textDecoration: "none", "&:focus-visible": { outline: `2px solid ${ds.primary["600"]}`, outlineOffset: 2 } }} target="_blank">
+                <WalletRow detail={t("walletConnect.none.notDetected")} name={wallet.name} trailing={<ChevronRight aria-hidden color={ds.gray["400"]} size={18} />} />
+              </Box>
+            </Box>
+          ))}
+        </Box>
+        <Callout body={t("walletConnect.none.mobileBody")} title={t("walletConnect.none.mobileTitle")} tone="info" />
+      </WalletStateFrame>
+    );
+  } else {
+    content = (
+      <WalletStateFrame
+        body={t("walletConnect.chooser.body")}
+        icon={Wallet}
+        onClose={closeModal}
+        status={t("walletConnect.notConnected")}
+        title={t("walletConnect.chooser.title")}
+        titleId="choose-wallet-title"
+        tone="neutral"
+      >
+        <Box>
+          <Box sx={{ color: ds.gray["600"], fontSize: 14, fontWeight: 500, mb: 1 }}>{t("walletConnect.supportedWallets")}</Box>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: 320, overflowY: "auto", p: 0.25 }}>
+            {walletOptions.map(({ icon, label, name, cip95Available }) => (
               <WalletOptionButton
-                dataTestId={`${name}-wallet-button`}
                 key={name}
+                cip95Available={cip95Available}
+                dataTestId={`${name}-wallet-button`}
                 icon={icon}
                 label={label}
                 name={name}
-                cip95Available={cip95Available}
                 pathToNavigate={state?.pathToNavigate}
               />
-            ))
-          )}
+            ))}
+          </Box>
         </Box>
-        <Typography
-          sx={{
-            fontSize: "11px",
-            fontWeight: "500",
-            marginTop: "24px",
-            textAlign: "center",
-          }}
-        >
-          {t("wallet.cantSeeWalletQuestion")}
-          <Link
-            fontSize={11}
-            fontWeight={500}
+        <Callout body={t("walletConnect.chooser.connectionOnlyBody")} title={t("walletConnect.chooser.connectionOnlyTitle")} tone="info" />
+        <Box sx={{ borderTop: `1px solid ${ds.gray["200"]}`, color: ds.gray["600"], fontSize: 14, pt: 2 }}>
+          {t("walletConnect.chooser.more")}
+          <ButtonBase
             onClick={() => openInNewTab(LINKS.COMPATIBLE_WALLETS)}
-            sx={{ cursor: "pointer" }}
+            sx={{ color: ds.primary["600"], display: "flex", fontSize: 14, fontWeight: 600, gap: 0.5, mt: 1, "&:hover": { textDecoration: "underline" } }}
           >
-            {t("here")}
-          </Link>
-          .
-        </Typography>
-      </ModalContents>
+            {t("walletConnect.chooser.learnMore")}
+            <ArrowRight aria-hidden size={14} />
+          </ButtonBase>
+        </Box>
+      </WalletStateFrame>
+    );
+  }
+
+  return (
+    <ModalWrapper ref={ref} dataTestId="connect-your-wallet-modal" hideCloseButton onClose={closeModal} sx={{ maxWidth: 500, p: 3 }}>
+      <Box aria-labelledby="choose-wallet-title" aria-modal="true" role="dialog">{content}</Box>
     </ModalWrapper>
   );
 });

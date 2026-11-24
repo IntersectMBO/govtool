@@ -16,7 +16,8 @@ import {
   generateMetadataBody,
 } from "@utils";
 
-import { useGetVoterInfo, useWalletErrorModal } from "@hooks";
+import { useGetVoterInfo } from "@hooks";
+import { walletErrorReason } from "@/utils/walletErrorReason";
 import { DRepDataFormValues } from "@/types/dRep";
 import { useValidateMutation } from "../mutations";
 
@@ -57,7 +58,6 @@ export const useRegisterAsdRepForm = (
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { closeModal, openModal } = useModal();
-  const openWalletErrorModal = useWalletErrorModal();
   const { cExplorerBaseUrl } = useAppContext();
 
   // Queries
@@ -227,10 +227,24 @@ export const useRegisterAsdRepForm = (
             },
           });
         } else {
-          openWalletErrorModal({
-            error: error?.message ? error.message : JSON.stringify(error),
-            onSumbit: () => backToDashboard(),
-            dataTestId: "registration-transaction-error-modal",
+          // The wallet did not sign or submit: say so, keep its reason, and
+          // let the user try again from where they were.
+          const reason = walletErrorReason(error);
+          openModal({
+            type: "statusModal",
+            state: {
+              status: "warning",
+              title: t("drepDashboard.registrationError.title"),
+              message: [
+                t("drepDashboard.registrationError.body"),
+                reason && t("drepDashboard.registrationError.reason", { reason }),
+              ].filter(Boolean).join(" "),
+              buttonText: t("drepDashboard.registrationError.retry"),
+              onSubmit: closeModal,
+              cancelText: t("drepDashboard.registrationError.close"),
+              onCancel: backToDashboard,
+              dataTestId: "registration-transaction-error-modal",
+            },
           });
         }
       } finally {

@@ -12,6 +12,7 @@ import { openInNewTab } from "@utils";
 
 import { ControlledField } from "..";
 import { LINKS } from "@/consts/links";
+import { FONT_FAMILY } from "@/consts/designTokens";
 
 export const DRepStoreDataInfo = ({
   setStep,
@@ -32,7 +33,7 @@ export const DRepStoreDataInfo = ({
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("registration.storeDataTitle")}
       </Typography>
       <Link
@@ -41,9 +42,8 @@ export const DRepStoreDataInfo = ({
           cursor: "pointer",
           fontSize: 16,
           fontWeight: 500,
-          fontFamily: "Poppins",
+          fontFamily: FONT_FAMILY.sans,
           my: 4,
-          textAlign: "center",
           textDecoration: "none",
         }}
       >

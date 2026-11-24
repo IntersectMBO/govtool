@@ -25,7 +25,7 @@ export const RolesAndResponsibilities = ({
 
   return (
     <>
-      <Typography sx={{ textAlign: "center" }} variant="headline4">
+      <Typography component="h1" variant="headline4">
         {t("registration.rolesAndResponsibilitiesTitle")}
       </Typography>
       <Typography
@@ -33,7 +33,6 @@ export const RolesAndResponsibilities = ({
         sx={{
           pb: isMobile ? 4 : 6,
           pt: 4,
-          textAlign: "center",
           whiteSpace: "pre-line",
         }}
         variant="body1"

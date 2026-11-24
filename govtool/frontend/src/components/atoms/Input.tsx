@@ -7,6 +7,8 @@ import {
 } from "react";
 import { InputBase } from "@mui/material";
 
+import { ds, RADIUS } from "@/consts/designTokens";
+
 import { InputProps } from "./types";
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -53,18 +55,30 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         inputRef={inputRef}
         onBlur={onBlur}
         sx={{
-          backgroundColor: errorMessage ? "inputRed" : "white",
+          backgroundColor: errorMessage ? ds.error["50"] : "#FFFFFF",
           border: 1,
-          borderColor: errorMessage ? "red" : "secondaryBlue",
-          borderRadius: 50,
-          padding: "8px 16px",
+          borderColor: errorMessage ? ds.error["500"] : ds.gray["200"],
+          borderRadius: `${RADIUS.md}px`,
+          color: ds.gray["900"],
+          fontSize: 14,
+          height: 38,
+          letterSpacing: "-0.09px",
+          lineHeight: "20px",
+          padding: "8px 10px",
           width: "100%",
+          "& input::placeholder": {
+            color: ds.gray["500"],
+            opacity: 1,
+          },
+          "&.Mui-focused": {
+            borderColor: errorMessage ? ds.error["500"] : ds.primary["600"],
+          },
           "& input.Mui-disabled": {
-            WebkitTextFillColor: "#4C495B",
+            WebkitTextFillColor: ds.gray["400"],
           },
           "&.Mui-disabled": {
-            backgroundColor: "#F5F5F8",
-            borderColor: "#9792B5",
+            backgroundColor: ds.gray["50"],
+            borderColor: ds.gray["200"],
           },
           ...sx,
         }}

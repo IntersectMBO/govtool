@@ -1,188 +1,74 @@
-import { useState, useEffect, useCallback } from "react";
-import { Box, CircularProgress, Tab, Tabs, styled } from "@mui/material";
-import { useLocation, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { Box, CircularProgress } from "@mui/material";
+import { useLocation } from "react-router";
 
-import {
-  GOVERNANCE_ACTIONS_FILTERS,
-  PATHS,
-  PDF_PATHS,
-} from "@consts";
-import { useCardano, useDataActionsBar, useFeatureFlag } from "@context";
-import { useGetVoterInfo, useScreenDimension, useTranslation } from "@hooks";
-import { DataActionsBar } from "@molecules";
+import { PageContainer } from "@atoms";
+import { useCardano, useDataActionsBar } from "@context";
+import { useGetVoterInfo, useTranslation } from "@hooks";
 import {
   GovernanceActionsToVote,
   DashboardGovernanceActionsVotedOn,
 } from "@organisms";
-import { Button } from "@atoms";
+import { SegmentedTabs } from "@/components/molecules/SegmentedTabs";
 
-type TabPanelProps = {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-};
-
-const CustomTabPanel = (props: TabPanelProps) => {
-  const { children, value, index } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        flex: value !== index ? 0 : 1,
-      }}
-    >
-      {value === index && <Box pb={3}>{children}</Box>}
-    </div>
-  );
-};
-
-const temporaryProposeButtonRemove: boolean = true;
-
-type StyledTabProps = {
-  label: string;
-};
-
-const StyledTab = styled((props: StyledTabProps) => (
-  <Tab disableRipple {...props} />
-))(() => ({
-  textTransform: "none",
-  fontWeight: 400,
-  fontSize: 16,
-  color: "#242232",
-  "&.Mui-selected": {
-    color: "#FF640A",
-    fontWeight: 500,
-  },
-}));
+import { GovernanceActionsHeader } from "./GovernanceActionsHeader";
+import { GovernanceActionsListLayout } from "./GovernanceActionsListLayout";
 
 export const DashboardGovernanceActions = () => {
-  const { debouncedSearchText, ...dataActionsBarProps } =
-    useDataActionsBar();
+  const { debouncedSearchText } = useDataActionsBar();
   const { voter } = useGetVoterInfo();
-  const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   const { isEnableLoading } = useCardano();
-  const { isProposalDiscussionForumEnabled, governanceActionsSort } =
-    useFeatureFlag();
-  const navigate = useNavigate();
   const { state } = useLocation();
 
   const [content, setContent] = useState<number>(
     state?.isVotedListOnLoad ? 1 : 0,
   );
-  const canVote = voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
-  // Without the tabs, such as for a retired DRep, only the first list shows.
-  const tab = canVote ? content : 0;
-
-  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setContent(newValue);
-  };
-
-  const onClickPropose = useCallback(() => {
-    navigate(
-      isProposalDiscussionForumEnabled
-        ? PDF_PATHS.proposalDiscussionPropose
-        : PATHS.createGovernanceAction,
-    );
-  }, [isProposalDiscussionForumEnabled]);
 
   useEffect(() => {
     window.history.replaceState({}, document.title);
   }, []);
 
+  const isVoter = voter?.isRegisteredAsDRep || voter?.isRegisteredAsSoleVoter;
+
   return (
-    <Box
-      px={isMobile ? 2 : 3.5}
-      pt={6}
-      flex={1}
-      display="flex"
-      flexDirection="column"
-    >
-      <>
-        <DataActionsBar
-          {...dataActionsBarProps}
-          filterOptions={GOVERNANCE_ACTIONS_FILTERS}
-          filtersTitle={t("govActions.filterTitle")}
-          sortOptions={governanceActionsSort.options}
-          isSorting={governanceActionsSort.isAvailable}
-        />
+    <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
+      <GovernanceActionsHeader />
+      <GovernanceActionsListLayout showCounts={!isVoter}>
         {!voter || isEnableLoading ? (
-          <Box
-            alignItems="center"
-            display="flex"
-            flex={1}
-            height="100%"
-            justifyContent="center"
-          >
+          <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
             <CircularProgress />
           </Box>
         ) : (
-          <>
-            {canVote && (
-              <Box display="flex" flexDirection="row" alignItems="center">
-                <Tabs
-                  sx={{
-                    marginTop: 3,
-                    display: "flex",
-                    fontSize: 16,
-                    fontWeight: 500,
-                  }}
-                  value={tab}
-                  indicatorColor="secondary"
-                  onChange={handleChange}
-                  aria-label="Governance Actions tabs"
-                >
-                  <StyledTab
-                    data-testid="to-vote-tab"
-                    label={t("govActions.toVote")}
-                    sx={{
-                      textTransform: "none",
-                      width: !isMobile ? "auto" : "50%",
-                    }}
-                  />
-                  <StyledTab
-                    data-testid="voted-tab"
-                    label={t("govActions.votedOnByMe")}
-                    sx={{
-                      textTransform: "none",
-                      width: !isMobile ? "auto" : "50%",
-                    }}
-                  />
-                </Tabs>
-                <Button
-                  data-testid="proposal-discussion-link"
-                  onClick={onClickPropose}
-                  sx={{
-                    display:
-                      isMobile || temporaryProposeButtonRemove
-                        ? "none"
-                        : "block",
-                    ml: "auto",
-                  }}
-                >
-                  {t("govActions.propose")}
-                </Button>
-              </Box>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {isVoter && (
+              <SegmentedTabs
+                idPrefix="dashboard-actions"
+                label={t("govActions.title")}
+                onChange={(next) => setContent(next === "voted" ? 1 : 0)}
+                tabs={[
+                  { value: "toVote", label: t("govActions.toVote"), dataTestId: "to-vote-tab" },
+                  { value: "voted", label: t("govActions.votedOnByMe"), dataTestId: "voted-tab" },
+                ]}
+                value={content === 1 ? "voted" : "toVote"}
+              />
             )}
-
-            <Box height={isMobile ? 24 : 60} />
-            <CustomTabPanel value={tab} index={0}>
-              <GovernanceActionsToVote onDashboard />
-            </CustomTabPanel>
-            <CustomTabPanel value={tab} index={1}>
+            <Box
+              {...(isVoter
+                ? SegmentedTabs.panelProps("dashboard-actions", content === 1 ? "voted" : "toVote")
+                : {})}
+            >
+              {content === 0 || !isVoter ? (
+                <GovernanceActionsToVote onDashboard />
+            ) : (
               <DashboardGovernanceActionsVotedOn
                 searchPhrase={debouncedSearchText}
               />
-            </CustomTabPanel>
-          </>
+            )}
+            </Box>
+          </Box>
         )}
-      </>
-    </Box>
+      </GovernanceActionsListLayout>
+    </PageContainer>
   );
 };

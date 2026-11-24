@@ -30,7 +30,7 @@ export const GovernanceActionsCategory = () => {
   const { debouncedSearchText, ...dataActionsBarProps } = useDataActionsBar();
   const { governanceActionsSort } = useFeatureFlag();
   const { chosenSorting } = dataActionsBarProps;
-  const { isMobile, pagePadding, screenWidth } = useScreenDimension();
+  const { isMobile, pagePadding } = useScreenDimension();
   const navigate = useNavigate();
   const { voter } = useGetVoterInfo();
   const { t } = useTranslation();
@@ -76,6 +76,7 @@ export const GovernanceActionsCategory = () => {
       >
         <TopNav />
         <Box
+          component="main"
           flex={1}
           pt={isMobile ? 3.25 : 6.25}
           overflow="hidden"
@@ -128,9 +129,7 @@ export const GovernanceActionsCategory = () => {
                 <Box
                   columnGap="20px"
                   display="grid"
-                  gridTemplateColumns={`repeat(auto-fit, minmax(${
-                    screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
-                  }, 1fr))`}
+                  gridTemplateColumns="minmax(0, 1fr)"
                 >
                   {mappedData.map((item) => (
                     <Box pb={4.25} key={item.txHash + item.index}>

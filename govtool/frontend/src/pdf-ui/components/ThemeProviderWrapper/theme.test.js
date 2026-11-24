@@ -118,9 +118,11 @@ describe('pdf-ui theme', () => {
     });
 
     it('builds on the GovTool theme', () => {
-        expect(pdfTheme.typography.fontFamily).toBe('Poppins, Arial');
-        expect(pdfTheme.palette.primary.main).toBe('#0033AD');
-        expect(pdfTheme.palette.lightBlue).toBe('#D6E2FF');
+        expect(pdfTheme.typography.fontFamily).toBe(
+            govtoolTheme.typography.fontFamily
+        );
+        expect(pdfTheme.palette.primary.main).toBe('#1447E6');
+        expect(pdfTheme.palette.lightBlue).toBe('#E0E9FF');
         expect(pdfTheme.shadows[1]).toBe(govtoolTheme.shadows[1]);
         expect(pdfTheme.components.MuiChip).toBeDefined();
         expect(pdfTheme.components.MuiCard).toBeDefined();

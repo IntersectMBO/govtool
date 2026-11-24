@@ -1,184 +1,144 @@
-import { FC } from "react";
-import { NavLink, useLocation } from "react-router";
-import { Box, Grid, IconButton, SwipeableDrawer } from "@mui/material";
+import { useLocation, useNavigate } from "react-router";
+import { Box, IconButton, SwipeableDrawer } from "@mui/material";
+import { LifeBuoy, X } from "lucide-react";
 
-import { Background, Button, Link, Typography } from "@atoms";
-import { ICONS, IMAGES, NAV_ITEMS, NavMenuItem, NavItem, PATHS } from "@consts";
-import { useScreenDimension, useTranslation } from "@hooks";
-import { useFeatureFlag, useModal } from "@context";
-import { findActiveNavTo, openInNewTab } from "@utils";
+import { Button } from "@atoms";
+import { IMAGES } from "@consts";
+import { useTranslation } from "@hooks";
+import { openInNewTab } from "@utils";
+import { ds } from "@/consts/designTokens";
+import { LINKS } from "@/consts/links";
+import { PATHS } from "@/consts/paths";
+import { requestProfileMenu } from "@/utils/profileMenu";
+
+import { ConnectedWalletCard } from "./ConnectedWalletCard";
 
 import { DrawerMobileProps } from "./types";
-import { LINKS } from "@/consts/links";
-
-const DRAWER_PADDING = 2;
-const CALCULATED_DRAWER_PADDING = DRAWER_PADDING * 8 * 2;
-
-const isNavMenuItem = (item: NavItem | NavMenuItem): item is NavMenuItem =>
-  "childNavItems" in item;
+import { isNavEntryActive, NavEntryLink } from "./topNavItems";
 
 export const DrawerMobile = ({
   isConnectButton,
+  isConnected,
   isDrawerOpen,
+  navEntries,
+  onConnect,
+  onNavigateAway,
   setIsDrawerOpen,
 }: DrawerMobileProps) => {
-  const { screenWidth } = useScreenDimension();
-  const { openModal } = useModal();
   const { t } = useTranslation();
-
-  const onClickHelp = () => openInNewTab(LINKS.SUPPORT);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const close = () => setIsDrawerOpen(false);
 
   return (
     <SwipeableDrawer
       anchor="right"
-      onClose={() => setIsDrawerOpen(false)}
+      disableSwipeToOpen
+      // Unmounted while closed, so its links and Connect button never sit in
+      // the page as hidden duplicates of the bar's.
+      ModalProps={{ keepMounted: false }}
+      onClose={close}
       onOpen={() => setIsDrawerOpen(true)}
       open={isDrawerOpen}
+      PaperProps={{ sx: { width: { xxs: "100%", sm: 375 } } }}
     >
-      <Background>
+      <Box
+        sx={{
+          backgroundColor: "#FFFFFF",
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100%",
+        }}
+      >
         <Box
           sx={{
+            alignItems: "center",
+            borderBottom: `1px solid ${ds.gray["200"]}`,
             display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            px: DRAWER_PADDING,
+            justifyContent: "space-between",
+            px: 2,
+            py: 1.5,
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              py: 3,
-              width: screenWidth - CALCULATED_DRAWER_PADDING,
-            }}
+          <img alt="Cardano GovTool" height={24} src={IMAGES.govToolLogo} width={118} />
+          <IconButton
+            aria-label={t("menu.close")}
+            onClick={close}
+            sx={{ border: `1px solid ${ds.gray["200"]}`, height: 36, width: 36 }}
           >
-            <NavLink
-              data-testid="logo-button"
-              style={{ display: "flex", justifyContent: "center" }}
-              to={PATHS.dashboard}
-            >
-              <img alt="app-logo" height={25} src={IMAGES.appLogo} />
-            </NavLink>
-            <IconButton
-              sx={{ padding: 0 }}
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              <img alt="close-drawer" src={ICONS.closeDrawerIcon} />
-            </IconButton>
-          </Box>
-          {isConnectButton ? (
+            <X aria-hidden color={ds.gray["600"]} size={18} />
+          </IconButton>
+        </Box>
+        <Box sx={{ display: "flex", flex: 1, flexDirection: "column", gap: 2, p: 2 }}>
+          {!isConnected && isConnectButton && (
             <Button
               data-testid="connect-wallet-button"
               onClick={() => {
-                openModal({ type: "chooseWallet" });
+                onConnect();
+                close();
               }}
               size="extraLarge"
-              sx={{
-                marginTop: 1,
-                width: "100%",
-              }}
-              variant="contained"
+              sx={{ width: "100%" }}
             >
               {t("wallet.connectYourWalletButton")}
             </Button>
-          ) : null}
-          <Box sx={{ display: "flex", flex: 1, flexDirection: "column" }}>
-            <Grid container direction="column" mt={6} rowGap={4}>
-              {NAV_ITEMS.map((navItem) => {
-                if (isNavMenuItem(navItem)) {
-                  return (
-                    <MenuNavItem
-                      closeDrawer={() => setIsDrawerOpen(false)}
-                      navItem={navItem}
-                      key={navItem.label}
-                    />
-                  );
-                }
-                return (
-                  <Grid item key={navItem.label}>
-                    <Link
-                      {...navItem}
-                      isConnectWallet={isConnectButton}
-                      onClick={() => {
-                        if (navItem.newTabLink)
-                          openInNewTab(navItem.newTabLink);
-                        setIsDrawerOpen(false);
-                      }}
-                      size="big"
-                    />
-                  </Grid>
-                );
-              })}
-            </Grid>
+          )}
+          <Box
+            aria-label={t("menu.mainNav")}
+            component="nav"
+            sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+          >
+            {navEntries.map((entry) => (
+              <NavEntryLink
+                key={entry.dataTestId}
+                entry={entry}
+                isActive={isNavEntryActive(entry, pathname)}
+                onClick={(event) => {
+                  close();
+                  if (onNavigateAway && !entry.newTabLink) {
+                    event.preventDefault();
+                    onNavigateAway();
+                  }
+                }}
+                variant="drawer"
+              />
+            ))}
           </Box>
+          {isConnected && (
+            <Box sx={{ border: `1px solid ${ds.gray["200"]}`, borderRadius: "12px", mt: 1, p: 2 }}>
+              <ConnectedWalletCard
+                onViewProfile={() => {
+                  close();
+                  // Phones show no avatar, so no profile menu to open.
+                  if (!requestProfileMenu()) navigate(PATHS.dashboard);
+                }}
+              />
+            </Box>
+          )}
         </Box>
         <Box
-          onClick={onClickHelp}
-          sx={{ alignItems: "center", display: "flex", p: DRAWER_PADDING }}
+          component="button"
+          onClick={() => openInNewTab(LINKS.SUPPORT)}
+          sx={{
+            alignItems: "center",
+            background: "none",
+            border: "none",
+            borderTop: `1px solid ${ds.gray["200"]}`,
+            color: ds.gray["700"],
+            cursor: "pointer",
+            display: "flex",
+            font: "inherit",
+            fontSize: 14,
+            fontWeight: 500,
+            gap: 1.5,
+            p: 2,
+          }}
+          type="button"
         >
-          <img alt="help" height={20} src={ICONS.helpIcon} width={20} />
-          <Typography fontWeight={500} sx={{ ml: 1.5 }}>
-            {t("menu.help")}
-          </Typography>
+          <LifeBuoy aria-hidden size={18} />
+          {t("menu.help")}
         </Box>
-      </Background>
+      </Box>
     </SwipeableDrawer>
-  );
-};
-
-const MenuNavItem: FC<{
-  navItem: NavMenuItem;
-  closeDrawer: () => void;
-}> = ({ closeDrawer, navItem }) => {
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
-
-  const filterChildNavItems = () => {
-    if (navItem.dataTestId === "governance-actions") {
-      return (navItem.childNavItems || []).filter((item) => {
-        if (
-          !isProposalDiscussionForumEnabled &&
-          item.dataTestId === "proposed-governance-actions-link"
-        )
-          return false;
-        return true;
-      });
-    }
-    return navItem.childNavItems;
-  };
-  const { pathname } = useLocation();
-  const childNavItems = filterChildNavItems();
-  const activeNavTo = findActiveNavTo(
-    pathname,
-    (childNavItems ?? []).map((item) => item.navTo),
-  );
-  return (
-    <>
-      <Grid item key={navItem.label}>
-        <Link
-          navTo=""
-          data-testid={navItem.dataTestId}
-          isActive={activeNavTo !== null}
-          label={navItem.label}
-          size="big"
-        />
-      </Grid>
-      {childNavItems?.map((childNavItem) => (
-        <Grid item key={childNavItem.label} ml={3}>
-          <Link
-            {...childNavItem}
-            isActive={childNavItem.navTo === activeNavTo}
-            data-testid={childNavItem.dataTestId}
-            onClick={() => {
-              if (childNavItem.newTabLink) {
-                openInNewTab(childNavItem.newTabLink);
-              }
-              closeDrawer();
-            }}
-            label={childNavItem.label}
-            size="big"
-          />
-        </Grid>
-      ))}
-    </>
   );
 };

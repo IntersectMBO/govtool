@@ -148,9 +148,137 @@ wallet is connected; copy CreateGovernanceAction.tsx.
 
 A new page touches src/consts/paths.ts, src/pages/index.ts, App.tsx
 (walletOptionalRoutes when it has both layouts), utils/getPageTitle.ts and
-en.json. It also needs the title function in pages/Dashboard.tsx when it
-renders in the Dashboard without a CONNECTED_NAV_ITEMS entry, and NAV_ITEMS and
-CONNECTED_NAV_ITEMS in src/consts/navItems.tsx when it is in the nav.
+en.json. It also needs NAV_ITEMS and CONNECTED_NAV_ITEMS in
+src/consts/navItems.tsx when it is in the nav. The redesigned Dashboard layout
+has no page title of its own, so nothing else names a page.
+
+Home's news section (organisms/Home/HomeNews, between Outcomes and the FAQ)
+lists the newsletter's four latest posts from its Ghost Content API, links to
+the newsletter site for the rest, and holds the newsletter sign-up, which left
+the footer. Both talk to newsletter.gov.tools directly
+(services/requests/newsletter.ts, consts/links.ts NEWSLETTER): the Content API
+key is Ghost's public read-only one, and signing up asks Ghost to email a
+confirmation link, as its own portal does. Tests that render Home mock
+useNewsletterPosts, so no test reaches that site.
+
+Public pages and the connected Dashboard layout share one frame: TopNav (logo,
+nav, Connect Wallet or the wallet menu that holds disconnect-button), the page,
+Footer. Below 1024px the nav moves into the mobile drawer. Governance Actions is
+one nav link; its three destinations are the Proposed, Live Voting and Outcomes
+tabs (organisms/GovernanceActionsTabs.tsx), which reuse the old dropdown's test
+ids, public or connected. Governance Activity (/activity, pages/GovernanceActivity.tsx,
+organisms/GovernanceActivity/) is one public URL for everyone, mounted outside
+the Dashboard route like Home, built from the
+live list and the newest decided actions. FAQ is a footer link (faqs-link).
+
+TopNav's search button (organisms/GlobalSearch, Ctrl+K or ⌘K) opens one dialog
+over six result types: live actions (/proposal/list), DReps (/drep/list,
+listed), forum proposals (the forum backend, only while the forum flag is on),
+outcomes (/governance-actions), a pasted address (its stake part through
+/account and the ada-holder routes) and an exact ADA handle (handle.me, as the
+DRep directory search already does). Its reads use GovernanceActionsAPI, so a
+failure stays in the dialog. The forum query (utils/globalSearch.ts) must stay
+within the forum backend's PROPOSALS_ALLOWLIST. The button is hidden inside
+wallet flows.
+
+Notifications (organisms/Notifications, hooks/useNotifications.ts) have two
+modes behind one hook. GET /notifications/config answering version 1 means a
+notifications service runs (docs/api/notifications.md): the hook signs in with
+the wallet's signData and reads the service. Anything else (404 today) means
+local mode: utils/notifications.ts derives items from the routes GovTool
+already reads and keeps read state, first-seen times and preferences in
+localStorage per stake key. Both modes share the model in models/notifications.ts
+(kind plus data, copy in en.json), so a new kind needs the model, the
+contract table and notificationContent.ts. The bell renders only for connected
+wallets outside wallet flows; tests that render a connected TopNav stub it,
+since it needs a QueryClient. The Notification Center and its preferences
+(/my/notifications, /my/notifications/preferences) are wallet-only pages
+inside the Dashboard route.
+
+A DRep directory card (organisms/DRepCard) shows participation from that DRep's
+votes, one /drep/getVotes request per card through the profile's query, and
+every /governance-actions row (useDRepCardStats). Delegators come from the
+row's delegatorCount (db-sync and Koios fill it), else the delegators route once
+drep.delegatorList is served; with neither, the registration date stands in.
+Its menu's View Voting History opens the profile at #voting-history, which
+DRepDetailsCard scrolls to.
+
+A registered DRep's /dashboard is organisms/DRepDashboard, tabbed by the tab
+query parameter; DashboardCards still builds its wallet and action cards, and
+everyone else keeps the cards. Its figures come from utils/drepDashboard.ts
+over the DRep's votes and every /governance-actions row. Delegators, the full
+history, delegation history and delegation growth read routes the backend does
+not have yet (docs/api/drep-dashboard.md), behind useIsFeatureServed in
+hooks/queries/useDRepDashboard.ts, which fails closed, unlike useFeatureFlag.
+Its story seeds the query cache, since the dashboard needs a wallet.
+A former DRep that is neither a DRep nor a direct voter gets RetiredDRepDashboard
+instead (utils/drepDashboard.ts isRetiredDRep). Retiring needs both
+acknowledgements ticked (retirement-ack-voting, retirement-ack-deposit) before
+continue-retirement-button enables; the Playwright retirement specs tick them.
+
+Creating a governance action (pages/CreateGovernanceAction.tsx) is six steps in
+CenteredBoxPageWrapper's frameless mode, built from
+organisms/CreateGovernanceActionSteps/parts.tsx. The CIP-179 suite drives it by
+continue-button, the ${type}-radio cards, the fields' name attributes,
+storing-information-checkbox and metadata-download-button, so keep those.
+
+Connecting goes through organisms/Modal/ChooseWalletModal and
+molecules/WalletOption: wallet.tsx's enable wrapper still opens its own modals,
+and WalletOption replaces them once enable settles with the walletConnection
+modal (organisms/WalletConnect: checking then a summary, or the failure read
+from the error text by utils/walletConnect.ts). Its close button keeps
+confirm-modal-button, which the E2E login clicks (with several stake keys it
+waits for /stake_keys instead, then dismisses the modal Continue opens); Disconnect opens the
+disconnectWallet modal (confirm-disconnect-button). The avatar opens the profile
+popup (organisms/ProfileMenu) and the wallet pill the wallet popup
+(organisms/ConnectedWalletCard, also in the phone drawer); there is no /profile
+page. View Profile and the connection summary open the profile popup through
+utils/profileMenu.ts, or go to the dashboard where no avatar is shown (phones).
+Switch wallet disconnects without the reload and opens the wallet chooser,
+because enable does nothing while a wallet is enabled.
+
+Each page has one main landmark, which TopNav's skip link focuses: public page
+shells pass component="main" to PageContainer (or a Box), while the Dashboard
+layout wraps its outlet in main, so a page rendered inside Dashboard must not
+add another. A filter sidebar renders once per breakpoint (the phone panel or
+the desktop column), never both, because Playwright's strict getByTestId fails
+on a duplicated row id.
+
+## Design system
+
+The redesign's values live in src/consts/designTokens.ts (colour scales ds.*,
+RADIUS, SHADOWS, FONT_FAMILY, PILL_TONES) and feed src/theme.ts; text colours
+must reach 4.5:1 on their background (designTokens.test.ts pins the pairs the
+design gets wrong: orange text uses 700, or 750 on the nav's orange tint, and
+green or amber text uses 700, never 600); the palette
+exposes them as theme.palette.ds, and the older palette keys keep their names
+with the new values. The type scale is src/consts/typography.ts, used by the
+Typography atom: the Figma names (paragraphSM, tagline...) plus the old names
+mapped to the nearest size. Geist and Geist Mono are self-hosted through
+src/fonts.ts; nothing loads Google Fonts. Icons come from lucide-react, pinned to
+an exact version. Rebuilt pages sit in the PageContainer atom (1180px). The
+governance action lists share GovernanceActionsHeader (title, Create Governance
+Action, tabs) and a search, sort and filter-sidebar frame:
+GovernanceActionsListLayout for Live Voting, GovernanceActionHistorySearchFiltersSortBar
+for Outcomes, whose state lives in the URL (its status filter draws
+FilterSidebar's checkbox rows). An outcome's page is organisms/OutcomeDetails:
+tabs in ?tab= (the action's CIP-129 id is the last path segment); each
+role section keeps the ${prefix}-voting-results-data and ${title}-expand-button
+ids and the Overall Outcome rows the ${prefix}-voting-results-indicator ids,
+which test:governance-action-aggregates reads. See all data is a modal dialog in
+a portal (in place, MUI would hide it from screen readers), so read its
+${title}-*-votes ids from the page, not the section. The page shows nothing from
+an anchored document that failed its check (utils/outcomeDetails.ts
+outcomeContent): the backend returns the body with an INVALID_HASH status. The
+Outcomes type rows show short names but keep the long names in their row ids
+(FilterSidebar testLabel), which the E2E filter specs click. The forum's
+Proposed list copies that frame inside pdf-ui. The header's four figures (GovernanceActionsStats)
+come from every /governance-actions row and the live list. On the Proposed tab
+the header's button and notice come from useProposeHeaderControls: GovTool
+knows the wallet, and pdf-ui reports the forum sign-in through the App prop
+onProposeStateChange (pdf-ui lib/proposeState.js). Import
+tokens from @/consts/designTokens rather than @consts in components that tests
+render with a mocked @consts barrel.
 
 ## Transactions
 
@@ -173,6 +301,12 @@ A new builder goes in CardanoContextType, the provider value and its dependency
 array. A new transaction type also goes in context/pendingTransaction/types.ts,
 usePendingTransaction.ts, pendingTransaction/utils.tsx (getDesiredResult,
 getQueryKey, refetchData) and the alerts.<type> strings in en.json.
+
+Delegating to a DRep goes through organisms/DelegationReviewDialog: it calls
+useDelegateTodRep's delegate on "Continue to wallet", then follows
+pendingTransaction.delegate and reads the delegation query entry keyed by that
+transaction to tell confirmed from not confirmed. The Abstain and No Confidence
+options still call delegate directly.
 
 wallet.test.tsx covers vote and certificate submission, but not the guardrail
 script path nor any governance action builder. Check those on tests/devnet.
@@ -198,8 +332,10 @@ path that src/theme.ts does not define.
 
 The forum backend pins the query strings the forum sends, in its SPEC.md
 appendix, its *.allowlists.ts files and test/helpers/pdf-ui-corpus.ts. They are
-built in lib/api.js and in components such as ProposalsList and CommentCard;
-changing a proposal, comment or poll query means changing all of them.
+built in lib/api.js, lib/proposalList.js (the proposals list: one request across
+the chosen types) and components such as ProposalsList (now only the unfinished
+drafts) and CommentCard; changing a proposal, comment or poll query means
+changing all of them.
 
 The budget archive never calls the forum backend: its E2E spec fails on any
 budget-discussion API request, and the shared CommentCard stays off the forum API only while the
@@ -209,6 +345,13 @@ this repository; the script strips creators' credentials, so any new export goes
 through it. The path is hard-coded in lib/budgetArchive.js, nginx.conf (404 for
 a missing file, 30-day cache), the split script and
 tests/govtool-frontend/playwright/lib/pages/budgetDiscussionPage.ts.
+
+A forum proposal's page (pages/ProposedGovernanceActions/SingleGovernanceAction)
+follows OutcomeDetails: it imports Card, CardTitle, MonoTag and HEADER_TINTS from
+organisms/OutcomeDetails/parts and shares through ShareDialog (kind proposal).
+detailsState.js decides which side card shows; the forum E2E specs read the
+page's ids, and copy-link-text appears beside the share button for two seconds
+after a copy, as spec 8E expects.
 
 Keep its four-space, single-quote style. lib/markdownRenderer.jsx renders raw
 HTML from user content; do not copy that into GovTool code.

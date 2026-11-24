@@ -43,9 +43,10 @@ export const CreateGovernanceAction = () => {
       type: "statusModal",
       state: {
         status: "warning",
-        message: t("modals.createGovernanceAction.cancelModalDescription"),
-        buttonText: t("modals.common.goToDashboard"),
-        title: t("modals.createGovernanceAction.cancelModalTitle"),
+        message: t("createGA.modals.cancelBody"),
+        buttonText: t("createGA.modals.cancelConfirm"),
+        cancelText: t("createGA.modals.cancelBack"),
+        title: t("createGA.modals.cancelTitle"),
         dataTestId: "cancel-governance-action-creation-modal",
         onSubmit: backToDashboard,
       },
@@ -54,8 +55,19 @@ export const CreateGovernanceAction = () => {
   return (
     <CenteredBoxPageWrapper
       pageTitle={t("createGovernanceAction.title")}
+      frameless
       onClickBackToDashboard={onClickBackToDashboard}
-      showVotingPower
+      stepper={{
+        steps: [
+          t("createGA.steps.understand"),
+          t("createGA.steps.type"),
+          t("createGA.steps.details"),
+          t("createGA.steps.review"),
+          t("createGA.steps.prepareFile"),
+          t("createGA.steps.confirm"),
+        ],
+        current: step,
+      }}
     >
       <FormProvider {...methods}>
         {step === 1 && (

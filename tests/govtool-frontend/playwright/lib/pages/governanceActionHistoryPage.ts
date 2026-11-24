@@ -10,7 +10,8 @@ import extractExpiryDateFromText from "@helpers/extractExpiryDateFromText";
 import { createNewPageWithWallet, injectLogger } from "@helpers/page";
 import { testWallet } from "lib/wallet/testWallets";
 
-const status = ["Expired", "Ratified", "Enacted", "Live"];
+// Outcomes offers no Live row; live actions are on Live Voting.
+const status = ["Expired", "Ratified", "Enacted"];
 
 enum SortOption {
   SoonToExpire = "Soon to expire",
@@ -85,13 +86,19 @@ export default class GovernanceActionHistoryPage {
     return await this.page.locator('[data-testid$="-governance-action-card"]').all();
   }
 
+  // Filter rows are buttons in the sidebar, named after their label
+  // without spaces ("Info Action" → InfoAction-checkbox).
   async clickCheckboxByNames(names: string[]) {
-    const formattedNames = names.map((name) =>
-      name === "Info Action" ? "Info" : name
-    );
-    for (const name of formattedNames) {
-      const testId = name.toLowerCase().replace(/ /g, "-");
-      await this.page.getByTestId(`${testId}-checkbox`).click();
+    for (const name of names) {
+      await this.page.getByTestId(`${name.replace(/ /g, "")}-checkbox`).click();
+    }
+  }
+
+  // The filters are a sidebar beside the list; phones open them with the
+  // Filters button.
+  async openFilters() {
+    if (isMobile(this.page)) {
+      await this.filterBtn.click();
     }
   }
 
@@ -161,9 +168,9 @@ export default class GovernanceActionHistoryPage {
     return toCamelCase(sortType);
   }
 
+  // Sort options keep their camelCase key: newestFirst-radio.
   getSortTestId(sortOption: string) {
-    const sortType = this.getSortType(sortOption);
-    return sortType.toLowerCase().replace(/[\s.]/g, "") + "-radio";
+    return `${this.getSortType(sortOption)}-radio`;
   }
 
   async sortAndValidate(
@@ -182,7 +189,12 @@ export default class GovernanceActionHistoryPage {
         )
     );
 
-    await this.page.getByTestId(this.getSortTestId(sortOption)).click();
+    // The sort menu closes after each choice, so reopen it when needed.
+    const radio = this.page.getByTestId(this.getSortTestId(sortOption));
+    if (!(await radio.isVisible())) {
+      await this.sortBtn.click();
+    }
+    await radio.click();
 
     const response = await responsePromise;
     const actionRecordProposalList: actionRecordProposal[] = await response.json();
@@ -262,36 +274,29 @@ export default class GovernanceActionHistoryPage {
   async shouldAccessPage(isLoggedIn = false) {
     await this.page.goto("/");
 
+    // Governance Actions is one nav item (governance-actions-link once
+    // connected); Outcomes is a tab on its page with the old dropdown id.
     if (isMobile(this.page)) {
       await this.page.getByTestId("open-drawer-button").click();
-    } else {
-      if (!isLoggedIn) {
-        await this.page.getByTestId("governance-actions").click();
-      }
     }
-    await this.page.getByTestId("governance-actions-governance-actions-link").click();
-
-    if (!isMobile(this.page) && !isLoggedIn) {
-      await this.page.getByTestId("governance-actions").click();
-    }
+    await this.page
+      .getByTestId(isLoggedIn ? "governance-actions-link" : "governance-actions")
+      .click();
+    await this.page
+      .getByTestId("governance-actions-governance-actions-link")
+      .click();
 
     await expect(this.page).toHaveURL(/\/actions\/history(\?|$)/);
-    // Text, not role: the governance actions menu reopened above leaves the
-    // page aria-hidden. Connected, the page has no heading of its own; the
-    // dashboard bar repeats the nav item's label.
-    if (isLoggedIn) {
-      await expect(
-        this.page.getByText("Historical", { exact: true })
-      ).toHaveCount(2);
-    } else {
-      await expect(
-        this.page.getByText("Historical Actions", { exact: true })
-      ).toBeVisible();
-    }
+    await expect(
+      this.page.getByTestId("governance-actions-governance-actions-link")
+    ).toHaveAttribute("aria-current", "page");
+    await expect(
+      this.page.getByRole("heading", { name: "Governance actions", exact: true })
+    ).toBeVisible();
   }
 
   async filterGovernanceActionHistory() {
-    await this.filterBtn.click();
+    await this.openFilters();
     const filterOptionNames = Object.values(actionRecordType);
 
     // proposal type filter

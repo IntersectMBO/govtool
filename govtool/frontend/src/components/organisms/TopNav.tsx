@@ -1,41 +1,75 @@
-import { useEffect, useRef, useState, FC } from "react";
+import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router";
-import { AppBar, Box, Grid, IconButton, Menu, MenuItem } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import { Button, Link, FakeLink } from "@atoms";
-import { ICONS, IMAGES, PATHS, NAV_ITEMS, NavMenuItem } from "@consts";
-import { useCardano, useFeatureFlag, useModal } from "@context";
+import { Box, IconButton } from "@mui/material";
+import { Menu, Wallet } from "lucide-react";
+
+import { Button } from "@atoms";
+import { CONNECTED_NAV_ITEMS, IMAGES, NAV_ITEMS, PATHS } from "@consts";
+import { useCardano, useModal } from "@context";
 import { useScreenDimension, useTranslation } from "@hooks";
-import { findActiveNavTo, openInNewTab } from "@utils";
+import { WalletMenu } from "@molecules";
+import { ds, SHADOWS } from "@/consts/designTokens";
+
 import { DrawerMobile } from "./DrawerMobile";
+import { GlobalSearchButton } from "./GlobalSearch/GlobalSearchButton";
+import { NotificationBell } from "./Notifications/NotificationBell";
+import { useOpenChooserAfterSwitch } from "@/hooks/useConnectedWallet";
 
-const POSITION_TO_BLUR = 80;
+import { ProfileMenu } from "./ProfileMenu";
+import { isNavEntryActive, NavEntry, NavEntryLink } from "./topNavItems";
 
-const isNavMenuItem = (item: NavItem | NavMenuItem): item is NavMenuItem =>
-  "childNavItems" in item;
+// Below this width the nav items and the wallet control no longer fit on one
+// line, so the nav collapses into the drawer.
+const DESKTOP_MIN_WIDTH = 1024;
+// Below this the bar keeps only search, the bell and the menu: the wallet pill
+// would push the menu button off the screen, and the drawer shows the wallet.
+const PHONE_MAX_WIDTH = 480;
 
-export const TopNav = ({ isConnectButton = true }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [shouldBlur, setShouldBlur] = useState(false);
+type TopNavProps = {
+  isConnectButton?: boolean;
+  /**
+   * Set inside a wallet flow: in-app links (logo and nav) call it instead of
+   * navigating, so the flow can confirm before its form is lost.
+   */
+  onNavigateAway?: () => void;
+};
+
+export const TopNav = ({ isConnectButton = true, onNavigateAway }: TopNavProps) => {
   const { openModal } = useModal();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { screenWidth, isMobile } = useScreenDimension();
+  const { screenWidth } = useScreenDimension();
   const { isEnabled, disconnectWallet, stakeKey } = useCardano();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const onScroll = () => {
-      if (!containerRef.current?.nextElementSibling) return;
-      setShouldBlur(
-        containerRef.current.nextElementSibling.getBoundingClientRect().top <
-          POSITION_TO_BLUR,
-      );
-    };
+  const isConnected = Boolean(isEnabled && stakeKey);
+  useOpenChooserAfterSwitch();
+  const navEntries = (
+    isConnected ? CONNECTED_NAV_ITEMS : NAV_ITEMS
+  ) as NavEntry[];
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const guardNavigation = (event: React.MouseEvent<HTMLElement>) => {
+    if (!onNavigateAway) return;
+    event.preventDefault();
+    onNavigateAway();
+  };
+
+  // The page's main landmark, or its heading when a page has none.
+  const skipToMain = (event: React.MouseEvent<HTMLElement>) => {
+    const target =
+      document.querySelector<HTMLElement>("main") ??
+      document.querySelector<HTMLElement>("h1");
+    if (!target) return;
+    event.preventDefault();
+    if (!target.hasAttribute("tabindex")) {
+      target.setAttribute("tabindex", "-1");
+      // A focused region needs no ring; the skip already moved the reader.
+      target.style.outline = "none";
+    }
+    target.focus();
+    target.scrollIntoView?.({ block: "start" });
+  };
 
   const onClickConnectButton = () => {
     if (isEnabled && stakeKey) {
@@ -44,90 +78,98 @@ export const TopNav = ({ isConnectButton = true }) => {
     openModal({ type: "chooseWallet" });
   };
 
-  const closeDrawer = () => {
-    setIsDrawerOpen(false);
+  const renderWalletControl = (isCompact = false) => {
+    // Wallet flows show neither search nor the bell, so the pill fits there.
+    if (isConnected && isCompact && screenWidth < PHONE_MAX_WIDTH && !onNavigateAway) {
+      return <NotificationBell />;
+    }
+    if (isConnected) {
+      return (
+        <>
+          <WalletMenu />
+          {!onNavigateAway && <NotificationBell />}
+          {!onNavigateAway && <ProfileMenu />}
+        </>
+      );
+    }
+    if (!isConnectButton) return null;
+    return (
+      <Button
+        data-testid="connect-wallet-button"
+        endIcon={
+          isCompact ? undefined : (
+            <Wallet
+              aria-hidden
+              color={ds.primary["600"]}
+              size={16}
+              strokeWidth={1.5}
+            />
+          )
+        }
+        onClick={onClickConnectButton}
+        size={isCompact ? "small" : "medium"}
+        variant="soft"
+      >
+        {t(isCompact ? "wallet.connect" : "wallet.connectWallet")}
+      </Button>
+    );
   };
 
   const renderDesktopNav = () => (
-    <nav
-      style={{ display: "flex", alignItems: "center", justifyContent: "end" }}
-    >
-      <Grid
-        container
-        alignItems="center"
-        columns={5}
-        columnSpacing={screenWidth < 1024 ? 2 : 4}
+    <>
+      <Box
+        aria-label={t("menu.mainNav")}
+        component="nav"
+        sx={{
+          alignItems: "center",
+          display: "flex",
+          flex: 1,
+          gap: 0.5,
+          justifyContent: "center",
+          px: 3,
+        }}
       >
-        {NAV_ITEMS.map((navItem) => {
-          if (isNavMenuItem(navItem)) {
-            return (
-              <Grid item key={navItem.label}>
-                <MenuNavItem navItem={navItem} closeDrawer={closeDrawer} />
-              </Grid>
-            );
-          }
-          return (
-            <Grid item key={navItem.label}>
-              <Link
-                {...navItem}
-                isConnectWallet={isConnectButton}
-                onClick={() => {
-                  if (navItem.newTabLink) openInNewTab(navItem.newTabLink);
-                  closeDrawer();
-                }}
-              />
-            </Grid>
-          );
-        })}
-        {isConnectButton && (
-          <Grid item>
-            <Button
-              data-testid="connect-wallet-button"
-              onClick={onClickConnectButton}
-              size="extraLarge"
-              variant="contained"
-            >
-              {t("wallet.connectWallet")}
-            </Button>
-          </Grid>
-        )}
-      </Grid>
-    </nav>
+        {navEntries.map((entry) => (
+          <NavEntryLink
+            key={entry.dataTestId}
+            entry={entry}
+            isActive={isNavEntryActive(entry, pathname)}
+            onClick={entry.newTabLink ? undefined : guardNavigation}
+          />
+        ))}
+      </Box>
+      <Box sx={{ alignItems: "center", display: "flex", gap: 1 }}>
+        {/* Not inside a wallet flow, where leaving would drop the form. */}
+        {!onNavigateAway && <GlobalSearchButton />}
+        {renderWalletControl()}
+      </Box>
+    </>
   );
 
   const renderMobileNav = () => (
-    <Box sx={{ display: "flex", alignItems: "center" }}>
-      {isConnectButton && (
-        <Button
-          data-testid="connect-wallet-button"
-          onClick={onClickConnectButton}
-          size="small"
-          sx={{ marginRight: screenWidth >= 768 ? 3 : 1, flex: 1 }}
-          variant="contained"
-        >
-          {t("wallet.connect")}
-        </Button>
-      )}
-      {screenWidth >= 768 ? (
-        <IconButton
-          data-testid="open-drawer-button"
-          onClick={() => setIsDrawerOpen(true)}
-          sx={{ bgcolor: "#FBFBFF" }}
-        >
-          <MenuIcon color="primary" />
-        </IconButton>
-      ) : (
-        <img
-          alt="drawer-icon"
-          src={ICONS.drawerIcon}
-          onClick={() => setIsDrawerOpen(true)}
-          onKeyDown={(e) => e.key === "Enter" && setIsDrawerOpen(true)}
-          data-testid="open-drawer-button"
-        />
-      )}
+    <Box sx={{ alignItems: "center", display: "flex", gap: 1 }}>
+      {!onNavigateAway && <GlobalSearchButton />}
+      {renderWalletControl(true)}
+      <IconButton
+        aria-label={t("menu.open")}
+        data-testid="open-drawer-button"
+        onClick={() => setIsDrawerOpen(true)}
+        sx={{
+          border: `1px solid ${ds.gray["200"]}`,
+          borderRadius: "50%",
+          height: 36,
+          width: 36,
+        }}
+      >
+        <Menu aria-hidden color={ds.gray["700"]} size={18} />
+      </IconButton>
       <DrawerMobile
         isConnectButton={isConnectButton}
+        isConnected={isConnected}
         isDrawerOpen={isDrawerOpen}
+        navEntries={navEntries}
+        onConnect={onClickConnectButton}
+        onNavigateAway={onNavigateAway}
         setIsDrawerOpen={setIsDrawerOpen}
       />
     </Box>
@@ -135,173 +177,79 @@ export const TopNav = ({ isConnectButton = true }) => {
 
   return (
     <Box
+      component="header"
       sx={{
+        backdropFilter: "blur(24px)",
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        borderBottom: `1px solid ${ds.gray["200"]}`,
+        boxShadow: SHADOWS.header,
         position: "sticky",
-        zIndex: 100,
+        px: { xxs: 2, md: 3 },
+        top: 0,
         width: "100%",
+        boxSizing: "border-box",
+        zIndex: 100,
       }}
     >
-      <AppBar
-        ref={containerRef}
-        position="static"
-        elevation={0}
+      <Box
+        component="a"
+        data-testid="skip-to-content-link"
+        href="#main-content"
+        onClick={skipToMain}
+        sx={{
+          backgroundColor: "#FFFFFF",
+          border: `2px solid ${ds.primary["600"]}`,
+          borderRadius: "8px",
+          color: ds.primary["700"],
+          fontSize: 14,
+          fontWeight: 600,
+          left: 16,
+          p: "8px 12px",
+          position: "absolute",
+          textDecoration: "none",
+          top: 8,
+          transform: "translateY(-200%)",
+          zIndex: 101,
+          "&:focus": { transform: "none" },
+        }}
+      >
+        {t("menu.skipToContent")}
+      </Box>
+      <Box
         sx={{
           alignItems: "center",
-          // TODO: Fix shouldBlur to work with sticky
-          backdropFilter: shouldBlur ? "blur(10px)" : "none",
-          backgroundColor: shouldBlur
-            ? "rgba(256, 256, 256, 0.7)"
-            : isMobile
-            ? "white"
-            : "rgba(256, 256, 256, 0.7)",
-          borderBottom: isMobile ? 1 : 0,
-          borderColor: "lightblue",
-          boxShadow: 0,
-          justifyContent: "center",
-          flexDirection: "row",
-          px: isMobile ? 2 : 5,
-          py: 3,
+          display: "flex",
+          justifyContent: "space-between",
+          maxWidth: 1180,
+          mx: "auto",
+          py: 2,
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flex: 1,
-            justifyContent: "space-between",
-            maxWidth: 1290,
+        <NavLink
+          data-testid="logo-button"
+          // Only leaving wallet setup (ChooseStakeKey, no stake key chosen
+          // yet) disconnects; a connected wallet goes to its dashboard.
+          onClick={(event) => {
+            if (onNavigateAway) {
+              guardNavigation(event);
+              return;
+            }
+            if (!isConnectButton && !isConnected) disconnectWallet();
           }}
+          style={{ display: "flex" }}
+          to={isConnected ? PATHS.dashboard : PATHS.home}
         >
-          <NavLink
-            data-testid="logo-button"
-            to={PATHS.home}
-            onClick={() => isConnectButton || disconnectWallet()}
-          >
-            <img
-              alt="app-logo"
-              height={isMobile ? 25 : 35}
-              src={IMAGES.appLogo}
-            />
-          </NavLink>
-          {screenWidth >= 1145 ? renderDesktopNav() : renderMobileNav()}
-        </Box>
-      </AppBar>
+          <img
+            alt="Cardano GovTool"
+            height={24}
+            src={IMAGES.govToolLogo}
+            width={118}
+          />
+        </NavLink>
+        {screenWidth >= DESKTOP_MIN_WIDTH
+          ? renderDesktopNav()
+          : renderMobileNav()}
+      </Box>
     </Box>
-  );
-};
-
-const MenuNavItem: FC<{
-  navItem: NavMenuItem;
-  closeDrawer: () => void;
-}> = ({ closeDrawer, navItem }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const { isProposalDiscussionForumEnabled } = useFeatureFlag();
-
-  // Create a ref array for child links to manage cliking within MenuItem but outside of Link
-  const linkRefs = useRef<Array<HTMLElement | null>>([]);
-
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const filterChildNavItems = () => {
-    if (navItem.dataTestId === "governance-actions") {
-      return (navItem.childNavItems || []).filter((item) => {
-        if (
-          !isProposalDiscussionForumEnabled &&
-          item.dataTestId === "proposed-governance-actions-link"
-        )
-          return false;
-        return true;
-      });
-    }
-    return navItem.childNavItems;
-  };
-  const { pathname } = useLocation();
-  const childNavItems = filterChildNavItems();
-  const activeNavTo = findActiveNavTo(
-    pathname,
-    (childNavItems ?? []).map((item) => item.navTo),
-  );
-  return (
-    <>
-      <FakeLink
-        dataTestId={navItem.dataTestId}
-        isActive={activeNavTo !== null}
-        onClick={handleClick}
-        label={
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-            }}
-          >
-            {navItem.label}
-            <img
-              alt="dropdown-icon"
-              src={ICONS.arrowDownIcon}
-              style={{
-                marginLeft: "8px",
-                width: "16px",
-                height: "16px",
-                transform: open ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform 0.2s ease-in-out",
-              }}
-            />
-          </span>
-        }
-      />
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        slotProps={{
-          paper: {
-            sx: {
-              mt: 2,
-            },
-          },
-        }}
-      >
-        {childNavItems?.map((childNavItem, idx) => (
-          <MenuItem
-            key={childNavItem.label}
-            sx={{ minWidth: 160 }}
-            onClick={() => {
-              linkRefs.current[idx]?.click();
-            }}
-          >
-            <Link
-              dataTestId={childNavItem.dataTestId}
-              navTo={childNavItem.navTo}
-              isActive={childNavItem.navTo === activeNavTo}
-              ref={(el) => {
-                linkRefs.current[idx] = el;
-              }}
-              onClick={() => {
-                if (childNavItem.newTabLink) {
-                  openInNewTab(childNavItem.newTabLink);
-                }
-                closeDrawer();
-                handleClose();
-              }}
-              label={childNavItem.label}
-            />
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
   );
 };

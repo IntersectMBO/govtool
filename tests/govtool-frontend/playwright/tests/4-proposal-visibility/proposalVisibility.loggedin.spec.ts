@@ -18,8 +18,13 @@ test("4A_1. Should access Governance Actions page with connecting wallet", async
     await openDrawer(page);
   }
 
-  await page.getByTestId("governance-actions-live-voting-link").click();
-  await expect(page.getByText(/Live Voting/i)).toHaveCount(2);
+  // The connected nav's Governance Actions item opens Live Voting, whose
+  // page tab keeps the old dropdown entry's id.
+  await page.getByTestId("governance-actions-link").click();
+  await expect(page).toHaveURL(/\/actions(\?|$)/);
+  await expect(
+    page.getByTestId("governance-actions-live-voting-link")
+  ).toHaveAttribute("aria-current", "page");
 });
 
 test("4B_1. Should restrict voting for users who are not registered as DReps (with wallet connected)", async ({

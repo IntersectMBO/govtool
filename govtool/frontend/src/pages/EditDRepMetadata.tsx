@@ -63,6 +63,14 @@ export const EditDRepMetadata = () => {
       pageTitle={t("editMetadata.pageTitle")}
       onClickBackToDashboard={onClickBackToDashboard}
       showVotingPower
+      stepper={{
+        steps: [
+          t("flow.steps.profile"),
+          t("flow.steps.prepareFile"),
+          t("flow.steps.publish"),
+        ],
+        current: step,
+      }}
     >
       {!voter || !voter.isRegisteredAsDRep ? (
         <CircularProgress />

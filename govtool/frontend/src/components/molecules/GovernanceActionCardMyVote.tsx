@@ -6,6 +6,8 @@ import { useTranslation } from "@hooks";
 import { Vote } from "@models";
 import { useAppContext } from "@context";
 
+import { ds } from "@/consts/designTokens";
+
 type Props = {
   voteTxHash: string;
   vote: Vote;
@@ -21,7 +23,7 @@ export const GovernanceActionCardMyVote = ({ voteTxHash, vote }: Props) => {
         variant="caption"
         sx={{
           fontWeight: 500,
-          color: "#8E908E",
+          color: ds.gray["500"],
         }}
       >
         {t("govActions.myVote")}

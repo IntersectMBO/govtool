@@ -4,6 +4,7 @@ export * from "./useCountdown";
 export * from "./useDebounce";
 export * from "./useDelegateToDrep";
 export * from "./useFetchNextPageDetector";
+export * from "./useGovernanceActionTabs";
 export * from "./useIsWalletConnected";
 export * from "./useOutsideClick";
 export * from "./usePrevious";
@@ -15,3 +16,4 @@ export * from "./useWalletErrorModal";
 
 export * from "./forms";
 export * from "./queries";
+export * from "./useNotifications";

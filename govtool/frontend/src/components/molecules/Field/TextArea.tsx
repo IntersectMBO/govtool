@@ -10,6 +10,8 @@ import {
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { TextAreaFieldProps } from "./types";
 
+import { ds } from "@/consts/designTokens";
+
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
   (
     {
@@ -98,7 +100,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
             ref={textAreaRef}
           />
           <Typography
-            color="#8E908E"
+            color={ds.gray["500"]}
             sx={{
               bottom: 12,
               position: "absolute",

@@ -4,7 +4,6 @@ import { Box, Typography, CircularProgress } from "@mui/material";
 import { useCardano, useDataActionsBar } from "@context";
 import {
   useGetDRepVotesQuery,
-  useScreenDimension,
   useTranslation,
 } from "@hooks";
 import { SearchNotReady } from "@molecules";
@@ -17,7 +16,6 @@ type DashboardGovernanceActionsVotedOnProps = {
 export const DashboardGovernanceActionsVotedOn = ({
   searchPhrase,
 }: DashboardGovernanceActionsVotedOnProps) => {
-  const { isMobile, screenWidth } = useScreenDimension();
   const { pendingTransaction } = useCardano();
   const { t } = useTranslation();
   const { ...dataActionsBarProps } = useDataActionsBar();
@@ -50,23 +48,16 @@ export const DashboardGovernanceActionsVotedOn = ({
           {t("govActions.noResultsForTheSearch")}
         </Typography>
       ) : (
-        <Box
-          columnGap="20px"
-          display="grid"
-          gridTemplateColumns={`repeat(auto-fill, minmax(${
-            screenWidth < 420 ? "290px" : isMobile ? "324px" : "350px"
-          }, 1fr))`}
-        >
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {proposals.map((item) => (
-            <Box pb={4.25} key={item.proposal.txHash + item.proposal.index}>
-              <ValidatedGovernanceVotedOnCard
-                votedProposal={item}
-                inProgress={
-                  pendingTransaction.vote?.resourceId ===
-                  `${item.proposal.txHash ?? ""}${item.proposal.index ?? ""}`
-                }
-              />
-            </Box>
+            <ValidatedGovernanceVotedOnCard
+              key={item.proposal.txHash + item.proposal.index}
+              votedProposal={item}
+              inProgress={
+                pendingTransaction.vote?.resourceId ===
+                `${item.proposal.txHash ?? ""}${item.proposal.index ?? ""}`
+              }
+            />
           ))}
         </Box>
       )}

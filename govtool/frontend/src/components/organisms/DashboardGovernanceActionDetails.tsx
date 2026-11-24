@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router";
 import { Box, CircularProgress, Link, Typography } from "@mui/material";
 import { AxiosError } from "axios";
+import { ChevronLeft } from "lucide-react";
 
-import { ICONS, GOV_ACTION_HISTORY_PATHS, PATHS } from "@consts";
+import { GOV_ACTION_HISTORY_PATHS, PATHS } from "@consts";
 import { useCardano } from "@context";
 import {
   useGetProposalQuery,
   useGetVoterInfo,
-  useScreenDimension,
   useTranslation,
 } from "@hooks";
 import {
@@ -19,6 +19,7 @@ import {
 } from "@utils";
 import { GovernanceActionDetailsCard } from "@organisms";
 import { Breadcrumbs } from "@molecules";
+import { PageContainer } from "@/components/atoms/PageContainer";
 import {
   MetadataIssue,
   MetadataStandard,
@@ -27,6 +28,7 @@ import {
   ProposalVote,
 } from "@/models";
 import { useValidateMutation } from "@/hooks/mutations";
+import { ds } from "@/consts/designTokens";
 
 type DashboardGovernanceActionDetailsState = {
   proposal?: ProposalData;
@@ -42,7 +44,6 @@ export const DashboardGovernanceActionDetails = () => {
   const { state: untypedState } = useLocation();
   const state = untypedState as DashboardGovernanceActionDetailsState | null;
   const navigate = useNavigate();
-  const { isMobile } = useScreenDimension();
   const { t } = useTranslation();
   // The CIP-129 gov_action1… id.
   const { proposalId = "" } = useParams();
@@ -147,26 +148,26 @@ export const DashboardGovernanceActionDetails = () => {
   }, [error]);
 
   return (
-    <Box
-      px={isMobile ? 2 : 4}
-      pb={3}
-      pt={1.25}
-      display="flex"
-      flexDirection="column"
-      flex={1}
-    >
+    <PageContainer sx={{ display: "flex", flex: 1, flexDirection: "column", pt: { xxs: 2, md: 3 } }}>
       <Breadcrumbs
-        elementOne={t("govActions.title")}
+        elementOne={t("govActions.pageTitle")}
         elementOnePath={PATHS.governanceActions}
-        elementTwo={extendedProposal?.title ?? ""}
+        elementTwo={extendedProposal?.title || t("govActions.card.untitled")}
         isDataMissing={metadataStatus ?? null}
       />
       <Link
         data-testid="back-to-list-link"
         sx={{
+          alignItems: "center",
+          alignSelf: "flex-start",
+          color: ds.gray["600"],
           cursor: "pointer",
           display: "flex",
+          fontSize: 13,
+          gap: 0.5,
+          mt: 1,
           textDecoration: "none",
+          "&:hover": { color: ds.primary["600"] },
         }}
         onClick={() =>
           navigate(
@@ -181,14 +182,8 @@ export const DashboardGovernanceActionDetails = () => {
           )
         }
       >
-        <img
-          src={ICONS.arrowRightIcon}
-          alt="arrow"
-          style={{ marginRight: "12px", transform: "rotate(180deg)" }}
-        />
-        <Typography variant="body2" color="primary">
-          {t("back")}
-        </Typography>
+        <ChevronLeft aria-hidden size={16} />
+        {t("back")}
       </Link>
       <Box display="flex" flex={1} justifyContent="center">
         {(isLoading && needsProposal) || isEnableLoading ? (
@@ -238,6 +233,6 @@ export const DashboardGovernanceActionDetails = () => {
           </Box>
         )}
       </Box>
-    </Box>
+    </PageContainer>
   );
 };

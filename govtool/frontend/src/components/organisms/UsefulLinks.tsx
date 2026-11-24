@@ -28,7 +28,7 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
 
   return (
     <div>
-      <Typography variant="title1" sx={{ mb: 4, textAlign: align }}>
+      <Typography variant="title2" sx={{ mb: 2, textAlign: align }}>
         {t("usefulLinks.title")}
       </Typography>
       <Box
@@ -46,9 +46,9 @@ export const UsefulLinks = ({ align = "left" }: Props) => {
           <Card
             key={key}
             sx={{
-              flexBasis: 0,
+              // Two equal cards that fill the column.
+              flex: "1 1 0",
               boxShadow: "2px 2px 20px 0px rgba(47, 98, 220, 0.20)",
-              maxWidth: 464,
               minWidth: 264,
               minHeight: 196,
               boxSizing: "border-box",

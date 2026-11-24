@@ -88,6 +88,7 @@ export const BudgetProposalsArchive = () => {
       {!isConnected && <TopNav />}
       <ArchiveBanner />
       <Box
+        component={isConnected ? "div" : "main"}
         sx={{
           px: isConnected ? { xxs: 2, md: 5 } : pagePadding,
           py: 3,

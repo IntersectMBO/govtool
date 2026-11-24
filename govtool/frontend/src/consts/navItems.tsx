@@ -20,6 +20,9 @@ export type NavItem = {
 export type NavMenuItem = {
   dataTestId: string;
   label: string;
+  // The top nav renders a menu item as one link to navTo; its children are
+  // the Governance Actions page tabs, which reuse their test ids.
+  navTo?: string;
   childNavItems?: Array<NavItem>;
 };
 export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
@@ -38,6 +41,7 @@ export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
   {
     dataTestId: "governance-actions",
     label: i18n.t("govActions.categoryTitle"),
+    navTo: PATHS.governanceActions,
     childNavItems: [
       {
         dataTestId: "proposed-governance-actions-link",
@@ -60,16 +64,16 @@ export const NAV_ITEMS: Array<NavItem | NavMenuItem> = [
     ],
   },
   {
+    dataTestId: "governance-activity-link",
+    navTo: PATHS.governanceActivity,
+    label: i18n.t("menu.governanceActivity"),
+    newTabLink: null,
+  },
+  {
     dataTestId: "guides-link",
     navTo: "",
     label: i18n.t("menu.guides"),
     newTabLink: LINKS.USING_GOVTOOL,
-  },
-  {
-    dataTestId: "faqs-link",
-    navTo: "",
-    label: i18n.t("menu.faqs"),
-    newTabLink: LINKS.FAQS,
   },
 ];
 
@@ -147,19 +151,19 @@ export const CONNECTED_NAV_ITEMS = [
     ],
   },
   {
+    dataTestId: "governance-activity-link",
+    label: i18n.t("menu.governanceActivity"),
+    navTo: PATHS.governanceActivity,
+    activeIcon: ICONS.governanceActionsActiveIcon,
+    icon: ICONS.governanceActionsIcon,
+    newTabLink: null,
+  },
+  {
     dataTestId: "guides-link",
     label: i18n.t("menu.guides"),
     navTo: "",
     activeIcon: ICONS.guidesActiveIcon,
     icon: ICONS.guidesIcon,
     newTabLink: LINKS.USING_GOVTOOL,
-  },
-  {
-    dataTestId: "faqs-link",
-    label: i18n.t("menu.faqs"),
-    navTo: "",
-    activeIcon: ICONS.faqsActiveIcon,
-    icon: ICONS.faqsIcon,
-    newTabLink: LINKS.FAQS,
   },
 ];

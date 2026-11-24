@@ -89,8 +89,26 @@ entrypoint and the published image never gets the variable, while npm run dev,
 the fixture stack's dev server and an image built from a checkout (which bakes
 in the local .env) all still have it.
 
-Container-only settings (TRUSTED_PROXY_CIDRS, REAL_IP_HEADER, UMAMI_*) are read
-by docker-entrypoint.sh for nginx and never go through env.ts.
+Container-only settings (TRUSTED_PROXY_CIDRS, REAL_IP_HEADER, UMAMI_*,
+SEO_BACKEND_URL, SITE_URL, SEO_NOINDEX) are read by docker-entrypoint.sh for
+nginx and never go through env.ts.
+
+Page tags come from the server, not the app: nginx fills index.html's two SSI
+includes (head tags, and a text summary inside #root that React replaces) from
+the backend's /seo routes at SEO_BACKEND_URL (a direct, internal address:
+the backend refuses calls that came through a proxy, and nginx strips the
+gateway's X-Forwarded-* headers before calling it), with index.html's own
+seo_head_default block as the fallback, and proxies /sitemap.xml and the /og/
+preview cards to it. SITE_URL fills the default og:image and robots.txt's
+Sitemap line; SEO_NOINDEX=true adds X-Robots-Tag: noindex everywhere, for test
+sites. A precompressed index.html (.br, .gz) would bypass SSI, so the
+entrypoint deletes them. On first load usePageMeta leaves the server's tags
+alone; after in-app navigation it updates the data-seo title, description and
+canonical in place. Do not render <title> or <meta> through React: it adds a
+second set. nginx also answers the URLs from before /actions with a 301 to
+the new route names (nginx.conf, mirroring LEGACY_PATH_SEGMENTS), so a new
+legacy segment there needs a location too. scripts/check-seo-nginx.sh checks
+all of this in Docker.
 
 getEnv reads runtimeEnv[key] || import.meta.env[key], so any falsy runtime
 value ("", false, 0) falls back to the build-time value; only

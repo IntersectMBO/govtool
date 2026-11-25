@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Once a develop build's images are on GHCR, CI asks the GitOps repository (the `k8s-dev` environment's `GOVTOOL_ARGO_REPO` variable) to deploy that commit to k8s.dev.gov.tools
 - `GET /drep/list` rows carry `delegatorCount`, the DRep's current delegators, from db-sync or Koios (null under Blockfrost and the fixture)
+- Pull requests get a Betterleaks secret scan of their commits, a dependency review that fails on high or critical vulnerabilities, and a report-only OSV-Scanner vulnerability scan
 
 ### Changed
 

@@ -70,5 +70,13 @@ builds the docs site when docs/ changes. The code checks run on push to a branch
 of this repository, for the paths they watch (code_check_frontend.yml,
 code_check_backend.yml, test_storybook.yml, frontend_sonar_scan.yml), so a pull
 request from a fork gets none of them. Nothing checks govtool-metadata-service
-or govtool-pdf-backend before merge. Run the nested file's checks before saying
-a change works.
+or govtool-pdf-backend code before merge. Run the nested file's checks before
+saying a change works.
+
+pr.yaml also scans every pull request, forks included. secret-scan runs
+Betterleaks over the pull request's commits with .betterleaks.toml; a reviewed
+false positive goes in .betterleaksignore as its fingerprint with a comment line
+above it, never as a secret value. dependency-review fails on a high or critical
+vulnerability in a dependency the pull request adds or changes. vuln-scan runs
+OSV-Scanner over every lockfile and reports vulnerabilities the pull request
+introduces without failing.

@@ -278,3 +278,87 @@ jobs:
               summary.write("\n".join(lines))
               summary.write("\n")
           PY
+
+  secret-scan:
+    name: Secret scan (Betterleaks)
+    runs-on: ubuntu-latest
+    env:
+      BETTERLEAKS_VERSION: 1.10.1
+      # SHA-256 of betterleaks_1.10.1_linux_x64.tar.gz; update together with the version.
+      BETTERLEAKS_SHA256: c174b42d7aa60caf58c0c3e555c0e4bed01fe6b0d99a412bce777b5af4ce913e
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Betterleaks
+        run: |
+          set -euo pipefail
+          tarball="betterleaks_${BETTERLEAKS_VERSION}_linux_x64.tar.gz"
+          base_url="https://github.com/betterleaks/betterleaks/releases/download/v${BETTERLEAKS_VERSION}"
+          workdir="$(mktemp -d)"
+          curl -fsSL --proto '=https' --tlsv1.2 -o "${workdir}/${tarball}" "${base_url}/${tarball}"
+          curl -fsSL --proto '=https' --tlsv1.2 -o "${workdir}/checksums.txt" "${base_url}/checksums.txt"
+          listed="$(awk -v f="${tarball}" '$2 == f { print $1 }' "${workdir}/checksums.txt")"
+          if [ "${listed}" != "${BETTERLEAKS_SHA256}" ]; then
+            echo "::error::checksums.txt lists '${listed}' for ${tarball}, expected the pinned ${BETTERLEAKS_SHA256}"
+            exit 1
+          fi
+          echo "${BETTERLEAKS_SHA256}  ${workdir}/${tarball}" | sha256sum --check --strict -
+          tar -xzf "${workdir}/${tarball}" -C "${workdir}" betterleaks
+          sudo install -m 0755 "${workdir}/betterleaks" /usr/local/bin/betterleaks
+          betterleaks version
+
+      - name: Scan pull request commits
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          args=(
+            git .
+            --config .betterleaks.toml
+            --log-opts "${BASE_SHA}..${HEAD_SHA}"
+            --redact
+            --no-banner
+            --report-format sarif
+            --report-path betterleaks.sarif
+          )
+          if [ -f .betterleaks-baseline.json ]; then
+            args+=(--baseline-path .betterleaks-baseline.json)
+          fi
+          betterleaks "${args[@]}"
+
+      - name: Upload Betterleaks report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: betterleaks-sarif
+          path: betterleaks.sarif
+          if-no-files-found: ignore
+          retention-days: 5
+
+  dependency-review:
+    name: Dependency review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec  # v5.0.1
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: never
+
+  vuln-scan:
+    name: Vulnerability scan (OSV-Scanner)
+    permissions:
+      actions: read
+      contents: read
+      # Only used to upload SARIF; pull requests from forks get a read-only token.
+      security-events: write
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@32d3cd482bdadfb38b186c0ad1b031902d55d932  # v2.7.1
+    with:
+      # Report-only: dependency-review is the gate for high and critical vulnerabilities.
+      fail-on-vuln: false
+      upload-sarif: ${{ github.event.pull_request.head.repo.full_name == github.repository }}

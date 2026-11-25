@@ -1,0 +1,305 @@
+# Betterleaks findings in git history that were reviewed and accepted.
+# Fingerprint format: commit:path:rule:line. No secret values belong in this file.
+
+# Historical credentials
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:.github/vva-be-config.json:generic-password:6
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:.github/vva-be-config.json:generic-password:13
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+c457395502a44c2974f405bfc0e0d0f41e22d289:.github/workflows/build-and-deploy-beta.yml:generic-password:24
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+4e2db9e62337cc3d9997ab2d12c89c5dd5444444:.github/workflows/build-and-deploy-staging.yml:generic-password:24
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+93e9c69de42711ffdd350a8cf3c7e49845e2be1c:.github/workflows/build-and-deploy-test.yml:generic-password:24
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:.github/workflows/build-and-deploy.yml:generic-password:116
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:.github/workflows/build-and-deploy.yml:generic-password:182
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+6fe53f963e9db7a1fcd605af0fed865b6f40c488:.github/workflows/deploy-dev-from-tag.yml:generic-password:23
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+3a8c19184bca9b032e0c22d9f06a806c76ec6a66:.github/workflows/resync-cardano-node-and-db-sync.yml:generic-password:31
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/.env.example:generic-password:11
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/config/secrets/vva-be-config.json:generic-password:6
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/config/secrets/vva-be-config.json.tpl:generic-password:6
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/config/secrets/vva-be-config.json.tpl:generic-password:13
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/docker-compose.preprod.yml:generic-password:55
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/vva-be/example-config.json:generic-password:6
+
+# 2023-24, pre-current-maintainers; not used by current deployment (reviewed 2026-11-24)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:tests/test-metrics-api/.env.example:generic-password:5
+
+# Historical tokens
+
+# <validated dead YYYY-MM-DD | revoked YYYY-MM-DD>
+6ba37d8c62c37979d88faae1d98082380721e21c:.github/workflows/frontend_sonar_scan.yml:sonar-api-token:22
+
+# <validated dead YYYY-MM-DD | revoked YYYY-MM-DD>
+3f583da0256ffa8b0737b0a7d37b1b55d2bc40de:.github/workflows/frontend_sonar_scan.yml:sonar-api-token:42
+
+# <validated dead YYYY-MM-DD | revoked YYYY-MM-DD>
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:tests/vva-fe/currents.config.js:generic-api-key:3
+
+# False positives and expired test fixtures
+
+# false positive: local development default password
+9a4971542638267f9b66831df67d8d7fc6de22af:govtool/backend-ts/.env.example:generic-password:5
+
+# false positive: local development default password
+2ac94abd0c78bb4ce4f16fa8bd03ee1eab4b410f:govtool/backend-ts/example-config.json:generic-password:6
+
+# false positive: placeholder Sentry DSN in an example config
+2ac94abd0c78bb4ce4f16fa8bd03ee1eab4b410f:govtool/backend-ts/example-config.json:generic-credential-uri:14
+
+# false positive: local development default password
+44c2d9d97d0b247a978dd178ba0ec5e56cba31e0:govtool/backend/example-config.json:generic-password:6
+
+# false positive: local development default password
+8210586b869770721e15d73a80acad5b85214f9a:govtool/backend/example-config.json:generic-password:6
+
+# false positive: placeholder Sentry DSN in an example config
+3a8d4d904688176352e351d18666b019df60daf4:govtool/backend/example-config.json:generic-credential-uri:12
+
+# false positive: placeholder Sentry DSN in an example config
+44c2d9d97d0b247a978dd178ba0ec5e56cba31e0:govtool/backend/example-config.json:generic-credential-uri:12
+
+# false positive: placeholder Sentry DSN in an example config
+b8e3aa3afe850b5671f9377c3f30e1fd8de1c477:govtool/backend/example-config.json:generic-credential-uri:12
+
+# false positive: placeholder Sentry DSN in an example config
+3a8d4d904688176352e351d18666b019df60daf4:govtool/backend/src/VVA/Config.hs:generic-credential-uri:97
+
+# false positive: placeholder Sentry DSN in an example config
+b8e3aa3afe850b5671f9377c3f30e1fd8de1c477:govtool/backend/src/VVA/Config.hs:generic-credential-uri:97
+
+# false positive: local development default password
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/docker-compose.fixture.yml:generic-password:28
+
+# false positive: local development database URL with default credentials
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/docker-compose.fixture.yml:generic-credential-uri:46
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/docker-compose.fixture.yml:generic-credential-uri:126
+
+# false positive: local development default password
+72e7462745e863e0d1954f7246a7efcbe856fb0f:govtool/docker-compose.koios.yml:generic-password:36
+
+# false positive: local development database URL with default credentials
+72e7462745e863e0d1954f7246a7efcbe856fb0f:govtool/docker-compose.koios.yml:generic-credential-uri:54
+
+# false positive: Firebase download token in a public document URL
+8306cb5b444f9bbe69eef4d3f7e4f589b71e29c3:govtool/frontend/public/budget-proposals-2025/152.json:generic-api-key:1
+
+# false positive: Firebase download token in a public document URL
+8306cb5b444f9bbe69eef4d3f7e4f589b71e29c3:govtool/frontend/public/budget-proposals-2025/515.json:generic-api-key:1
+
+# false positive: Firebase download token in a public document URL
+8306cb5b444f9bbe69eef4d3f7e4f589b71e29c3:govtool/frontend/public/budget-proposals-2025/613.json:generic-api-key:1
+
+# false positive: local development default password
+eac30cd0a2c97e79e736f02b1d0692a2cf01208c:govtool/govtool-backend/.env.example:generic-password:10
+
+# false positive: local development default password
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/govtool-backend/.env.example:generic-password:15
+
+# false positive: placeholder Sentry DSN in an example config
+eac30cd0a2c97e79e736f02b1d0692a2cf01208c:govtool/govtool-backend/.env.example:generic-credential-uri:23
+
+# false positive: placeholder Sentry DSN in an example config
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/govtool-backend/.env.example:generic-credential-uri:34
+
+# false positive: Cardano key hash (public on-chain identifier)
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/govtool-backend/src/common/legacy-ids.spec.ts:generic-api-key:22
+
+# false positive: local development default password
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-backend/src/config/config.service.spec.ts:generic-password:13
+
+# false positive: local development default password
+23fd16416e540a6ca33680b99d2aa27d97bbc246:govtool/govtool-backend/src/config/config.service.spec.ts:generic-password:94
+
+# false positive: local development default password
+23fd16416e540a6ca33680b99d2aa27d97bbc246:govtool/govtool-backend/src/config/config.service.spec.ts:generic-password:99
+
+# false positive: local development default password
+23fd16416e540a6ca33680b99d2aa27d97bbc246:govtool/govtool-backend/src/config/config.service.spec.ts:generic-password:105
+
+# false positive: local development default password
+23fd16416e540a6ca33680b99d2aa27d97bbc246:govtool/govtool-backend/src/config/config.service.spec.ts:generic-password:124
+
+# false positive: dummy userinfo in a unit test URL
+5d6724524c3e5b7b6c532c131e02e15971b34858:govtool/govtool-backend/src/metadata/safe-metadata-fetch.spec.ts:generic-credential-uri:149
+
+# false positive: local development database URL with default credentials
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/govtool-metadata-service/Dockerfile:generic-credential-uri:10
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pdf-backend/.env.example:generic-credential-uri:7
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pdf-backend/.env.example:generic-credential-uri:9
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pdf-backend/SPEC.md:generic-credential-uri:1262
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pdf-backend/SPEC.md:generic-credential-uri:1325
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pdf-backend/docker-compose.yml:generic-credential-uri:42
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pdf-backend/src/config/config.spec.ts:generic-credential-uri:4
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pdf-backend/test/setup/test-db.ts:generic-credential-uri:8
+
+# false positive: test service host and port
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pinning-test/test/test-pinning.spec.ts:generic-api-key:132
+
+# false positive: test service host and port
+d9837416bced9ae5460537c017cec43a7bbd3a08:govtool/govtool-pinning-test/test/test-pinning.spec.ts:generic-api-key:145
+
+# false positive: Cardano key hash (public on-chain identifier)
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/govtool-provider-fixture/data/mainnet.json:generic-api-key:4070
+
+# false positive: Cardano key hash (public on-chain identifier)
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/govtool-provider-fixture/data/mainnet.json:generic-api-key:4073
+
+# false positive: Cardano key hash (public on-chain identifier)
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/govtool-provider-fixture/data/mainnet.json:generic-api-key:4076
+
+# false positive: dummy userinfo in a unit test URL
+3e6fd2bda8f4d88518f8ebb04bc04a5ec646de5f:govtool/govtool-provider-koios/test/http.test.mjs:generic-credential-uri:98
+
+# false positive: local development Grafana datasource default
+aff4f5a31b8e2f6bc1299cbf03d6e3565f963d2c:scripts/govtool/config/templates/grafana-provisioning/datasources/datasource.yml:generic-password:73
+
+# false positive: credentials come from a make variable
+541e275a03a6124194990104c93d708d6819ed5b:scripts/govtool/utils.mk:curl-auth-user:25
+
+# false positive: credentials come from a make variable
+541e275a03a6124194990104c93d708d6819ed5b:scripts/govtool/utils.mk:curl-auth-user:26
+
+# false positive: credentials come from a make variable
+541e275a03a6124194990104c93d708d6819ed5b:scripts/govtool/utils.mk:curl-auth-user:27
+
+# false positive: local development Grafana datasource default
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/config/grafana-provisioning/datasources/datasource.yml:generic-password:33
+
+# false positive: Cardano key hash (public on-chain identifier)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/gov-action-loader-be/app/transaction.py:generic-api-key:32
+
+# false positive: placeholder Sentry DSN in an example config
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/vva-be/example-config.json:generic-credential-uri:12
+
+# false positive: placeholder Sentry DSN in an example config
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/vva-be/src/VVA/Config.hs:generic-credential-uri:89
+
+# false positive: Sonar project key, not a token
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:src/vva-fe/sonar-project.properties:generic-api-key:1
+
+# false positive: local development default password
+d9837416bced9ae5460537c017cec43a7bbd3a08:tests/devnet/.env.devnet:generic-password:52
+
+# false positive: local development default password
+d9837416bced9ae5460537c017cec43a7bbd3a08:tests/devnet/docker-compose.yml:generic-password:41
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:tests/devnet/docker-compose.yml:generic-credential-uri:58
+
+# false positive: local development database URL with default credentials
+d9837416bced9ae5460537c017cec43a7bbd3a08:tests/devnet/docker-compose.yml:generic-credential-uri:203
+
+# false positive: Cardano key hash (public on-chain identifier)
+63f038cfa35ab2701cbaa6679df2f21ea121fa73:tests/govtool-backend/test_data.json:generic-api-key:1
+
+# false positive: Cardano key hash (public on-chain identifier)
+a4804b81a6cb37c9fd37897e4e0ae38b16278ddd:tests/govtool-backend/test_data.json:generic-api-key:16
+
+# false positive: Cardano key hash (public on-chain identifier)
+a4804b81a6cb37c9fd37897e4e0ae38b16278ddd:tests/govtool-backend/test_data.json:generic-api-key:33
+
+# false positive: Cardano key hash (public on-chain identifier)
+a4804b81a6cb37c9fd37897e4e0ae38b16278ddd:tests/govtool-backend/test_data.json:generic-api-key:52
+
+# false positive: Cardano key hash (public on-chain identifier)
+a4804b81a6cb37c9fd37897e4e0ae38b16278ddd:tests/govtool-backend/test_data.json:generic-api-key:67
+
+# test fixture: test JWT, expired 2024-07-12
+4a5115fff3b0bc69a7a0acdf755097fa40d3ad42:tests/govtool-frontend/playwright/lib/services/proposalDiscussion/index.ts:jwt:15
+
+# test fixture: test JWT, expired 2024-07-12
+4a5115fff3b0bc69a7a0acdf755097fa40d3ad42:tests/govtool-frontend/playwright/lib/services/proposalDiscussion/index.ts:jwt:30
+
+# test fixture: test JWT, expired 2024-07-12
+4a5115fff3b0bc69a7a0acdf755097fa40d3ad42:tests/govtool-frontend/playwright/lib/services/proposalDiscussion/index.ts:jwt:44
+
+# test fixture: test JWT, expired 2024-07-12
+4a5115fff3b0bc69a7a0acdf755097fa40d3ad42:tests/govtool-frontend/playwright/lib/services/proposalDiscussion/index.ts:jwt:59
+
+# test fixture: test JWT, expired 2024-07-12
+f37bf633ce3010bcbf9d6585c5bf2435bc3eded4:tests/govtool-frontend/playwright/lib/services/proposalDiscussionService.ts:jwt:15
+
+# test fixture: test JWT, expired 2024-07-12
+f37bf633ce3010bcbf9d6585c5bf2435bc3eded4:tests/govtool-frontend/playwright/lib/services/proposalDiscussionService.ts:jwt:44
+
+# test fixture: test JWT, expired 2024-07-12
+f37bf633ce3010bcbf9d6585c5bf2435bc3eded4:tests/govtool-frontend/playwright/lib/services/proposalDiscussionService.ts:jwt:63
+
+# test fixture: test JWT, expired 2024-07-12
+64fc37cb9d19b7b19cbdf0c66ef288147f69c18e:tests/govtool-frontend/playwright/lib/services/proposalDiscussionService.ts:jwt:100
+
+# test fixture: recorded third-party upload response, expired 2025-02-11
+94fdb4a0482ab051442d20ff9edd4ce620c7176a:tests/govtool-frontend/playwright/tests/6-miscellaneous/miscellaneous.spec.ts:generic-api-key:214
+
+# false positive: documentation placeholder
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:tests/test-infrastructure/README.md:generic-password:58
+
+# false positive: placeholder Sentry DSN in an example config
+3ef147a0f220d2ab1a3495c621cf1de7f9059d9a:tests/test-infrastructure/configs_template/backend_config.json:generic-credential-uri:12
+
+# false positive: placeholder Sentry DSN in an example config
+76713bb2093b4a2fafbbf810e6d17124bc7c56dd:tests/test-infrastructure/configs_template/backend_config.json:generic-credential-uri:12
+
+# false positive: placeholder Sentry DSN in an example config
+aee028a3e73637467ff8fe5661b9cf03818fb091:tests/test-infrastructure/configs_template/backend_config.json:generic-credential-uri:12
+
+# false positive: placeholder Sentry DSN in an example config
+cf57b4009de13ebfd3f050ec3e3371a07c7098a4:tests/test-infrastructure/configs_template/backend_config.json:generic-credential-uri:12
+
+# false positive: Cardano key hash (public on-chain identifier)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:tests/vva-be/setup.py:generic-api-key:37
+
+# false positive: Cardano key hash (public on-chain identifier)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:tests/vva-be/setup.py:generic-api-key:54
+
+# false positive: Cardano key hash (public on-chain identifier)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:tests/vva-be/setup.py:generic-api-key:73
+
+# false positive: Cardano key hash (public on-chain identifier)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:tests/vva-be/setup.py:generic-api-key:88
+
+# false positive: Cardano key hash (public on-chain identifier)
+b2a9ed211dff910feb4fff67c330058c9d0f3f48:tests/vva-be/test_data.json:generic-api-key:1

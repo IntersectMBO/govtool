@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Shared links and search results show each page's own title, description and preview image: nginx includes the page's tags from the backend's new /seo routes, which also draw a preview card per governance action, DRep and forum proposal and serve a sitemap; robots.txt names it, and SEO_NOINDEX keeps test sites out of search results ([#1410](https://github.com/IntersectMBO/govtool/issues/1410))
 - Once a develop build's images are on GHCR, CI asks the GitOps repository (the `k8s-dev` environment's `GOVTOOL_ARGO_REPO` variable) to deploy that commit to k8s.dev.gov.tools
 - `GET /drep/list` rows carry `delegatorCount`, the DRep's current delegators, from db-sync or Koios (null under Blockfrost and the fixture)
+- Pull requests get a Betterleaks secret scan of their commits, a dependency review that fails on high or critical vulnerabilities, and a report-only OSV-Scanner vulnerability scan
 
 ### Changed
 

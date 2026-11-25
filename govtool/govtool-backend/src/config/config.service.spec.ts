@@ -126,3 +126,45 @@ describe('ConfigService: file-backed secrets', () => {
     expect(new ConfigService().get().pinataApiJwt).toBe('file-jwt');
   });
 });
+
+describe('ConfigService: SEO settings', () => {
+  const saved = { ...process.env };
+
+  beforeEach(() => {
+    process.env = { ...saved, GOVTOOL_CHAIN_DATA_PROVIDER: 'fixture' };
+    delete process.env.GOVTOOL_SITE_URL;
+    delete process.env.GOVTOOL_SEO_URL_SCHEME;
+  });
+
+  afterAll(() => {
+    process.env = saved;
+  });
+
+  it('leaves the site URL unset and uses the clean URL scheme by default', () => {
+    expect(new ConfigService().get()).toMatchObject({
+      siteUrl: null,
+      seoUrlScheme: 'clean',
+    });
+  });
+
+  it('takes the site origin without a trailing slash', () => {
+    process.env.GOVTOOL_SITE_URL = 'https://gov.tools/';
+    expect(new ConfigService().get().siteUrl).toBe('https://gov.tools');
+  });
+
+  it('rejects a site URL that is more than an origin', () => {
+    process.env.GOVTOOL_SITE_URL = 'https://gov.tools/app?x=1';
+    expect(() => new ConfigService()).toThrow(
+      'GOVTOOL_SITE_URL must be an http(s) origin such as https://gov.tools',
+    );
+  });
+
+  it('takes the develop URL scheme and rejects others', () => {
+    process.env.GOVTOOL_SEO_URL_SCHEME = 'develop';
+    expect(new ConfigService().get().seoUrlScheme).toBe('develop');
+    process.env.GOVTOOL_SEO_URL_SCHEME = 'pretty';
+    expect(() => new ConfigService()).toThrow(
+      "GOVTOOL_SEO_URL_SCHEME must be develop or clean; got 'pretty'",
+    );
+  });
+});

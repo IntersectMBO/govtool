@@ -81,6 +81,12 @@ GOVTOOL_BLOCKFROST_NETWORK; KOIOS_NETWORK in docker-compose.koios.yml and
 NETWORK_FLAG in the Swarm stack). A mismatch, or an unset flag, shows as every
 wallet being refused as the wrong network, not as a config error.
 
+Every page load also reaches the backend through the frontend's nginx: its SSI
+includes call govtool-backend's /seo routes for the page's tags, with a 500 ms
+timeout and index.html's defaults as the fallback (govtool/govtool-backend
+AGENTS.md, SEO). The frontend's page paths are therefore known to the backend
+too, in src/seo/routes.ts: a new page or a changed URL needs a row there.
+
 ## Build order
 
 file: deps resolve to built dist, not source, so nothing typechecks until its

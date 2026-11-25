@@ -17,7 +17,7 @@ import type { MetadataServiceV1 } from '@govtool/data-providers/metadata';
 import { CacheService } from 'src/cache/cache.service';
 import { ConfigService } from 'src/config/config.service';
 import { asHttp } from 'src/common/errors';
-import { legacyGovActionId } from 'src/common/legacy-ids';
+import { legacyGovActionId, tryLegacyGovActionId } from 'src/common/legacy-ids';
 import { LegacyNetwork } from 'src/common/legacy-network';
 import { toLegacyEpochParams } from 'src/epoch/epoch.service';
 import type { LegacyEpochParams } from 'src/epoch/epoch.type';
@@ -26,6 +26,7 @@ import { MetadataService } from 'src/metadata/metadata.service';
 import { MetadataStandard } from 'src/metadata/metadata.type';
 import { ProposalService, isActionIdTerm } from 'src/proposal/proposal.service';
 import { CHAIN_DATA, METADATA } from 'src/providers/providers.module';
+import type { SeoAction } from 'src/seo/seo.types';
 import { SystemService } from 'src/system/system.service';
 import {
   NO_TEXT,
@@ -49,6 +50,7 @@ import { verifyAuthorWitness, type AuthorWitnessInput } from './signature';
 const PDF_TIMEOUT_MS = 10_000;
 const PDF_MAX_BYTES = 1024 * 1024;
 const DOCUMENT_MAX_BYTES = 1024 * 1024;
+const TX_HASH = /^[0-9a-fA-F]{64}$/;
 
 const bodyOf = (
   document: Record<string, unknown>,
@@ -412,6 +414,59 @@ export class GovernanceActionsService {
       // Only the "current term" column needs it; the rest of the row stands.
       return null;
     }
+  }
+
+  /**
+   * One action for the SEO pages, from the cached snapshot and the stored
+   * document only. A bare tx hash answers only when its transaction holds a
+   * single action: a URL fragment carrying the index never reaches a server.
+   */
+  async storedSeoAction(id: string): Promise<SeoAction | null> {
+    const actions = await this.proposals.getActions();
+    let matches: GovAction[];
+    if (TX_HASH.test(id)) {
+      const txHash = id.toLowerCase();
+      matches = actions.filter((a) => a.txHash === txHash);
+    } else {
+      const parsed = tryLegacyGovActionId(id);
+      if (parsed === undefined) return null;
+      matches = actions.filter((a) => a.id === parsed.id);
+    }
+    if (matches.length !== 1) return null;
+    const schedule = await this.network.epochSchedule();
+    return this.toSeoAction(matches[0], schedule);
+  }
+
+  /** Every action for the sitemap, from the same snapshot and store. */
+  async storedSeoActions(): Promise<SeoAction[]> {
+    const [actions, schedule] = await Promise.all([
+      this.proposals.getActions(),
+      this.network.epochSchedule(),
+    ]);
+    return actions.map((a) => this.toSeoAction(a, schedule));
+  }
+
+  private toSeoAction(
+    action: GovAction,
+    schedule: Awaited<ReturnType<LegacyNetwork['epochSchedule']>>,
+  ): SeoAction {
+    const row = toGovernanceActionListRow(
+      action,
+      schedule,
+      null,
+      this.storedText(action),
+    );
+    return {
+      cip129Id: row.id,
+      type: row.type,
+      title: row.title,
+      abstract: row.abstract,
+      expiryDate: row.expiry_date,
+      expiryEpoch: row.expiration,
+      createdDate: row.time,
+      status: row.status,
+      statusTimes: row.status_times,
+    };
   }
 
   /**

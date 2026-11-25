@@ -45,6 +45,18 @@ if [ -n "$TRUSTED_PROXY_CIDRS_VALUE" ]; then
   fi
 fi
 
+# The container's DNS servers, for upstreams resolved at run time (Umami and
+# the SEO backend), so nginx starts even before they resolve.
+DNS_RESOLVERS="$(awk '
+  /^nameserver[[:space:]]+/ {
+    if ($2 ~ /:/) {
+      printf "[%s] ", $2
+    } else {
+      printf "%s ", $2
+    }
+  }
+' /etc/resolv.conf)"
+
 UMAMI_URL_VALUE="${UMAMI_URL:-}"
 UMAMI_WEBSITE_ID_VALUE="${UMAMI_WEBSITE_ID:-}"
 UMAMI_SSL_VERIFY_VALUE="$(printf '%s' "${UMAMI_SSL_VERIFY:-true}" | tr '[:upper:]' '[:lower:]')"
@@ -91,23 +103,11 @@ if [ -n "$UMAMI_URL_VALUE" ] && [ -n "$UMAMI_WEBSITE_ID_VALUE" ]; then
       UMAMI_BASE_PATH="/${UMAMI_URL_REMAINDER#*/}"
     fi
 
-    DNS_RESOLVERS="$(awk '
-      /^nameserver[[:space:]]+/ {
-        if ($2 ~ /:/) {
-          printf "[%s] ", $2
-        } else {
-          printf "%s ", $2
-        }
-      }
-    ' /etc/resolv.conf)"
-
     if [ -z "$DNS_RESOLVERS" ]; then
       echo "WARNING: Umami analytics is disabled because no DNS resolver is configured in the container." >&2
       UMAMI_SCRIPT=""
     else
-      UMAMI_UPSTREAM_CONFIG="resolver ${DNS_RESOLVERS}valid=30s;
-
-upstream umami_backend {
+      UMAMI_UPSTREAM_CONFIG="upstream umami_backend {
   zone umami_backend 64k;
   server ${UMAMI_AUTHORITY} resolve;
 }"
@@ -149,6 +149,138 @@ elif [ -n "$UMAMI_URL_VALUE" ] || [ -n "$UMAMI_WEBSITE_ID_VALUE" ]; then
   echo "WARNING: Umami analytics is disabled because both UMAMI_URL and UMAMI_WEBSITE_ID must be set." >&2
 fi
 
+# SEO: nginx fills index.html's SSI includes from govtool-backend's /seo
+# routes, and proxies /sitemap.xml and the /og/ cards to it. SEO_BACKEND_URL
+# is the backend's internal origin (http://backend:9999); SITE_URL the public
+# origin (https://gov.tools); SEO_NOINDEX=true keeps a test site out of
+# search results. Without a backend the page keeps index.html's defaults.
+ORIGIN_PATTERN='^https?://[A-Za-z0-9.-]+(:[0-9]{1,5})?$'
+SEO_BACKEND_URL_VALUE="${SEO_BACKEND_URL:-}"
+SEO_BACKEND_URL_VALUE="${SEO_BACKEND_URL_VALUE%/}"
+SITE_URL_VALUE="${SITE_URL:-}"
+SITE_URL_VALUE="${SITE_URL_VALUE%/}"
+SEO_NOINDEX_VALUE="$(printf '%s' "${SEO_NOINDEX:-}" | tr '[:upper:]' '[:lower:]')"
+SEO_UPSTREAM_CONFIG=""
+SEO_SERVER_CONFIG=""
+
+if [ -n "$SITE_URL_VALUE" ] && ! printf '%s' "$SITE_URL_VALUE" | grep -Eq "$ORIGIN_PATTERN"; then
+  echo "WARNING: SITE_URL is ignored because it must be an http(s) origin such as https://gov.tools." >&2
+  SITE_URL_VALUE=""
+fi
+
+if [ -n "$SEO_BACKEND_URL_VALUE" ] && ! printf '%s' "$SEO_BACKEND_URL_VALUE" | grep -Eq "$ORIGIN_PATTERN"; then
+  echo "WARNING: SEO tags are disabled because SEO_BACKEND_URL must be an http(s) origin such as http://backend:9999." >&2
+  SEO_BACKEND_URL_VALUE=""
+fi
+if [ -n "$SEO_BACKEND_URL_VALUE" ] && [ -z "$DNS_RESOLVERS" ]; then
+  echo "WARNING: SEO tags are disabled because no DNS resolver is configured in the container." >&2
+  SEO_BACKEND_URL_VALUE=""
+fi
+
+case "$SEO_NOINDEX_VALUE" in
+  true|yes|1) SEO_SERVER_CONFIG='  add_header X-Robots-Tag "noindex" always;' ;;
+  ""|false|no|0) ;;
+  *) echo "WARNING: SEO_NOINDEX must be true/false, yes/no, or 1/0; treating it as false." >&2 ;;
+esac
+
+if [ -n "$SEO_BACKEND_URL_VALUE" ]; then
+  SEO_SCHEME="${SEO_BACKEND_URL_VALUE%%://*}"
+  SEO_AUTHORITY="${SEO_BACKEND_URL_VALUE#*://}"
+  SEO_SSL_CONFIG=""
+  if [ "$SEO_SCHEME" = "https" ]; then
+    SEO_SSL_CONFIG="    proxy_ssl_server_name on;
+    proxy_ssl_name ${SEO_AUTHORITY%%:*};"
+  fi
+  # The backend answers only direct calls (src/seo/direct-only.guard.ts), so
+  # the gateway's proxy headers, which a page request carries, are dropped.
+  SEO_PROXY_COMMON="    proxy_http_version 1.1;
+    proxy_set_header Host ${SEO_AUTHORITY};
+    proxy_set_header Cookie \"\";
+    proxy_set_header Authorization \"\";
+    proxy_set_header X-Forwarded-For \"\";
+    proxy_set_header X-Real-IP \"\";
+    proxy_set_header Forwarded \"\";
+    proxy_set_header X-Forwarded-Host \"\";
+    proxy_set_header X-Forwarded-Proto \"\";
+    proxy_set_header X-Forwarded-Port \"\";
+${SEO_SSL_CONFIG}"
+
+  SEO_UPSTREAM_CONFIG="upstream seo_backend {
+  zone seo_backend 64k;
+  server ${SEO_AUTHORITY} resolve;
+}
+
+proxy_cache_path /var/cache/nginx/seo_og levels=1:2 keys_zone=seo_og_cache:10m max_size=200m inactive=365d use_temp_path=off;
+limit_req_zone \$binary_remote_addr zone=seo_og_rate:10m rate=10r/s;"
+
+  # /__seo/ is reached only through the SSI includes. A failure or a slow
+  # answer becomes an empty body, which the include replaces with its stub.
+  SEO_LOCATIONS_CONFIG="  location /__seo/ {
+    internal;
+    proxy_pass ${SEO_SCHEME}://seo_backend/seo/;
+${SEO_PROXY_COMMON}
+    proxy_set_header X-Seo-Path \$request_uri;
+    proxy_set_header Accept-Encoding \"\";
+    proxy_connect_timeout 500ms;
+    proxy_send_timeout 500ms;
+    proxy_read_timeout 500ms;
+    proxy_intercept_errors on;
+    error_page 400 404 500 502 503 504 = @seo_empty;
+  }
+
+  # Asked for /__seo/ directly, the internal check's 404 lands here too;
+  # in an SSI subrequest \$request_uri is still the page's own URI.
+  location @seo_empty {
+    if (\$request_uri ~ \"^/__seo/\") {
+      return 404;
+    }
+    return 204;
+  }
+
+  location = /sitemap.xml {
+    proxy_pass ${SEO_SCHEME}://seo_backend/seo/sitemap.xml;
+${SEO_PROXY_COMMON}
+    proxy_read_timeout 30s;
+  }
+
+  # Cards are addressed by a hash of what they show, so a cached one never
+  # goes stale; limit_req keeps a loop over every id off the renderer.
+  location /og/ {
+${REAL_IP_CONFIG}
+    limit_req zone=seo_og_rate burst=30 nodelay;
+    limit_req_status 429;
+    proxy_cache seo_og_cache;
+    proxy_cache_key \$uri;
+    # Only cards: a redirect to the current hash must never be cached.
+    proxy_cache_valid 200 365d;
+    proxy_cache_valid 404 1m;
+    proxy_cache_lock on;
+    proxy_ignore_headers Set-Cookie;
+    add_header X-Cache-Status \$upstream_cache_status always;
+    proxy_pass ${SEO_SCHEME}://seo_backend/seo/image/;
+${SEO_PROXY_COMMON}
+    proxy_read_timeout 15s;
+  }"
+else
+  SEO_LOCATIONS_CONFIG="  location /__seo/ {
+    internal;
+    return 204;
+  }
+
+  location = /sitemap.xml {
+    return 404;
+  }
+
+  location /og/ {
+    return 404;
+  }"
+fi
+
+RESOLVER_CONFIG=""
+if [ -n "$UMAMI_UPSTREAM_CONFIG" ] || [ -n "$SEO_UPSTREAM_CONFIG" ]; then
+  RESOLVER_CONFIG="resolver ${DNS_RESOLVERS}valid=30s;"
+fi
+
 ENV_SCRIPT="<script>
 window.__ENV__ = {
   VITE_IS_DEV: $(json_escape "${VITE_IS_DEV:-}"),
@@ -178,7 +310,45 @@ mv /tmp/index.html /usr/share/nginx/html/index.html
 
 rm -f /usr/share/nginx/html/index.html.br /usr/share/nginx/html/index.html.gz
 
-awk -v umami_upstream="$UMAMI_UPSTREAM_CONFIG" -v umami_proxy="$UMAMI_PROXY_CONFIG" '
+# The default og:image needs an absolute URL; without SITE_URL the line goes.
+if [ -n "$SITE_URL_VALUE" ]; then
+  sed -i "s#__SITE_URL__#${SITE_URL_VALUE}#g" /usr/share/nginx/html/index.html
+else
+  sed -i '/__SITE_URL__/d' /usr/share/nginx/html/index.html
+fi
+
+# robots.txt allows everything: a page blocked here could never show the
+# crawler its noindex. The sitemap is named only when the backend serves it.
+{
+  printf 'User-agent: *\nAllow: /\n'
+  if [ -n "$SITE_URL_VALUE" ] && [ -n "$SEO_BACKEND_URL_VALUE" ]; then
+    printf '\nSitemap: %s/sitemap.xml\n' "$SITE_URL_VALUE"
+  fi
+} > /usr/share/nginx/html/robots.txt
+
+awk -v resolver="$RESOLVER_CONFIG" -v umami_upstream="$UMAMI_UPSTREAM_CONFIG" -v umami_proxy="$UMAMI_PROXY_CONFIG" -v seo_upstream="$SEO_UPSTREAM_CONFIG" -v seo_server="$SEO_SERVER_CONFIG" -v seo_locations="$SEO_LOCATIONS_CONFIG" '
+  /# RESOLVER_CONFIG/ {
+    if (resolver != "") {
+      print resolver
+    }
+    next
+  }
+  /# SEO_UPSTREAM_CONFIG/ {
+    if (seo_upstream != "") {
+      print seo_upstream
+    }
+    next
+  }
+  /# SEO_SERVER_CONFIG/ {
+    if (seo_server != "") {
+      print seo_server
+    }
+    next
+  }
+  /# SEO_LOCATIONS_CONFIG/ {
+    print seo_locations
+    next
+  }
   /# UMAMI_UPSTREAM_CONFIG/ {
     if (umami_upstream != "") {
       print umami_upstream

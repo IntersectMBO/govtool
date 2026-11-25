@@ -45,6 +45,7 @@ import {
 import { DocumentStore } from 'src/metadata/document-store';
 import { readAll } from 'src/common/snapshot';
 import { ProposalService } from 'src/proposal/proposal.service';
+import type { SeoDRep } from 'src/seo/seo.types';
 import {
   GovernanceActionSortMode,
   GovernanceActionType,
@@ -165,6 +166,40 @@ export class DRepService {
    * backend's rows carried db-sync's fetch error. One with no answer yet goes
    * out without its profile, and its card checks the document itself.
    */
+  /**
+   * One DRep for the SEO pages, from the cached directory snapshot and the
+   * stored document only: a page load never waits on a document fetch.
+   */
+  async storedSeoDRep(id: string): Promise<SeoDRep | null> {
+    const candidates = tryLegacyDRepCandidates(id);
+    if (candidates === undefined) return null;
+    const dreps = await this.getCachedDReps('');
+    const drep = dreps.find((d) => candidates.includes(d.id));
+    return drep === undefined ? null : this.toSeoDRep(drep);
+  }
+
+  /** Every DRep in the directory snapshot, for the sitemap. */
+  async storedSeoDReps(): Promise<SeoDRep[]> {
+    const dreps = await this.getCachedDReps('');
+    return dreps.map((drep) => this.toSeoDRep(drep));
+  }
+
+  private toSeoDRep(drep: DRep): SeoDRep {
+    const item = this.withStoredProfile(this.toLegacyListItem(drep));
+    return {
+      view: item.view,
+      givenName: item.givenName,
+      objectives: item.objectives,
+      status: item.status,
+      votingPower:
+        item.votingPower === null ? null : BigInt(String(item.votingPower)),
+      doNotList: item.doNotList,
+      metadataError: item.metadataError,
+      hasMetadata: item.url !== null,
+      latestRegistrationDate: item.latestRegistrationDate,
+    };
+  }
+
   private withStoredProfile(item: DRepListItem): DRepListItem {
     const stored = this.documents.get({
       url: item.url,

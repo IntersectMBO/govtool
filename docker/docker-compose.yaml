@@ -62,6 +62,8 @@ services:
             GOVTOOL_PDF_API_URL: ${PDF_API_URL:-}
             IPFS_GATEWAY: ${IPFS_GATEWAY:-}
             GOVTOOL_METADATA_SERVICE_URL: http://metadata:3000
+            GOVTOOL_SITE_URL: ${SITE_URL:-}
+            GOVTOOL_SEO_URL_SCHEME: ${SEO_URL_SCHEME:-clean}
         ports:
          - "9999:9999"
         depends_on:
@@ -81,6 +83,9 @@ services:
             UMAMI_SSL_VERIFY: ${UMAMI_SSL_VERIFY:-true}
             TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-}
             REAL_IP_HEADER: ${REAL_IP_HEADER:-X-Forwarded-For}
+            SEO_BACKEND_URL: http://govtool-backend:9999
+            SITE_URL: ${SITE_URL:-}
+            SEO_NOINDEX: ${SEO_NOINDEX:-}
         ports:
             - "80:80"
         depends_on:

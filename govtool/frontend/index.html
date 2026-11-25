@@ -10,7 +10,25 @@
       rel="stylesheet"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cardano Govtool</title>
+    <!--
+      Page tags. In the image, nginx fills the include from the backend's
+      /seo/head for each page, and falls back to this block; without SSI
+      (the Vite dev server) these comments are inert and the block applies.
+      docker-entrypoint.sh fills in the site URL, or drops the og:image line.
+    -->
+    <!--# block name="seo_head_default" -->
+    <title data-seo>Cardano GovTool</title>
+    <meta name="description" content="Take part in Cardano on-chain governance: read and vote on governance actions, delegate to a DRep, or become one." data-seo />
+    <meta property="og:type" content="website" data-seo />
+    <meta property="og:site_name" content="Cardano GovTool" data-seo />
+    <meta property="og:title" content="Cardano GovTool" data-seo />
+    <meta property="og:description" content="Take part in Cardano on-chain governance: read and vote on governance actions, delegate to a DRep, or become one." data-seo />
+    <meta property="og:image" content="__SITE_URL__/images/og-default.png" data-seo />
+    <meta property="og:image:width" content="1200" data-seo />
+    <meta property="og:image:height" content="630" data-seo />
+    <meta name="twitter:card" content="summary_large_image" data-seo />
+    <!--# endblock -->
+    <!--# include virtual="/__seo/head" stub="seo_head_default" -->
     <style>
       html,
       body {
@@ -21,7 +39,8 @@
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <!--# block name="seo_body_default" --><!--# endblock -->
+    <div id="root"><!--# include virtual="/__seo/body" stub="seo_body_default" --></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

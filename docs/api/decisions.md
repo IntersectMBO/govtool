@@ -5937,3 +5937,23 @@ the directory, though the registration form refuses one. On mainnet on 2026-11-0
 - Blockfrost and the fixture supply none, and the row says `null`, never 0: the field is optional
   on the contract, and absent means the provider cannot count.
 - The Haskell backend sent no count, so the field is an addition, not a restored one.
+
+## D178 — Page tags come from the backend through nginx includes, not from rendering the app
+
+**Date:** 2026-11-17
+**Evidence:** every gov.tools URL returns the same `index.html`, with no description, Open Graph
+tags or image, so a shared link previews as a bare URL; `/robots.txt` and `/sitemap.xml` fall
+through to `index.html`. Link-preview bots do not run JavaScript.
+**Said:** "special focus should be gov.tools", "its better to have correct wording for correct
+page that is shared and same images", and on the approach, "option A seems reasonable without need
+to completely render something for seo, rather serving index.html from nginx seems logical"
+
+- The frontend's nginx fills two server-side include placeholders in `index.html` (head tags, and
+  a text summary inside `#root`) from a new backend `SeoModule`, with site-wide defaults when the
+  backend is slow or down. No server-side rendering, no prerender service, no bot detection.
+- Each page gets its own title, description, canonical URL and a generated 1200×630 card
+  (Satori and resvg-js), addressed by a hash of what the card shows.
+- Page tags read only the documents the cache warmer has stored, so a page load never waits on
+  IPFS.
+- Non-production sites send `X-Robots-Tag: noindex` when `SEO_NOINDEX` is set; robots.txt allows
+  everything everywhere, since a blocked page's `noindex` is never read.

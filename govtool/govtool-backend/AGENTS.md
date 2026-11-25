@@ -99,6 +99,31 @@ Specs build ConfigService as a partial cast, so a new field reads as undefined
 in them without an error. Limits a reviewer must sign off stay code constants,
 not variables (D120, src/metadata/config.ts).
 
+## SEO
+
+src/seo answers the frontend nginx's SSI includes (/seo/head and /seo/body,
+the page path in X-Seo-Path), the preview cards (/seo/image) and
+/seo/sitemap.xml. It reads only cached snapshots and stored documents
+(ProposalService.storedDocument, DRepService.storedSeoDRep), never
+resolveDocument, because every page load waits on it; anything it cannot
+build falls back to indexable defaults, never a 500. All text is user-written:
+it goes through src/seo/text.ts before reaching HTML, JSON-LD or a card, and
+text.ts caps its input and keeps every pattern linear, since one DRep's
+document could otherwise stall the event loop. The routes answer only direct
+calls (src/seo/direct-only.guard.ts): through the gateway, as /api/seo/..., a
+request carries X-Forwarded-For and friends and gets 404, so the card
+renderer is reachable only behind the frontend nginx's cache and rate limit.
+Cards render with resvg's renderAsync, off the event loop, are cached by their
+full SHA-256 digest, and a character the bundled fonts' character maps lack
+gets the default card.
+GOVTOOL_SITE_URL (a bare origin) enables canonical, og:url, og:image and the
+sitemap; GOVTOOL_SEO_URL_SCHEME (clean by default, develop for an older
+frontend) must match the URLs the deployed frontend serves. Cards are Satori plus resvg with the fonts in
+assets/seo (OFL); after changing src/seo/card/template.ts, bump
+CARD_TEMPLATE_VERSION and run scripts/render-default-card.ts, which rewrites
+the frontend's public/images/og-default.png. scripts/ is excluded from the
+build: a .ts file there would move dist/main.js to dist/src/main.js.
+
 ## Adding a governance action type
 
 Rare, since it needs a hard fork, but it spans the contract, every provider, this
